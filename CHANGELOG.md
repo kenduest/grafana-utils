@@ -14,6 +14,36 @@ Format rule going forward:
 - keep older tagged releases below
 - use commit/tag history as the source of truth
 
+## [0.7.1] - 2026-04-03
+
+### Highlights
+
+- The published HTML docs site is now enabled on GitHub Pages for the
+  `kenduest-brobridge/grafana-utils` repository and linked from the README.
+- The README landing pages were rewritten in a more professional,
+  operator-facing tone for SRE, sysadmin, and platform-maintainer audiences.
+- The Traditional Chinese README wording was refined toward Taiwan usage rather
+  than literal machine-style translation.
+
+### Added
+
+- GitHub Pages enablement in the docs deployment workflow so the docs site can
+  self-bootstrap on repositories that have not enabled Pages yet.
+
+### Changed
+
+- README and README.zh-TW now point to the correct published docs URL:
+  - `https://kenduest-brobridge.github.io/grafana-utils/`
+- The English README now presents the tool as an operational and
+  administration CLI rather than as a marketing-style landing page.
+- The Traditional Chinese README now uses more natural Taiwan-oriented wording
+  across the landing sections, workflow headings, and documentation routing.
+
+### Fixed
+
+- The previous published docs URL in the README pointed at an old
+  `kendlee.github.io` address and did not resolve for the current repository.
+
 ## [0.7.0] - 2026-04-03
 
 ### Highlights
