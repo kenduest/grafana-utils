@@ -6,6 +6,19 @@
   <title>grafana-util-alert.1 · grafana-util docs</title>
   <style>:root {
   color-scheme: light dark;
+  --font-display-en: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  --font-heading-en: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI Variable Display", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-body-en: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI Variable Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-heading-zh: "PingFang TC", "Hiragino Sans GB", "Noto Sans CJK TC", "Noto Sans TC", "Microsoft JhengHei UI", "Microsoft JhengHei", "Heiti TC", sans-serif;
+  --font-body-zh: "PingFang TC", "Hiragino Sans GB", "Noto Sans CJK TC", "Noto Sans TC", "Microsoft JhengHei UI", "Microsoft JhengHei", "Heiti TC", sans-serif;
+  --font-display: var(--font-display-en);
+  --font-heading: var(--font-heading-en);
+  --font-body: var(--font-body-en);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --weight-body: 460;
+  --weight-ui: 560;
+  --weight-heading: 650;
+  --weight-display: 720;
   --bg: linear-gradient(180deg, #f7f3eb 0%, #fcfbf8 100%);
   --panel: rgba(255, 255, 255, 0.82);
   --panel-strong: rgba(255, 255, 255, 0.92);
@@ -76,13 +89,30 @@ html[data-theme="dark"] body {
 * { box-sizing: border-box; }
 body {
   margin: 0;
-  font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+  font-family: var(--font-body);
+  font-weight: var(--weight-body);
   color: var(--text);
   background: var(--bg);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+html[lang="zh-TW"] body {
+  --font-display: var(--font-heading-zh);
+  --font-heading: var(--font-heading-zh);
+  --font-body: var(--font-body-zh);
+  --weight-body: 470;
+  --weight-ui: 580;
+  --weight-heading: 680;
+  --weight-display: 720;
 }
 a { color: var(--accent); }
+strong,
+b {
+  font-weight: 700;
+}
 code {
-  font: 0.92em ui-monospace, SFMono-Regular, Menlo, monospace;
+  font: 0.92em var(--font-mono);
   background: var(--code-bg);
   padding: 0.12em 0.35em;
   border-radius: 4px;
@@ -131,7 +161,7 @@ th {
   text-decoration: none;
 }
 .brand {
-  font: 700 0.96rem/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+  font: 700 0.96rem/1.2 var(--font-mono);
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -140,7 +170,7 @@ th {
   gap: 8px;
   align-items: center;
   color: var(--muted);
-  font: 600 12px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+  font: var(--weight-ui) 12px/1.2 var(--font-mono);
 }
 .themebar select {
   border: 1px solid var(--border);
@@ -163,21 +193,24 @@ th {
   border-radius: 999px;
   background: var(--accent-soft);
   color: var(--accent);
-  font: 700 12px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+  font: 700 12px/1.2 var(--font-mono);
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 .hero h1 {
   margin: 0;
+  font-family: var(--font-display);
+  font-weight: var(--weight-display);
   font-size: clamp(2rem, 4vw, 3.2rem);
-  line-height: 1.05;
+  line-height: 1.08;
   color: var(--heading);
 }
 .hero p {
   max-width: 74ch;
   margin: 14px 0 0;
-  font-size: 1.06rem;
-  line-height: 1.8;
+  font-size: 1.07rem;
+  font-weight: var(--weight-body);
+  line-height: 1.78;
   color: var(--muted);
 }
 .hero p.hero-summary-inline {
@@ -222,23 +255,30 @@ th {
 .article h1,
 .article h2,
 .article h3 {
+  font-family: var(--font-heading);
+  font-weight: var(--weight-heading);
   color: var(--heading);
+  letter-spacing: -0.01em;
 }
 .article h1 {
   margin-top: 0;
+  line-height: 1.16;
 }
 .article h2 {
   margin-top: 40px;
   padding-top: 22px;
   border-top: 1px solid var(--border);
+  line-height: 1.2;
 }
 .article h3 {
   margin-top: 28px;
+  line-height: 1.26;
 }
 .article p,
 .article li {
-  font-size: 1.03rem;
-  line-height: 1.8;
+  font-size: 1.06rem;
+  font-weight: var(--weight-body);
+  line-height: 1.82;
 }
 .article pre.manpage {
   white-space: pre-wrap;
@@ -246,6 +286,8 @@ th {
 }
 .sidebar {
   padding: 22px;
+  font-size: 1rem;
+  font-weight: var(--weight-body);
 }
 .sidebar section + section {
   margin-top: 20px;
@@ -253,6 +295,8 @@ th {
 .sidebar h2 {
   margin: 0 0 10px;
   font-size: 0.96rem;
+  font-family: var(--font-heading);
+  font-weight: var(--weight-heading);
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--muted);
@@ -274,6 +318,7 @@ th {
   border-radius: 12px;
   border: 1px solid var(--border);
   background: var(--panel-strong);
+  font-weight: var(--weight-body);
 }
 .footer-nav {
   display: grid;
@@ -285,6 +330,8 @@ th {
   display: block;
   color: var(--muted);
   font-size: 0.84rem;
+  font-family: var(--font-heading);
+  font-weight: var(--weight-ui);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -296,12 +343,16 @@ th {
   background: var(--panel);
   color: var(--muted);
   font-size: 0.94rem;
+  font-weight: var(--weight-body);
 }
 .landing-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
   margin-top: 22px;
+}
+.landing-grid.primary {
+  align-items: stretch;
 }
 .landing-card {
   padding: 22px;
@@ -312,11 +363,88 @@ th {
 }
 .landing-card h2 {
   margin-top: 0;
+  font-family: var(--font-heading);
+  font-weight: var(--weight-heading);
   color: var(--heading);
+}
+.landing-card p,
+.landing-card li,
+.landing-secondary p {
+  font-weight: var(--weight-body);
 }
 .landing-card ul {
   margin: 0;
   padding-left: 20px;
+}
+.landing-secondary {
+  margin-top: 18px;
+  padding: 18px 22px;
+}
+.landing-secondary h2 {
+  margin: 0 0 8px;
+  font-family: var(--font-heading);
+  font-weight: var(--weight-heading);
+  color: var(--heading);
+}
+.landing-secondary p {
+  margin: 0 0 14px;
+  color: var(--muted);
+}
+.inline-link-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.inline-link-list a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 9px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--panel-strong);
+  text-decoration: none;
+}
+.manpage-rendered {
+  display: grid;
+  gap: 18px;
+}
+.manpage-rendered > p {
+  margin: 0;
+}
+.manpage-rendered .man-section h2 {
+  margin: 0 0 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.manpage-rendered .man-section + .man-section {
+  margin-top: 6px;
+}
+.manpage-rendered .man-bullets {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+.manpage-rendered .man-bullets li + li {
+  margin-top: 8px;
+}
+.manpage-rendered .man-definitions {
+  display: grid;
+  grid-template-columns: minmax(0, 220px) minmax(0, 1fr);
+  gap: 10px 18px;
+  margin: 0;
+}
+.manpage-rendered .man-definitions dt {
+  font-weight: 700;
+  color: var(--heading);
+}
+.manpage-rendered .man-definitions dd {
+  margin: 0;
+}
+.manpage-rendered pre.man-example {
+  margin: 0;
 }
 @media (max-width: 980px) {
   .layout,
@@ -328,6 +456,9 @@ th {
     white-space: normal;
     overflow: visible;
     text-overflow: clip;
+  }
+  .inline-link-list {
+    flex-direction: column;
   }
 }</style>
 </head>
@@ -347,125 +478,18 @@ th {
     <header class="hero">
       <div class="eyebrow">Manpage Mirror · 0.7.3</div>
       <h1>grafana-util-alert.1</h1>
-      <p class="">HTML mirror of a generated roff manpage.</p>
+      <p class="">Browser-readable rendering of a generated roff manpage.</p>
       <ol class="breadcrumbs"><li><a href="../index.html">Home</a></li><li><a href="index.html">Manpages</a></li><li>grafana-util-alert.1</li></ol>
     </header>
     <div class="layout">
       <article class="panel article">
-        <p>This page mirrors the generated roff manpage in HTML so it can be read from GitHub Pages. For deeper per-subcommand detail, prefer the command-reference pages.</p><pre class="manpage">.\&quot; Generated by scripts/generate_manpages.py from docs/commands/en/.
-.TH GRAFANA-UTIL-ALERT 1 &quot;2026-04-03&quot; &quot;grafana-util 0.7.3&quot; &quot;User Commands&quot;
-.SH NAME
-grafana\-util\-alert \- alert export, import, planning, apply, routing, and authoring workflows
-.SH SYNOPSIS
-.B grafana-util alert [\fISUBCOMMAND\fR] [\fIOPTIONS\fR]
-.SH DESCRIPTION
-Run the alerting command surface for exporting, importing, diffing, planning, applying, deleting, authoring, and listing Grafana alert resources.
-.IP \(bu 2
-Export local alert bundles from Grafana.
-.IP \(bu 2
-Import or diff alert bundles against live Grafana state.
-.IP \(bu 2
-Build and apply a reviewed alert management plan.
-.IP \(bu 2
-Author staged rules, contact points, routes, and templates.
-.IP \(bu 2
-List live alert rules, contact points, mute timings, and templates.
-.SH SUBCOMMANDS
-.TP
-.B export
-Export alerting resources into raw/ JSON files.
-.TP
-.B import
-Import alerting resource JSON files through the Grafana API.
-.TP
-.B diff
-Compare local alerting export files against live Grafana resources.
-.TP
-.B plan
-Build a staged alert management plan from desired alert resources.
-.TP
-.B apply
-Apply a reviewed alert management plan.
-.TP
-.B delete
-Delete one explicit alert resource identity.
-.TP
-.B add\-rule
-Author a staged alert rule from the higher\-level authoring surface.
-.TP
-.B clone\-rule
-Clone an existing staged alert rule into a new authoring target.
-.TP
-.B add\-contact\-point
-Author a staged alert contact point from the higher\-level authoring surface.
-.TP
-.B set\-route
-Author or replace the tool\-owned staged notification route.
-.TP
-.B preview\-route
-Preview the managed route inputs without changing runtime behavior.
-.TP
-.B new\-rule
-Create a low\-level staged alert rule scaffold.
-.TP
-.B new\-contact\-point
-Create a low\-level staged alert contact point scaffold.
-.TP
-.B new\-template
-Create a low\-level staged alert template scaffold.
-.TP
-.B list\-rules
-List live Grafana alert rules.
-.TP
-.B list\-contact\-points
-List live Grafana alert contact points.
-.TP
-.B list\-mute\-timings
-List live Grafana mute timings.
-.TP
-.B list\-templates
-List live Grafana notification templates.
-.SH COMMON OPTIONS
-.IP \(bu 2
-\-\-profile, \-\-url, \-\-token, \-\-basic\-user, \-\-basic\-password
-.IP \(bu 2
-\-\-prompt\-password, \-\-prompt\-token, \-\-timeout, \-\-verify\-ssl
-.IP \(bu 2
-Use the nested subcommands for export, import, diff, plan, apply, delete, add\-rule, clone\-rule, add\-contact\-point, set\-route, preview\-route, new\-rule, new\-contact\-point, new\-template, list\-rules, list\-contact\-points, list\-mute\-timings, and list\-templates.
-.SH WORKFLOW NOTES
-.PP
-The safest alert workflow is: author or update desired files, inspect the delta with alert plan, then execute only reviewed changes with alert apply.
-.SH EXAMPLES
-.EX
-grafana-util alert list-rules --profile prod --json
-.EE
-.EX
-grafana-util alert export --url http://localhost:3000 --basic-user admin --basic-password admin --output-dir ./alerts --overwrite
-.EE
-.EX
-grafana-util alert export --url http://localhost:3000 --token &quot;$GRAFANA_API_TOKEN&quot; --output-dir ./alerts --flat
-.EE
-.EX
-grafana-util alert export --url http://localhost:3000 --basic-user admin --basic-password admin --output-dir ./alerts --flat
-.EE
-.EX
-grafana-util alert import --url http://localhost:3000 --import-dir ./alerts/raw --replace-existing
-.EE
-.EX
-grafana-util alert import --url http://localhost:3000 --import-dir ./alerts/raw --replace-existing --dry-run --json
-.EE
-.SH SEE ALSO
-\fBgrafana-util\fR(1),
-\fBgrafana-util-change\fR(1),
-\fBgrafana-util-status\fR(1),
-\fBgrafana-util-overview\fR(1)
-</pre>
+        <p>This page renders the generated roff manpage into readable HTML for GitHub Pages and browser use. For deeper per-subcommand detail, prefer the command-reference pages.</p><div class="manpage-rendered"><section class="man-section"><h2>NAME</h2><p>grafana-util-alert - alert export, import, planning, apply, routing, and authoring workflows</p></section><section class="man-section"><h2>SYNOPSIS</h2><p><strong>grafana-util alert [<em>SUBCOMMAND</em>] [<em>OPTIONS</em>]</strong></p></section><section class="man-section"><h2>DESCRIPTION</h2><p>Run the alerting command surface for exporting, importing, diffing, planning, applying, deleting, authoring, and listing Grafana alert resources.</p><ul class="man-bullets"><li>Export local alert bundles from Grafana.</li><li>Import or diff alert bundles against live Grafana state.</li><li>Build and apply a reviewed alert management plan.</li><li>Author staged rules, contact points, routes, and templates.</li><li>List live alert rules, contact points, mute timings, and templates.</li></ul></section><section class="man-section"><h2>SUBCOMMANDS</h2><dl class="man-definitions"><dt><strong>export</strong></dt><dd>Export alerting resources into raw/ JSON files.</dd><dt><strong>import</strong></dt><dd>Import alerting resource JSON files through the Grafana API.</dd><dt><strong>diff</strong></dt><dd>Compare local alerting export files against live Grafana resources.</dd><dt><strong>plan</strong></dt><dd>Build a staged alert management plan from desired alert resources.</dd><dt><strong>apply</strong></dt><dd>Apply a reviewed alert management plan.</dd><dt><strong>delete</strong></dt><dd>Delete one explicit alert resource identity.</dd><dt><strong>add-rule</strong></dt><dd>Author a staged alert rule from the higher-level authoring surface.</dd><dt><strong>clone-rule</strong></dt><dd>Clone an existing staged alert rule into a new authoring target.</dd><dt><strong>add-contact-point</strong></dt><dd>Author a staged alert contact point from the higher-level authoring surface.</dd><dt><strong>set-route</strong></dt><dd>Author or replace the tool-owned staged notification route.</dd><dt><strong>preview-route</strong></dt><dd>Preview the managed route inputs without changing runtime behavior.</dd><dt><strong>new-rule</strong></dt><dd>Create a low-level staged alert rule scaffold.</dd><dt><strong>new-contact-point</strong></dt><dd>Create a low-level staged alert contact point scaffold.</dd><dt><strong>new-template</strong></dt><dd>Create a low-level staged alert template scaffold.</dd><dt><strong>list-rules</strong></dt><dd>List live Grafana alert rules.</dd><dt><strong>list-contact-points</strong></dt><dd>List live Grafana alert contact points.</dd><dt><strong>list-mute-timings</strong></dt><dd>List live Grafana mute timings.</dd><dt><strong>list-templates</strong></dt><dd>List live Grafana notification templates.</dd></dl></section><section class="man-section"><h2>COMMON OPTIONS</h2><ul class="man-bullets"><li>--profile, --url, --token, --basic-user, --basic-password</li><li>--prompt-password, --prompt-token, --timeout, --verify-ssl</li><li>Use the nested subcommands for export, import, diff, plan, apply, delete, add-rule, clone-rule, add-contact-point, set-route, preview-route, new-rule, new-contact-point, new-template, list-rules, list-contact-points, list-mute-timings, and list-templates.</li></ul></section><section class="man-section"><h2>WORKFLOW NOTES</h2><p>The safest alert workflow is: author or update desired files, inspect the delta with alert plan, then execute only reviewed changes with alert apply.</p></section><section class="man-section"><h2>EXAMPLES</h2><pre class="man-example"><code>grafana-util alert list-rules --profile prod --json</code></pre><pre class="man-example"><code>grafana-util alert export --url http://localhost:3000 --basic-user admin --basic-password admin --output-dir ./alerts --overwrite</code></pre><pre class="man-example"><code>grafana-util alert export --url http://localhost:3000 --token &quot;$GRAFANA_API_TOKEN&quot; --output-dir ./alerts --flat</code></pre><pre class="man-example"><code>grafana-util alert export --url http://localhost:3000 --basic-user admin --basic-password admin --output-dir ./alerts --flat</code></pre><pre class="man-example"><code>grafana-util alert import --url http://localhost:3000 --import-dir ./alerts/raw --replace-existing</code></pre><pre class="man-example"><code>grafana-util alert import --url http://localhost:3000 --import-dir ./alerts/raw --replace-existing --dry-run --json</code></pre></section><section class="man-section"><h2>SEE ALSO</h2><p><strong>grafana-util</strong>(1), <strong>grafana-util-change</strong>(1), <strong>grafana-util-status</strong>(1), <strong>grafana-util-overview</strong>(1)</p></section></div>
         
       </article>
       <aside class="panel sidebar">
         <section>
           <h2>On This Page</h2>
-          <p>This mirror preserves the generated manpage content as preformatted text.</p>
+          <p>This page renders the generated manpage into readable HTML sections.</p>
         </section>
         <section>
           <h2>Related</h2>

@@ -6,6 +6,19 @@
   <title>grafana-util-dashboard.1 · grafana-util docs</title>
   <style>:root {
   color-scheme: light dark;
+  --font-display-en: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  --font-heading-en: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI Variable Display", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-body-en: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI Variable Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-heading-zh: "PingFang TC", "Hiragino Sans GB", "Noto Sans CJK TC", "Noto Sans TC", "Microsoft JhengHei UI", "Microsoft JhengHei", "Heiti TC", sans-serif;
+  --font-body-zh: "PingFang TC", "Hiragino Sans GB", "Noto Sans CJK TC", "Noto Sans TC", "Microsoft JhengHei UI", "Microsoft JhengHei", "Heiti TC", sans-serif;
+  --font-display: var(--font-display-en);
+  --font-heading: var(--font-heading-en);
+  --font-body: var(--font-body-en);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --weight-body: 460;
+  --weight-ui: 560;
+  --weight-heading: 650;
+  --weight-display: 720;
   --bg: linear-gradient(180deg, #f7f3eb 0%, #fcfbf8 100%);
   --panel: rgba(255, 255, 255, 0.82);
   --panel-strong: rgba(255, 255, 255, 0.92);
@@ -76,13 +89,30 @@ html[data-theme="dark"] body {
 * { box-sizing: border-box; }
 body {
   margin: 0;
-  font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+  font-family: var(--font-body);
+  font-weight: var(--weight-body);
   color: var(--text);
   background: var(--bg);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+html[lang="zh-TW"] body {
+  --font-display: var(--font-heading-zh);
+  --font-heading: var(--font-heading-zh);
+  --font-body: var(--font-body-zh);
+  --weight-body: 470;
+  --weight-ui: 580;
+  --weight-heading: 680;
+  --weight-display: 720;
 }
 a { color: var(--accent); }
+strong,
+b {
+  font-weight: 700;
+}
 code {
-  font: 0.92em ui-monospace, SFMono-Regular, Menlo, monospace;
+  font: 0.92em var(--font-mono);
   background: var(--code-bg);
   padding: 0.12em 0.35em;
   border-radius: 4px;
@@ -131,7 +161,7 @@ th {
   text-decoration: none;
 }
 .brand {
-  font: 700 0.96rem/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+  font: 700 0.96rem/1.2 var(--font-mono);
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -140,7 +170,7 @@ th {
   gap: 8px;
   align-items: center;
   color: var(--muted);
-  font: 600 12px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+  font: var(--weight-ui) 12px/1.2 var(--font-mono);
 }
 .themebar select {
   border: 1px solid var(--border);
@@ -163,21 +193,24 @@ th {
   border-radius: 999px;
   background: var(--accent-soft);
   color: var(--accent);
-  font: 700 12px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+  font: 700 12px/1.2 var(--font-mono);
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 .hero h1 {
   margin: 0;
+  font-family: var(--font-display);
+  font-weight: var(--weight-display);
   font-size: clamp(2rem, 4vw, 3.2rem);
-  line-height: 1.05;
+  line-height: 1.08;
   color: var(--heading);
 }
 .hero p {
   max-width: 74ch;
   margin: 14px 0 0;
-  font-size: 1.06rem;
-  line-height: 1.8;
+  font-size: 1.07rem;
+  font-weight: var(--weight-body);
+  line-height: 1.78;
   color: var(--muted);
 }
 .hero p.hero-summary-inline {
@@ -222,23 +255,30 @@ th {
 .article h1,
 .article h2,
 .article h3 {
+  font-family: var(--font-heading);
+  font-weight: var(--weight-heading);
   color: var(--heading);
+  letter-spacing: -0.01em;
 }
 .article h1 {
   margin-top: 0;
+  line-height: 1.16;
 }
 .article h2 {
   margin-top: 40px;
   padding-top: 22px;
   border-top: 1px solid var(--border);
+  line-height: 1.2;
 }
 .article h3 {
   margin-top: 28px;
+  line-height: 1.26;
 }
 .article p,
 .article li {
-  font-size: 1.03rem;
-  line-height: 1.8;
+  font-size: 1.06rem;
+  font-weight: var(--weight-body);
+  line-height: 1.82;
 }
 .article pre.manpage {
   white-space: pre-wrap;
@@ -246,6 +286,8 @@ th {
 }
 .sidebar {
   padding: 22px;
+  font-size: 1rem;
+  font-weight: var(--weight-body);
 }
 .sidebar section + section {
   margin-top: 20px;
@@ -253,6 +295,8 @@ th {
 .sidebar h2 {
   margin: 0 0 10px;
   font-size: 0.96rem;
+  font-family: var(--font-heading);
+  font-weight: var(--weight-heading);
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--muted);
@@ -274,6 +318,7 @@ th {
   border-radius: 12px;
   border: 1px solid var(--border);
   background: var(--panel-strong);
+  font-weight: var(--weight-body);
 }
 .footer-nav {
   display: grid;
@@ -285,6 +330,8 @@ th {
   display: block;
   color: var(--muted);
   font-size: 0.84rem;
+  font-family: var(--font-heading);
+  font-weight: var(--weight-ui);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -296,12 +343,16 @@ th {
   background: var(--panel);
   color: var(--muted);
   font-size: 0.94rem;
+  font-weight: var(--weight-body);
 }
 .landing-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
   margin-top: 22px;
+}
+.landing-grid.primary {
+  align-items: stretch;
 }
 .landing-card {
   padding: 22px;
@@ -312,11 +363,88 @@ th {
 }
 .landing-card h2 {
   margin-top: 0;
+  font-family: var(--font-heading);
+  font-weight: var(--weight-heading);
   color: var(--heading);
+}
+.landing-card p,
+.landing-card li,
+.landing-secondary p {
+  font-weight: var(--weight-body);
 }
 .landing-card ul {
   margin: 0;
   padding-left: 20px;
+}
+.landing-secondary {
+  margin-top: 18px;
+  padding: 18px 22px;
+}
+.landing-secondary h2 {
+  margin: 0 0 8px;
+  font-family: var(--font-heading);
+  font-weight: var(--weight-heading);
+  color: var(--heading);
+}
+.landing-secondary p {
+  margin: 0 0 14px;
+  color: var(--muted);
+}
+.inline-link-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.inline-link-list a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 9px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--panel-strong);
+  text-decoration: none;
+}
+.manpage-rendered {
+  display: grid;
+  gap: 18px;
+}
+.manpage-rendered > p {
+  margin: 0;
+}
+.manpage-rendered .man-section h2 {
+  margin: 0 0 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.manpage-rendered .man-section + .man-section {
+  margin-top: 6px;
+}
+.manpage-rendered .man-bullets {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+.manpage-rendered .man-bullets li + li {
+  margin-top: 8px;
+}
+.manpage-rendered .man-definitions {
+  display: grid;
+  grid-template-columns: minmax(0, 220px) minmax(0, 1fr);
+  gap: 10px 18px;
+  margin: 0;
+}
+.manpage-rendered .man-definitions dt {
+  font-weight: 700;
+  color: var(--heading);
+}
+.manpage-rendered .man-definitions dd {
+  margin: 0;
+}
+.manpage-rendered pre.man-example {
+  margin: 0;
 }
 @media (max-width: 980px) {
   .layout,
@@ -328,6 +456,9 @@ th {
     white-space: normal;
     overflow: visible;
     text-overflow: clip;
+  }
+  .inline-link-list {
+    flex-direction: column;
   }
 }</style>
 </head>
@@ -347,127 +478,18 @@ th {
     <header class="hero">
       <div class="eyebrow">Manpage Mirror · 0.7.3</div>
       <h1>grafana-util-dashboard.1</h1>
-      <p class="">HTML mirror of a generated roff manpage.</p>
+      <p class="">Browser-readable rendering of a generated roff manpage.</p>
       <ol class="breadcrumbs"><li><a href="../index.html">Home</a></li><li><a href="index.html">Manpages</a></li><li>grafana-util-dashboard.1</li></ol>
     </header>
     <div class="layout">
       <article class="panel article">
-        <p>This page mirrors the generated roff manpage in HTML so it can be read from GitHub Pages. For deeper per-subcommand detail, prefer the command-reference pages.</p><pre class="manpage">.\&quot; Generated by scripts/generate_manpages.py from docs/commands/en/.
-.TH GRAFANA-UTIL-DASHBOARD 1 &quot;2026-04-03&quot; &quot;grafana-util 0.7.3&quot; &quot;User Commands&quot;
-.SH NAME
-grafana\-util\-dashboard \- dashboard browse, export, import, inspection, governance, and screenshot workflows
-.SH SYNOPSIS
-.B grafana-util dashboard [\fISUBCOMMAND\fR] [\fIOPTIONS\fR]
-.PP
-.B grafana-util db [\fISUBCOMMAND\fR] [\fIOPTIONS\fR]
-.SH DESCRIPTION
-grafana\-util dashboard is the namespace for live dashboard workflows, local draft handling, export/import review, inspection, topology, and screenshots. The same namespace is also available as grafana\-util db.
-.PP
-Use this namespace when you need to browse live dashboards, fetch or clone a live dashboard into a local JSON draft, compare local files with Grafana, inspect export or live metadata, convert raw dashboards into prompt JSON, or publish a prepared dashboard back to Grafana.
-.SH SUBCOMMANDS
-.TP
-.B browse
-Open the live dashboard tree in an interactive terminal UI.
-.TP
-.B get
-Fetch one live dashboard into an API\-safe local JSON draft.
-.TP
-.B clone\-live
-Clone one live dashboard into a local draft with optional overrides.
-.TP
-.B list
-List dashboard summaries without writing export files.
-.TP
-.B export
-Export dashboards to raw/, prompt/, and provisioning/ files.
-.TP
-.B import
-Import dashboard JSON files through the Grafana API.
-.TP
-.B patch\-file
-Patch one local dashboard JSON file in place or write it to a new path.
-.TP
-.B review
-Review one local dashboard JSON file without touching Grafana.
-.TP
-.B publish
-Publish one local dashboard JSON file through the existing dashboard import pipeline.
-.TP
-.B delete
-Delete live dashboards by UID or folder path.
-.TP
-.B diff
-Compare local dashboard files against live Grafana dashboards.
-.TP
-.B inspect\-export
-Analyze dashboard export directories with operator\-summary and report\-contract views.
-.TP
-.B inspect\-live
-Analyze live Grafana dashboards via a temporary raw\-export snapshot.
-.TP
-.B inspect\-vars
-List dashboard templating variables and datasource\-like choices from live Grafana.
-.TP
-.B governance\-gate
-Evaluate governance policy against dashboard inspect JSON artifacts.
-.TP
-.B topology
-Build a deterministic dashboard topology graph from JSON artifacts.
-.TP
-.B screenshot
-Open one dashboard in a headless browser and capture image or PDF output.
-.SH COMMON OPTIONS
-.TP
-.B \-\-url
-Grafana base URL.
-.TP
-.B \-\-token, \-\-basic\-user, \-\-basic\-password
-shared live Grafana credentials.
-.TP
-.B \-\-profile
-load repo\-local defaults from grafana\-util.yaml.
-.TP
-.B \-\-color
-control JSON color output for the namespace.
-.SH WORKFLOW NOTES
-.PP
-Dashboard export intentionally separates output lanes for different workflows. Treat the raw export tree as the canonical replay or import source unless a command explicitly asks for another lane.
-.PP
-inspect\-export and inspect\-live are read\-only analysis commands, not mutation paths.
-.PP
-browse and screenshot operate against live Grafana state.
-.SH EXAMPLES
-.EX
-grafana-util dashboard --help
-.EE
-.EX
-grafana-util dashboard browse --profile prod
-.EE
-.EX
-grafana-util dashboard browse --url http://localhost:3000 --basic-user admin --basic-password admin
-.EE
-.EX
-grafana-util dashboard raw-to-prompt --input-file ./legacy/cpu-main.json --profile prod --org-id 2
-.EE
-.EX
-grafana-util dashboard inspect-live --url http://localhost:3000 --token &quot;$GRAFANA_API_TOKEN&quot; --output-format governance-json
-.EE
-.EX
-grafana-util dashboard inspect-live --url http://localhost:3000 --basic-user admin --basic-password admin --interactive
-.EE
-.SH SEE ALSO
-\fBgrafana-util\fR(1),
-\fBgrafana-util-datasource\fR(1),
-\fBgrafana-util-status\fR(1),
-\fBgrafana-util-overview\fR(1),
-\fBgrafana-util-snapshot\fR(1)
-</pre>
+        <p>This page renders the generated roff manpage into readable HTML for GitHub Pages and browser use. For deeper per-subcommand detail, prefer the command-reference pages.</p><div class="manpage-rendered"><section class="man-section"><h2>NAME</h2><p>grafana-util-dashboard - dashboard browse, export, import, inspection, governance, and screenshot workflows</p></section><section class="man-section"><h2>SYNOPSIS</h2><p><strong>grafana-util dashboard [<em>SUBCOMMAND</em>] [<em>OPTIONS</em>]</strong></p><p><strong>grafana-util db [<em>SUBCOMMAND</em>] [<em>OPTIONS</em>]</strong></p></section><section class="man-section"><h2>DESCRIPTION</h2><p>grafana-util dashboard is the namespace for live dashboard workflows, local draft handling, export/import review, inspection, topology, and screenshots. The same namespace is also available as grafana-util db.</p><p>Use this namespace when you need to browse live dashboards, fetch or clone a live dashboard into a local JSON draft, compare local files with Grafana, inspect export or live metadata, convert raw dashboards into prompt JSON, or publish a prepared dashboard back to Grafana.</p></section><section class="man-section"><h2>SUBCOMMANDS</h2><dl class="man-definitions"><dt><strong>browse</strong></dt><dd>Open the live dashboard tree in an interactive terminal UI.</dd><dt><strong>get</strong></dt><dd>Fetch one live dashboard into an API-safe local JSON draft.</dd><dt><strong>clone-live</strong></dt><dd>Clone one live dashboard into a local draft with optional overrides.</dd><dt><strong>list</strong></dt><dd>List dashboard summaries without writing export files.</dd><dt><strong>export</strong></dt><dd>Export dashboards to raw/, prompt/, and provisioning/ files.</dd><dt><strong>import</strong></dt><dd>Import dashboard JSON files through the Grafana API.</dd><dt><strong>patch-file</strong></dt><dd>Patch one local dashboard JSON file in place or write it to a new path.</dd><dt><strong>review</strong></dt><dd>Review one local dashboard JSON file without touching Grafana.</dd><dt><strong>publish</strong></dt><dd>Publish one local dashboard JSON file through the existing dashboard import pipeline.</dd><dt><strong>delete</strong></dt><dd>Delete live dashboards by UID or folder path.</dd><dt><strong>diff</strong></dt><dd>Compare local dashboard files against live Grafana dashboards.</dd><dt><strong>inspect-export</strong></dt><dd>Analyze dashboard export directories with operator-summary and report-contract views.</dd><dt><strong>inspect-live</strong></dt><dd>Analyze live Grafana dashboards via a temporary raw-export snapshot.</dd><dt><strong>inspect-vars</strong></dt><dd>List dashboard templating variables and datasource-like choices from live Grafana.</dd><dt><strong>governance-gate</strong></dt><dd>Evaluate governance policy against dashboard inspect JSON artifacts.</dd><dt><strong>topology</strong></dt><dd>Build a deterministic dashboard topology graph from JSON artifacts.</dd><dt><strong>screenshot</strong></dt><dd>Open one dashboard in a headless browser and capture image or PDF output.</dd></dl></section><section class="man-section"><h2>COMMON OPTIONS</h2><dl class="man-definitions"><dt><strong>--url</strong></dt><dd>Grafana base URL.</dd><dt><strong>--token, --basic-user, --basic-password</strong></dt><dd>shared live Grafana credentials.</dd><dt><strong>--profile</strong></dt><dd>load repo-local defaults from grafana-util.yaml.</dd><dt><strong>--color</strong></dt><dd>control JSON color output for the namespace.</dd></dl></section><section class="man-section"><h2>WORKFLOW NOTES</h2><p>Dashboard export intentionally separates output lanes for different workflows. Treat the raw export tree as the canonical replay or import source unless a command explicitly asks for another lane.</p><p>inspect-export and inspect-live are read-only analysis commands, not mutation paths.</p><p>browse and screenshot operate against live Grafana state.</p></section><section class="man-section"><h2>EXAMPLES</h2><pre class="man-example"><code>grafana-util dashboard --help</code></pre><pre class="man-example"><code>grafana-util dashboard browse --profile prod</code></pre><pre class="man-example"><code>grafana-util dashboard browse --url http://localhost:3000 --basic-user admin --basic-password admin</code></pre><pre class="man-example"><code>grafana-util dashboard raw-to-prompt --input-file ./legacy/cpu-main.json --profile prod --org-id 2</code></pre><pre class="man-example"><code>grafana-util dashboard inspect-live --url http://localhost:3000 --token &quot;$GRAFANA_API_TOKEN&quot; --output-format governance-json</code></pre><pre class="man-example"><code>grafana-util dashboard inspect-live --url http://localhost:3000 --basic-user admin --basic-password admin --interactive</code></pre></section><section class="man-section"><h2>SEE ALSO</h2><p><strong>grafana-util</strong>(1), <strong>grafana-util-datasource</strong>(1), <strong>grafana-util-status</strong>(1), <strong>grafana-util-overview</strong>(1), <strong>grafana-util-snapshot</strong>(1)</p></section></div>
         
       </article>
       <aside class="panel sidebar">
         <section>
           <h2>On This Page</h2>
-          <p>This mirror preserves the generated manpage content as preformatted text.</p>
+          <p>This page renders the generated manpage into readable HTML sections.</p>
         </section>
         <section>
           <h2>Related</h2>

@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import html
+import re
 from dataclasses import dataclass, replace
 from pathlib import Path
 
@@ -56,6 +57,19 @@ HANDBOOK_CONTEXT_BY_COMMAND = {
 PAGE_STYLE = """
 :root {
   color-scheme: light dark;
+  --font-display-en: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  --font-heading-en: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI Variable Display", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-body-en: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI Variable Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-heading-zh: "PingFang TC", "Hiragino Sans GB", "Noto Sans CJK TC", "Noto Sans TC", "Microsoft JhengHei UI", "Microsoft JhengHei", "Heiti TC", sans-serif;
+  --font-body-zh: "PingFang TC", "Hiragino Sans GB", "Noto Sans CJK TC", "Noto Sans TC", "Microsoft JhengHei UI", "Microsoft JhengHei", "Heiti TC", sans-serif;
+  --font-display: var(--font-display-en);
+  --font-heading: var(--font-heading-en);
+  --font-body: var(--font-body-en);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --weight-body: 460;
+  --weight-ui: 560;
+  --weight-heading: 650;
+  --weight-display: 720;
   --bg: linear-gradient(180deg, #f7f3eb 0%, #fcfbf8 100%);
   --panel: rgba(255, 255, 255, 0.82);
   --panel-strong: rgba(255, 255, 255, 0.92);
@@ -126,13 +140,30 @@ html[data-theme="dark"] body {
 * { box-sizing: border-box; }
 body {
   margin: 0;
-  font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+  font-family: var(--font-body);
+  font-weight: var(--weight-body);
   color: var(--text);
   background: var(--bg);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+html[lang="zh-TW"] body {
+  --font-display: var(--font-heading-zh);
+  --font-heading: var(--font-heading-zh);
+  --font-body: var(--font-body-zh);
+  --weight-body: 470;
+  --weight-ui: 580;
+  --weight-heading: 680;
+  --weight-display: 720;
 }
 a { color: var(--accent); }
+strong,
+b {
+  font-weight: 700;
+}
 code {
-  font: 0.92em ui-monospace, SFMono-Regular, Menlo, monospace;
+  font: 0.92em var(--font-mono);
   background: var(--code-bg);
   padding: 0.12em 0.35em;
   border-radius: 4px;
@@ -181,7 +212,7 @@ th {
   text-decoration: none;
 }
 .brand {
-  font: 700 0.96rem/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+  font: 700 0.96rem/1.2 var(--font-mono);
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -190,7 +221,7 @@ th {
   gap: 8px;
   align-items: center;
   color: var(--muted);
-  font: 600 12px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+  font: var(--weight-ui) 12px/1.2 var(--font-mono);
 }
 .themebar select {
   border: 1px solid var(--border);
@@ -213,21 +244,24 @@ th {
   border-radius: 999px;
   background: var(--accent-soft);
   color: var(--accent);
-  font: 700 12px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+  font: 700 12px/1.2 var(--font-mono);
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 .hero h1 {
   margin: 0;
+  font-family: var(--font-display);
+  font-weight: var(--weight-display);
   font-size: clamp(2rem, 4vw, 3.2rem);
-  line-height: 1.05;
+  line-height: 1.08;
   color: var(--heading);
 }
 .hero p {
   max-width: 74ch;
   margin: 14px 0 0;
-  font-size: 1.06rem;
-  line-height: 1.8;
+  font-size: 1.07rem;
+  font-weight: var(--weight-body);
+  line-height: 1.78;
   color: var(--muted);
 }
 .hero p.hero-summary-inline {
@@ -272,23 +306,30 @@ th {
 .article h1,
 .article h2,
 .article h3 {
+  font-family: var(--font-heading);
+  font-weight: var(--weight-heading);
   color: var(--heading);
+  letter-spacing: -0.01em;
 }
 .article h1 {
   margin-top: 0;
+  line-height: 1.16;
 }
 .article h2 {
   margin-top: 40px;
   padding-top: 22px;
   border-top: 1px solid var(--border);
+  line-height: 1.2;
 }
 .article h3 {
   margin-top: 28px;
+  line-height: 1.26;
 }
 .article p,
 .article li {
-  font-size: 1.03rem;
-  line-height: 1.8;
+  font-size: 1.06rem;
+  font-weight: var(--weight-body);
+  line-height: 1.82;
 }
 .article pre.manpage {
   white-space: pre-wrap;
@@ -296,6 +337,8 @@ th {
 }
 .sidebar {
   padding: 22px;
+  font-size: 1rem;
+  font-weight: var(--weight-body);
 }
 .sidebar section + section {
   margin-top: 20px;
@@ -303,6 +346,8 @@ th {
 .sidebar h2 {
   margin: 0 0 10px;
   font-size: 0.96rem;
+  font-family: var(--font-heading);
+  font-weight: var(--weight-heading);
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--muted);
@@ -324,6 +369,7 @@ th {
   border-radius: 12px;
   border: 1px solid var(--border);
   background: var(--panel-strong);
+  font-weight: var(--weight-body);
 }
 .footer-nav {
   display: grid;
@@ -335,6 +381,8 @@ th {
   display: block;
   color: var(--muted);
   font-size: 0.84rem;
+  font-family: var(--font-heading);
+  font-weight: var(--weight-ui);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -346,12 +394,16 @@ th {
   background: var(--panel);
   color: var(--muted);
   font-size: 0.94rem;
+  font-weight: var(--weight-body);
 }
 .landing-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
   margin-top: 22px;
+}
+.landing-grid.primary {
+  align-items: stretch;
 }
 .landing-card {
   padding: 22px;
@@ -362,11 +414,88 @@ th {
 }
 .landing-card h2 {
   margin-top: 0;
+  font-family: var(--font-heading);
+  font-weight: var(--weight-heading);
   color: var(--heading);
+}
+.landing-card p,
+.landing-card li,
+.landing-secondary p {
+  font-weight: var(--weight-body);
 }
 .landing-card ul {
   margin: 0;
   padding-left: 20px;
+}
+.landing-secondary {
+  margin-top: 18px;
+  padding: 18px 22px;
+}
+.landing-secondary h2 {
+  margin: 0 0 8px;
+  font-family: var(--font-heading);
+  font-weight: var(--weight-heading);
+  color: var(--heading);
+}
+.landing-secondary p {
+  margin: 0 0 14px;
+  color: var(--muted);
+}
+.inline-link-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.inline-link-list a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 9px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--panel-strong);
+  text-decoration: none;
+}
+.manpage-rendered {
+  display: grid;
+  gap: 18px;
+}
+.manpage-rendered > p {
+  margin: 0;
+}
+.manpage-rendered .man-section h2 {
+  margin: 0 0 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.manpage-rendered .man-section + .man-section {
+  margin-top: 6px;
+}
+.manpage-rendered .man-bullets {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+.manpage-rendered .man-bullets li + li {
+  margin-top: 8px;
+}
+.manpage-rendered .man-definitions {
+  display: grid;
+  grid-template-columns: minmax(0, 220px) minmax(0, 1fr);
+  gap: 10px 18px;
+  margin: 0;
+}
+.manpage-rendered .man-definitions dt {
+  font-weight: 700;
+  color: var(--heading);
+}
+.manpage-rendered .man-definitions dd {
+  margin: 0;
+}
+.manpage-rendered pre.man-example {
+  margin: 0;
 }
 @media (max-width: 980px) {
   .layout,
@@ -378,6 +507,9 @@ th {
     white-space: normal;
     overflow: visible;
     text-overflow: clip;
+  }
+  .inline-link-list {
+    flex-direction: column;
   }
 }
 """.strip()
@@ -612,6 +744,178 @@ def render_manpage_index_page(output_rel: str, manpage_names: list[str], config:
     )
 
 
+ROFF_FONT_TOKEN_RE = re.compile(r"\\f[BRI]|\\fR")
+
+
+def normalize_roff_text(text: str) -> str:
+    return text.replace(r"\-", "-").replace(r"\(bu", "•")
+
+
+def render_roff_inline(text: str) -> str:
+    pieces: list[str] = []
+    font_stack: list[str] = []
+    cursor = 0
+    for match in ROFF_FONT_TOKEN_RE.finditer(text):
+        if match.start() > cursor:
+            pieces.append(html.escape(normalize_roff_text(text[cursor:match.start()])))
+        token = match.group(0)
+        if token == r"\fB":
+            pieces.append("<strong>")
+            font_stack.append("strong")
+        elif token == r"\fI":
+            pieces.append("<em>")
+            font_stack.append("em")
+        elif token == r"\fR" and font_stack:
+            pieces.append(f"</{font_stack.pop()}>")
+        cursor = match.end()
+    if cursor < len(text):
+        pieces.append(html.escape(normalize_roff_text(text[cursor:])))
+    while font_stack:
+        pieces.append(f"</{font_stack.pop()}>")
+    return "".join(pieces)
+
+
+def render_roff_macro_text(line: str) -> str:
+    if line.startswith(".B "):
+        return f"<strong>{render_roff_inline(line[3:])}</strong>"
+    if line.startswith(".I "):
+        return f"<em>{render_roff_inline(line[3:])}</em>"
+    return render_roff_inline(line)
+
+
+def render_roff_manpage_html(roff_text_body: str) -> str:
+    body_parts: list[str] = []
+    section_parts: list[str] = []
+    paragraph_lines: list[str] = []
+    bullet_items: list[str] = []
+    definition_items: list[tuple[str, str]] = []
+    definition_term: str | None = None
+    definition_desc: list[str] = []
+    code_lines: list[str] = []
+    current_heading: str | None = None
+    in_code_block = False
+    pending_bullet = False
+    expecting_definition_term = False
+
+    def flush_paragraph() -> None:
+        nonlocal paragraph_lines
+        if paragraph_lines:
+            section_parts.append(
+                "<p>"
+                + " ".join(
+                    render_roff_macro_text(line) if line.startswith((".B ", ".I ")) else render_roff_inline(line)
+                    for line in paragraph_lines
+                )
+                + "</p>"
+            )
+            paragraph_lines = []
+
+    def flush_bullets() -> None:
+        nonlocal bullet_items
+        if bullet_items:
+            section_parts.append(
+                '<ul class="man-bullets">' + "".join(f"<li>{item}</li>" for item in bullet_items) + "</ul>"
+            )
+            bullet_items = []
+
+    def flush_definition() -> None:
+        nonlocal definition_term, definition_desc
+        if definition_term is not None:
+            description = " ".join(render_roff_inline(line) for line in definition_desc).strip()
+            definition_items.append((definition_term, description))
+            definition_term = None
+            definition_desc = []
+
+    def flush_definitions() -> None:
+        nonlocal definition_items
+        flush_definition()
+        if definition_items:
+            section_parts.append(
+                '<dl class="man-definitions">'
+                + "".join(f"<dt>{term}</dt><dd>{desc}</dd>" for term, desc in definition_items)
+                + "</dl>"
+            )
+            definition_items = []
+
+    def flush_code() -> None:
+        nonlocal code_lines
+        if code_lines:
+            section_parts.append(f'<pre class="man-example"><code>{html.escape(chr(10).join(code_lines))}</code></pre>')
+            code_lines = []
+
+    def flush_section_content() -> None:
+        flush_paragraph()
+        flush_bullets()
+        flush_definitions()
+        flush_code()
+
+    def emit_section() -> None:
+        nonlocal section_parts
+        flush_section_content()
+        if current_heading is not None:
+            body_parts.append(
+                f'<section class="man-section"><h2>{html.escape(current_heading)}</h2>{"".join(section_parts)}</section>'
+            )
+            section_parts = []
+
+    for raw_line in roff_text_body.splitlines():
+        line = raw_line.rstrip()
+        if in_code_block:
+            if line == ".EE":
+                in_code_block = False
+                flush_code()
+            else:
+                code_lines.append(line)
+            continue
+        if pending_bullet:
+            bullet_items.append(render_roff_inline(line))
+            pending_bullet = False
+            continue
+        if expecting_definition_term:
+            definition_term = render_roff_macro_text(line)
+            definition_desc = []
+            expecting_definition_term = False
+            continue
+        if line.startswith('.\\"') or line.startswith(".TH"):
+            continue
+        if line.startswith(".SH "):
+            emit_section()
+            current_heading = normalize_roff_text(line[4:])
+            continue
+        if line == ".PP":
+            flush_paragraph()
+            flush_bullets()
+            flush_definitions()
+            continue
+        if line.startswith(".IP "):
+            flush_paragraph()
+            flush_definitions()
+            pending_bullet = True
+            continue
+        if line == ".TP":
+            flush_paragraph()
+            flush_bullets()
+            flush_definition()
+            expecting_definition_term = True
+            continue
+        if line == ".EX":
+            flush_paragraph()
+            flush_bullets()
+            flush_definitions()
+            in_code_block = True
+            code_lines = []
+            continue
+        if definition_term is not None:
+            definition_desc.append(line)
+        else:
+            paragraph_lines.append(line)
+
+    emit_section()
+    if not body_parts and section_parts:
+        body_parts.extend(section_parts)
+    return '<div class="manpage-rendered">' + "".join(body_parts) + "</div>"
+
+
 def render_manpage_page(output_rel: str, name: str, roff_text_body: str, config: HtmlBuildConfig) -> str:
     stem = Path(name).stem
     command_root = command_reference_root_for_stem(stem, config)
@@ -623,16 +927,16 @@ def render_manpage_page(output_rel: str, name: str, roff_text_body: str, config:
     if command_root:
         related_links.append(("Matching command reference", relative_href(output_rel, command_root)))
     body_html = (
-        "<p>This page mirrors the generated roff manpage in HTML so it can be read from GitHub Pages. "
+        "<p>This page renders the generated roff manpage into readable HTML for GitHub Pages and browser use. "
         "For deeper per-subcommand detail, prefer the command-reference pages.</p>"
-        f'<pre class="manpage">{html.escape(roff_text_body)}</pre>'
+        f"{render_roff_manpage_html(roff_text_body)}"
     )
     return page_shell(
         page_title=name,
         html_lang="en",
         home_href=relative_href(output_rel, prefixed_output_rel(config, "index.html")),
         hero_title=name,
-        hero_summary="HTML mirror of a generated roff manpage.",
+        hero_summary="Browser-readable rendering of a generated roff manpage.",
         hero_summary_class="",
         eyebrow=f"Manpage Mirror · {html.escape(config.version)}",
         breadcrumbs=[
@@ -641,7 +945,7 @@ def render_manpage_page(output_rel: str, name: str, roff_text_body: str, config:
             (name, None),
         ],
         body_html=body_html,
-        toc_html="<p>This mirror preserves the generated manpage content as preformatted text.</p>",
+        toc_html="<p>This page renders the generated manpage into readable HTML sections.</p>",
         related_html=html_list(related_links),
         version_html=render_version_links(output_rel, config),
         locale_html="<p>English only. The manpage lane currently generates from English command docs.</p>",
@@ -666,75 +970,66 @@ def render_landing_page(config: HtmlBuildConfig) -> str:
     </ul>
   </section>
 """.strip()
-    if config.output_prefix:
-        secondary_card_html = f"""
-  <section class="landing-card">
-    <div class="eyebrow">Version</div>
-    <h2>{html.escape(config.version_label or config.version)}</h2>
-    <p>This lane is a versioned snapshot for GitHub Pages. Use the version switcher to move between release and preview docs.</p>
-    <ul>
-      <li><a href="{html.escape(relative_href(prefixed_output_rel(config, "index.html"), prefixed_output_rel(config, "commands/en/index.html")))}">English command reference</a></li>
-      <li><a href="{html.escape(relative_href(prefixed_output_rel(config, "index.html"), prefixed_output_rel(config, "commands/zh-TW/index.html")))}">繁體中文逐指令說明</a></li>
-      {manpage_link}
-    </ul>
-  </section>
+    version_links = []
+    if config.version_label is not None:
+        version_links.append(
+            f'<li><a href="#">{html.escape(config.version_label)}</a></li>'
+        )
+    for link in config.version_links:
+        version_links.append(
+            f'<li><a href="{html.escape(relative_href(prefixed_output_rel(config, "index.html"), link.target_rel))}">{html.escape(link.label)}</a></li>'
+        )
+    if config.include_raw_manpages or config.raw_manpage_target_rel:
+        version_links.append(
+            f'<li><a href="{html.escape(relative_href(prefixed_output_rel(config, "index.html"), prefixed_output_rel(config, "man/index.html")))}">Manpages (HTML)</a></li>'
+        )
+    version_secondary_html = ""
+    if version_links:
+        version_secondary_html = f"""
+<section class="panel landing-secondary">
+  <div class="eyebrow">Version</div>
+  <h2>{html.escape(config.version_label or config.version)}</h2>
+  <p>Version navigation stays secondary here. Pick a language lane first, then switch release or preview context if needed.</p>
+  <ul class="inline-link-list">
+    {''.join(version_links)}
+  </ul>
+</section>
 """.strip()
     body_html = f"""
-<div class="landing-grid">
-  <section class="landing-card">
-    <div class="eyebrow">Language</div>
-    <h2>Start by language</h2>
-    <p>Choose the language lane first, then continue into the handbook, command reference, or role-specific entry pages.</p>
-    <ul>
-      <li><a href="{html.escape(relative_href(prefixed_output_rel(config, "index.html"), prefixed_output_rel(config, "handbook/en/index.html")))}">English handbook</a></li>
-      <li><a href="{html.escape(relative_href(prefixed_output_rel(config, "index.html"), prefixed_output_rel(config, "commands/en/index.html")))}">English command reference</a></li>
-      <li><a href="{html.escape(relative_href(prefixed_output_rel(config, "index.html"), prefixed_output_rel(config, "handbook/zh-TW/index.html")))}">繁體中文手冊</a></li>
-      <li><a href="{html.escape(relative_href(prefixed_output_rel(config, "index.html"), prefixed_output_rel(config, "commands/zh-TW/index.html")))}">繁體中文逐指令說明</a></li>
-    </ul>
-  </section>
-  {secondary_card_html}
-</div>
-<div class="landing-grid">
+<div class="landing-grid primary">
   <section class="landing-card">
     <div class="eyebrow">English</div>
-    <h2>English handbook and reference</h2>
-    <p>Use the English lane if you want the handbook, role guides, and one-page-per-command reference in English.</p>
+    <h2>English docs lane</h2>
+    <p>Start here if you want the handbook, role guides, and command reference in English without mixing locales in the first reading path.</p>
     <ul>
       <li><a href="{html.escape(relative_href(prefixed_output_rel(config, "index.html"), prefixed_output_rel(config, "handbook/en/index.html")))}">Handbook index</a></li>
+      <li><a href="{html.escape(relative_href(prefixed_output_rel(config, "index.html"), prefixed_output_rel(config, "commands/en/index.html")))}">Command reference</a></li>
       <li><a href="{html.escape(relative_href(prefixed_output_rel(config, "index.html"), prefixed_output_rel(config, "handbook/en/role-new-user.html")))}">New user path</a></li>
       <li><a href="{html.escape(relative_href(prefixed_output_rel(config, "index.html"), prefixed_output_rel(config, "handbook/en/role-sre-ops.html")))}">SRE / operator path</a></li>
-      <li><a href="{html.escape(relative_href(prefixed_output_rel(config, "index.html"), prefixed_output_rel(config, "handbook/en/role-automation-ci.html")))}">Automation / CI path</a></li>
-      <li><a href="{html.escape(relative_href(prefixed_output_rel(config, "index.html"), prefixed_output_rel(config, "commands/en/index.html")))}">Command reference</a></li>
-      {manpage_link}
     </ul>
   </section>
   <section class="landing-card">
     <div class="eyebrow">繁體中文</div>
-    <h2>繁體中文手冊與逐指令說明</h2>
-    <p>Use the Traditional Chinese lane if you want handbook chapters, role guides, and command pages without mixing locales in the same entry flow.</p>
+    <h2>繁體中文文件入口</h2>
+    <p>如果你想直接用繁體中文閱讀手冊、角色導覽與逐指令說明，從這裡進去會最順，不需要先在英文入口之後再切語言。</p>
     <ul>
       <li><a href="{html.escape(relative_href(prefixed_output_rel(config, "index.html"), prefixed_output_rel(config, "handbook/zh-TW/index.html")))}">手冊目錄</a></li>
+      <li><a href="{html.escape(relative_href(prefixed_output_rel(config, "index.html"), prefixed_output_rel(config, "commands/zh-TW/index.html")))}">逐指令說明</a></li>
       <li><a href="{html.escape(relative_href(prefixed_output_rel(config, "index.html"), prefixed_output_rel(config, "handbook/zh-TW/role-new-user.html")))}">新使用者路徑</a></li>
       <li><a href="{html.escape(relative_href(prefixed_output_rel(config, "index.html"), prefixed_output_rel(config, "handbook/zh-TW/role-sre-ops.html")))}">SRE / 維運路徑</a></li>
       <li><a href="{html.escape(relative_href(prefixed_output_rel(config, "index.html"), prefixed_output_rel(config, "handbook/zh-TW/role-automation-ci.html")))}">自動化 / CI 路徑</a></li>
-      <li><a href="{html.escape(relative_href(prefixed_output_rel(config, "index.html"), prefixed_output_rel(config, "commands/zh-TW/index.html")))}">逐指令說明</a></li>
-      {manpage_link.replace("Manpages (HTML)", "Manpage HTML")}
     </ul>
   </section>
 </div>
+{version_secondary_html}
 """.strip()
     footer_html = (
         "Source roots: <code>docs/user-guide/*</code> and <code>docs/commands/*</code>. "
         "Generated by <code>scripts/generate_command_html.py</code>."
     )
-    related_links = [
-        ("English handbook", relative_href(prefixed_output_rel(config, "index.html"), prefixed_output_rel(config, "handbook/en/index.html"))),
-        ("繁體中文手冊", relative_href(prefixed_output_rel(config, "index.html"), prefixed_output_rel(config, "handbook/zh-TW/index.html"))),
-        ("English command reference", relative_href(prefixed_output_rel(config, "index.html"), prefixed_output_rel(config, "commands/en/index.html"))),
-        ("繁體中文逐指令說明", relative_href(prefixed_output_rel(config, "index.html"), prefixed_output_rel(config, "commands/zh-TW/index.html"))),
-    ]
+    related_links = []
     if config.version_links:
-        related_links.insert(0, ("Version portal", "#"))
+        related_links.append(("Version portal", "#"))
     if config.include_raw_manpages or config.raw_manpage_target_rel:
         related_links.append(("Manpages (HTML)", relative_href(prefixed_output_rel(config, "index.html"), prefixed_output_rel(config, "man/index.html"))))
     if config.raw_manpage_target_rel:
@@ -751,10 +1046,10 @@ def render_landing_page(config: HtmlBuildConfig) -> str:
         eyebrow=f"Generated HTML · grafana-util {html.escape(config.version)}",
         breadcrumbs=[("Home", None)],
         body_html=body_html,
-        toc_html="<p>Start from one of the two main entrypoints.</p>",
+        toc_html="<p>Choose a language lane first, then use version links only if you need a different release context.</p>",
         related_html=html_list(related_links),
         version_html=render_version_links(prefixed_output_rel(config, "index.html"), config),
-        locale_html="<p>Choose a language first, then stay within that handbook or command-reference lane.</p>",
+        locale_html="<p>This homepage is language-first by design: enter English or 繁體中文, then keep reading inside that lane.</p>",
         footer_nav_html="",
         footer_html=footer_html,
     )

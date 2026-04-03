@@ -63,6 +63,39 @@ class GenerateCommandHtmlTests(unittest.TestCase):
         self.assertIn("Current: v9.9", generated["v9.9/commands/en/dashboard.html"])
         self.assertIn("../index.html", generated["v9.9/commands/en/dashboard.html"])
 
+    def test_render_manpage_page_renders_structured_html(self):
+        module = load_module()
+
+        config = module.HtmlBuildConfig(version="9.9.0")
+        roff = "\n".join(
+            (
+                '.TH TEST 1 "2026-04-04" "grafana-util 9.9.0" "User Commands"',
+                ".SH NAME",
+                r"grafana\-util\-test \- sample command",
+                ".SH DESCRIPTION",
+                r"Run \fBgrafana-util test\fR with readable HTML output.",
+                r".IP \(bu 2",
+                "First bullet",
+                ".TP",
+                ".B --flag",
+                "Flag description",
+                ".SH EXAMPLES",
+                ".EX",
+                "grafana-util test --flag",
+                ".EE",
+            )
+        )
+
+        rendered = module.render_manpage_page("man/test.html", "grafana-util-test.1", roff, config)
+
+        self.assertIn('<div class="manpage-rendered">', rendered)
+        self.assertIn("<h2>DESCRIPTION</h2>", rendered)
+        self.assertIn("<strong>grafana-util test</strong>", rendered)
+        self.assertIn('<ul class="man-bullets">', rendered)
+        self.assertIn('<dl class="man-definitions">', rendered)
+        self.assertIn('<pre class="man-example"><code>grafana-util test --flag</code></pre>', rendered)
+        self.assertNotIn('<pre class="manpage">', rendered)
+
 
 if __name__ == "__main__":
     unittest.main()
