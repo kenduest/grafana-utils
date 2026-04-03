@@ -169,6 +169,7 @@ code {
   border-radius: 4px;
 }
 pre {
+  max-width: 100%;
   overflow-x: auto;
   padding: 16px 18px;
   border-radius: 14px;
@@ -295,12 +296,14 @@ th {
   margin-top: 22px;
 }
 .panel {
+  min-width: 0;
   border: 1px solid var(--border);
   border-radius: 22px;
   background: var(--panel);
   box-shadow: var(--shadow);
 }
 .article {
+  min-width: 0;
   padding: 30px;
 }
 .article h1,
@@ -336,6 +339,7 @@ th {
   word-break: break-word;
 }
 .sidebar {
+  min-width: 0;
   padding: 22px;
   font-size: 1rem;
   font-weight: var(--weight-body);
