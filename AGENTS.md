@@ -2,32 +2,32 @@
 
 ## Project Structure & Module Organization
 
-- `grafana_utils/dashboard_cli.py`: packaged dashboard implementation.
-- `grafana_utils/alert_cli.py`: packaged alerting implementation.
-- `grafana_utils/access_cli.py`: packaged access-management implementation.
-- `grafana_utils/access/parser.py`: Python access CLI argparse definitions.
-- `grafana_utils/access/workflows.py`: Python access user, org, team, and service-account workflows.
-- `grafana_utils/unified_cli.py`: unified Python CLI dispatcher.
-- `grafana_utils/http_transport.py`: shared replaceable HTTP transport layer.
-- `grafana_utils/__main__.py`: source-tree module entrypoint for running the unified CLI directly from the repo checkout.
+- `python/grafana_utils/dashboard_cli.py`: packaged dashboard implementation.
+- `python/grafana_utils/alert_cli.py`: packaged alerting implementation.
+- `python/grafana_utils/access_cli.py`: packaged access-management implementation.
+- `python/grafana_utils/access/parser.py`: Python access CLI argparse definitions.
+- `python/grafana_utils/access/workflows.py`: Python access user, org, team, and service-account workflows.
+- `python/grafana_utils/unified_cli.py`: unified Python CLI dispatcher.
+- `python/grafana_utils/http_transport.py`: shared replaceable HTTP transport layer.
+- `python/grafana_utils/__main__.py`: source-tree module entrypoint for running the unified CLI directly from the repo checkout.
 - `pyproject.toml`: package metadata and console-script entrypoints.
 - `rust/src/`: Rust implementation for dashboard, alerting, access, and unified dispatch.
 - `rust/src/access_org.rs`: Rust access org list/add/modify/delete/export/import implementation.
-- `tests/`: Python unit tests.
+- `python/tests/`: Python unit tests.
 - `Makefile`: root shortcuts for Python wheel builds, Rust release builds, and test runs.
 - `README.md`: GitHub-facing usage and operator examples.
 - `docs/DEVELOPER.md`: maintainer notes, internal behavior, and implementation tradeoffs.
 - `docs/internal/ai-status.md` and `docs/internal/ai-changes.md`: internal change trace files for meaningful feature work.
 
-Keep implementation code in `grafana_utils/` and keep `python/` wrappers thin unless a new workflow clearly deserves its own module.
+Keep Python implementation and source-tree entrypoints under `python/grafana_utils/` so the repo uses one clear parent path for Python code. Python imports remain `grafana_utils.*`.
 
 ## Build, Test, and Development Commands
 
 - `poetry install --with dev`: create the standard Python development environment for this repo.
-- `poetry run python -m unittest -v`: run the full Python test suite from the Poetry-managed environment.
-- `poetry run python -m unittest -v tests/test_python_alert_cli.py`: run alerting Python tests only from the Poetry-managed environment.
-- `poetry run python -m unittest -v tests/test_python_dashboard_cli.py`: run dashboard Python tests only from the Poetry-managed environment.
-- `poetry run python -m unittest -v tests/test_python_access_cli.py`: run access Python tests only from the Poetry-managed environment.
+- `PYTHONPATH=python poetry run python -m unittest -v`: run the full Python test suite from the Poetry-managed environment.
+- `PYTHONPATH=python poetry run python -m unittest -v python/python/tests/test_python_alert_cli.py`: run alerting Python tests only from the Poetry-managed environment.
+- `PYTHONPATH=python poetry run python -m unittest -v python/python/tests/test_python_dashboard_cli.py`: run dashboard Python tests only from the Poetry-managed environment.
+- `PYTHONPATH=python poetry run python -m unittest -v python/python/tests/test_python_access_cli.py`: run access Python tests only from the Poetry-managed environment.
 - `python3 -m pip install .`: install the package into the active Python environment.
 - `python3 -m pip install --user .`: install the package into the current user's Python environment.
 - `python3 -m pip install '.[http2]'`: install the optional HTTP/2 transport dependencies on Python 3.9+.
@@ -36,10 +36,10 @@ Keep implementation code in `grafana_utils/` and keep `python/` wrappers thin un
 - `make build`: build both the Python wheel and the Rust release binaries.
 - `make test`: run both the Python and Rust test suites.
 - `make test-rust-live`: start Docker Grafana and run the Rust live smoke test script.
-- `python3 -m unittest -v`: run the full test suite.
-- `python3 -m unittest -v tests/test_python_alert_cli.py`: run alerting Python tests only.
-- `python3 -m unittest -v tests/test_python_dashboard_cli.py`: run dashboard Python tests only.
-- `python3 -m unittest -v tests/test_python_access_cli.py`: run access Python tests only.
+- `PYTHONPATH=python python3 -m unittest -v`: run the full test suite.
+- `PYTHONPATH=python python3 -m unittest -v python/python/tests/test_python_alert_cli.py`: run alerting Python tests only.
+- `PYTHONPATH=python python3 -m unittest -v python/python/tests/test_python_dashboard_cli.py`: run dashboard Python tests only.
+- `PYTHONPATH=python python3 -m unittest -v python/python/tests/test_python_access_cli.py`: run access Python tests only.
 - `cd rust && cargo test --quiet`: run the full Rust test suite.
 
 Use Poetry-first commands for Python development and test execution. Keep the `pip install` commands for packaged-install validation, local release checks, or environments that intentionally skip Poetry.
@@ -51,9 +51,10 @@ For external command usage and operator examples, prefer `README.md`, `README.zh
 ## Versioning And Release Policy
 
 - Treat `dev` as the preview branch and `main` as the release branch.
-- On `dev`, Python package versions must use `X.Y.Z.devN` in `pyproject.toml`.
-- On `dev`, Rust package versions must use `X.Y.Z-dev.N` in `rust/Cargo.toml`.
-- On `main`, both Python and Rust package versions must use plain release versions `X.Y.Z` with no dev suffix.
+- Day-to-day work on `dev` does not need a mandatory `.devN` / `-dev.N` package version.
+- `dev` and `main` may carry the same plain checked-in package version between releases to reduce merge noise.
+- Use preview versions such as `X.Y.Z.devN` / `X.Y.Z-dev.N` only when a branch-specific preview artifact is intentionally needed.
+- On `main`, formal release tags and release artifacts must use plain release versions `X.Y.Z` with no dev suffix.
 - Formal releases must use Git tags in the form `vX.Y.Z`, created from `main`.
 - Release tags must match the plain release version already present in both `pyproject.toml` and `rust/Cargo.toml`.
 - Preview GitLab artifacts come from the `dev` and `main` branches; release GitLab artifacts come only from `vX.Y.Z` tags.
@@ -83,10 +84,27 @@ For external command usage and operator examples, prefer `README.md`, `README.zh
 ## Testing Guidelines
 
 - Tests use `unittest`.
-- Name Python test files `tests/test_python_*.py` and test methods `test_*`.
+- Name Python test files `python/python/tests/test_python_*.py` and test methods `test_*`.
 - Keep Rust unit tests in `rust/src/*_rust_tests.rs` when the filename needs to distinguish them from Python tests.
 - Add or update tests for every user-visible behavior change.
 - For CLI UX changes, test parser behavior or `format_help()` output directly.
+
+## Agent Routing
+
+- Planner tasks should use `gpt-5.4`.
+- General worker tasks should use `gpt-5.4-mini` with `high` reasoning.
+- Validation tasks should use `gpt-5.4` with `high` reasoning.
+- Bulk or repetitive tasks should prefer `gpt-5.4-mini`.
+
+## Worker Delegation
+
+- Write a short mini-spec before delegating: goal, owned files, non-goals, acceptance criteria, and focused validation commands.
+- Give workers only the minimum context needed for the assigned slice; do not pass full thread history by default.
+- Keep architecture, schema/contract changes, risky runtime wiring, migrations, and cross-language parity decisions on the main agent unless a stronger worker is clearly justified.
+- Prefer one worker per disjoint write scope. Avoid overlapping ownership unless the work is intentionally sequential.
+- Good worker slices in this repo are local module work, CLI/parser/help updates, renderer or TUI slices, focused tests, and repetitive repo tasks.
+- Poor worker slices in this repo are broad Rust/Python parity efforts, sync/apply semantics across resource kinds, and contract redesign without a settled main-agent plan.
+- The main agent owns final architecture decisions, cross-slice integration, final validation, and commits.
 
 ## Commit & Pull Request Guidelines
 

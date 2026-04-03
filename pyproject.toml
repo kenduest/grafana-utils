@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "grafana-util"
-version = "0.2.19"
+version = "0.2.20"
 description = "Grafana dashboard and alerting export/import utilities."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -26,7 +26,7 @@ grafana-util = "grafana_utils.unified_cli:main"
 [tool.poetry]
 requires-poetry = ">=2.1"
 packages = [
-  { include = "grafana_utils" },
+  { include = "grafana_utils", from = "python" },
 ]
 
 [tool.poetry.group.dev.dependencies]
@@ -39,6 +39,8 @@ wheel = ">=0.45,<1"
 
 [tool.setuptools]
 include-package-data = false
+package-dir = {"" = "python"}
 
 [tool.setuptools.packages.find]
+where = ["python"]
 include = ["grafana_utils", "grafana_utils.*"]

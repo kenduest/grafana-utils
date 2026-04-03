@@ -13,7 +13,7 @@
 //! Caveats:
 //! - Keep API-field compatibility logic in `datasource_diff.rs` and import/export helpers.
 //! - Avoid side effects in normalization helpers; keep them as pure value transforms.
-use clap::{Args, Parser, Subcommand, ValueEnum};
+use clap::{ArgAction, Args, Parser, Subcommand, ValueEnum};
 use reqwest::Method;
 use serde_json::{Map, Value};
 use std::collections::BTreeSet;
@@ -31,6 +31,11 @@ use crate::datasource::datasource_diff::{
     build_datasource_diff_report, normalize_export_records, normalize_live_records,
     DatasourceDiffEntry, DatasourceDiffReport, DatasourceDiffStatus,
 };
+use crate::datasource_catalog::{
+    build_add_defaults_for_supported_type, normalize_supported_datasource_type,
+    render_supported_datasource_catalog_json, render_supported_datasource_catalog_text,
+    DatasourcePresetProfile,
+};
 use crate::http::JsonHttpClient;
 
 const DEFAULT_EXPORT_DIR: &str = "datasources";
@@ -38,12 +43,14 @@ const DATASOURCE_EXPORT_FILENAME: &str = "datasources.json";
 const EXPORT_METADATA_FILENAME: &str = "export-metadata.json";
 const ROOT_INDEX_KIND: &str = "grafana-utils-datasource-export-index";
 const TOOL_SCHEMA_VERSION: i64 = 1;
-const DATASOURCE_ROOT_HELP_TEXT: &str = "Examples:\n\n  List datasources as JSON:\n    grafana-util datasource list --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --json\n\n  Dry-run a live datasource create:\n    grafana-util datasource add --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --name prometheus-main --type prometheus --datasource-url http://prometheus:9090 --dry-run --table\n\n  Dry-run a datasource import:\n    grafana-util datasource import --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --import-dir ./datasources --dry-run --json";
-const DATASOURCE_LIST_HELP_TEXT: &str = "Examples:\n\n  grafana-util datasource list --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --json\n  grafana-util datasource list --url http://localhost:3000 --output-format csv";
+const DATASOURCE_ROOT_HELP_TEXT: &str = "Examples:\n\n  Show the built-in datasource type catalog:\n    grafana-util datasource types\n\n  List datasources from the current org as JSON:\n    grafana-util datasource list --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --json\n\n  List datasources across all visible orgs with Basic auth:\n    grafana-util datasource list --url http://localhost:3000 --basic-user admin --basic-password admin --all-orgs --json\n\n  Dry-run a live datasource create with the richer preset scaffold:\n    grafana-util datasource add --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --name prometheus-main --type prometheus --datasource-url http://prometheus:9090 --preset-profile full --dry-run --table\n\n  Dry-run a datasource import:\n    grafana-util datasource import --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --import-dir ./datasources --dry-run --json";
+const DATASOURCE_TYPES_HELP_TEXT: &str =
+    "Examples:\n\n  grafana-util datasource types\n  grafana-util datasource types --json";
+const DATASOURCE_LIST_HELP_TEXT: &str = "Examples:\n\n  grafana-util datasource list --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --json\n  grafana-util datasource list --url http://localhost:3000 --basic-user admin --basic-password admin --org-id 2 --output-format csv\n  grafana-util datasource list --url http://localhost:3000 --basic-user admin --basic-password admin --all-orgs --json";
 const DATASOURCE_EXPORT_HELP_TEXT: &str = "Examples:\n\n  grafana-util datasource export --url http://localhost:3000 --basic-user admin --basic-password admin --export-dir ./datasources --overwrite\n  grafana-util datasource export --url http://localhost:3000 --basic-user admin --basic-password admin --all-orgs --export-dir ./datasources";
 const DATASOURCE_IMPORT_HELP_TEXT: &str = "Examples:\n\n  grafana-util datasource import --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --import-dir ./datasources --dry-run --table\n  grafana-util datasource import --url http://localhost:3000 --basic-user admin --basic-password admin --import-dir ./datasources --use-export-org --only-org-id 2 --create-missing-orgs --dry-run --json";
 const DATASOURCE_DIFF_HELP_TEXT: &str = "Examples:\n\n  grafana-util datasource diff --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --diff-dir ./datasources";
-const DATASOURCE_ADD_HELP_TEXT: &str = "Examples:\n\n  grafana-util datasource add --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --name prometheus-main --type prometheus --datasource-url http://prometheus:9090 --dry-run --table\n  grafana-util datasource add --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --uid loki-main --name loki-main --type loki --datasource-url http://loki:3100 --json-data '{\"timeout\":60}' --dry-run --json";
+const DATASOURCE_ADD_HELP_TEXT: &str = "Examples:\n\n  grafana-util datasource add --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --name prometheus-main --type prometheus --datasource-url http://prometheus:9090 --dry-run --table\n  grafana-util datasource add --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --name logs-main --type grafana-loki-datasource --datasource-url http://loki:3100 --apply-supported-defaults --dry-run --json\n  grafana-util datasource add --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --name tempo-main --type tempo --datasource-url http://tempo:3200 --preset-profile full --dry-run --json\n  grafana-util datasource add --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --uid loki-main --name loki-main --type loki --datasource-url http://loki:3100 --json-data '{\"timeout\":60}' --dry-run --json";
 const DATASOURCE_MODIFY_HELP_TEXT: &str = "Examples:\n\n  grafana-util datasource modify --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --uid prom-main --set-url http://prometheus-v2:9090 --dry-run --json\n  grafana-util datasource modify --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --uid prom-main --set-default true --dry-run --table";
 const DATASOURCE_DELETE_HELP_TEXT: &str = "Examples:\n\n  grafana-util datasource delete --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --uid prom-main --dry-run --json\n  grafana-util datasource delete --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --uid prom-main --yes";
 const DATASOURCE_CONTRACT_FIELDS: &[&str] = &[
@@ -60,6 +67,7 @@ const DATASOURCE_CONTRACT_FIELDS: &[&str] = &[
 #[path = "datasource_diff.rs"]
 mod datasource_diff;
 
+/// Enum definition for ListOutputFormat.
 #[derive(Debug, Clone, Copy, ValueEnum, PartialEq, Eq)]
 pub enum ListOutputFormat {
     Table,
@@ -67,6 +75,7 @@ pub enum ListOutputFormat {
     Json,
 }
 
+/// Enum definition for DryRunOutputFormat.
 #[derive(Debug, Clone, Copy, ValueEnum, PartialEq, Eq)]
 pub enum DryRunOutputFormat {
     Text,
@@ -74,10 +83,50 @@ pub enum DryRunOutputFormat {
     Json,
 }
 
+/// Enum definition for SupportOutputFormat.
+#[derive(Debug, Clone, Copy, ValueEnum, PartialEq, Eq)]
+pub enum SupportOutputFormat {
+    Text,
+    Json,
+}
+
+/// Struct definition for DatasourceTypesArgs.
+#[derive(Debug, Clone, Args)]
+pub struct DatasourceTypesArgs {
+    #[arg(
+        long,
+        default_value_t = false,
+        conflicts_with = "output_format",
+        help = "Render the supported datasource catalog as JSON."
+    )]
+    pub json: bool,
+    #[arg(
+        long,
+        value_enum,
+        conflicts_with = "json",
+        help = "Alternative single-flag output selector. Use text or json."
+    )]
+    pub output_format: Option<SupportOutputFormat>,
+}
+
+/// Struct definition for DatasourceListArgs.
 #[derive(Debug, Clone, Args)]
 pub struct DatasourceListArgs {
     #[command(flatten)]
     pub common: CommonCliArgs,
+    #[arg(
+        long,
+        conflicts_with = "all_orgs",
+        help = "List datasources from one explicit Grafana org ID instead of the current org. Requires Basic auth."
+    )]
+    pub org_id: Option<i64>,
+    #[arg(
+        long,
+        default_value_t = false,
+        conflicts_with = "org_id",
+        help = "Enumerate all visible Grafana orgs and aggregate datasource inventory across them. Requires Basic auth."
+    )]
+    pub all_orgs: bool,
     #[arg(long, default_value_t = false, conflicts_with_all = ["csv", "json"], help = "Render datasource summaries as a table.", help_heading = "Output Options")]
     pub table: bool,
     #[arg(long, default_value_t = false, conflicts_with_all = ["table", "json"], help = "Render datasource summaries as CSV.", help_heading = "Output Options")]
@@ -101,6 +150,7 @@ pub struct DatasourceListArgs {
     pub no_header: bool,
 }
 
+/// Struct definition for DatasourceExportArgs.
 #[derive(Debug, Clone, Args)]
 pub struct DatasourceExportArgs {
     #[command(flatten)]
@@ -138,6 +188,7 @@ pub struct DatasourceExportArgs {
     pub dry_run: bool,
 }
 
+/// Struct definition for DatasourceImportArgs.
 #[derive(Debug, Clone, Args)]
 pub struct DatasourceImportArgs {
     #[command(flatten)]
@@ -247,6 +298,7 @@ pub struct DatasourceImportArgs {
     pub verbose: bool,
 }
 
+/// Struct definition for DatasourceDiffArgs.
 #[derive(Debug, Clone, Args)]
 pub struct DatasourceDiffArgs {
     #[command(flatten)]
@@ -258,6 +310,7 @@ pub struct DatasourceDiffArgs {
     pub diff_dir: PathBuf,
 }
 
+/// Struct definition for DatasourceAddArgs.
 #[derive(Debug, Clone, Args)]
 pub struct DatasourceAddArgs {
     #[command(flatten)]
@@ -269,8 +322,23 @@ pub struct DatasourceAddArgs {
     pub uid: Option<String>,
     #[arg(long, help = "Datasource name to create.")]
     pub name: String,
-    #[arg(long = "type", help = "Grafana datasource plugin type id to create.")]
+    #[arg(
+        long = "type",
+        help = "Grafana datasource plugin type id to create. Supported aliases from `datasource types` are normalized to canonical type ids."
+    )]
     pub datasource_type: String,
+    #[arg(
+        long,
+        default_value_t = false,
+        help = "Legacy shortcut for starter preset defaults on supported datasource types."
+    )]
+    pub apply_supported_defaults: bool,
+    #[arg(
+        long,
+        value_enum,
+        help = "Apply a preset profile for supported datasource types. Use starter to match --apply-supported-defaults or full for a richer scaffold."
+    )]
+    pub preset_profile: Option<DatasourcePresetProfile>,
     #[arg(long, help = "Datasource access mode such as proxy or direct.")]
     pub access: Option<String>,
     #[arg(long, help = "Datasource target URL to store in Grafana.")]
@@ -281,6 +349,48 @@ pub struct DatasourceAddArgs {
         help = "Mark the new datasource as the default datasource."
     )]
     pub is_default: bool,
+    #[arg(
+        long,
+        default_value_t = false,
+        help = "Enable basic auth for the datasource."
+    )]
+    pub basic_auth: bool,
+    #[arg(long, help = "Username for datasource basic auth.")]
+    pub basic_auth_user: Option<String>,
+    #[arg(
+        long,
+        help = "Password for datasource basic auth. Stored in secureJsonData."
+    )]
+    pub basic_auth_password: Option<String>,
+    #[arg(
+        long,
+        help = "Datasource user/login field where the plugin supports it."
+    )]
+    pub user: Option<String>,
+    #[arg(
+        long = "password",
+        help = "Datasource password field where the plugin supports it. Stored in secureJsonData."
+    )]
+    pub datasource_password: Option<String>,
+    #[arg(
+        long,
+        default_value_t = false,
+        help = "Send browser credentials such as cookies for supported datasource types."
+    )]
+    pub with_credentials: bool,
+    #[arg(long, action = ArgAction::Append, help = "Add one custom HTTP header for supported datasource types. May be specified multiple times.", value_name = "NAME=VALUE")]
+    pub http_header: Vec<String>,
+    #[arg(
+        long,
+        default_value_t = false,
+        help = "Set jsonData.tlsSkipVerify=true for supported datasource types."
+    )]
+    pub tls_skip_verify: bool,
+    #[arg(
+        long,
+        help = "Set jsonData.serverName for supported datasource TLS validation."
+    )]
+    pub server_name: Option<String>,
     #[arg(long, help = "Inline JSON object string for datasource jsonData.")]
     pub json_data: Option<String>,
     #[arg(
@@ -316,6 +426,7 @@ pub struct DatasourceAddArgs {
     pub no_header: bool,
 }
 
+/// Struct definition for DatasourceDeleteArgs.
 #[derive(Debug, Clone, Args)]
 pub struct DatasourceDeleteArgs {
     #[command(flatten)]
@@ -336,7 +447,12 @@ pub struct DatasourceDeleteArgs {
         help_heading = "Target Options"
     )]
     pub name: Option<String>,
-    #[arg(long, default_value_t = false, help = "Acknowledge the live datasource delete. Required unless --dry-run is set.", help_heading = "Safety Options")]
+    #[arg(
+        long,
+        default_value_t = false,
+        help = "Acknowledge the live datasource delete. Required unless --dry-run is set.",
+        help_heading = "Safety Options"
+    )]
     pub yes: bool,
     #[arg(
         long,
@@ -370,6 +486,7 @@ pub struct DatasourceDeleteArgs {
     pub no_header: bool,
 }
 
+/// Struct definition for DatasourceModifyArgs.
 #[derive(Debug, Clone, Args)]
 pub struct DatasourceModifyArgs {
     #[command(flatten)]
@@ -389,6 +506,48 @@ pub struct DatasourceModifyArgs {
         help = "Set whether Grafana treats this datasource as default. Use true or false."
     )]
     pub set_default: Option<bool>,
+    #[arg(
+        long,
+        default_value_t = false,
+        help = "Enable basic auth for the datasource."
+    )]
+    pub basic_auth: bool,
+    #[arg(long, help = "Replace datasource basic auth username.")]
+    pub basic_auth_user: Option<String>,
+    #[arg(
+        long,
+        help = "Replace datasource basic auth password. Stored in secureJsonData."
+    )]
+    pub basic_auth_password: Option<String>,
+    #[arg(
+        long,
+        help = "Replace datasource user/login field where the plugin supports it."
+    )]
+    pub user: Option<String>,
+    #[arg(
+        long = "password",
+        help = "Replace datasource password field where the plugin supports it. Stored in secureJsonData."
+    )]
+    pub datasource_password: Option<String>,
+    #[arg(
+        long,
+        default_value_t = false,
+        help = "Set withCredentials=true for supported datasource types."
+    )]
+    pub with_credentials: bool,
+    #[arg(long, action = ArgAction::Append, help = "Replace or add one custom HTTP header for supported datasource types. May be specified multiple times.", value_name = "NAME=VALUE")]
+    pub http_header: Vec<String>,
+    #[arg(
+        long,
+        default_value_t = false,
+        help = "Set jsonData.tlsSkipVerify=true for supported datasource types."
+    )]
+    pub tls_skip_verify: bool,
+    #[arg(
+        long,
+        help = "Set jsonData.serverName for supported datasource TLS validation."
+    )]
+    pub server_name: Option<String>,
     #[arg(
         long,
         help = "Inline JSON object string to merge into datasource jsonData."
@@ -427,8 +586,11 @@ pub struct DatasourceModifyArgs {
     pub no_header: bool,
 }
 
+/// Enum definition for DatasourceGroupCommand.
 #[derive(Debug, Clone, Subcommand)]
 pub enum DatasourceGroupCommand {
+    #[command(about = "Show the built-in supported datasource type catalog.", after_help = DATASOURCE_TYPES_HELP_TEXT)]
+    Types(DatasourceTypesArgs),
     #[command(about = "List live Grafana datasource inventory.", after_help = DATASOURCE_LIST_HELP_TEXT)]
     List(DatasourceListArgs),
     #[command(about = "Create one live Grafana datasource through the Grafana API.", after_help = DATASOURCE_ADD_HELP_TEXT)]
@@ -449,8 +611,10 @@ pub enum DatasourceGroupCommand {
 #[command(
     name = "grafana-util datasource",
     about = "List, add, modify, delete, export, import, and diff Grafana datasources.",
-    after_help = DATASOURCE_ROOT_HELP_TEXT
+    after_help = DATASOURCE_ROOT_HELP_TEXT,
+    styles = crate::help_styles::CLI_HELP_STYLES
 )]
+/// Struct definition for DatasourceCliArgs.
 pub struct DatasourceCliArgs {
     #[command(subcommand)]
     pub command: DatasourceGroupCommand,
@@ -461,6 +625,10 @@ pub struct DatasourceCliArgs {
 #[cfg(test)]
 fn normalize_output_formats(args: &mut DatasourceCliArgs) {
     match &mut args.command {
+        DatasourceGroupCommand::Types(inner) => match inner.output_format {
+            Some(SupportOutputFormat::Json) => inner.json = true,
+            Some(SupportOutputFormat::Text) | None => {}
+        },
         DatasourceGroupCommand::List(inner) => match inner.output_format {
             Some(ListOutputFormat::Table) => inner.table = true,
             Some(ListOutputFormat::Csv) => inner.csv = true,
@@ -497,6 +665,10 @@ fn normalize_datasource_group_command(
     mut command: DatasourceGroupCommand,
 ) -> DatasourceGroupCommand {
     match &mut command {
+        DatasourceGroupCommand::Types(inner) => match inner.output_format {
+            Some(SupportOutputFormat::Json) => inner.json = true,
+            Some(SupportOutputFormat::Text) | None => {}
+        },
         DatasourceGroupCommand::List(inner) => match inner.output_format {
             Some(ListOutputFormat::Table) => inner.table = true,
             Some(ListOutputFormat::Csv) => inner.csv = true,
@@ -531,6 +703,10 @@ fn normalize_datasource_group_command(
 // Parse output-column aliases for datasource import dry-run rendering, accepting both
 // preferred snake_case and legacy camelCase spellings where applicable.
 fn parse_datasource_import_output_column(value: &str) -> std::result::Result<String, String> {
+    // Call graph (hierarchy): this function is used in related modules.
+    // Upstream callers: 無
+    // Downstream callees: 無
+
     match value {
         "uid" => Ok("uid".to_string()),
         "name" => Ok("name".to_string()),
@@ -546,6 +722,10 @@ fn parse_datasource_import_output_column(value: &str) -> std::result::Result<Str
 }
 
 fn parse_bool_choice(value: &str) -> std::result::Result<bool, String> {
+    // Call graph (hierarchy): this function is used in related modules.
+    // Upstream callers: 無
+    // Downstream callees: 無
+
     match value.trim().to_ascii_lowercase().as_str() {
         "true" => Ok(true),
         "false" => Ok(false),
@@ -741,8 +921,18 @@ fn build_datasource_export_metadata(count: usize) -> Value {
     ]))
 }
 
-fn build_data_source_record(datasource: &Map<String, Value>) -> Vec<String> {
-    vec![
+fn data_source_rows_include_org_scope(datasources: &[Map<String, Value>]) -> bool {
+    datasources.iter().any(|datasource| {
+        !string_field(datasource, "org", "").is_empty()
+            || !string_field(datasource, "orgId", "").is_empty()
+    })
+}
+
+fn build_data_source_record(
+    datasource: &Map<String, Value>,
+    include_org_scope: bool,
+) -> Vec<String> {
+    let mut row = vec![
         string_field(datasource, "uid", ""),
         string_field(datasource, "name", ""),
         string_field(datasource, "type", ""),
@@ -756,21 +946,34 @@ fn build_data_source_record(datasource: &Map<String, Value>) -> Vec<String> {
         } else {
             "false".to_string()
         },
-    ]
+    ];
+    if include_org_scope {
+        row.push(string_field(datasource, "org", ""));
+        row.push(string_field(datasource, "orgId", ""));
+    }
+    row
 }
 
 fn render_data_source_table(
     datasources: &[Map<String, Value>],
     include_header: bool,
 ) -> Vec<String> {
-    let headers = vec![
+    let include_org_scope = data_source_rows_include_org_scope(datasources);
+    let mut headers = vec![
         "UID".to_string(),
         "NAME".to_string(),
         "TYPE".to_string(),
         "URL".to_string(),
         "IS_DEFAULT".to_string(),
     ];
-    let rows: Vec<Vec<String>> = datasources.iter().map(build_data_source_record).collect();
+    if include_org_scope {
+        headers.push("ORG".to_string());
+        headers.push("ORG_ID".to_string());
+    }
+    let rows: Vec<Vec<String>> = datasources
+        .iter()
+        .map(|datasource| build_data_source_record(datasource, include_org_scope))
+        .collect();
     let mut widths: Vec<usize> = headers.iter().map(|header| header.len()).collect();
     for row in &rows {
         for (index, value) in row.iter().enumerate() {
@@ -795,9 +998,14 @@ fn render_data_source_table(
 }
 
 fn render_data_source_csv(datasources: &[Map<String, Value>]) -> Vec<String> {
-    let mut lines = vec!["uid,name,type,url,isDefault".to_string()];
+    let include_org_scope = data_source_rows_include_org_scope(datasources);
+    let mut lines = vec![if include_org_scope {
+        "uid,name,type,url,isDefault,org,orgId".to_string()
+    } else {
+        "uid,name,type,url,isDefault".to_string()
+    }];
     lines.extend(datasources.iter().map(|datasource| {
-        build_data_source_record(datasource)
+        build_data_source_record(datasource, include_org_scope)
             .into_iter()
             .map(|value| {
                 if value.contains(',') || value.contains('"') || value.contains('\n') {
@@ -813,21 +1021,45 @@ fn render_data_source_csv(datasources: &[Map<String, Value>]) -> Vec<String> {
 }
 
 fn render_data_source_json(datasources: &[Map<String, Value>]) -> Value {
+    let include_org_scope = data_source_rows_include_org_scope(datasources);
     Value::Array(
         datasources
             .iter()
             .map(|datasource| {
-                let row = build_data_source_record(datasource);
-                Value::Object(Map::from_iter(vec![
+                let row = build_data_source_record(datasource, include_org_scope);
+                let mut object = Map::from_iter(vec![
                     ("uid".to_string(), Value::String(row[0].clone())),
                     ("name".to_string(), Value::String(row[1].clone())),
                     ("type".to_string(), Value::String(row[2].clone())),
                     ("url".to_string(), Value::String(row[3].clone())),
                     ("isDefault".to_string(), Value::String(row[4].clone())),
-                ]))
+                ]);
+                if include_org_scope {
+                    object.insert("org".to_string(), Value::String(row[5].clone()));
+                    object.insert("orgId".to_string(), Value::String(row[6].clone()));
+                }
+                Value::Object(object)
             })
             .collect(),
     )
+}
+
+fn build_list_records(client: &JsonHttpClient) -> Result<Vec<Map<String, Value>>> {
+    let org = fetch_current_org(client)?;
+    let org_name = string_field(&org, "name", "");
+    let org_id = org
+        .get("id")
+        .map(|value| value.to_string())
+        .unwrap_or_else(|| DEFAULT_ORG_ID.to_string());
+    let datasources = list_datasources(client)?;
+    Ok(datasources
+        .into_iter()
+        .map(|mut datasource| {
+            datasource.insert("org".to_string(), Value::String(org_name.clone()));
+            datasource.insert("orgId".to_string(), Value::String(org_id.clone()));
+            datasource
+        })
+        .collect())
 }
 
 fn build_export_index(records: &[Map<String, Value>]) -> Value {
@@ -1035,6 +1267,10 @@ fn export_datasource_scope(
 
 // Parse and validate datasource export metadata before importing any inventory data.
 fn parse_export_metadata(path: &Path) -> Result<DatasourceExportMetadata> {
+    // Call graph (hierarchy): this function is used in related modules.
+    // Upstream callers: datasource.rs:load_diff_record_values, datasource.rs:load_import_records, datasource.rs:parse_export_org_scope
+    // Downstream callees: common.rs:load_json_object_file, common.rs:message
+
     let value = load_json_object_file(path, "Datasource export metadata")?;
     let object = value
         .as_object()
@@ -1279,6 +1515,10 @@ fn parse_export_org_scope(
     import_root: &Path,
     scope_dir: &Path,
 ) -> Result<DatasourceExportOrgScope> {
+    // Call graph (hierarchy): this function is used in related modules.
+    // Upstream callers: datasource.rs:discover_export_org_import_scopes
+    // Downstream callees: common.rs:message, datasource.rs:collect_source_org_ids, datasource.rs:collect_source_org_names, datasource.rs:parse_export_metadata
+
     let metadata = parse_export_metadata(&scope_dir.join(EXPORT_METADATA_FILENAME))?;
     let export_org_ids = collect_source_org_ids(scope_dir, &metadata)?;
     let (source_org_id, source_org_name_from_dir) = if export_org_ids.is_empty() {
@@ -1779,6 +2019,45 @@ fn import_datasources_with_client(
     Ok(created + updated)
 }
 
+pub(crate) fn format_routed_datasource_target_org_label(target_org_id: Option<i64>) -> String {
+    target_org_id
+        .map(|value| value.to_string())
+        .unwrap_or_else(|| "<new>".to_string())
+}
+
+pub(crate) fn format_routed_datasource_scope_summary_fields(
+    source_org_id: i64,
+    source_org_name: &str,
+    org_action: &str,
+    target_org_id: Option<i64>,
+    import_dir: &Path,
+) -> String {
+    let source_org_name = if source_org_name.is_empty() {
+        "-".to_string()
+    } else {
+        source_org_name.to_string()
+    };
+    let target_org_id = format_routed_datasource_target_org_label(target_org_id);
+    format!(
+        "export orgId={} name={} orgAction={} targetOrgId={} from {}",
+        source_org_id,
+        source_org_name,
+        org_action,
+        target_org_id,
+        import_dir.display()
+    )
+}
+
+fn format_routed_datasource_scope_summary(plan: &DatasourceExportOrgTargetPlan) -> String {
+    format_routed_datasource_scope_summary_fields(
+        plan.source_org_id,
+        &plan.source_org_name,
+        plan.org_action,
+        plan.target_org_id,
+        &plan.import_dir,
+    )
+}
+
 fn build_routed_datasource_import_org_row(
     plan: &DatasourceExportOrgTargetPlan,
     datasource_count: usize,
@@ -1791,9 +2070,7 @@ fn build_routed_datasource_import_org_row(
             plan.source_org_name.clone()
         },
         plan.org_action.to_string(),
-        plan.target_org_id
-            .map(|value| value.to_string())
-            .unwrap_or_else(|| "-".to_string()),
+        format_routed_datasource_target_org_label(plan.target_org_id),
         datasource_count.to_string(),
         plan.import_dir.display().to_string(),
     ]
@@ -1941,21 +2218,9 @@ fn import_datasources_by_export_org(args: &DatasourceImportArgs) -> Result<usize
     }
     let mut imported_count = 0usize;
     for plan in plans {
-        let target_org_id_label = plan
-            .target_org_id
-            .map(|value| value.to_string())
-            .unwrap_or_else(|| "-".to_string());
         println!(
-            "Importing export orgId={} name={} orgAction={} targetOrgId={} from {}",
-            plan.source_org_id,
-            if plan.source_org_name.is_empty() {
-                "-"
-            } else {
-                &plan.source_org_name
-            },
-            plan.org_action,
-            target_org_id_label,
-            plan.import_dir.display()
+            "Importing {}",
+            format_routed_datasource_scope_summary(&plan)
         );
         let Some(target_org_id) = plan.target_org_id else {
             continue;
@@ -1967,7 +2232,14 @@ fn import_datasources_by_export_org(args: &DatasourceImportArgs) -> Result<usize
         scoped_args.create_missing_orgs = false;
         scoped_args.import_dir = plan.import_dir.clone();
         let scoped_client = build_http_client_for_org(&args.common, target_org_id)?;
-        imported_count += import_datasources_with_client(&scoped_client, &scoped_args)?;
+        imported_count +=
+            import_datasources_with_client(&scoped_client, &scoped_args).map_err(|error| {
+                message(format!(
+                    "Datasource routed import failed for {}: {}",
+                    format_routed_datasource_scope_summary(&plan),
+                    error
+                ))
+            })?;
     }
     Ok(imported_count)
 }
@@ -2064,6 +2336,10 @@ fn parse_json_object_argument(
     value: Option<&str>,
     label: &str,
 ) -> Result<Option<Map<String, Value>>> {
+    // Call graph (hierarchy): this function is used in related modules.
+    // Upstream callers: datasource.rs:build_add_payload, datasource.rs:build_modify_updates, datasource_rust_tests.rs:parse_json_object_argument_rejects_non_object_values
+    // Downstream callees: common.rs:message
+
     let Some(raw) = value else {
         return Ok(None);
     };
@@ -2076,14 +2352,83 @@ fn parse_json_object_argument(
     Ok(Some(object))
 }
 
+fn merge_json_object_defaults(existing: &mut Map<String, Value>, incoming: Map<String, Value>) {
+    for (key, value) in incoming {
+        match (existing.get_mut(&key), value) {
+            (Some(Value::Object(existing_value)), Value::Object(incoming_value)) => {
+                merge_json_object_defaults(existing_value, incoming_value);
+            }
+            (_, value) => {
+                existing.insert(key, value);
+            }
+        }
+    }
+}
+
+fn merge_json_object_fields(
+    base: Option<Map<String, Value>>,
+    extra: Map<String, Value>,
+    label: &str,
+) -> Result<Map<String, Value>> {
+    let mut merged = base.unwrap_or_default();
+    for (key, value) in extra {
+        if merged.contains_key(&key) {
+            return Err(message(format!(
+                "{label} would overwrite existing key {key:?}. Move that field to one place."
+            )));
+        }
+        merged.insert(key, value);
+    }
+    Ok(merged)
+}
+
+fn parse_http_header_arguments(
+    values: &[String],
+) -> Result<(Map<String, Value>, Map<String, Value>)> {
+    let mut json_data = Map::new();
+    let mut secure_json_data = Map::new();
+    for (index, item) in values.iter().enumerate() {
+        let raw = item.trim();
+        let Some((name, value)) = raw.split_once('=') else {
+            return Err(message(format!(
+                "--http-header requires NAME=VALUE form. Invalid value: {raw:?}."
+            )));
+        };
+        let header_name = name.trim();
+        if header_name.is_empty() {
+            return Err(message(format!(
+                "--http-header requires a non-empty header name. Invalid value: {raw:?}."
+            )));
+        }
+        let suffix = index + 1;
+        json_data.insert(
+            format!("httpHeaderName{suffix}"),
+            Value::String(header_name.to_string()),
+        );
+        secure_json_data.insert(
+            format!("httpHeaderValue{suffix}"),
+            Value::String(value.to_string()),
+        );
+    }
+    Ok((json_data, secure_json_data))
+}
+
 fn build_add_payload(args: &DatasourceAddArgs) -> Result<Value> {
+    let normalized_type = normalize_supported_datasource_type(&args.datasource_type);
+    let preset_profile = args
+        .preset_profile
+        .unwrap_or(DatasourcePresetProfile::Starter);
+    let use_preset_defaults = args.apply_supported_defaults || args.preset_profile.is_some();
     let mut payload = Map::from_iter(vec![
         ("name".to_string(), Value::String(args.name.clone())),
-        (
-            "type".to_string(),
-            Value::String(args.datasource_type.clone()),
-        ),
+        ("type".to_string(), Value::String(normalized_type.clone())),
     ]);
+    if use_preset_defaults {
+        for (key, value) in build_add_defaults_for_supported_type(&normalized_type, preset_profile)
+        {
+            payload.insert(key, value);
+        }
+    }
     if let Some(uid) = &args.uid {
         if !uid.trim().is_empty() {
             payload.insert("uid".to_string(), Value::String(uid.trim().to_string()));
@@ -2105,16 +2450,88 @@ fn build_add_payload(args: &DatasourceAddArgs) -> Result<Value> {
     if args.is_default {
         payload.insert("isDefault".to_string(), Value::Bool(true));
     }
-    if let Some(json_data) = parse_json_object_argument(args.json_data.as_deref(), "--json-data")? {
-        payload.insert("jsonData".to_string(), Value::Object(json_data));
+    if args.basic_auth || args.basic_auth_user.is_some() || args.basic_auth_password.is_some() {
+        payload.insert("basicAuth".to_string(), Value::Bool(true));
     }
-    if let Some(secure_json_data) =
-        parse_json_object_argument(args.secure_json_data.as_deref(), "--secure-json-data")?
-    {
+    if let Some(basic_auth_user) = &args.basic_auth_user {
+        if !basic_auth_user.trim().is_empty() {
+            payload.insert(
+                "basicAuthUser".to_string(),
+                Value::String(basic_auth_user.trim().to_string()),
+            );
+        }
+    }
+    if let Some(user) = &args.user {
+        if !user.trim().is_empty() {
+            payload.insert("user".to_string(), Value::String(user.trim().to_string()));
+        }
+    }
+    if args.with_credentials {
+        payload.insert("withCredentials".to_string(), Value::Bool(true));
+    }
+
+    let mut json_data = parse_json_object_argument(args.json_data.as_deref(), "--json-data")?;
+    let mut secure_json_data =
+        parse_json_object_argument(args.secure_json_data.as_deref(), "--secure-json-data")?;
+    let mut derived_json_data = Map::new();
+    if args.tls_skip_verify {
+        derived_json_data.insert("tlsSkipVerify".to_string(), Value::Bool(true));
+    }
+    if let Some(server_name) = &args.server_name {
+        if !server_name.trim().is_empty() {
+            derived_json_data.insert(
+                "serverName".to_string(),
+                Value::String(server_name.trim().to_string()),
+            );
+        }
+    }
+    let (header_json_data, header_secure_json_data) =
+        parse_http_header_arguments(&args.http_header)?;
+    derived_json_data.extend(header_json_data);
+    if !derived_json_data.is_empty() || json_data.is_some() {
+        json_data = Some(merge_json_object_fields(
+            json_data,
+            derived_json_data,
+            "--json-data",
+        )?);
+    }
+    let mut derived_secure_json_data = Map::new();
+    if let Some(basic_auth_password) = &args.basic_auth_password {
+        derived_secure_json_data.insert(
+            "basicAuthPassword".to_string(),
+            Value::String(basic_auth_password.to_string()),
+        );
+    }
+    if let Some(password) = &args.datasource_password {
+        derived_secure_json_data
+            .insert("password".to_string(), Value::String(password.to_string()));
+    }
+    derived_secure_json_data.extend(header_secure_json_data);
+    if !derived_secure_json_data.is_empty() || secure_json_data.is_some() {
+        secure_json_data = Some(merge_json_object_fields(
+            secure_json_data,
+            derived_secure_json_data,
+            "--secure-json-data",
+        )?);
+    }
+    if let Some(json_data) = json_data {
+        let merged_json_data = match payload.remove("jsonData") {
+            Some(Value::Object(mut existing)) => {
+                merge_json_object_defaults(&mut existing, json_data);
+                Value::Object(existing)
+            }
+            _ => Value::Object(json_data),
+        };
+        payload.insert("jsonData".to_string(), merged_json_data);
+    }
+    if let Some(secure_json_data) = secure_json_data {
         payload.insert(
             "secureJsonData".to_string(),
             Value::Object(secure_json_data),
         );
+    }
+    if args.basic_auth_password.is_some() && args.basic_auth_user.is_none() {
+        return Err(message("--basic-auth-password requires --basic-auth-user."));
     }
     Ok(Value::Object(payload))
 }
@@ -2137,12 +2554,71 @@ fn build_modify_updates(args: &DatasourceModifyArgs) -> Result<Map<String, Value
     if let Some(is_default) = args.set_default {
         updates.insert("isDefault".to_string(), Value::Bool(is_default));
     }
-    if let Some(json_data) = parse_json_object_argument(args.json_data.as_deref(), "--json-data")? {
+    if args.basic_auth || args.basic_auth_user.is_some() || args.basic_auth_password.is_some() {
+        updates.insert("basicAuth".to_string(), Value::Bool(true));
+    }
+    if let Some(basic_auth_user) = &args.basic_auth_user {
+        updates.insert(
+            "basicAuthUser".to_string(),
+            Value::String(basic_auth_user.to_string()),
+        );
+    }
+    if let Some(user) = &args.user {
+        updates.insert("user".to_string(), Value::String(user.to_string()));
+    }
+    if args.with_credentials {
+        updates.insert("withCredentials".to_string(), Value::Bool(true));
+    }
+
+    let mut json_data = parse_json_object_argument(args.json_data.as_deref(), "--json-data")?;
+    let mut secure_json_data =
+        parse_json_object_argument(args.secure_json_data.as_deref(), "--secure-json-data")?;
+    let mut derived_json_data = Map::new();
+    if args.tls_skip_verify {
+        derived_json_data.insert("tlsSkipVerify".to_string(), Value::Bool(true));
+    }
+    if let Some(server_name) = &args.server_name {
+        if !server_name.trim().is_empty() {
+            derived_json_data.insert(
+                "serverName".to_string(),
+                Value::String(server_name.trim().to_string()),
+            );
+        }
+    }
+    let (header_json_data, header_secure_json_data) =
+        parse_http_header_arguments(&args.http_header)?;
+    derived_json_data.extend(header_json_data);
+    if !derived_json_data.is_empty() || json_data.is_some() {
+        json_data = Some(merge_json_object_fields(
+            json_data,
+            derived_json_data,
+            "--json-data",
+        )?);
+    }
+    if let Some(json_data) = json_data {
         updates.insert("jsonData".to_string(), Value::Object(json_data));
     }
-    if let Some(secure_json_data) =
-        parse_json_object_argument(args.secure_json_data.as_deref(), "--secure-json-data")?
-    {
+
+    let mut derived_secure_json_data = Map::new();
+    if let Some(basic_auth_password) = &args.basic_auth_password {
+        derived_secure_json_data.insert(
+            "basicAuthPassword".to_string(),
+            Value::String(basic_auth_password.to_string()),
+        );
+    }
+    if let Some(password) = &args.datasource_password {
+        derived_secure_json_data
+            .insert("password".to_string(), Value::String(password.to_string()));
+    }
+    derived_secure_json_data.extend(header_secure_json_data);
+    if !derived_secure_json_data.is_empty() || secure_json_data.is_some() {
+        secure_json_data = Some(merge_json_object_fields(
+            secure_json_data,
+            derived_secure_json_data,
+            "--secure-json-data",
+        )?);
+    }
+    if let Some(secure_json_data) = secure_json_data {
         updates.insert(
             "secureJsonData".to_string(),
             Value::Object(secure_json_data),
@@ -2177,7 +2653,10 @@ fn fetch_datasource_by_uid_if_exists(
     }
 }
 
-fn build_modify_payload(existing: &Map<String, Value>, updates: &Map<String, Value>) -> Value {
+fn build_modify_payload(
+    existing: &Map<String, Value>,
+    updates: &Map<String, Value>,
+) -> Result<Value> {
     let mut payload = Map::from_iter(vec![
         (
             "id".to_string(),
@@ -2216,6 +2695,26 @@ fn build_modify_payload(existing: &Map<String, Value>, updates: &Map<String, Val
     if let Some(database) = existing.get("database").cloned() {
         payload.insert("database".to_string(), database);
     }
+    if let Some(value) = updates.get("basicAuth").cloned() {
+        payload.insert("basicAuth".to_string(), value);
+    } else if let Some(value) = existing.get("basicAuth").cloned() {
+        payload.insert("basicAuth".to_string(), value);
+    }
+    if let Some(value) = updates.get("basicAuthUser").cloned() {
+        payload.insert("basicAuthUser".to_string(), value);
+    } else if let Some(value) = existing.get("basicAuthUser").cloned() {
+        payload.insert("basicAuthUser".to_string(), value);
+    }
+    if let Some(value) = updates.get("user").cloned() {
+        payload.insert("user".to_string(), value);
+    } else if let Some(value) = existing.get("user").cloned() {
+        payload.insert("user".to_string(), value);
+    }
+    if let Some(value) = updates.get("withCredentials").cloned() {
+        payload.insert("withCredentials".to_string(), value);
+    } else if let Some(value) = existing.get("withCredentials").cloned() {
+        payload.insert("withCredentials".to_string(), value);
+    }
     let merged_json_data = {
         let mut json_data = existing
             .get("jsonData")
@@ -2223,9 +2722,7 @@ fn build_modify_payload(existing: &Map<String, Value>, updates: &Map<String, Val
             .cloned()
             .unwrap_or_default();
         if let Some(update_json_data) = updates.get("jsonData").and_then(Value::as_object) {
-            for (key, value) in update_json_data {
-                json_data.insert(key.clone(), value.clone());
-            }
+            merge_json_object_defaults(&mut json_data, update_json_data.clone());
         }
         json_data
     };
@@ -2240,12 +2737,22 @@ fn build_modify_payload(existing: &Map<String, Value>, updates: &Map<String, Val
             );
         }
     }
+    if updates
+        .get("secureJsonData")
+        .and_then(Value::as_object)
+        .is_some_and(|secure_json_data| secure_json_data.contains_key("basicAuthPassword"))
+        && !payload.contains_key("basicAuthUser")
+    {
+        return Err(message(
+            "--basic-auth-password requires --basic-auth-user or an existing basicAuthUser.",
+        ));
+    }
     for key in ["url", "access", "isDefault"] {
         if let Some(value) = updates.get(key).cloned() {
             payload.insert(key.to_string(), value);
         }
     }
-    Value::Object(payload)
+    Ok(Value::Object(payload))
 }
 
 fn resolve_live_mutation_match(
@@ -2590,6 +3097,7 @@ fn print_datasource_diff_report(report: &DatasourceDiffReport) {
     }
 }
 
+/// Purpose: implementation note.
 pub(crate) fn diff_datasources_with_live(
     diff_dir: &Path,
     live: &[Map<String, Value>],
@@ -2618,11 +3126,63 @@ pub(crate) fn diff_datasources_with_live(
 /// After command normalization, this function builds required clients, validates constraints
 /// for output mode flags, and delegates execution to list/export/import/diff handlers.
 pub fn run_datasource_cli(command: DatasourceGroupCommand) -> Result<()> {
+    // Call graph (hierarchy): this function is used in related modules.
+    // Upstream callers: datasource_rust_tests.rs:datasource_import_rejects_output_columns_without_table_output, datasource_rust_tests.rs:datasource_import_with_use_export_org_requires_basic_auth
+    // Downstream callees: common.rs:message, common.rs:write_json_file, dashboard_cli_defs.rs:build_http_client_for_org, dashboard_live.rs:list_datasources, datasource.rs:build_add_payload, datasource.rs:build_all_orgs_export_index, datasource.rs:build_all_orgs_export_metadata, datasource.rs:build_all_orgs_output_dir, datasource.rs:build_datasource_export_metadata, datasource.rs:build_export_index, datasource.rs:build_export_records, datasource.rs:build_list_records ...
+
     let command = normalize_datasource_group_command(command);
     match command {
+        DatasourceGroupCommand::Types(args) => {
+            if args.json {
+                println!(
+                    "{}",
+                    serde_json::to_string_pretty(&render_supported_datasource_catalog_json())?
+                );
+            } else {
+                for line in render_supported_datasource_catalog_text() {
+                    println!("{line}");
+                }
+            }
+            Ok(())
+        }
         DatasourceGroupCommand::List(args) => {
-            let client = build_http_client(&args.common)?;
-            let datasources = list_datasources(&client)?;
+            let datasources = if args.all_orgs {
+                let context = build_auth_context(&args.common)?;
+                if context.auth_mode != "basic" {
+                    return Err(message(
+                        "Datasource list with --all-orgs requires Basic auth (--basic-user / --basic-password).",
+                    ));
+                }
+                let admin_client = build_http_client(&args.common)?;
+                let mut rows = Vec::new();
+                for org in list_orgs(&admin_client)? {
+                    let org_id = org
+                        .get("id")
+                        .and_then(Value::as_i64)
+                        .ok_or_else(|| message("Grafana org list entry is missing numeric id."))?;
+                    let org_client = build_http_client_for_org(&args.common, org_id)?;
+                    rows.extend(build_list_records(&org_client)?);
+                }
+                rows.sort_by(|left, right| {
+                    let left_org_id = string_field(left, "orgId", "");
+                    let right_org_id = string_field(right, "orgId", "");
+                    left_org_id
+                        .cmp(&right_org_id)
+                        .then_with(|| {
+                            string_field(left, "name", "").cmp(&string_field(right, "name", ""))
+                        })
+                        .then_with(|| {
+                            string_field(left, "uid", "").cmp(&string_field(right, "uid", ""))
+                        })
+                });
+                rows
+            } else if args.org_id.is_some() {
+                let client = resolve_target_client(&args.common, args.org_id)?;
+                build_list_records(&client)?
+            } else {
+                let client = build_http_client(&args.common)?;
+                list_datasources(&client)?
+            };
             if args.json {
                 println!(
                     "{}",
@@ -2719,7 +3279,7 @@ pub fn run_datasource_cli(command: DatasourceGroupCommand) -> Result<()> {
             let existing = fetch_datasource_by_uid_if_exists(&client, &args.uid)?;
             let (action, destination, payload, name, datasource_type, target_id) =
                 if let Some(existing) = existing {
-                    let payload = build_modify_payload(&existing, &updates);
+                    let payload = build_modify_payload(&existing, &updates)?;
                     (
                         "would-update",
                         "exists-uid",
@@ -2847,7 +3407,9 @@ pub fn run_datasource_cli(command: DatasourceGroupCommand) -> Result<()> {
                 return Ok(());
             }
             if !args.yes {
-                return Err(message("Datasource delete requires --yes unless --dry-run is set."));
+                return Err(message(
+                    "Datasource delete requires --yes unless --dry-run is set.",
+                ));
             }
             if matching.action != "would-delete" {
                 return Err(message(format!(
@@ -3045,6 +3607,10 @@ impl DatasourceCliArgs {
         I: IntoIterator<Item = T>,
         T: Into<std::ffi::OsString> + Clone,
     {
+        // Call graph (hierarchy): this function is used in related modules.
+        // Upstream callers: datasource_rust_tests.rs:build_add_payload_keeps_optional_json_fields, datasource_rust_tests.rs:build_modify_updates_keeps_optional_json_fields, datasource_rust_tests.rs:datasource_import_rejects_output_columns_without_table_output, datasource_rust_tests.rs:datasource_import_with_use_export_org_requires_basic_auth, datasource_rust_tests.rs:parse_datasource_add_supports_output_format_table, datasource_rust_tests.rs:parse_datasource_delete_accepts_yes_confirmation, datasource_rust_tests.rs:parse_datasource_delete_supports_output_format_json, datasource_rust_tests.rs:parse_datasource_export_supports_all_orgs_flag, datasource_rust_tests.rs:parse_datasource_export_supports_org_scope_flags, datasource_rust_tests.rs:parse_datasource_import_preserves_requested_path, datasource_rust_tests.rs:parse_datasource_import_supports_output_columns, datasource_rust_tests.rs:parse_datasource_import_supports_output_format_table ...
+        // Downstream callees: datasource.rs:normalize_output_formats
+
         let mut args = Self::parse_from(iter);
         normalize_output_formats(&mut args);
         args

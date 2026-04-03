@@ -113,6 +113,9 @@ Exported prompt mem-main -> dashboards/prompt/Infra/MEM__mem-main.json
 Dashboard export completed: 2 dashboard(s), 4 file(s) written
 ```
 
+補充：
+- 使用 `--all-orgs` 時，匯出根目錄的 `export-metadata.json` 會包含 `orgCount` 與每個已匯出 org 的 `orgs[]` 摘要。
+
 ### 3.2 `dashboard list`
 
 **用途**：列出線上的 dashboards。
@@ -259,7 +262,7 @@ Dashboard diff found 1 differing item(s).
 
 | 參數 | 用途 | 差異 / 情境 |
 | --- | --- | --- |
-| `--import-dir`（必須） | 指向 raw/ 目錄 | 不連線線上 API |
+| `--import-dir`（必須） | 指向單一 org 的 raw/ 目錄，或 `--all-orgs` 產生的整體匯出根目錄 | 不連線線上 API |
 | `--json` | JSON 輸出 | 與 `--table`/`--report*` 互斥 |
 | `--table` | 表格輸出 | 與 `--json` 互斥 |
 | `--report` | report mode 快捷；可為空值 | 空值預設是 flat table；也可指定 `csv`、`json`、`tree`、`tree-table`、`dependency`、`dependency-json`、`governance`、`governance-json` |
@@ -273,6 +276,29 @@ Dashboard diff found 1 differing item(s).
 範例指令：
 ```bash
 grafana-util dashboard inspect-export --import-dir ./dashboards/raw --output-format report-table
+```
+
+多 org 整體匯出根目錄：
+```bash
+grafana-util dashboard inspect-export --import-dir ./dashboards --output-format report-tree-table
+```
+
+檢查 datasource 自己的 org、database、bucket、index pattern 欄位：
+```bash
+grafana-util dashboard inspect-export --import-dir ./dashboards/raw --report csv \
+  --report-columns datasource_name,datasource_org,datasource_org_id,datasource_database,datasource_bucket,datasource_index_pattern,query
+```
+
+檢查 metrics、functions、bucket 抽取：
+```bash
+grafana-util dashboard inspect-export --import-dir ./dashboards/raw --report csv \
+  --report-columns panel_id,ref_id,datasource_name,metrics,functions,buckets,query
+```
+
+檢查 folder 身分和來源檔案路徑：
+```bash
+grafana-util dashboard inspect-export --import-dir ./dashboards/raw --report csv \
+  --report-columns dashboard_uid,folder_path,folder_uid,parent_folder_uid,file
 ```
 
 範例輸出：
@@ -325,6 +351,7 @@ grafana-util dashboard inspect-live --url http://localhost:3000 --basic-user adm
 - `--report-columns` 只適用 flat 或 grouped table 類 report；summary JSON、dependency contract、governance 輸出都會拒絕。
 - `--report-filter-datasource` 會精準匹配 datasource label、uid、type、normalized family。
 - `--report-filter-panel-id` 只適用 report 類輸出。
+- `dependency` / `dependency-json` 會輸出機器可讀的契約文件：含 `queryCount`、`datasourceCount`、`dashboardCount` 等彙總欄位，以及 `queries`、`datasourceUsage` 內容區。
 
 ### 3.8 `dashboard inspect-vars`
 
@@ -420,20 +447,45 @@ Alert export completed: 3 resource(s) written
 | `--import-dir`（必須） | 指向 alert `raw/` 目錄 | 不能指向上層目錄 |
 | `--replace-existing` | 已存在則更新 | 常見於正式匯入覆寫 |
 | `--dry-run` | 僅模擬執行，不真的送 API | 建議先確認變更範圍 |
+| `--json` | 結構化 dry-run 預覽 | 適合自動化 |
 | `--dashboard-uid-map` | dashboard uid 對照檔 | linked rule 在目標系統 UID 變更時必備 |
 | `--panel-id-map` | panel id 對照檔 | 修復 linked alert 內 panel 參考 |
 
 範例指令：
 ```bash
-grafana-util alert import --url http://localhost:3000 --basic-user admin --basic-password admin --import-dir ./alerts/raw --replace-existing --dry-run
+grafana-util alert import --url http://localhost:3000 --basic-user admin --basic-password admin --import-dir ./alerts/raw --replace-existing --dry-run --json
 ```
 
 範例輸出：
-```text
-kind=contact-point name=oncall-webhook action=would-update
-kind=rule-group name=linux-hosts action=would-create
-kind=template name=default_message action=no-change
+```json
+{
+  "summary": {
+    "processed": 2,
+    "wouldCreate": 1,
+    "wouldUpdate": 1,
+    "wouldFailExisting": 0
+  },
+  "rows": [
+    {
+      "path": "alerts/raw/contact-points/Smoke_Webhook/Smoke_Webhook__smoke-webhook.json",
+      "kind": "grafana-contact-point",
+      "identity": "smoke-webhook",
+      "action": "would-update"
+    },
+    {
+      "path": "alerts/raw/policies/notification-policies.json",
+      "kind": "grafana-notification-policies",
+      "identity": "grafana-default-email",
+      "action": "would-create"
+    }
+  ]
+}
 ```
+
+如何判讀：
+- `summary` 是 replay 前最快的安全檢查。
+- `would-*` 是 dry-run 預測結果。
+- `kind` 可快速看出哪一類 alert 資源會變動。
 
 ### 4.3 `alert diff`（legacy `diff-alert`）
 
@@ -442,21 +494,39 @@ kind=template name=default_message action=no-change
 | 參數 | 用途 | 差異 / 情境 |
 | --- | --- | --- |
 | `--diff-dir`（必須） | 指向 raw 目錄 | 比對本地匯出與線上狀態的基準目錄 |
+| `--json` | 結構化 diff 輸出 | 適合自動化 |
 | `--dashboard-uid-map` | dashboard 對映，確保跨環境比對一致 | 跨環境 UID 不一致時使用 |
 | `--panel-id-map` | panel 對映，修正 linked path | panel 編號差異時使用 |
 
 範例指令：
 ```bash
-grafana-util alert diff --url http://localhost:3000 --basic-user admin --basic-password admin --diff-dir ./alerts/raw
+grafana-util alert diff --url http://localhost:3000 --basic-user admin --basic-password admin --diff-dir ./alerts/raw --json
 ```
 
 範例輸出：
-```text
-Diff different
-
-resource=contact-point name=oncall-webhook
-- url=http://127.0.0.1/notify
-+ url=http://127.0.0.1/updated
+```json
+{
+  "summary": {
+    "checked": 2,
+    "same": 1,
+    "different": 1,
+    "missingRemote": 0
+  },
+  "rows": [
+    {
+      "path": "alerts/raw/contact-points/Smoke_Webhook/Smoke_Webhook__smoke-webhook.json",
+      "kind": "grafana-contact-point",
+      "identity": "smoke-webhook",
+      "action": "different"
+    },
+    {
+      "path": "alerts/raw/policies/notification-policies.json",
+      "kind": "grafana-notification-policies",
+      "identity": "grafana-default-email",
+      "action": "same"
+    }
+  ]
+}
 ```
 
 ### 4.4 `alert list-rules`（legacy `list-alert-rules`）
@@ -508,6 +578,9 @@ default_message    Alert: {{ .CommonLabels.alertname }}
 ops_summary        [{{ .Status }}] {{ .CommonLabels.severity }}
 ```
 
+跨 org 說明：
+- `--org-id` 與 `--all-orgs` 在 alert list 命令中只支援 Basic Auth，因為 Grafana org 切換需要管理員式 org scope 變更。
+
 5) datasource 命令
 ------------------
 
@@ -517,6 +590,8 @@ ops_summary        [{{ .Status }}] {{ .CommonLabels.severity }}
 
 | 參數 | 用途 | 差異 / 情境 |
 | --- | --- | --- |
+| `--org-id` | 限定單一 org | 需搭配 Basic Auth |
+| `--all-orgs` | 彙整所有可見 org | 跨 org 盤點，需搭配 Basic Auth |
 | `--table` | 表格輸出 | 人工掃描 |
 | `--csv` | CSV 輸出 | 報表 |
 | `--json` | JSON 輸出 | 腳本 |
@@ -535,6 +610,9 @@ prom-main          prometheus-main    prometheus   http://prometheus:9090
 loki-prod          loki-prod          loki         http://loki:3100
 tempo-prod         tempo-prod         tempo        http://tempo:3200
 ```
+
+跨 org 說明：
+- `--org-id` 與 `--all-orgs` 只支援 Basic Auth，因為 datasource list 需要透過 Grafana 管理員式 org 切換來盤點資料。
 
 ### 5.2 `datasource export`
 
@@ -1389,12 +1467,14 @@ grafana-util dashboard inspect-live --url <URL> --basic-user <USER> --basic-pass
 
 # alert
 grafana-util alert export --url <URL> --token <TOKEN> --output-dir <DIR> [--flat] [--overwrite]
-grafana-util alert import --url <URL> --basic-user <USER> --basic-password <PASS> --import-dir <DIR>/raw --replace-existing [--dry-run] [--dashboard-uid-map <FILE>] [--panel-id-map <FILE>]
-grafana-util alert diff --url <URL> --basic-user <USER> --basic-password <PASS> --diff-dir <DIR>/raw [--dashboard-uid-map <FILE>] [--panel-id-map <FILE>]
+grafana-util alert import --url <URL> --basic-user <USER> --basic-password <PASS> --import-dir <DIR>/raw --replace-existing [--dry-run] [--json] [--dashboard-uid-map <FILE>] [--panel-id-map <FILE>]
+grafana-util alert diff --url <URL> --basic-user <USER> --basic-password <PASS> --diff-dir <DIR>/raw [--json] [--dashboard-uid-map <FILE>] [--panel-id-map <FILE>]
 grafana-util alert list-rules --url <URL> --token <TOKEN> [--table|--csv|--json]
+grafana-util alert list-rules --url <URL> --basic-user <USER> --basic-password <PASS> [--org-id <ORG_ID>|--all-orgs] [--table|--csv|--json]
 
 # datasource
 grafana-util datasource list --url <URL> --token <TOKEN> [--table|--csv|--json]
+grafana-util datasource list --url <URL> --basic-user <USER> --basic-password <PASS> [--org-id <ORG_ID>|--all-orgs] [--table|--csv|--json]
 grafana-util datasource add --url <URL> --token <TOKEN> --name <NAME> --type <TYPE> [--uid <UID>] [--access proxy|direct] [--datasource-url <URL>] [--basic-auth] [--basic-auth-user <USER>] [--basic-auth-password <PASS>] [--user <USER>] [--password <PASS>] [--with-credentials] [--http-header NAME=VALUE] [--tls-skip-verify] [--server-name <NAME>] [--json-data <JSON>] [--secure-json-data <JSON>] [--dry-run] [--table|--json|--output-format text|table|json]
 grafana-util datasource export --url <URL> --basic-user <USER> --basic-password <PASS> --export-dir <DIR> [--overwrite] [--dry-run] [--org-id <ORG_ID>|--all-orgs]
 grafana-util datasource import --url <URL> --basic-user <USER> --basic-password <PASS> --import-dir <DIR> --replace-existing [--org-id <ORG_ID>] [--use-export-org [--only-org-id <ORG_ID>]... [--create-missing-orgs]] [--dry-run] [--output-format table|text|json] [--output-columns uid,name,type,destination,action,org_id,file]
@@ -1466,7 +1546,9 @@ grafana-util access service-account token delete --url <URL> --token <TOKEN> --n
 | dashboard list | 可用（不可用 token，需 Grafana 帳號密碼） | 可用（不可用 token，需 Grafana 帳號密碼） |
 | dashboard export | 可用（不可用 token，需 Grafana 帳號密碼） | 可用（不可用 token，需 Grafana 帳號密碼） |
 | dashboard import | 可用（不可用 token，需 Grafana 帳號密碼） | 不可 |
+| datasource list | 可用（不可用 token，需 Grafana 帳號密碼） | 可用（不可用 token，需 Grafana 帳號密碼） |
 | datasource export | 可用（不可用 token，需 Grafana 帳號密碼） | 可用（不可用 token，需 Grafana 帳號密碼） |
 | datasource import | 可用（不可用 token，需 Grafana 帳號密碼） | 不可 |
-| alert 全部 | 不支援 `org-id`/`all-orgs` | 不支援 |
+| alert list-* | 可用（不可用 token，需 Grafana 帳號密碼） | 可用（不可用 token，需 Grafana 帳號密碼） |
+| alert export/import/diff | 不支援 `org-id`/`all-orgs` | 不支援 |
 | access 全部 | 用 `--scope` 替代 | 不支援 |
