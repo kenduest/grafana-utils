@@ -146,6 +146,9 @@ pre:hover .code-controls { opacity: 1; }
 #theme-select { width: 128px; }
 
 .layout { display: grid; grid-template-columns: 232px minmax(0, 1fr) 244px; gap: 20px; align-items: start; }
+.layout.layout-no-nav { grid-template-columns: minmax(0, 1fr) 244px; }
+.layout.layout-no-sidebar { grid-template-columns: 232px minmax(0, 1fr); }
+.layout.layout-no-nav.layout-no-sidebar { grid-template-columns: minmax(0, 1fr); }
 @media (max-width: 1280px) { .layout { grid-template-columns: 210px minmax(0, 1fr); gap: 18px; } .sidebar { display: none !important; } }
 @media (max-width: 768px) { .layout { grid-template-columns: 1fr; } .nav-sidebar { display: none !important; } }
 
@@ -742,10 +745,7 @@ ops-user    Viewer  create   missing
     <nav class="footer-nav"><a class="link-card" href="change-overview-status.html"><span>Previous</span>Project Status &amp; Change Overview</a><a class="link-card" href="recipes.html"><span>Next</span>Best Practices &amp; Real-World Recipes</a></nav>
   </article>
   <aside class="sidebar">
-  <section class="sidebar-section"><h2>On This Page</h2><ul class="toc-list"><li class="toc-level-2"><a href="#1-environment-verification"><span class="toc-label">1. Environment Verification</span></a></li><li class="toc-level-2"><a href="#2-estate-wide-audit"><span class="toc-label">2. Estate-Wide Audit</span></a></li><li class="toc-level-2"><a href="#3-reliable-backups-dashboard-export"><span class="toc-label">3. Reliable Backups (Dashboard Export)</span></a></li><li class="toc-level-2"><a href="#4-controlled-restore-dashboard-import"><span class="toc-label">4. Controlled Restore (Dashboard Import)</span></a></li><li class="toc-level-2"><a href="#5-alert-governance-planapply"><span class="toc-label">5. Alert Governance (Plan/Apply)</span></a></li><li class="toc-level-2"><a href="#6-identity-replay-access-management"><span class="toc-label">6. Identity Replay (Access Management)</span></a></li></ul></section>
-  <section class="sidebar-section"><h2>Related</h2></section>
-  <section class="sidebar-section"><h2>Version</h2><p class="sidebar-meta-text">Current checkout</p></section>
-  <section class="sidebar-section"><h2>Language</h2><ul class="sidebar-meta-list"><li><a href="#" class="sidebar-meta-link sidebar-meta-current">Current: English</a></li><li><a href="../zh-TW/scenarios.html" class="sidebar-meta-link">Switch to 繁體中文</a></li></ul></section>
+  <section class="sidebar-section"><h2>On This Page</h2><ul class="toc-list"><li class="toc-level-2"><a href="#1-environment-verification"><span class="toc-label">1. Environment Verification</span></a></li><li class="toc-level-2"><a href="#2-estate-wide-audit"><span class="toc-label">2. Estate-Wide Audit</span></a></li><li class="toc-level-2"><a href="#3-reliable-backups-dashboard-export"><span class="toc-label">3. Reliable Backups (Dashboard Export)</span></a></li><li class="toc-level-2"><a href="#4-controlled-restore-dashboard-import"><span class="toc-label">4. Controlled Restore (Dashboard Import)</span></a></li><li class="toc-level-2"><a href="#5-alert-governance-planapply"><span class="toc-label">5. Alert Governance (Plan/Apply)</span></a></li><li class="toc-level-2"><a href="#6-identity-replay-access-management"><span class="toc-label">6. Identity Replay (Access Management)</span></a></li></ul></section><section class="sidebar-section"><h2>Version</h2><p class="sidebar-meta-text">Current checkout</p></section><section class="sidebar-section"><h2>Language</h2><ul class="sidebar-meta-list"><li><a href="#" class="sidebar-meta-link sidebar-meta-current">Current: English</a></li><li><a href="../zh-TW/scenarios.html" class="sidebar-meta-link">Switch to 繁體中文</a></li></ul></section>
 </aside>
 
 </div>

@@ -146,6 +146,9 @@ pre:hover .code-controls { opacity: 1; }
 #theme-select { width: 128px; }
 
 .layout { display: grid; grid-template-columns: 232px minmax(0, 1fr) 244px; gap: 20px; align-items: start; }
+.layout.layout-no-nav { grid-template-columns: minmax(0, 1fr) 244px; }
+.layout.layout-no-sidebar { grid-template-columns: 232px minmax(0, 1fr); }
+.layout.layout-no-nav.layout-no-sidebar { grid-template-columns: minmax(0, 1fr); }
 @media (max-width: 1280px) { .layout { grid-template-columns: 210px minmax(0, 1fr); gap: 18px; } .sidebar { display: none !important; } }
 @media (max-width: 768px) { .layout { grid-template-columns: 1fr; } .nav-sidebar { display: none !important; } }
 
@@ -664,10 +667,7 @@ code[class*="language-"],pre[class*="language-"]{color:#ccc;background:none;font
     
   </article>
   <aside class="sidebar">
-  <section class="sidebar-section"><h2>On This Page</h2><ul class="toc-list"><li class="toc-level-2"><a href="#語言切換"><span class="toc-label">語言切換</span></a></li><li class="toc-level-2"><a href="#dashboard"><span class="toc-label">Dashboard</span></a></li><li class="toc-level-2"><a href="#datasource"><span class="toc-label">Datasource</span></a></li><li class="toc-level-2"><a href="#alert"><span class="toc-label">Alert</span></a></li><li class="toc-level-2"><a href="#access"><span class="toc-label">Access</span></a></li><li class="toc-level-2"><a href="#共用介面"><span class="toc-label">共用介面</span></a></li></ul></section>
-  <section class="sidebar-section"><h2>Related</h2><ul class="sidebar-meta-list"><li><a href="../../handbook/zh-TW/index.html" class="sidebar-meta-link">Matching handbook chapter</a></li></ul></section>
-  <section class="sidebar-section"><h2>Version</h2><p class="sidebar-meta-text">Current checkout</p></section>
-  <section class="sidebar-section"><h2>Language</h2><ul class="sidebar-meta-list"><li><a href="#" class="sidebar-meta-link sidebar-meta-current">Current: 繁體中文</a></li><li><a href="../en/index.html" class="sidebar-meta-link">Switch to English</a></li></ul></section>
+  <section class="sidebar-section"><h2>On This Page</h2><ul class="toc-list"><li class="toc-level-2"><a href="#語言切換"><span class="toc-label">語言切換</span></a></li><li class="toc-level-2"><a href="#dashboard"><span class="toc-label">Dashboard</span></a></li><li class="toc-level-2"><a href="#datasource"><span class="toc-label">Datasource</span></a></li><li class="toc-level-2"><a href="#alert"><span class="toc-label">Alert</span></a></li><li class="toc-level-2"><a href="#access"><span class="toc-label">Access</span></a></li><li class="toc-level-2"><a href="#共用介面"><span class="toc-label">共用介面</span></a></li></ul></section><section class="sidebar-section"><h2>Related</h2><ul class="sidebar-meta-list"><li><a href="../../handbook/zh-TW/index.html" class="sidebar-meta-link">Matching handbook chapter</a></li></ul></section><section class="sidebar-section"><h2>Version</h2><p class="sidebar-meta-text">Current checkout</p></section><section class="sidebar-section"><h2>Language</h2><ul class="sidebar-meta-list"><li><a href="#" class="sidebar-meta-link sidebar-meta-current">Current: 繁體中文</a></li><li><a href="../en/index.html" class="sidebar-meta-link">Switch to English</a></li></ul></section>
 </aside>
 
 </div>

@@ -288,6 +288,16 @@ class GenerateCommandHtmlTests(unittest.TestCase):
         self.assertIn("什麼時候看這頁", rendered)
         self.assertIn("適合誰", rendered)
 
+    def test_render_developer_page_collapses_empty_nav_and_sidebar_sections(self):
+        module = load_module()
+
+        rendered = module.render_developer_page(module.HtmlBuildConfig())
+
+        self.assertIn('class="layout layout-no-nav"', rendered)
+        self.assertNotIn("<h2>Related</h2>", rendered)
+        self.assertNotIn("<h2>Version</h2>", rendered)
+        self.assertNotIn("<h2>Language</h2>", rendered)
+
     def test_versioned_handbook_build_skips_missing_newer_chapters(self):
         module = load_module()
 

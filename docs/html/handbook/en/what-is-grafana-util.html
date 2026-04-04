@@ -146,6 +146,9 @@ pre:hover .code-controls { opacity: 1; }
 #theme-select { width: 128px; }
 
 .layout { display: grid; grid-template-columns: 232px minmax(0, 1fr) 244px; gap: 20px; align-items: start; }
+.layout.layout-no-nav { grid-template-columns: minmax(0, 1fr) 244px; }
+.layout.layout-no-sidebar { grid-template-columns: 232px minmax(0, 1fr); }
+.layout.layout-no-nav.layout-no-sidebar { grid-template-columns: minmax(0, 1fr); }
 @media (max-width: 1280px) { .layout { grid-template-columns: 210px minmax(0, 1fr); gap: 18px; } .sidebar { display: none !important; } }
 @media (max-width: 768px) { .layout { grid-template-columns: 1fr; } .nav-sidebar { display: none !important; } }
 
@@ -685,10 +688,7 @@ code[class*="language-"],pre[class*="language-"]{color:#ccc;background:none;font
     <nav class="footer-nav"><a class="link-card" href="index.html"><span>Previous</span>Operator Handbook</a><a class="link-card" href="getting-started.html"><span>Next</span>Getting Started</a></nav>
   </article>
   <aside class="sidebar">
-  <section class="sidebar-section"><h2>On This Page</h2><ul class="toc-list"><li class="toc-level-2"><a href="#what-it-is"><span class="toc-label">What it is</span></a></li><li class="toc-level-2"><a href="#feature-overview-table"><span class="toc-label">Feature overview table</span></a></li><li class="toc-level-2"><a href="#where-it-helps-most"><span class="toc-label">Where it helps most</span></a></li><li class="toc-level-3"><a href="#1-daily-operations-and-checks"><span class="toc-label">1. Daily operations and checks</span></a></li><li class="toc-level-3"><a href="#2-export-migration-and-replay"><span class="toc-label">2. Export, migration, and replay</span></a></li><li class="toc-level-3"><a href="#3-review-before-mutation"><span class="toc-label">3. Review before mutation</span></a></li><li class="toc-level-3"><a href="#4-automation-and-cicd"><span class="toc-label">4. Automation and CI/CD</span></a></li><li class="toc-level-2"><a href="#what-it-is-not-trying-to-replace"><span class="toc-label">What it is not trying to replace</span></a></li><li class="toc-level-2"><a href="#a-good-way-to-start"><span class="toc-label">A good way to start</span></a></li></ul></section>
-  <section class="sidebar-section"><h2>Related</h2></section>
-  <section class="sidebar-section"><h2>Version</h2><p class="sidebar-meta-text">Current checkout</p></section>
-  <section class="sidebar-section"><h2>Language</h2><ul class="sidebar-meta-list"><li><a href="#" class="sidebar-meta-link sidebar-meta-current">Current: English</a></li><li><a href="../zh-TW/what-is-grafana-util.html" class="sidebar-meta-link">Switch to 繁體中文</a></li></ul></section>
+  <section class="sidebar-section"><h2>On This Page</h2><ul class="toc-list"><li class="toc-level-2"><a href="#what-it-is"><span class="toc-label">What it is</span></a></li><li class="toc-level-2"><a href="#feature-overview-table"><span class="toc-label">Feature overview table</span></a></li><li class="toc-level-2"><a href="#where-it-helps-most"><span class="toc-label">Where it helps most</span></a></li><li class="toc-level-3"><a href="#1-daily-operations-and-checks"><span class="toc-label">1. Daily operations and checks</span></a></li><li class="toc-level-3"><a href="#2-export-migration-and-replay"><span class="toc-label">2. Export, migration, and replay</span></a></li><li class="toc-level-3"><a href="#3-review-before-mutation"><span class="toc-label">3. Review before mutation</span></a></li><li class="toc-level-3"><a href="#4-automation-and-cicd"><span class="toc-label">4. Automation and CI/CD</span></a></li><li class="toc-level-2"><a href="#what-it-is-not-trying-to-replace"><span class="toc-label">What it is not trying to replace</span></a></li><li class="toc-level-2"><a href="#a-good-way-to-start"><span class="toc-label">A good way to start</span></a></li></ul></section><section class="sidebar-section"><h2>Version</h2><p class="sidebar-meta-text">Current checkout</p></section><section class="sidebar-section"><h2>Language</h2><ul class="sidebar-meta-list"><li><a href="#" class="sidebar-meta-link sidebar-meta-current">Current: English</a></li><li><a href="../zh-TW/what-is-grafana-util.html" class="sidebar-meta-link">Switch to 繁體中文</a></li></ul></section>
 </aside>
 
 </div>

@@ -146,6 +146,9 @@ pre:hover .code-controls { opacity: 1; }
 #theme-select { width: 128px; }
 
 .layout { display: grid; grid-template-columns: 232px minmax(0, 1fr) 244px; gap: 20px; align-items: start; }
+.layout.layout-no-nav { grid-template-columns: minmax(0, 1fr) 244px; }
+.layout.layout-no-sidebar { grid-template-columns: 232px minmax(0, 1fr); }
+.layout.layout-no-nav.layout-no-sidebar { grid-template-columns: minmax(0, 1fr); }
 @media (max-width: 1280px) { .layout { grid-template-columns: 210px minmax(0, 1fr); gap: 18px; } .sidebar { display: none !important; } }
 @media (max-width: 768px) { .layout { grid-template-columns: 1fr; } .nav-sidebar { display: none !important; } }
 
@@ -706,10 +709,7 @@ grafana-util change preflight --desired-file ./desired.json --fetch-live --outpu
     <nav class="footer-nav"><a class="link-card" href="access.html"><span>Previous</span>身分與存取管理 (Identity &amp; Access)</a><a class="link-card" href="scenarios.html"><span>Next</span>維運情境手冊 (Operator Scenarios)</a></nav>
   </article>
   <aside class="sidebar">
-  <section class="sidebar-section"><h2>On This Page</h2><ul class="toc-list"><li class="toc-level-2"><a href="#指令詳細頁面"><span class="toc-label">指令詳細頁面</span></a></li><li class="toc-level-2"><a href="#狀態操作面"><span class="toc-label">狀態操作面</span></a></li><li class="toc-level-3"><a href="#1-即時整備度檢查-live-check"><span class="toc-label">1. 即時整備度檢查 (Live Check)</span></a></li><li class="toc-level-3"><a href="#2-暫存整備度檢查-staged-check"><span class="toc-label">2. 暫存整備度檢查 (Staged Check)</span></a></li><li class="toc-level-2"><a href="#變更生命週期-change-lifecycle"><span class="toc-label">變更生命週期 (Change Lifecycle)</span></a></li><li class="toc-level-3"><a href="#1-變更摘要-change-summary"><span class="toc-label">1. 變更摘要 (Change Summary)</span></a></li><li class="toc-level-3"><a href="#2-預檢驗證-preflight-validation"><span class="toc-label">2. 預檢驗證 (Preflight Validation)</span></a></li><li class="toc-level-2"><a href="#互動模式-tui-語意"><span class="toc-label">互動模式 (TUI) 語意</span></a></li></ul></section>
-  <section class="sidebar-section"><h2>Related</h2></section>
-  <section class="sidebar-section"><h2>Version</h2><p class="sidebar-meta-text">Current checkout</p></section>
-  <section class="sidebar-section"><h2>Language</h2><ul class="sidebar-meta-list"><li><a href="#" class="sidebar-meta-link sidebar-meta-current">Current: 繁體中文</a></li><li><a href="../en/change-overview-status.html" class="sidebar-meta-link">Switch to English</a></li></ul></section>
+  <section class="sidebar-section"><h2>On This Page</h2><ul class="toc-list"><li class="toc-level-2"><a href="#指令詳細頁面"><span class="toc-label">指令詳細頁面</span></a></li><li class="toc-level-2"><a href="#狀態操作面"><span class="toc-label">狀態操作面</span></a></li><li class="toc-level-3"><a href="#1-即時整備度檢查-live-check"><span class="toc-label">1. 即時整備度檢查 (Live Check)</span></a></li><li class="toc-level-3"><a href="#2-暫存整備度檢查-staged-check"><span class="toc-label">2. 暫存整備度檢查 (Staged Check)</span></a></li><li class="toc-level-2"><a href="#變更生命週期-change-lifecycle"><span class="toc-label">變更生命週期 (Change Lifecycle)</span></a></li><li class="toc-level-3"><a href="#1-變更摘要-change-summary"><span class="toc-label">1. 變更摘要 (Change Summary)</span></a></li><li class="toc-level-3"><a href="#2-預檢驗證-preflight-validation"><span class="toc-label">2. 預檢驗證 (Preflight Validation)</span></a></li><li class="toc-level-2"><a href="#互動模式-tui-語意"><span class="toc-label">互動模式 (TUI) 語意</span></a></li></ul></section><section class="sidebar-section"><h2>Version</h2><p class="sidebar-meta-text">Current checkout</p></section><section class="sidebar-section"><h2>Language</h2><ul class="sidebar-meta-list"><li><a href="#" class="sidebar-meta-link sidebar-meta-current">Current: 繁體中文</a></li><li><a href="../en/change-overview-status.html" class="sidebar-meta-link">Switch to English</a></li></ul></section>
 </aside>
 
 </div>

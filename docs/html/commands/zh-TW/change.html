@@ -146,6 +146,9 @@ pre:hover .code-controls { opacity: 1; }
 #theme-select { width: 128px; }
 
 .layout { display: grid; grid-template-columns: 232px minmax(0, 1fr) 244px; gap: 20px; align-items: start; }
+.layout.layout-no-nav { grid-template-columns: minmax(0, 1fr) 244px; }
+.layout.layout-no-sidebar { grid-template-columns: 232px minmax(0, 1fr); }
+.layout.layout-no-nav.layout-no-sidebar { grid-template-columns: minmax(0, 1fr); }
 @media (max-width: 1280px) { .layout { grid-template-columns: 210px minmax(0, 1fr); gap: 18px; } .sidebar { display: none !important; } }
 @media (max-width: 768px) { .layout { grid-template-columns: 1fr; } .nav-sidebar { display: none !important; } }
 
@@ -757,10 +760,7 @@ grafana-util change promotion-preflight --source-bundle ./sync-source-bundle.jso
     
   </article>
   <aside class="sidebar">
-  <section class="sidebar-section"><h2>On This Page</h2><ul class="toc-list"><li class="toc-level-2"><a href="#root"><span class="toc-label">Root</span></a></li><li class="toc-level-2"><a href="#summary"><span class="toc-label">summary`</span></a></li><li class="toc-level-2"><a href="#plan"><span class="toc-label">plan`</span></a></li><li class="toc-level-2"><a href="#review"><span class="toc-label">review`</span></a></li><li class="toc-level-2"><a href="#apply"><span class="toc-label">apply`</span></a></li><li class="toc-level-2"><a href="#audit"><span class="toc-label">audit`</span></a></li><li class="toc-level-2"><a href="#preflight"><span class="toc-label">preflight`</span></a></li><li class="toc-level-2"><a href="#assess-alerts"><span class="toc-label">assess-alerts`</span></a></li><li class="toc-level-2"><a href="#bundle"><span class="toc-label">bundle`</span></a></li><li class="toc-level-2"><a href="#bundle-preflight"><span class="toc-label">bundle-preflight`</span></a></li><li class="toc-level-2"><a href="#promotion-preflight"><span class="toc-label">promotion-preflight`</span></a></li></ul></section>
-  <section class="sidebar-section"><h2>Related</h2><ul class="sidebar-meta-list"><li><a href="../../handbook/zh-TW/change-overview-status.html" class="sidebar-meta-link">Matching handbook chapter</a></li></ul></section>
-  <section class="sidebar-section"><h2>Version</h2><p class="sidebar-meta-text">Current checkout</p></section>
-  <section class="sidebar-section"><h2>Language</h2><ul class="sidebar-meta-list"><li><a href="#" class="sidebar-meta-link sidebar-meta-current">Current: 繁體中文</a></li><li><a href="../en/change.html" class="sidebar-meta-link">Switch to English</a></li></ul></section>
+  <section class="sidebar-section"><h2>On This Page</h2><ul class="toc-list"><li class="toc-level-2"><a href="#root"><span class="toc-label">Root</span></a></li><li class="toc-level-2"><a href="#summary"><span class="toc-label">summary`</span></a></li><li class="toc-level-2"><a href="#plan"><span class="toc-label">plan`</span></a></li><li class="toc-level-2"><a href="#review"><span class="toc-label">review`</span></a></li><li class="toc-level-2"><a href="#apply"><span class="toc-label">apply`</span></a></li><li class="toc-level-2"><a href="#audit"><span class="toc-label">audit`</span></a></li><li class="toc-level-2"><a href="#preflight"><span class="toc-label">preflight`</span></a></li><li class="toc-level-2"><a href="#assess-alerts"><span class="toc-label">assess-alerts`</span></a></li><li class="toc-level-2"><a href="#bundle"><span class="toc-label">bundle`</span></a></li><li class="toc-level-2"><a href="#bundle-preflight"><span class="toc-label">bundle-preflight`</span></a></li><li class="toc-level-2"><a href="#promotion-preflight"><span class="toc-label">promotion-preflight`</span></a></li></ul></section><section class="sidebar-section"><h2>Related</h2><ul class="sidebar-meta-list"><li><a href="../../handbook/zh-TW/change-overview-status.html" class="sidebar-meta-link">Matching handbook chapter</a></li></ul></section><section class="sidebar-section"><h2>Version</h2><p class="sidebar-meta-text">Current checkout</p></section><section class="sidebar-section"><h2>Language</h2><ul class="sidebar-meta-list"><li><a href="#" class="sidebar-meta-link sidebar-meta-current">Current: 繁體中文</a></li><li><a href="../en/change.html" class="sidebar-meta-link">Switch to English</a></li></ul></section>
 </aside>
 
 </div>

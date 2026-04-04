@@ -146,6 +146,9 @@ pre:hover .code-controls { opacity: 1; }
 #theme-select { width: 128px; }
 
 .layout { display: grid; grid-template-columns: 232px minmax(0, 1fr) 244px; gap: 20px; align-items: start; }
+.layout.layout-no-nav { grid-template-columns: minmax(0, 1fr) 244px; }
+.layout.layout-no-sidebar { grid-template-columns: 232px minmax(0, 1fr); }
+.layout.layout-no-nav.layout-no-sidebar { grid-template-columns: minmax(0, 1fr); }
 @media (max-width: 1280px) { .layout { grid-template-columns: 210px minmax(0, 1fr); gap: 18px; } .sidebar { display: none !important; } }
 @media (max-width: 768px) { .layout { grid-template-columns: 1fr; } .nav-sidebar { display: none !important; } }
 
@@ -681,10 +684,7 @@ grafana-util overview live --profile ci --output yaml</code></pre>
     <nav class="footer-nav"><a class="link-card" href="role-sre-ops.html"><span>Previous</span>SRE / 維運角色導讀</a><a class="link-card" href="architecture.html"><span>Next</span>系統架構與設計原則</a></nav>
   </article>
   <aside class="sidebar">
-  <section class="sidebar-section"><h2>On This Page</h2><ul class="toc-list"><li class="toc-level-2"><a href="#適用對象"><span class="toc-label">適用對象</span></a></li><li class="toc-level-2"><a href="#主要目標"><span class="toc-label">主要目標</span></a></li><li class="toc-level-2"><a href="#典型自動化任務"><span class="toc-label">典型自動化任務</span></a></li><li class="toc-level-2"><a href="#建議的連線與秘密資料處理方式"><span class="toc-label">建議的連線與秘密資料處理方式</span></a></li><li class="toc-level-2"><a href="#建議先跑的-5-個指令"><span class="toc-label">建議先跑的 5 個指令</span></a></li><li class="toc-level-2"><a href="#什麼叫做自動化流程已經穩定"><span class="toc-label">什麼叫做自動化流程已經穩定</span></a></li><li class="toc-level-2"><a href="#接下來先讀哪些章節"><span class="toc-label">接下來先讀哪些章節</span></a></li><li class="toc-level-2"><a href="#建議同時開著哪些指令頁"><span class="toc-label">建議同時開著哪些指令頁</span></a></li><li class="toc-level-2"><a href="#常見錯誤與限制"><span class="toc-label">常見錯誤與限制</span></a></li><li class="toc-level-2"><a href="#失敗排查提示"><span class="toc-label">失敗排查提示</span></a></li><li class="toc-level-2"><a href="#什麼時候切到更深的文件"><span class="toc-label">什麼時候切到更深的文件</span></a></li><li class="toc-level-2"><a href="#下一步"><span class="toc-label">下一步</span></a></li></ul></section>
-  <section class="sidebar-section"><h2>Related</h2></section>
-  <section class="sidebar-section"><h2>Version</h2><p class="sidebar-meta-text">Current checkout</p></section>
-  <section class="sidebar-section"><h2>Language</h2><ul class="sidebar-meta-list"><li><a href="#" class="sidebar-meta-link sidebar-meta-current">Current: 繁體中文</a></li><li><a href="../en/role-automation-ci.html" class="sidebar-meta-link">Switch to English</a></li></ul></section>
+  <section class="sidebar-section"><h2>On This Page</h2><ul class="toc-list"><li class="toc-level-2"><a href="#適用對象"><span class="toc-label">適用對象</span></a></li><li class="toc-level-2"><a href="#主要目標"><span class="toc-label">主要目標</span></a></li><li class="toc-level-2"><a href="#典型自動化任務"><span class="toc-label">典型自動化任務</span></a></li><li class="toc-level-2"><a href="#建議的連線與秘密資料處理方式"><span class="toc-label">建議的連線與秘密資料處理方式</span></a></li><li class="toc-level-2"><a href="#建議先跑的-5-個指令"><span class="toc-label">建議先跑的 5 個指令</span></a></li><li class="toc-level-2"><a href="#什麼叫做自動化流程已經穩定"><span class="toc-label">什麼叫做自動化流程已經穩定</span></a></li><li class="toc-level-2"><a href="#接下來先讀哪些章節"><span class="toc-label">接下來先讀哪些章節</span></a></li><li class="toc-level-2"><a href="#建議同時開著哪些指令頁"><span class="toc-label">建議同時開著哪些指令頁</span></a></li><li class="toc-level-2"><a href="#常見錯誤與限制"><span class="toc-label">常見錯誤與限制</span></a></li><li class="toc-level-2"><a href="#失敗排查提示"><span class="toc-label">失敗排查提示</span></a></li><li class="toc-level-2"><a href="#什麼時候切到更深的文件"><span class="toc-label">什麼時候切到更深的文件</span></a></li><li class="toc-level-2"><a href="#下一步"><span class="toc-label">下一步</span></a></li></ul></section><section class="sidebar-section"><h2>Version</h2><p class="sidebar-meta-text">Current checkout</p></section><section class="sidebar-section"><h2>Language</h2><ul class="sidebar-meta-list"><li><a href="#" class="sidebar-meta-link sidebar-meta-current">Current: 繁體中文</a></li><li><a href="../en/role-automation-ci.html" class="sidebar-meta-link">Switch to English</a></li></ul></section>
 </aside>
 
 </div>

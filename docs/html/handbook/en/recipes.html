@@ -146,6 +146,9 @@ pre:hover .code-controls { opacity: 1; }
 #theme-select { width: 128px; }
 
 .layout { display: grid; grid-template-columns: 232px minmax(0, 1fr) 244px; gap: 20px; align-items: start; }
+.layout.layout-no-nav { grid-template-columns: minmax(0, 1fr) 244px; }
+.layout.layout-no-sidebar { grid-template-columns: 232px minmax(0, 1fr); }
+.layout.layout-no-nav.layout-no-sidebar { grid-template-columns: minmax(0, 1fr); }
 @media (max-width: 1280px) { .layout { grid-template-columns: 210px minmax(0, 1fr); gap: 18px; } .sidebar { display: none !important; } }
 @media (max-width: 768px) { .layout { grid-template-columns: 1fr; } .nav-sidebar { display: none !important; } }
 
@@ -701,10 +704,7 @@ grafana-util dashboard import --import-dir ./dashboards/raw --replace-existing -
     <nav class="footer-nav"><a class="link-card" href="scenarios.html"><span>Previous</span>Operator Scenarios</a><a class="link-card" href="reference.html"><span>Next</span>Technical Reference</a></nav>
   </article>
   <aside class="sidebar">
-  <section class="sidebar-section"><h2>On This Page</h2><ul class="toc-list"><li class="toc-level-2"><a href="#recipe-1-promoting-dashboards-dev-prod"><span class="toc-label">Recipe 1: Promoting Dashboards (Dev -&gt; Prod)</span></a></li><li class="toc-level-2"><a href="#recipe-2-auditing-dependencies-before-import"><span class="toc-label">Recipe 2: Auditing Dependencies Before Import</span></a></li><li class="toc-level-2"><a href="#recipe-3-mass-taggingrenaming-surgical-patching"><span class="toc-label">Recipe 3: Mass Tagging/Renaming (Surgical Patching)</span></a></li><li class="toc-level-2"><a href="#recipe-4-verifying-alert-routing-logic"><span class="toc-label">Recipe 4: Verifying Alert Routing Logic</span></a></li><li class="toc-level-2"><a href="#expert-tips"><span class="toc-label">Expert Tips</span></a></li></ul></section>
-  <section class="sidebar-section"><h2>Related</h2></section>
-  <section class="sidebar-section"><h2>Version</h2><p class="sidebar-meta-text">Current checkout</p></section>
-  <section class="sidebar-section"><h2>Language</h2><ul class="sidebar-meta-list"><li><a href="#" class="sidebar-meta-link sidebar-meta-current">Current: English</a></li><li><a href="../zh-TW/recipes.html" class="sidebar-meta-link">Switch to 繁體中文</a></li></ul></section>
+  <section class="sidebar-section"><h2>On This Page</h2><ul class="toc-list"><li class="toc-level-2"><a href="#recipe-1-promoting-dashboards-dev-prod"><span class="toc-label">Recipe 1: Promoting Dashboards (Dev -&gt; Prod)</span></a></li><li class="toc-level-2"><a href="#recipe-2-auditing-dependencies-before-import"><span class="toc-label">Recipe 2: Auditing Dependencies Before Import</span></a></li><li class="toc-level-2"><a href="#recipe-3-mass-taggingrenaming-surgical-patching"><span class="toc-label">Recipe 3: Mass Tagging/Renaming (Surgical Patching)</span></a></li><li class="toc-level-2"><a href="#recipe-4-verifying-alert-routing-logic"><span class="toc-label">Recipe 4: Verifying Alert Routing Logic</span></a></li><li class="toc-level-2"><a href="#expert-tips"><span class="toc-label">Expert Tips</span></a></li></ul></section><section class="sidebar-section"><h2>Version</h2><p class="sidebar-meta-text">Current checkout</p></section><section class="sidebar-section"><h2>Language</h2><ul class="sidebar-meta-list"><li><a href="#" class="sidebar-meta-link sidebar-meta-current">Current: English</a></li><li><a href="../zh-TW/recipes.html" class="sidebar-meta-link">Switch to 繁體中文</a></li></ul></section>
 </aside>
 
 </div>

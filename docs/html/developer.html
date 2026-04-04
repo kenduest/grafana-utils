@@ -146,6 +146,9 @@ pre:hover .code-controls { opacity: 1; }
 #theme-select { width: 128px; }
 
 .layout { display: grid; grid-template-columns: 232px minmax(0, 1fr) 244px; gap: 20px; align-items: start; }
+.layout.layout-no-nav { grid-template-columns: minmax(0, 1fr) 244px; }
+.layout.layout-no-sidebar { grid-template-columns: 232px minmax(0, 1fr); }
+.layout.layout-no-nav.layout-no-sidebar { grid-template-columns: minmax(0, 1fr); }
 @media (max-width: 1280px) { .layout { grid-template-columns: 210px minmax(0, 1fr); gap: 18px; } .sidebar { display: none !important; } }
 @media (max-width: 768px) { .layout { grid-template-columns: 1fr; } .nav-sidebar { display: none !important; } }
 
@@ -635,7 +638,7 @@ code[class*="language-"],pre[class*="language-"]{color:#ccc;background:none;font
   </div>
 </div>
 
-      <div class="layout">
+      <div class="layout layout-no-nav">
   
   <article class="article">
     <div class="breadcrumbs"><a href="index.html">Home</a> / Developer Guide</div>
@@ -736,9 +739,6 @@ make html-check</code></pre>
   </article>
   <aside class="sidebar">
   <section class="sidebar-section"><h2>On This Page</h2><ul class="toc-list"><li class="toc-level-2"><a href="#start-here"><span class="toc-label">Start Here</span></a></li><li class="toc-level-2"><a href="#repo-priorities"><span class="toc-label">Repo Priorities</span></a></li><li class="toc-level-2"><a href="#user-facing-cli-surface"><span class="toc-label">User-Facing CLI Surface</span></a></li><li class="toc-level-2"><a href="#code-architecture-map"><span class="toc-label">Code Architecture Map</span></a></li><li class="toc-level-2"><a href="#documentation-map"><span class="toc-label">Documentation Map</span></a></li><li class="toc-level-3"><a href="#public-operator-docs"><span class="toc-label">Public Operator Docs</span></a></li><li class="toc-level-3"><a href="#command-reference-source"><span class="toc-label">Command Reference Source</span></a></li><li class="toc-level-3"><a href="#generated-docs-design-and-maintenance"><span class="toc-label">Generated Docs Design And Maintenance</span></a></li><li class="toc-level-3"><a href="#contract-and-policy-docs"><span class="toc-label">Contract And Policy Docs</span></a></li><li class="toc-level-3"><a href="#trace-and-change-history"><span class="toc-label">Trace And Change History</span></a></li><li class="toc-level-2"><a href="#validation-and-build-guide"><span class="toc-label">Validation And Build Guide</span></a></li><li class="toc-level-2"><a href="#high-signal-project-rules"><span class="toc-label">High-Signal Project Rules</span></a></li><li class="toc-level-2"><a href="#maintainer-personas"><span class="toc-label">Maintainer Personas</span></a></li><li class="toc-level-2"><a href="#quick-routing-table"><span class="toc-label">Quick Routing Table</span></a></li><li class="toc-level-2"><a href="#maintenance-standard"><span class="toc-label">Maintenance Standard</span></a></li></ul></section>
-  <section class="sidebar-section"><h2>Related</h2></section>
-  <section class="sidebar-section"><h2>Version</h2></section>
-  <section class="sidebar-section"><h2>Language</h2></section>
 </aside>
 
 </div>

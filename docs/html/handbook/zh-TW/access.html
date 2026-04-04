@@ -146,6 +146,9 @@ pre:hover .code-controls { opacity: 1; }
 #theme-select { width: 128px; }
 
 .layout { display: grid; grid-template-columns: 232px minmax(0, 1fr) 244px; gap: 20px; align-items: start; }
+.layout.layout-no-nav { grid-template-columns: minmax(0, 1fr) 244px; }
+.layout.layout-no-sidebar { grid-template-columns: 232px minmax(0, 1fr); }
+.layout.layout-no-nav.layout-no-sidebar { grid-template-columns: minmax(0, 1fr); }
 @media (max-width: 1280px) { .layout { grid-template-columns: 210px minmax(0, 1fr); gap: 18px; } .sidebar { display: none !important; } }
 @media (max-width: 768px) { .layout { grid-template-columns: 1fr; } .nav-sidebar { display: none !important; } }
 
@@ -764,10 +767,7 @@ No service account differences across 2 service account(s).</code></pre>
     <nav class="footer-nav"><a class="link-card" href="alert.html"><span>Previous</span>Alert 維運人員手冊</a><a class="link-card" href="change-overview-status.html"><span>Next</span>專案狀態與變更總覽 (Change &amp; Status)</a></nav>
   </article>
   <aside class="sidebar">
-  <section class="sidebar-section"><h2>On This Page</h2><ul class="toc-list"><li class="toc-level-2"><a href="#指令頁面"><span class="toc-label">指令頁面</span></a></li><li class="toc-level-2"><a href="#org-管理"><span class="toc-label">org 管理</span></a></li><li class="toc-level-3"><a href="#1-列出匯出與回放-org"><span class="toc-label">1. 列出、匯出與回放 org</span></a></li><li class="toc-level-2"><a href="#使用者-team-管理"><span class="toc-label">使用者 / team 管理</span></a></li><li class="toc-level-3"><a href="#1-新增修改與比對使用者"><span class="toc-label">1. 新增、修改與比對使用者</span></a></li><li class="toc-level-3"><a href="#2-team-盤點與同步"><span class="toc-label">2. team 盤點與同步</span></a></li><li class="toc-level-2"><a href="#service-account-管理"><span class="toc-label">service account 管理</span></a></li><li class="toc-level-3"><a href="#1-列出與匯出-service-account"><span class="toc-label">1. 列出與匯出 service account</span></a></li><li class="toc-level-3"><a href="#2-建立與刪除-token"><span class="toc-label">2. 建立與刪除 token</span></a></li><li class="toc-level-2"><a href="#漂移檢查-diff"><span class="toc-label">漂移檢查 (Diff)</span></a></li></ul></section>
-  <section class="sidebar-section"><h2>Related</h2></section>
-  <section class="sidebar-section"><h2>Version</h2><p class="sidebar-meta-text">Current checkout</p></section>
-  <section class="sidebar-section"><h2>Language</h2><ul class="sidebar-meta-list"><li><a href="#" class="sidebar-meta-link sidebar-meta-current">Current: 繁體中文</a></li><li><a href="../en/access.html" class="sidebar-meta-link">Switch to English</a></li></ul></section>
+  <section class="sidebar-section"><h2>On This Page</h2><ul class="toc-list"><li class="toc-level-2"><a href="#指令頁面"><span class="toc-label">指令頁面</span></a></li><li class="toc-level-2"><a href="#org-管理"><span class="toc-label">org 管理</span></a></li><li class="toc-level-3"><a href="#1-列出匯出與回放-org"><span class="toc-label">1. 列出、匯出與回放 org</span></a></li><li class="toc-level-2"><a href="#使用者-team-管理"><span class="toc-label">使用者 / team 管理</span></a></li><li class="toc-level-3"><a href="#1-新增修改與比對使用者"><span class="toc-label">1. 新增、修改與比對使用者</span></a></li><li class="toc-level-3"><a href="#2-team-盤點與同步"><span class="toc-label">2. team 盤點與同步</span></a></li><li class="toc-level-2"><a href="#service-account-管理"><span class="toc-label">service account 管理</span></a></li><li class="toc-level-3"><a href="#1-列出與匯出-service-account"><span class="toc-label">1. 列出與匯出 service account</span></a></li><li class="toc-level-3"><a href="#2-建立與刪除-token"><span class="toc-label">2. 建立與刪除 token</span></a></li><li class="toc-level-2"><a href="#漂移檢查-diff"><span class="toc-label">漂移檢查 (Diff)</span></a></li></ul></section><section class="sidebar-section"><h2>Version</h2><p class="sidebar-meta-text">Current checkout</p></section><section class="sidebar-section"><h2>Language</h2><ul class="sidebar-meta-list"><li><a href="#" class="sidebar-meta-link sidebar-meta-current">Current: 繁體中文</a></li><li><a href="../en/access.html" class="sidebar-meta-link">Switch to English</a></li></ul></section>
 </aside>
 
 </div>

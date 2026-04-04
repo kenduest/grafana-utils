@@ -316,22 +316,34 @@ def page_shell(*, page_title, html_lang, home_href, hero_title, hero_summary, br
         header_html = render_template("page_header.html.tmpl", title_html=title_html, summary_html=summary_html)
     
     sidebar_html = ""
-    if toc_html and not is_landing:
-        sidebar_html = render_template(
-            "right_sidebar.html.tmpl",
-            toc_html=toc_html,
-            related_html=related_html,
-            version_html=version_html,
-            locale_html=locale_html,
-        )
+    if not is_landing:
+        sidebar_sections: list[str] = []
+        if toc_html:
+            sidebar_sections.append(f'<section class="sidebar-section"><h2>On This Page</h2>{toc_html}</section>')
+        if related_html:
+            sidebar_sections.append(f'<section class="sidebar-section"><h2>Related</h2>{related_html}</section>')
+        if version_html:
+            sidebar_sections.append(f'<section class="sidebar-section"><h2>Version</h2>{version_html}</section>')
+        if locale_html:
+            sidebar_sections.append(f'<section class="sidebar-section"><h2>Language</h2>{locale_html}</section>')
+        if sidebar_sections:
+            sidebar_html = render_template(
+                "right_sidebar.html.tmpl",
+                sections_html="".join(sidebar_sections),
+            )
     
     content = ""
     if is_landing:
         content = body_html
     else:
+        layout_class = "layout"
+        if not nav_html:
+            layout_class += " layout-no-nav"
+        if not sidebar_html:
+            layout_class += " layout-no-sidebar"
         content = render_template(
             "article_layout.html.tmpl",
-            layout_class="layout",
+            layout_class=layout_class,
             nav_html=nav_html,
             breadcrumbs_html=render_breadcrumbs(breadcrumbs),
             header_html=header_html,

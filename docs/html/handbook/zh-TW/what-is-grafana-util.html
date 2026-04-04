@@ -146,6 +146,9 @@ pre:hover .code-controls { opacity: 1; }
 #theme-select { width: 128px; }
 
 .layout { display: grid; grid-template-columns: 232px minmax(0, 1fr) 244px; gap: 20px; align-items: start; }
+.layout.layout-no-nav { grid-template-columns: minmax(0, 1fr) 244px; }
+.layout.layout-no-sidebar { grid-template-columns: 232px minmax(0, 1fr); }
+.layout.layout-no-nav.layout-no-sidebar { grid-template-columns: minmax(0, 1fr); }
 @media (max-width: 1280px) { .layout { grid-template-columns: 210px minmax(0, 1fr); gap: 18px; } .sidebar { display: none !important; } }
 @media (max-width: 768px) { .layout { grid-template-columns: 1fr; } .nav-sidebar { display: none !important; } }
 
@@ -685,10 +688,7 @@ code[class*="language-"],pre[class*="language-"]{color:#ccc;background:none;font
     <nav class="footer-nav"><a class="link-card" href="index.html"><span>Previous</span>維運導引手冊 (Operator Handbook)</a><a class="link-card" href="getting-started.html"><span>Next</span>開始使用 (Getting Started)</a></nav>
   </article>
   <aside class="sidebar">
-  <section class="sidebar-section"><h2>On This Page</h2><ul class="toc-list"><li class="toc-level-2"><a href="#它的定位"><span class="toc-label">它的定位</span></a></li><li class="toc-level-2"><a href="#功能總覽表"><span class="toc-label">功能總覽表</span></a></li><li class="toc-level-2"><a href="#這個工具特別適合哪些情境"><span class="toc-label">這個工具特別適合哪些情境</span></a></li><li class="toc-level-3"><a href="#1-日常維運與巡檢"><span class="toc-label">1. 日常維運與巡檢</span></a></li><li class="toc-level-3"><a href="#2-匯出搬移與回放"><span class="toc-label">2. 匯出、搬移與回放</span></a></li><li class="toc-level-3"><a href="#3-變更前先做審查"><span class="toc-label">3. 變更前先做審查</span></a></li><li class="toc-level-3"><a href="#4-自動化與-cicd"><span class="toc-label">4. 自動化與 CI/CD</span></a></li><li class="toc-level-2"><a href="#它不特別想解的事"><span class="toc-label">它不特別想解的事</span></a></li><li class="toc-level-2"><a href="#建議怎麼開始"><span class="toc-label">建議怎麼開始</span></a></li></ul></section>
-  <section class="sidebar-section"><h2>Related</h2></section>
-  <section class="sidebar-section"><h2>Version</h2><p class="sidebar-meta-text">Current checkout</p></section>
-  <section class="sidebar-section"><h2>Language</h2><ul class="sidebar-meta-list"><li><a href="#" class="sidebar-meta-link sidebar-meta-current">Current: 繁體中文</a></li><li><a href="../en/what-is-grafana-util.html" class="sidebar-meta-link">Switch to English</a></li></ul></section>
+  <section class="sidebar-section"><h2>On This Page</h2><ul class="toc-list"><li class="toc-level-2"><a href="#它的定位"><span class="toc-label">它的定位</span></a></li><li class="toc-level-2"><a href="#功能總覽表"><span class="toc-label">功能總覽表</span></a></li><li class="toc-level-2"><a href="#這個工具特別適合哪些情境"><span class="toc-label">這個工具特別適合哪些情境</span></a></li><li class="toc-level-3"><a href="#1-日常維運與巡檢"><span class="toc-label">1. 日常維運與巡檢</span></a></li><li class="toc-level-3"><a href="#2-匯出搬移與回放"><span class="toc-label">2. 匯出、搬移與回放</span></a></li><li class="toc-level-3"><a href="#3-變更前先做審查"><span class="toc-label">3. 變更前先做審查</span></a></li><li class="toc-level-3"><a href="#4-自動化與-cicd"><span class="toc-label">4. 自動化與 CI/CD</span></a></li><li class="toc-level-2"><a href="#它不特別想解的事"><span class="toc-label">它不特別想解的事</span></a></li><li class="toc-level-2"><a href="#建議怎麼開始"><span class="toc-label">建議怎麼開始</span></a></li></ul></section><section class="sidebar-section"><h2>Version</h2><p class="sidebar-meta-text">Current checkout</p></section><section class="sidebar-section"><h2>Language</h2><ul class="sidebar-meta-list"><li><a href="#" class="sidebar-meta-link sidebar-meta-current">Current: 繁體中文</a></li><li><a href="../en/what-is-grafana-util.html" class="sidebar-meta-link">Switch to English</a></li></ul></section>
 </aside>
 
 </div>
