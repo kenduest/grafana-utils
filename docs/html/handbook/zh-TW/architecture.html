@@ -3,494 +3,487 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>🏛️ 系統架構與設計原則 · grafana-util docs</title>
-  <style>:root {
+  <title>系統架構與設計原則 · grafana-util docs</title>
+  <style>
+:root {
   color-scheme: light dark;
-  --font-display-en: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
-  --font-heading-en: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI Variable Display", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-body-en: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI Variable Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-heading-zh: "PingFang TC", "Hiragino Sans GB", "Noto Sans CJK TC", "Noto Sans TC", "Microsoft JhengHei UI", "Microsoft JhengHei", "Heiti TC", sans-serif;
-  --font-body-zh: "PingFang TC", "Hiragino Sans GB", "Noto Sans CJK TC", "Noto Sans TC", "Microsoft JhengHei UI", "Microsoft JhengHei", "Heiti TC", sans-serif;
-  --font-display: var(--font-display-en);
-  --font-heading: var(--font-heading-en);
-  --font-body: var(--font-body-en);
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  --weight-body: 460;
-  --weight-ui: 560;
-  --weight-heading: 650;
-  --weight-display: 720;
-  --bg: linear-gradient(180deg, #f7f3eb 0%, #fcfbf8 100%);
-  --panel: rgba(255, 255, 255, 0.82);
-  --panel-strong: rgba(255, 255, 255, 0.92);
-  --text: #1f2933;
-  --muted: #52606d;
-  --heading: #102a43;
-  --accent: #0b6e4f;
-  --accent-soft: #e8f1eb;
-  --border: #d9e2ec;
-  --code-bg: #f0f4f8;
-  --pre-bg: #0f1720;
-  --pre-text: #e6edf3;
-  --shadow: 0 18px 45px rgba(15, 23, 32, 0.08);
+  --font-scale: 1;
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI Variable Text", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI Variable Display", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-zh: "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  --font-mono: ui-monospace, "JetBrains Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  
+  --bg: #ffffff;
+  --panel: #ffffff;
+  --panel-strong: #f9fbfe;
+  --text: #1c2740;
+  --muted: #30435f;
+  --heading: #0b1633;
+  --accent: #0d84d8;
+  --accent-soft: #ecf7ff;
+  --border: #ccd8e5;
+  --code-bg: #edf3f9;
+  --pre-bg: #0f172a;
+  --pre-text: #f8fafc;
+  --shadow: 0 8px 22px rgba(15, 23, 42, 0.05);
 }
+
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: linear-gradient(180deg, #0b1220 0%, #111827 100%);
-    --panel: rgba(15, 23, 32, 0.86);
-    --panel-strong: rgba(15, 23, 32, 0.94);
-    --text: #d9e2ec;
-    --muted: #9fb3c8;
-    --heading: #f0f4f8;
-    --accent: #7bdcb5;
-    --accent-soft: rgba(18, 53, 40, 0.9);
-    --border: #243b53;
-    --code-bg: #1f2933;
-    --pre-bg: #081018;
-    --pre-text: #e6edf3;
-    --shadow: 0 18px 45px rgba(0, 0, 0, 0.32);
+    --bg: #020617;
+    --panel: #0f172a;
+    --panel-strong: #1e293b;
+    --text: #cbd5e1;
+    --muted: #a6b4c7;
+    --heading: #f8fafc;
+    --accent: #38bdf8;
+    --accent-soft: rgba(56, 189, 248, 0.15);
+    --border: #334155;
+    --code-bg: #1e293b;
+    --pre-bg: #020617;
+    --pre-text: #f8fafc;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
   }
 }
+
 html[data-theme="light"] {
-  color-scheme: light;
+  --bg: #ffffff;
+  --panel: #ffffff;
+  --panel-strong: #f9fbfe;
+  --text: #1c2740;
+  --muted: #30435f;
+  --heading: #0b1633;
+  --accent: #0d84d8;
+  --accent-soft: #ecf7ff;
+  --border: #ccd8e5;
+  --code-bg: #edf3f9;
+  --pre-bg: #0f172a;
+  --pre-text: #f8fafc;
+  --shadow: 0 8px 22px rgba(15, 23, 42, 0.05);
 }
+
 html[data-theme="dark"] {
-  color-scheme: dark;
+  --bg: #020617;
+  --panel: #0f172a;
+  --panel-strong: #1e293b;
+  --text: #cbd5e1;
+  --muted: #a6b4c7;
+  --heading: #f8fafc;
+  --accent: #38bdf8;
+  --accent-soft: rgba(56, 189, 248, 0.15);
+  --border: #334155;
+  --code-bg: #1e293b;
+  --pre-bg: #020617;
+  --pre-text: #f8fafc;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
 }
-html[data-theme="light"] body {
-  --bg: linear-gradient(180deg, #f7f3eb 0%, #fcfbf8 100%);
-  --panel: rgba(255, 255, 255, 0.82);
-  --panel-strong: rgba(255, 255, 255, 0.92);
-  --text: #1f2933;
-  --muted: #52606d;
-  --heading: #102a43;
-  --accent: #0b6e4f;
-  --accent-soft: #e8f1eb;
-  --border: #d9e2ec;
-  --code-bg: #f0f4f8;
-  --pre-bg: #0f1720;
-  --pre-text: #e6edf3;
-  --shadow: 0 18px 45px rgba(15, 23, 32, 0.08);
-}
-html[data-theme="dark"] body {
-  --bg: linear-gradient(180deg, #0b1220 0%, #111827 100%);
-  --panel: rgba(15, 23, 32, 0.86);
-  --panel-strong: rgba(15, 23, 32, 0.94);
-  --text: #d9e2ec;
-  --muted: #9fb3c8;
-  --heading: #f0f4f8;
-  --accent: #7bdcb5;
-  --accent-soft: rgba(18, 53, 40, 0.9);
-  --border: #243b53;
-  --code-bg: #1f2933;
-  --pre-bg: #081018;
-  --pre-text: #e6edf3;
-  --shadow: 0 18px 45px rgba(0, 0, 0, 0.32);
-}
+
+html { font-size: calc(16px * var(--font-scale)); scroll-behavior: smooth; }
 * { box-sizing: border-box; }
-body {
-  margin: 0;
-  font-family: var(--font-body);
-  font-weight: var(--weight-body);
-  color: var(--text);
-  background: var(--bg);
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-html[lang="zh-TW"] body {
-  --font-display: var(--font-heading-zh);
-  --font-heading: var(--font-heading-zh);
-  --font-body: var(--font-body-zh);
-  --weight-body: 470;
-  --weight-ui: 580;
-  --weight-heading: 680;
-  --weight-display: 720;
-}
-a { color: var(--accent); }
-strong,
-b {
-  font-weight: 700;
-}
-code {
-  font: 0.92em var(--font-mono);
-  background: var(--code-bg);
-  padding: 0.12em 0.35em;
-  border-radius: 4px;
-}
-pre {
-  max-width: 100%;
-  overflow-x: auto;
-  padding: 16px 18px;
-  border-radius: 14px;
-  background: var(--pre-bg);
-  color: var(--pre-text);
-}
-pre code {
-  background: transparent;
-  color: inherit;
-  padding: 0;
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 22px 0;
-  font-size: 0.98rem;
-}
-th, td {
-  border: 1px solid var(--border);
-  padding: 10px 12px;
-  vertical-align: top;
-}
-th {
-  text-align: left;
-  background: var(--accent-soft);
-}
-.site {
-  max-width: 1520px;
-  margin: 0 auto;
-  padding: 28px 28px 68px;
-}
-.topbar {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  align-items: center;
-  margin-bottom: 18px;
-}
-.topbar a {
-  color: inherit;
-  text-decoration: none;
-}
-.brand {
-  font: 700 0.96rem/1.2 var(--font-mono);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-.themebar {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  color: var(--muted);
-  font: var(--weight-ui) 12px/1.2 var(--font-mono);
-}
+body { margin: 0; font-family: var(--font-sans); font-weight: 400; color: var(--text); background: var(--bg); text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; }
+html[lang="zh-TW"] body { font-family: var(--font-zh); letter-spacing: 0.025em; }
+a { color: var(--accent); text-decoration: none; font-weight: 500; transition: color 0.15s; }
+a:hover { color: var(--heading); }
+
+/* Typography */
+h1, h2, h3, h4 { font-family: var(--font-display); color: var(--heading); font-weight: 650; line-height: 1.2; margin: 0; }
+p, li { line-height: 1.72; margin-bottom: 1rem; }
+code { font: 0.88em var(--font-mono); background: var(--code-bg); padding: 0.2em 0.4em; border-radius: 4px; }
+
+/* Pre & Code Blocks */
+pre { position: relative; padding: 20px; border-radius: 8px; background: var(--pre-bg); color: var(--pre-text); margin: 1.5rem 0; border: 1px solid var(--border); overflow-x: auto; }
+pre code { background: transparent !important; color: inherit !important; padding: 0 !important; font-size: 0.9rem; line-height: 1.6; white-space: pre; }
+pre.wrapped code { white-space: pre-wrap !important; word-break: break-all; }
+.code-controls { position: absolute; top: 8px; right: 8px; display: flex; gap: 6px; opacity: 0; transition: opacity 0.2s; z-index: 10; }
+pre:hover .code-controls { opacity: 1; }
+.control-btn { padding: 4px 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.1); color: #fff; font: 500 11px var(--font-mono); cursor: pointer; transition: 0.2s; }
+.control-btn:hover { background: rgba(255,255,255,0.2); }
+.control-btn.active { background: var(--accent); border-color: var(--accent); }
+
+/* Layout Elements */
+.site { max-width: 1820px; margin: 0 auto; padding: 20px 18px; min-height: 100vh; display: flex; flex-direction: column; }
+.site.landing-shell { max-width: 1640px; padding-left: 36px; padding-right: 36px; }
+.site.landing-shell .topbar { margin-bottom: 10px; }
+.site-content { flex-grow: 1; }
+.topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 16px; border-bottom: 1px solid var(--border); padding-bottom: 14px; }
+.brand { font: 760 1.08rem var(--font-mono); text-transform: uppercase; letter-spacing: 0.045em; color: var(--heading) !important; text-decoration: none !important; }
+.themebar { display: flex; gap: 8px; align-items: center; }
 .themebar select {
   border: 1px solid var(--border);
-  background: var(--panel-strong);
+  background: var(--panel);
   color: var(--text);
-  padding: 6px 10px;
-  border-radius: 10px;
+  padding: 4px 10px;
+  font-size: 0.8rem; font-weight: 500; font-family: var(--font-sans);
+  border-radius: 4px; height: 28px;
+  cursor: pointer; transition: all 0.2s;
 }
-.hero {
-  padding: 26px 28px;
-  border: 1px solid var(--border);
-  border-radius: 24px;
-  background: var(--panel-strong);
-  box-shadow: var(--shadow);
-}
-.eyebrow {
-  display: inline-block;
-  margin-bottom: 14px;
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: var(--accent-soft);
-  color: var(--accent);
-  font: 700 12px/1.2 var(--font-mono);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-.hero h1 {
-  margin: 0;
-  font-family: var(--font-display);
-  font-weight: var(--weight-display);
-  font-size: clamp(2rem, 4vw, 3.2rem);
-  line-height: 1.08;
-  color: var(--heading);
-}
-.hero p {
-  max-width: 74ch;
-  margin: 14px 0 0;
-  font-size: 1.07rem;
-  font-weight: var(--weight-body);
-  line-height: 1.78;
-  color: var(--muted);
-}
-.hero p.hero-summary-inline {
-  max-width: none;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.breadcrumbs {
-  margin: 20px 0 0;
-  padding: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  list-style: none;
-  font-size: 0.96rem;
-  color: var(--muted);
-}
-.breadcrumbs li::after {
-  content: "/";
-  margin-left: 10px;
-}
-.breadcrumbs li:last-child::after {
-  content: "";
-  margin: 0;
-}
-.layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1.18fr) 320px;
-  gap: 22px;
-  margin-top: 22px;
-}
-.panel {
-  min-width: 0;
-  border: 1px solid var(--border);
-  border-radius: 22px;
-  background: var(--panel);
-  box-shadow: var(--shadow);
-}
-.article {
-  min-width: 0;
-  padding: 30px;
-}
-.article h1,
-.article h2,
-.article h3 {
-  font-family: var(--font-heading);
-  font-weight: var(--weight-heading);
-  color: var(--heading);
-  letter-spacing: -0.01em;
-}
-.article h1 {
-  margin-top: 0;
-  line-height: 1.16;
-}
-.article h2 {
-  margin-top: 40px;
-  padding-top: 22px;
-  border-top: 1px solid var(--border);
-  line-height: 1.2;
-}
-.article h3 {
-  margin-top: 28px;
-  line-height: 1.26;
-}
+.themebar select:hover, .themebar select:focus { border-color: var(--accent); outline: none; }
+
+/* Content Grid */
+.layout { display: grid; grid-template-columns: 232px minmax(0, 1fr) 244px; gap: 20px; align-items: start; }
+@media (max-width: 1280px) { .layout { grid-template-columns: 210px minmax(0, 1fr); gap: 18px; } .sidebar { display: none !important; } }
+@media (max-width: 768px) { .layout { grid-template-columns: 1fr; } .nav-sidebar { display: none !important; } }
+
+/* Left Nav Sidebar */
+.nav-sidebar { position: sticky; top: 12px; padding: 2px 0 0; max-height: calc(100vh - 24px); overflow-y: auto; font-family: var(--font-sans); letter-spacing: -0.01em; }
+html[lang="zh-TW"] .nav-sidebar { font-family: var(--font-zh); letter-spacing: 0; }
+.nav-sidebar li { margin-bottom: 0; }
+.nav-sidebar h2 { font-size: 0.74rem; font-weight: 700; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; letter-spacing: 0.04em; }
+.nav-section + .nav-section { margin-top: 18px; }
+.nav-tree,
+.nav-sub-list { list-style: none; margin: 0; padding: 0; position: relative; }
+.nav-tree::before,
+.nav-sub-list::before { display: none; }
+.nav-tree-node { position: relative; margin: 0; }
+.nav-tree-node + .nav-tree-node { margin-top: 2px; }
+.nav-tree-node::before { display: none; }
+.nav-group { margin: 0; position: relative; }
+.nav-group + .nav-group { margin-top: 4px; }
+.nav-group-header { display: flex; justify-content: space-between; align-items: center; gap: 6px; padding: 1px 0; cursor: pointer; border-radius: 0; font-weight: 620; color: var(--heading); transition: color 0.15s; font-size: 0.92rem; }
+.nav-group-header:hover { color: var(--heading); }
+.nav-group-link { flex: 1; display: block; padding: 5px 8px; border-radius: 8px; color: var(--heading); text-decoration: none !important; font-weight: 610; line-height: 1.42; }
+.nav-group-link:hover { background: var(--panel-strong); }
+.nav-item { display: block; padding: 5px 8px; border-radius: 8px; color: var(--text); text-decoration: none !important; transition: 0.15s; font-weight: 550; font-size: 0.9rem; line-height: 1.44; }
+.nav-group-link,
+.nav-item,
+.nav-command-link { white-space: nowrap; }
+.nav-item:hover { background: var(--panel-strong); color: var(--heading); }
+.nav-item.active,
+.nav-group-link.active { background: color-mix(in srgb, var(--accent-soft) 82%, white); color: var(--heading); font-weight: 620; box-shadow: inset 2px 0 0 var(--accent); }
+.nav-sub-list { margin-top: 4px; margin-left: 10px; }
+.nav-sub-list .nav-item { color: var(--muted); font-weight: 520; }
+.nav-sub-list .nav-item.active { color: var(--heading); font-weight: 610; }
+.nav-command-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 1px; }
+.nav-command-link { display: block; padding: 4px 8px; border-radius: 6px; color: var(--muted); text-decoration: none !important; font-size: 0.84rem; font-weight: 520; line-height: 1.32; transition: 0.15s; }
+.nav-command-link:hover { color: var(--heading); background: color-mix(in srgb, var(--panel-strong) 72%, white); }
+.nav-command-link.active { color: var(--heading); font-weight: 610; background: transparent; box-shadow: inset 2px 0 0 var(--accent); }
+
+/* Main Article */
+.article { padding: 10px 0 24px; }
 .article p,
-.article li {
-  font-size: 1.06rem;
-  font-weight: var(--weight-body);
-  line-height: 1.82;
+.article li { color: var(--text); font-weight: 460; }
+.article ul li::marker,
+.article ol li::marker { color: var(--heading); }
+.hero-eyebrow { display: inline-block; padding: 2px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font: 700 10px var(--font-mono); margin-bottom: 8px; text-transform: uppercase; }
+.article h1 { font-size: 2.15rem; margin-bottom: 12px; letter-spacing: -0.018em; font-weight: 680; }
+.article h2 { margin-top: 40px; border-top: 1px solid var(--border); padding-top: 24px; font-size: 1.5rem; margin-bottom: 12px; letter-spacing: -0.012em; font-weight: 620; }
+.article h3 { margin-top: 24px; font-size: 1.2rem; margin-bottom: 12px; letter-spacing: -0.01em; font-weight: 610; }
+.hero-title-main { display: block; }
+.hero-title-secondary { display: block; margin-top: 6px; font-size: 0.68em; line-height: 1.2; color: var(--muted); font-weight: 560; letter-spacing: -0.012em; }
+.hero-summary { margin: 0 0 18px; max-width: 68ch; color: var(--text); font-size: 1rem; line-height: 1.72; font-weight: 450; }
+.article blockquote { margin: 1.5rem 0; padding: 12px 16px; border-left: 3px solid var(--accent); background: var(--accent-soft); border-radius: 4px; }
+.article blockquote p { margin: 0; font-size: 0.95rem; color: var(--heading); }
+
+/* Right TOC Sidebar */
+.sidebar { position: sticky; top: 12px; padding: 2px 0 0; max-height: calc(100vh - 24px); overflow-y: auto; font-family: var(--font-sans); letter-spacing: -0.01em; }
+html[lang="zh-TW"] .sidebar { font-family: var(--font-zh); letter-spacing: 0; }
+.sidebar li { margin-bottom: 0; }
+.sidebar h2 { font-size: 0.74rem; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; letter-spacing: 0.05em; }
+.sidebar-section + .sidebar-section { margin-top: 22px; }
+.toc-list { list-style: none; padding: 0; margin: 0; border-left: 1px solid var(--border); }
+.toc-list li + li { margin-top: 2px; }
+.toc-list li.toc-level-2 a { font-size: 0.84rem; font-weight: 620; color: var(--text); }
+.toc-list li.toc-level-3 a { font-size: 0.78rem; font-weight: 500; color: var(--muted); padding-left: 18px; }
+.toc-list a { display: block; padding: 4px 10px; border-left: 2px solid transparent; margin-left: -1px; color: var(--muted); font-size: 0.82rem; transition: 0.15s; font-weight: 520; text-decoration: none !important; white-space: nowrap; }
+.toc-list a:hover { color: var(--heading); border-left-color: var(--border); }
+.toc-list a.active { color: var(--heading); border-left-color: var(--accent); font-weight: 680; }
+.sidebar-meta-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.sidebar-meta-link,
+.sidebar-meta-text { display: block; font-size: 0.84rem; line-height: 1.4; font-weight: 520; }
+.sidebar-meta-link { color: var(--text); text-decoration: none !important; }
+.sidebar-meta-link,
+.sidebar-meta-text { white-space: nowrap; }
+.sidebar-meta-link:hover { color: var(--heading); }
+.sidebar-meta-text { color: var(--muted); }
+.sidebar-meta-current { color: var(--heading); font-weight: 620; }
+.toc-icon { display: inline-block; opacity: 0.58; transform: scale(0.9); transform-origin: left center; margin-right: 0.32rem; }
+
+.footer-nav { display: flex; justify-content: space-between; gap: 16px; margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--border); }
+.link-card { flex: 1; padding: 12px 16px; border: 1px solid var(--border); border-radius: 6px; background: var(--panel-strong); transition: 0.2s; text-decoration: none !important; color: var(--text); }
+.link-card:hover { border-color: var(--accent); }
+.link-card span { display: block; font-size: 0.7rem; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; font-weight: 700; }
+
+.site-footer { margin-top: 40px; padding: 24px 0; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; text-align: center; }
+
+/* Landing */
+.landing-page {
+  width: 100%;
+  padding: 12px 0 20px;
 }
-.article pre.manpage {
-  white-space: pre-wrap;
-  word-break: break-word;
+.landing-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(360px, 0.72fr);
+  gap: 40px;
+  align-items: start;
+  padding: 18px 0 30px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--panel) 98%, white), color-mix(in srgb, var(--panel) 96%, var(--accent-soft)));
 }
-.sidebar {
-  min-width: 0;
-  padding: 22px;
-  font-size: 1rem;
-  font-weight: var(--weight-body);
+.landing-hero-inner {
+  max-width: 760px;
 }
-.sidebar section + section {
-  margin-top: 20px;
+.landing-title {
+  margin: 0 0 18px;
+  font-size: clamp(2.35rem, 4.3vw, 3.6rem);
+  line-height: 0.96;
+  letter-spacing: -0.05em;
 }
-.sidebar h2 {
-  margin: 0 0 10px;
-  font-size: 0.96rem;
-  font-family: var(--font-heading);
-  font-weight: var(--weight-heading);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+.landing-summary {
+  max-width: 72ch;
+  margin: 0;
+  font-size: 1.02rem;
+  line-height: 1.72;
+  color: var(--text);
+}
+.landing-search-panel {
+  padding-top: 12px;
+}
+.landing-search-panel h2 {
+  margin: 0 0 8px;
+  font-size: 1.15rem;
+  letter-spacing: -0.02em;
+}
+.landing-search-panel p {
+  margin: 0 0 16px;
+  font-size: 0.95rem;
+  line-height: 1.7;
   color: var(--muted);
 }
-.sidebar ul {
-  list-style: none;
+.landing-search-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: stretch;
+  max-width: 100%;
+}
+.landing-search-input {
+  flex: 1;
+  min-height: 48px;
+  padding: 0 16px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--text);
+  font: 500 1rem var(--font-sans);
+}
+.landing-search-input::placeholder {
+  color: var(--muted);
+}
+.landing-search-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.landing-search-button {
+  min-height: 46px;
+  padding: 0 18px;
+  border: 1px solid var(--accent);
+  border-radius: 14px;
+  background: var(--accent);
+  color: #fff;
+  font: 700 0.95rem var(--font-sans);
+  cursor: pointer;
+  align-self: flex-start;
+}
+.landing-sections {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 36px;
+  margin-top: 30px;
+  padding-top: 26px;
+  border-top: 1px solid var(--border);
+}
+.landing-section h2 {
+  margin: 0 0 10px;
+  font-size: 1.2rem;
+  letter-spacing: -0.02em;
+}
+.landing-section p {
+  margin: 0 0 18px;
+  font-size: 0.96rem;
+  line-height: 1.72;
+  color: var(--muted);
+}
+.landing-task-list {
   margin: 0;
   padding: 0;
-}
-.sidebar li + li {
-  margin-top: 8px;
-}
-.sidebar a {
-  text-decoration: none;
-}
-.link-card {
-  display: block;
-  padding: 10px 12px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  background: var(--panel-strong);
-  font-weight: var(--weight-body);
-}
-.footer-nav {
+  list-style: none;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-  margin-top: 24px;
+  gap: 0;
 }
-.footer-nav .link-card span {
-  display: block;
-  color: var(--muted);
-  font-size: 0.84rem;
-  font-family: var(--font-heading);
-  font-weight: var(--weight-ui);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-.site-footer {
-  margin-top: 24px;
-  padding: 18px 22px;
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  background: var(--panel);
-  color: var(--muted);
-  font-size: 0.94rem;
-  font-weight: var(--weight-body);
-}
-.landing-grid {
+.landing-meta {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
-  margin-top: 22px;
+  grid-template-columns: 1fr auto;
+  gap: 28px;
+  align-items: start;
+  margin-top: 36px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
 }
-.landing-grid.primary {
-  align-items: stretch;
+.landing-panel {
+  padding: 0;
 }
-.landing-card {
-  padding: 22px;
-  border: 1px solid var(--border);
-  border-radius: 22px;
-  background: var(--panel);
-  box-shadow: var(--shadow);
-}
-.landing-card h2 {
-  margin-top: 0;
-  font-family: var(--font-heading);
-  font-weight: var(--weight-heading);
-  color: var(--heading);
-}
-.landing-card p,
-.landing-card li,
-.landing-secondary p {
-  font-weight: var(--weight-body);
-}
-.landing-card ul {
-  margin: 0;
-  padding-left: 20px;
-}
-.landing-secondary {
-  margin-top: 18px;
-  padding: 18px 22px;
-}
-.landing-secondary h2 {
+.landing-panel h2 {
   margin: 0 0 8px;
-  font-family: var(--font-heading);
-  font-weight: var(--weight-heading);
-  color: var(--heading);
+  font-size: 0.92rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
-.landing-secondary p {
+.landing-panel p {
   margin: 0 0 14px;
+  font-size: 0.98rem;
+  line-height: 1.7;
   color: var(--muted);
 }
-.inline-link-list {
+.landing-link-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 16px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
-.inline-link-list a {
+.landing-link-list a {
   display: inline-flex;
   align-items: center;
-  min-height: 40px;
-  padding: 9px 12px;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  background: var(--panel-strong);
-  text-decoration: none;
+  min-height: 30px;
+  padding: 0;
+  background: transparent;
+  color: var(--text);
 }
-.manpage-rendered {
-  display: grid;
-  gap: 18px;
+.landing-task {
+  padding: 16px 0 18px;
+  border-top: 1px solid var(--border);
 }
-.manpage-rendered > p {
-  margin: 0;
+.landing-task:first-child {
+  border-top: 0;
+  padding-top: 0;
 }
-.manpage-rendered .man-section h2 {
-  margin: 0 0 10px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--border);
-}
-.manpage-rendered .man-section + .man-section {
-  margin-top: 6px;
-}
-.manpage-rendered .man-bullets {
-  margin: 0;
-  padding-left: 1.2rem;
-}
-.manpage-rendered .man-bullets li + li {
-  margin-top: 8px;
-}
-.manpage-rendered .man-definitions {
-  display: grid;
-  grid-template-columns: minmax(0, 220px) minmax(0, 1fr);
-  gap: 10px 18px;
-  margin: 0;
-}
-.manpage-rendered .man-definitions dt {
+.landing-task-title {
+  margin: 0 0 6px;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--heading);
 }
-.manpage-rendered .man-definitions dd {
-  margin: 0;
+.landing-task-copy {
+  margin: 0 0 10px;
+  font-size: 0.92rem;
+  line-height: 1.65;
+  color: var(--text);
 }
-.manpage-rendered pre.man-example {
+.landing-task-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
   margin: 0;
+  padding: 0;
+  list-style: none;
 }
-@media (max-width: 980px) {
-  .layout,
-  .landing-grid,
-  .footer-nav {
+.landing-task-links a {
+  color: var(--accent);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+.landing-inline-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 18px;
+  margin: 0 0 18px;
+  padding: 0;
+  list-style: none;
+}
+.landing-inline-links a {
+  color: var(--text);
+  font-size: 0.92rem;
+  font-weight: 650;
+}
+
+/* Manpage */
+.manpage-rendered { display: grid; gap: 18px; }
+.manpage-rendered > p { margin: 0; }
+.manpage-rendered .man-section h2 { margin: 0 0 10px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+.manpage-rendered .man-section + .man-section { margin-top: 6px; }
+.manpage-rendered .man-bullets { margin: 0; padding-left: 1.2rem; }
+.manpage-rendered .man-bullets li + li { margin-top: 8px; }
+.manpage-rendered .man-definitions { display: grid; grid-template-columns: minmax(0, 220px) minmax(0, 1fr); gap: 10px 18px; margin: 0; }
+.manpage-rendered .man-definitions dt { font-weight: 700; color: var(--heading); }
+.manpage-rendered .man-definitions dd { margin: 0; }
+.manpage-rendered pre.man-example { margin: 0; }
+
+@media (max-width: 860px) {
+  .landing-sections,
+  .landing-meta {
     grid-template-columns: 1fr;
   }
-  .hero p.hero-summary-inline {
+  .landing-page {
+    width: 100%;
+    margin: 0;
+  }
+  .landing-hero {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 20px 0 24px;
+  }
+  .landing-hero-inner {
+    max-width: 100%;
+  }
+  .landing-summary {
+    font-size: 1.05rem;
     white-space: normal;
-    overflow: visible;
-    text-overflow: clip;
   }
-  .inline-link-list {
-    flex-direction: column;
+  .landing-search-form {
+    align-items: stretch;
   }
-}</style>
+  .landing-search-button {
+    width: 100%;
+    align-self: stretch;
+  }
+  .landing-panel {
+    padding: 0;
+  }
+  .landing-meta {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  .site.landing-shell {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+code[class*="language-"],pre[class*="language-"]{color:#ccc;background:none;font-family:var(--font-mono);font-size:1em;text-align:left;white-space:pre;word-spacing:normal;word-break:normal;word-wrap:normal;line-height:1.5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-hyphens:none;-moz-hyphens:none;-ms-hyphens:none;hyphens:none}
+.token.comment{color:#999}.token.punctuation{color:#ccc}.token.keyword{color:#cc99cd}.token.string{color:#7ec699}.token.function{color:#f08d49}.token.operator{color:#67cdcc}
+</style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" media="print" onload="this.media='all'">
 </head>
 <body>
   <div class="site">
-    <div class="topbar">
-      <a class="brand" href="../../index.html">grafana-util docs</a>
-      <div class="themebar">
-        <label for="theme-select">Theme</label>
-        <select id="theme-select" aria-label="Theme">
-          <option value="auto">Auto</option>
-          <option value="light">Light</option>
-          <option value="dark">Dark</option>
-        </select>
+    <div class="site-content">
+      <div class="topbar">
+        <a class="brand" href="../../index.html">grafana-util docs</a>
+        <div class="themebar">
+          <select id="jump-select" aria-label="Jump"><option value="" selected>快速跳轉...</option><optgroup label="使用手冊"><option value="index.html">概觀</option><option value="getting-started.html">開始使用</option><option value="role-new-user.html">新手快速入門</option><option value="role-sre-ops.html">SRE / 維運角色導讀</option><option value="role-automation-ci.html">自動化 / CI 角色導讀</option><option value="architecture.html">系統架構與設計原則</option><option value="dashboard.html">Dashboard 維運人員手冊</option><option value="datasource.html">Datasource 維運人員手冊</option><option value="alert.html">Alert 維運人員手冊</option><option value="access.html">身分與存取管理</option><option value="change-overview-status.html">專案狀態與變更總覽</option><option value="scenarios.html">維運情境手冊</option><option value="recipes.html">實戰錦囊與最佳實踐</option><option value="reference.html">技術參考手冊</option><option value="troubleshooting.html">疑難排解與名詞解釋</option></optgroup><optgroup label="指令參考"><option value="../../commands/zh-TW/dashboard.html">Dashboard</option><option value="../../commands/zh-TW/alert.html">Alert</option><option value="../../commands/zh-TW/datasource.html">Datasource</option><option value="../../commands/zh-TW/access.html">Access</option><option value="../../commands/zh-TW/profile.html">Profile</option><option value="../../commands/zh-TW/status.html">Status</option><option value="../../commands/zh-TW/overview.html">Overview</option><option value="../../commands/zh-TW/change.html">Change</option><option value="../../commands/zh-TW/snapshot.html">Snapshot</option></optgroup></select>
+          <select id="font-select" aria-label="Font Size">
+            <option value="0.9">Font: Compact</option>
+            <option value="1">Font: Default</option>
+            <option value="1.1">Font: Large</option>
+            <option value="1.2">Font: Extra Large</option>
+          </select>
+          <select id="theme-select" aria-label="Theme">
+            <option value="auto">Theme: Auto</option>
+            <option value="light">Theme: Light</option>
+            <option value="dark">Theme: Dark</option>
+          </select>
+        </div>
       </div>
-    </div>
-    <header class="hero">
-      <div class="eyebrow">Handbook · 繁體中文</div>
-      <h1>🏛️ 系統架構與設計原則</h1>
-      <p class="">敘事式手冊頁面，適合照工作流閱讀，再跳到逐指令頁查精確命令面。</p>
-      <ol class="breadcrumbs"><li><a href="../../index.html">Home</a></li><li><a href="index.html">Handbook</a></li><li>繁體中文</li><li>🏛️ 系統架構與設計原則</li></ol>
-    </header>
-    <div class="layout">
-      <article class="panel article">
-        <h1 id="系統架構與設計原則">🏛️ 系統架構與設計原則</h1>
-<p>理解 <code>grafana-util</code> 的架構哲學，是有效管理大規模 Grafana Estate 的關鍵。本章不只解釋設計上的 Why，也直接說明這些設計應該怎麼影響您的操作判斷。</p>
+      
+        <div class="layout">
+          <aside class="nav-sidebar"><section class="nav-section"><h2>使用手冊</h2><ul class="nav-tree"><li class="nav-tree-node"><a href="index.html" class="nav-item">概觀</a></li><li class="nav-tree-node"><a href="getting-started.html" class="nav-item">開始使用</a></li><li class="nav-tree-node"><a href="role-new-user.html" class="nav-item">新手快速入門</a></li><li class="nav-tree-node"><a href="role-sre-ops.html" class="nav-item">SRE / 維運角色導讀</a></li><li class="nav-tree-node"><a href="role-automation-ci.html" class="nav-item">自動化 / CI 角色導讀</a></li><li class="nav-tree-node"><a href="architecture.html" class="nav-item active">系統架構與設計原則</a></li><li class="nav-tree-node"><a href="dashboard.html" class="nav-item">Dashboard 維運人員手冊</a></li><li class="nav-tree-node"><a href="datasource.html" class="nav-item">Datasource 維運人員手冊</a></li><li class="nav-tree-node"><a href="alert.html" class="nav-item">Alert 維運人員手冊</a></li><li class="nav-tree-node"><a href="access.html" class="nav-item">身分與存取管理</a></li><li class="nav-tree-node"><a href="change-overview-status.html" class="nav-item">專案狀態與變更總覽</a></li><li class="nav-tree-node"><a href="scenarios.html" class="nav-item">維運情境手冊</a></li><li class="nav-tree-node"><a href="recipes.html" class="nav-item">實戰錦囊與最佳實踐</a></li><li class="nav-tree-node"><a href="reference.html" class="nav-item">技術參考手冊</a></li><li class="nav-tree-node"><a href="troubleshooting.html" class="nav-item">疑難排解與名詞解釋</a></li></ul></section><section class="nav-section"><h2>指令參考</h2><ul class="nav-command-list"><li><a href="../../commands/zh-TW/dashboard.html" class="nav-command-link">Dashboard</a></li><li><a href="../../commands/zh-TW/alert.html" class="nav-command-link">Alert</a></li><li><a href="../../commands/zh-TW/datasource.html" class="nav-command-link">Datasource</a></li><li><a href="../../commands/zh-TW/access.html" class="nav-command-link">Access</a></li><li><a href="../../commands/zh-TW/profile.html" class="nav-command-link">Profile</a></li><li><a href="../../commands/zh-TW/status.html" class="nav-command-link">Status</a></li><li><a href="../../commands/zh-TW/overview.html" class="nav-command-link">Overview</a></li><li><a href="../../commands/zh-TW/change.html" class="nav-command-link">Change</a></li><li><a href="../../commands/zh-TW/snapshot.html" class="nav-command-link">Snapshot</a></li></ul></section></aside>
+          <article class="article">
+            <div style="margin-bottom:12px; font-size:0.84rem; color:color-mix(in srgb, var(--muted) 78%, white); font-weight:460;"><a href="../../index.html" style="color:inherit;text-decoration:none;">Home</a> / Handbook / 系統架構與設計原則</div>
+            <div class="hero-eyebrow">Docs</div><h1><span class="hero-title-main">系統架構與設計原則</span></h1>
+            <p>理解 <code>grafana-util</code> 的架構哲學，是有效管理大規模 Grafana Estate 的關鍵。本章不只解釋設計上的 Why，也直接說明這些設計應該怎麼影響您的操作判斷。</p>
 <p>若要對照這些概念背後的指令面，請參考 <a href="../../commands/zh-TW/status.html">status</a>、<a href="../../commands/zh-TW/overview.html">overview</a>、<a href="../../commands/zh-TW/change.html">change</a> 與 <a href="../../commands/zh-TW/dashboard.html">dashboard</a>。</p>
-<h2 id="三層介面模式-the-three-surfaces">🏗️ 三層介面模式 (The Three Surfaces)</h2>
+<h2 id="三層介面模式-the-three-surfaces">三層介面模式 (The Three Surfaces)</h2>
 <p><code>grafana-util</code> 將維運關注點拆分為三種獨立的「介面 (Surface)」，避免把「人類可讀的資訊」與「機器可讀的合約」混在一起。</p>
 <table><thead><tr><th>介面類型</th><th>核心用途</th><th>主要受眾</th><th>輸出格式</th></tr></thead><tbody><tr><td><strong>Status</strong></td><td><strong>整備度與技術合約</strong></td><td>CI/CD 管線、自動化腳本</td><td>JSON, Table</td></tr><tr><td><strong>Overview</strong></td><td><strong>全域觀測性</strong></td><td>SRE 工程師、維運主管</td><td>互動式 TUI, 摘要報告</td></tr><tr><td><strong>Change</strong></td><td><strong>變更意向與生命週期</strong></td><td>PR 審查、稽核紀錄</td><td>JSON 計畫書, Diff</td></tr></tbody></table>
 <h3 id="什麼時候該選哪一個-surface">什麼時候該選哪一個 Surface</h3>
@@ -501,7 +494,7 @@ th {
 <p>如果三個 surface 在團隊心中混成一團，最常發生的是：</p>
 <ul><li>拿給人看的摘要去當成 CI gate</li><li>把 live read 當成 staged package 也正確的證明</li><li>因為目前 live 狀態看起來沒問題，就直接跳過 preflight / review</li></ul>
 <p>這個設計是故意有立場的，目的就是讓您不用猜哪個輸出能放心拿去自動化，哪個輸出是給人判斷方向用的。</p>
-<h2 id="隔離政策-lane-isolation-policy">🛣️ 隔離政策 (Lane Isolation Policy)</h2>
+<h2 id="隔離政策-lane-isolation-policy">隔離政策 (Lane Isolation Policy)</h2>
 <p>為了防止設定漂移 (Configuration Drift) 與「Frankenstein」式資產，我們對資料流 (Lanes) 實施嚴格隔離。</p>
 <p>1. <strong>Raw Lane (<code>raw/</code>)</strong>：與 API 100% 同步的原始快照。用於備份與災難恢復 (DR)。禁止人工手動編輯。 2. <strong>Prompt Lane (<code>prompt/</code>)</strong>：針對 UI 匯入最佳化的資產。剝離特定 metadata，確保新組織能乾淨接收。 3. <strong>Provisioning Lane (<code>provisioning/</code>)</strong>：磁碟型佈署專用檔案。這是從 API 模型轉換而來的單向投影。</p>
 <h3 id="lane-isolation-對實際維運判斷的影響">Lane isolation 對實際維運判斷的影響</h3>
@@ -510,7 +503,7 @@ th {
 <ul><li>dashboard 帶著不該帶的環境資訊被匯入</li><li>provisioning 檔與 canonical export tree 逐漸脫節</li><li>團隊後來無法解釋 live state 為什麼和手上的檔案不一致</li></ul>
 <h3 id="不確定時怎麼選-lane">不確定時怎麼選 lane</h3>
 <ul><li>備份、回放、diff、audit：用 <code>raw/</code></li><li>跨環境遷移、乾淨匯入：用 <code>prompt/</code></li><li>目標是 Grafana disk provisioning：用 <code>provisioning/</code></li></ul>
-<h2 id="秘密治理-masked-recovery">🔐 秘密治理 (Masked Recovery)</h2>
+<h2 id="秘密治理-masked-recovery">秘密治理 (Masked Recovery)</h2>
 <p>對於敏感資訊，例如 datasource 密碼與 secure connection 欄位，<code>grafana-util</code> 遵循 <strong>「預設安全 (Safe-by-Default)」</strong> 的架構。</p>
 <ul><li><strong>匯出 (Export)</strong>：敏感欄位會被遮蔽 (masked)，匯出檔可以安全地進 Git。</li><li><strong>恢復 (Recovery)</strong>：執行 <code>import</code> 時，CLI 會辨識哪些 secret 缺失，並透過環境變數或互動式提示提供安全的補回流程。</li></ul>
 <h3 id="這件事在實務上代表什麼">這件事在實務上代表什麼</h3>
@@ -518,7 +511,7 @@ th {
 <ul><li>可用的 datasource secret 被直接洩漏到 Git</li><li>團隊誤以為 masked export 已經包含完整 replay 所需的全部資料</li></ul>
 <p>理想狀態是：</p>
 <ul><li>您可以安全地把 datasource inventory commit 進 Git</li><li>replay / import 流程會清楚指出哪些 secret 還需要補回</li><li>團隊知道 secret recovery 是明確步驟，不是暗中完成的副作用</li></ul>
-<h2 id="狀態流轉模型-state-transition">🔄 狀態流轉模型 (State Transition)</h2>
+<h2 id="狀態流轉模型-state-transition">狀態流轉模型 (State Transition)</h2>
 <p><code>grafana-util</code> 對 Alerting 是「<strong>狀態調解器 (State Reconciler)</strong>」，對 Dashboard 則是「<strong>快照回放器 (Snapshot Replayer)</strong>」。</p>
 <ul><li><strong>Dashboard (Snapshot/Replay)</strong>：命令式 (Imperative)。「讓目標 Grafana 此刻看起來與此檔案完全一致」。</li><li><strong>Alerting (Desired State)</strong>：宣告式 (Declarative)。「先計算我的檔案與伺服器之間的差異 (Plan)，再只套用該差異」。</li></ul>
 <h3 id="為什麼-dashboard-和-alert-故意走不同模型">為什麼 dashboard 和 alert 故意走不同模型</h3>
@@ -528,56 +521,137 @@ th {
 <ul><li>dashboard 請優先思考 artifact 品質、lane 選擇與 replay 目標</li><li>alert 請優先思考 staged intent、route 正確性、plan review 與受控 apply</li></ul>
 <h3 id="快速判斷">快速判斷</h3>
 <ul><li>您第一個問題是「這是不是正確的 replay artifact？」時，通常是 dashboard 思維</li><li>您第一個問題是「它到底會造成什麼 delta？」時，通常是 alert / change 思維</li></ul>
-<h2 id="什麼叫做架構真的有幫到你">✅ 什麼叫做架構真的有幫到你</h2>
+<h2 id="什麼叫做架構真的有幫到你">什麼叫做架構真的有幫到你</h2>
 <p>當下面幾點成立時，代表這套架構不是只有名詞，而是真的落地：</p>
 <ul><li>團隊能清楚分辨 <code>status</code>、<code>overview</code>、<code>change</code></li><li>live check 與 staged check 不再被當成可互換</li><li>dashboard lanes 不會被隨意混用</li><li>被遮蔽的 secret export 被當成安全 artifact，而不是完整 replay payload</li><li>維運者知道什麼時候應該停在唯讀驗證，什麼時候才進入 plan/apply 流程</li></ul>
 <p><a href="getting-started.html">⬅️ 上一章：開始使用</a> | <a href="index.html">🏠 回首頁</a> | <a href="dashboard.html">➡️ 下一章：Dashboard 管理</a></p>
-        <nav class="footer-nav"><a class="link-card" href="role-automation-ci.html"><span>Previous</span>🤖 自動化 / CI 角色導讀</a><a class="link-card" href="dashboard.html"><span>Next</span>Dashboard 維運人員手冊</a></nav>
-      </article>
-      <aside class="panel sidebar">
-        <section>
-          <h2>On This Page</h2>
-          <ul><li><a class="link-card" href="#三層介面模式-the-three-surfaces">🏗️ 三層介面模式 (The Three Surfaces)</a></li><li><a class="link-card" href="#什麼時候該選哪一個-surface">什麼時候該選哪一個 Surface</a></li><li><a class="link-card" href="#為什麼這個切分很重要">為什麼這個切分很重要</a></li><li><a class="link-card" href="#隔離政策-lane-isolation-policy">🛣️ 隔離政策 (Lane Isolation Policy)</a></li><li><a class="link-card" href="#lane-isolation-對實際維運判斷的影響">Lane isolation 對實際維運判斷的影響</a></li><li><a class="link-card" href="#不確定時怎麼選-lane">不確定時怎麼選 lane</a></li><li><a class="link-card" href="#秘密治理-masked-recovery">🔐 秘密治理 (Masked Recovery)</a></li><li><a class="link-card" href="#這件事在實務上代表什麼">這件事在實務上代表什麼</a></li><li><a class="link-card" href="#狀態流轉模型-state-transition">🔄 狀態流轉模型 (State Transition)</a></li><li><a class="link-card" href="#為什麼-dashboard-和-alert-故意走不同模型">為什麼 dashboard 和 alert 故意走不同模型</a></li><li><a class="link-card" href="#快速判斷">快速判斷</a></li><li><a class="link-card" href="#什麼叫做架構真的有幫到你">✅ 什麼叫做架構真的有幫到你</a></li></ul>
-        </section>
-        <section>
-          <h2>Related</h2>
-          <ul><li><a class="link-card" href="index.html">Handbook home</a></li><li><a class="link-card" href="../../commands/zh-TW/index.html">Command reference index</a></li><li><a class="link-card" href="../../man/index.html">Manpages (HTML)</a></li></ul>
-        </section>
-        <section>
-          <h2>Version</h2>
-          <p>Current checkout</p>
-        </section>
-        <section>
-          <h2>Language</h2>
-          <ul><li><a class="link-card" href="#">Current: 繁體中文</a></li><li><a class="link-card" href="../en/architecture.html">Switch to English</a></li></ul>
-        </section>
-      </aside>
+            <nav class="footer-nav"><a class="link-card" href="role-automation-ci.html"><span>Previous</span>自動化 / CI 角色導讀</a><a class="link-card" href="dashboard.html"><span>Next</span>Dashboard 維運人員手冊</a></nav>
+          </article>
+          <aside class="sidebar"><section class="sidebar-section"><h2>On This Page</h2><ul class="toc-list"><li class="toc-level-2"><a href="#三層介面模式-the-three-surfaces"><span class="toc-label">三層介面模式 (The Three Surfaces)</span></a></li><li class="toc-level-3"><a href="#什麼時候該選哪一個-surface"><span class="toc-label">什麼時候該選哪一個 Surface</span></a></li><li class="toc-level-3"><a href="#為什麼這個切分很重要"><span class="toc-label">為什麼這個切分很重要</span></a></li><li class="toc-level-2"><a href="#隔離政策-lane-isolation-policy"><span class="toc-label">隔離政策 (Lane Isolation Policy)</span></a></li><li class="toc-level-3"><a href="#lane-isolation-對實際維運判斷的影響"><span class="toc-label">Lane isolation 對實際維運判斷的影響</span></a></li><li class="toc-level-3"><a href="#不確定時怎麼選-lane"><span class="toc-label">不確定時怎麼選 lane</span></a></li><li class="toc-level-2"><a href="#秘密治理-masked-recovery"><span class="toc-label">秘密治理 (Masked Recovery)</span></a></li><li class="toc-level-3"><a href="#這件事在實務上代表什麼"><span class="toc-label">這件事在實務上代表什麼</span></a></li><li class="toc-level-2"><a href="#狀態流轉模型-state-transition"><span class="toc-label">狀態流轉模型 (State Transition)</span></a></li><li class="toc-level-3"><a href="#為什麼-dashboard-和-alert-故意走不同模型"><span class="toc-label">為什麼 dashboard 和 alert 故意走不同模型</span></a></li><li class="toc-level-3"><a href="#快速判斷"><span class="toc-label">快速判斷</span></a></li><li class="toc-level-2"><a href="#什麼叫做架構真的有幫到你"><span class="toc-label">什麼叫做架構真的有幫到你</span></a></li></ul></section><section class="sidebar-section"><h2>Related</h2></section><section class="sidebar-section"><h2>Version</h2><p class="sidebar-meta-text">Current checkout</p></section><section class="sidebar-section"><h2>Language</h2><ul class="sidebar-meta-list"><li><a href="#" class="sidebar-meta-link sidebar-meta-current">Current: 繁體中文</a></li><li><a href="../en/architecture.html" class="sidebar-meta-link">Switch to English</a></li></ul></section></aside>
+        </div>
+        
     </div>
-    <footer class="site-footer">Source: <code>docs/user-guide/zh-TW/architecture.md</code><br>Generated by <code>scripts/generate_command_html.py</code>.</footer>
+    <footer class="site-footer">Source: architecture.md</footer>
   </div>
-  <script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js" async></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js" async></script>
+  
+<script>
 (() => {
-  const storageKey = "grafana-util-docs-theme";
   const root = document.documentElement;
+  const storageKey = "grafana-util-docs-theme";
   const select = document.getElementById("theme-select");
   const saved = localStorage.getItem(storageKey) || "auto";
-  const applyTheme = (value) => {
-    if (value === "auto") {
-      root.removeAttribute("data-theme");
-    } else {
-      root.setAttribute("data-theme", value);
-    }
-  };
+  const applyTheme = (val) => { if(val==="auto") root.removeAttribute("data-theme"); else root.setAttribute("data-theme", val); };
   applyTheme(saved);
-  if (select) {
-    select.value = saved;
-    select.addEventListener("change", (event) => {
-      const value = event.target.value;
-      localStorage.setItem(storageKey, value);
-      applyTheme(value);
+  if(select) { select.value = saved; select.onchange = (e) => { localStorage.setItem(storageKey, e.target.value); applyTheme(e.target.value); }; }
+
+  const fontKey = "grafana-util-docs-font";
+  const fontSelect = document.getElementById("font-select");
+  const savedFont = localStorage.getItem(fontKey) || "1";
+  const applyFont = (val) => { root.style.setProperty("--font-scale", val); };
+  applyFont(savedFont);
+  if(fontSelect) { fontSelect.value = savedFont; fontSelect.onchange = (e) => { localStorage.setItem(fontKey, e.target.value); applyFont(e.target.value); }; }
+
+  const wrapKey = "grafana-util-docs-wrap";
+  let isWrapped = localStorage.getItem(wrapKey) === "true";
+  const updateWrap = (block, btn, wrapped) => {
+    if(!btn) return;
+    if(wrapped) { block.classList.add("wrapped"); btn.classList.add("active"); btn.innerText="Wrap: ON"; }
+    else { block.classList.remove("wrapped"); btn.classList.remove("active"); btn.innerText="Wrap: OFF"; }
+  };
+  document.querySelectorAll("pre").forEach(block => {
+    const controls = document.createElement("div"); controls.className = "code-controls";
+    const wrapBtn = document.createElement("button"); wrapBtn.className = "control-btn";
+    updateWrap(block, wrapBtn, isWrapped);
+    wrapBtn.onclick = () => { isWrapped = !isWrapped; localStorage.setItem(wrapKey, isWrapped); document.querySelectorAll("pre").forEach(b => updateWrap(b, b.querySelector(".control-btn"), isWrapped)); };
+    const copyBtn = document.createElement("button"); copyBtn.className = "control-btn"; copyBtn.innerText = "Copy";
+    copyBtn.onclick = () => {
+      const raw = block.querySelector("code").innerText;
+      const filtered = raw.split("\n").filter(l => l.trim() && !l.trim().startsWith("#")).join("\n") || raw;
+      navigator.clipboard.writeText(filtered).then(() => { copyBtn.innerText="Copied!"; setTimeout(()=>copyBtn.innerText="Copy", 2000); });
+    };
+    controls.append(wrapBtn, copyBtn); block.append(controls);
+  });
+
+  document.querySelectorAll(".nav-group-header").forEach(header => {
+    header.onclick = () => { header.closest(".nav-group").classList.toggle("collapsed"); };
+  });
+
+  const jumpSelect = document.getElementById("jump-select");
+  if(jumpSelect) jumpSelect.onchange = (e) => { if(e.target.value) window.location.href = e.target.value; };
+
+  const landingI18n = document.getElementById("landing-i18n");
+  const localeSelect = document.getElementById("locale-select");
+  const landingSearchForm = document.getElementById("landing-search-form");
+  const landingSearchInput = document.getElementById("landing-search");
+  const landingSearchButton = document.getElementById("landing-search-button");
+  const landingTitle = document.getElementById("landing-title");
+  const landingSummary = document.getElementById("landing-summary");
+  const landingSearchHeading = document.getElementById("landing-search-heading");
+  const landingSearchCopy = document.getElementById("landing-search-copy");
+  const landingSections = document.getElementById("landing-sections");
+  const landingMeta = document.getElementById("landing-meta");
+  if(landingI18n) {
+    const landingData = JSON.parse(landingI18n.textContent);
+    const landingLocaleKey = "grafana-util-docs-locale";
+    const pickLandingLocale = () => {
+      const saved = localStorage.getItem(landingLocaleKey);
+      if(saved && landingData[saved]) return saved;
+      const browserLocales = [...(navigator.languages || []), navigator.language || ""];
+      const preferredZh = browserLocales.some((locale) => locale && locale.toLowerCase().startsWith("zh"));
+      return preferredZh && landingData["zh-TW"] ? "zh-TW" : "en";
+    };
+    const applyLandingLocale = (locale) => {
+      const copy = landingData[locale] || landingData.en;
+      if(!copy) return;
+      document.documentElement.lang = copy.lang || locale;
+      if(localeSelect) localeSelect.value = locale;
+      if(landingTitle) landingTitle.textContent = copy.hero_title;
+      if(landingSummary) landingSummary.textContent = copy.hero_summary;
+      if(landingSearchHeading) landingSearchHeading.textContent = copy.search_heading;
+      if(landingSearchCopy) landingSearchCopy.textContent = copy.search_copy;
+      if(landingSearchInput) {
+        landingSearchInput.placeholder = copy.search_placeholder;
+        landingSearchInput.setAttribute("aria-label", copy.search_placeholder);
+      }
+      if(landingSearchButton) landingSearchButton.textContent = copy.search_button;
+      if(landingSections) landingSections.innerHTML = copy.sections_html;
+      if(landingMeta) landingMeta.innerHTML = copy.meta_html;
+      if(jumpSelect) jumpSelect.innerHTML = copy.jump_options_html;
+      localStorage.setItem(landingLocaleKey, locale);
+    };
+    applyLandingLocale(pickLandingLocale());
+    if(localeSelect) {
+      localeSelect.addEventListener("change", (event) => {
+        applyLandingLocale(event.target.value);
+      });
+    }
+  }
+
+  if(landingSearchForm && landingSearchInput && jumpSelect) {
+    landingSearchForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const query = landingSearchInput.value.trim().toLowerCase();
+      if(!query) return;
+      const options = [...jumpSelect.querySelectorAll("option")].filter((option) => option.value);
+      const exact = options.find((option) => option.textContent.toLowerCase().includes(query));
+      const fuzzy = options.find((option) => option.value.toLowerCase().includes(query.replace(/\s+/g, "-")));
+      const target = exact || fuzzy;
+      if(target) window.location.href = target.value;
     });
   }
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      const id = entry.target.id; if(!id) return;
+      const link = document.querySelector(`.sidebar a[href="#${id}"]`);
+      if(link && entry.isIntersecting) { document.querySelectorAll(".sidebar a").forEach(l => l.classList.remove("active")); link.classList.add("active"); }
+    });
+  }, { rootMargin: "-20px 0px -80% 0px" });
+  document.querySelectorAll(".article h2[id], .article h3[id]").forEach(el => observer.observe(el));
 })();
 </script>
+
 </body>
 </html>
