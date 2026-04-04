@@ -567,6 +567,13 @@ pub struct SyncBundleArgs {
     pub output_file: Option<PathBuf>,
     #[arg(
         long,
+        default_value_t = false,
+        requires = "output_file",
+        help = "When --output-file is set, also print the source bundle document to stdout."
+    )]
+    pub also_stdout: bool,
+    #[arg(
+        long,
         value_enum,
         default_value_t = SyncOutputFormat::Text,
         help = "Render the source bundle document as text or json."

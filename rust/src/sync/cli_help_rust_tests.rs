@@ -90,6 +90,7 @@ fn change_bundle_help_includes_examples_and_output_heading() {
     assert!(help.contains("--dashboard-export-dir"));
     assert!(help.contains("--dashboard-provisioning-dir"));
     assert!(help.contains("--output-file"));
+    assert!(help.contains("--also-stdout"));
     assert!(help.contains("--datasource-provisioning-file"));
 }
 
@@ -503,7 +504,32 @@ fn parse_change_cli_supports_bundle_command() {
                 inner.output_file,
                 Some(Path::new("./bundle.json").to_path_buf())
             );
+            assert!(!inner.also_stdout);
             assert_eq!(inner.output, SyncOutputFormat::Json);
+        }
+        _ => panic!("expected bundle"),
+    }
+}
+
+#[test]
+fn parse_change_cli_supports_bundle_also_stdout() {
+    let args = SyncCliArgs::parse_from([
+        "grafana-util",
+        "bundle",
+        "--dashboard-export-dir",
+        "./dashboards/raw",
+        "--output-file",
+        "./bundle.json",
+        "--also-stdout",
+    ]);
+
+    match args.command {
+        SyncGroupCommand::Bundle(inner) => {
+            assert_eq!(
+                inner.output_file,
+                Some(Path::new("./bundle.json").to_path_buf())
+            );
+            assert!(inner.also_stdout);
         }
         _ => panic!("expected bundle"),
     }

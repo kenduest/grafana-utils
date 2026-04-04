@@ -153,6 +153,7 @@ fn run_sync_cli_bundle_writes_source_bundle_artifact() {
         datasource_provisioning_file: None,
         metadata_file: Some(metadata_file.clone()),
         output_file: Some(output_file.clone()),
+        also_stdout: false,
         output: SyncOutputFormat::Json,
     }));
 
@@ -323,6 +324,7 @@ fn run_sync_cli_bundle_preserves_alert_export_artifact_metadata() {
         datasource_provisioning_file: None,
         metadata_file: None,
         output_file: Some(output_file.clone()),
+        also_stdout: false,
         output: SyncOutputFormat::Json,
     }));
 
@@ -415,6 +417,7 @@ fn run_sync_cli_bundle_ignores_dashboard_permissions_bundle() {
         datasource_provisioning_file: None,
         metadata_file: None,
         output_file: Some(output_file.clone()),
+        also_stdout: false,
         output: SyncOutputFormat::Json,
     }));
 
@@ -441,6 +444,7 @@ fn run_sync_cli_bundle_supports_dashboard_provisioning_root() {
         datasource_provisioning_file: None,
         metadata_file: None,
         output_file: Some(output_file.clone()),
+        also_stdout: false,
         output: SyncOutputFormat::Json,
     }));
 
@@ -479,6 +483,7 @@ fn run_sync_cli_bundle_rejects_conflicting_dashboard_inputs() {
         datasource_provisioning_file: None,
         metadata_file: None,
         output_file: None,
+        also_stdout: false,
         output: SyncOutputFormat::Json,
     }));
 
@@ -521,6 +526,7 @@ fn run_sync_cli_bundle_preserves_datasource_provider_metadata_from_inventory_fil
         datasource_provisioning_file: None,
         metadata_file: None,
         output_file: Some(output_file.clone()),
+        also_stdout: false,
         output: SyncOutputFormat::Json,
     }));
 
@@ -557,6 +563,7 @@ fn run_sync_cli_bundle_preserves_datasource_metadata_from_provisioning_file() {
         datasource_provisioning_file: Some(datasource_provisioning_file.clone()),
         metadata_file: None,
         output_file: Some(output_file.clone()),
+        also_stdout: false,
         output: SyncOutputFormat::Json,
     }));
 
@@ -629,6 +636,7 @@ fn run_sync_cli_bundle_normalizes_tool_rule_export_into_top_level_alert_spec() {
         datasource_provisioning_file: None,
         metadata_file: None,
         output_file: Some(output_file.clone()),
+        also_stdout: false,
         output: SyncOutputFormat::Json,
     }));
 
