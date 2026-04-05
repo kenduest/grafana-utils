@@ -211,6 +211,7 @@ Dashboard watch implementation policy:
 - Keep facades thin: `cli.rs` and domain `mod.rs` files should route, normalize, and re-export, not absorb downstream contract logic.
 - Keep comments high-signal: explain ownership, invariants, and non-obvious behavior; do not narrate obvious control flow.
 - Keep trace/history notes in `docs/internal/ai-status.md` and `docs/internal/ai-changes.md`.
+- For new live workflow code, prefer adding one workflow-level helper under `rust/src/grafana_api/` and keep raw `"/api/..."` contract ownership there instead of reintroducing those paths inside command runtimes. Keep `with_request` style seams for tests and adapters, not as a second production main path.
 
 ## Maintainer Personas
 

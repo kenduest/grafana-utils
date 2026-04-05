@@ -260,6 +260,13 @@ Current AI-maintained status only.
 - Current Update: added a repo-owned POSIX install script that detects `linux-amd64` and `macos-arm64`, downloads the matching GitHub release archive, installs `grafana-util` into `/usr/local/bin` when writable or falls back to `~/.local/bin`, and supports explicit `BIN_DIR`, `VERSION`, `REPO`, and `ASSET_URL` overrides. Public English and Traditional Chinese docs now show the one-line `curl ... | sh` path plus the direct local-checkout fallback.
 - Result: users now have a documented one-line installer for the maintained Rust binary without needing to compile from source or hand-place the executable.
 
+## 2026-04-05 - Converge project-status and sync onto the shared live layer
+- State: Done
+- Scope: `rust/src/grafana_api/mod.rs`, `rust/src/grafana_api/tests.rs`, `rust/src/grafana_api/project_status_live.rs`, `rust/src/grafana_api/sync_live.rs`, `rust/src/project_status_live_runtime.rs`, `rust/src/project_status_support.rs`, `rust/src/sync/live.rs`, `rust/src/sync/live_apply.rs`, `rust/src/sync/live_fetch.rs`, `rust/src/sync/mod.rs`
+- Baseline: the repository had already introduced `GrafanaConnection` and `GrafanaApiClient`, but `project-status` and `sync` still owned major live endpoint contracts directly. That left the repo in a half-migrated state where shared live wiring and request-closure flows coexisted as parallel main paths.
+- Current Update: added workflow-level shared live helpers for `project-status` and `sync`, moved org listing / alert-surface reads / dashboard version-history reads behind `grafana_api::project_status_live`, and moved sync live fetch/apply endpoint ownership behind `grafana_api::sync_live`. `project-status` now resolves one root `GrafanaApiClient` and derives org-scoped clients from it, while `sync` now resolves one client per command and routes client-backed fetch/apply through `SyncLiveClient` instead of owning raw Grafana path handling in the command runtime.
+- Result: `grafana_api` is now acting as an internal shared live layer for the two biggest remaining workflow-heavy live paths, reducing duplicate endpoint ownership without turning the repo into a generic endpoint SDK.
+
 ## 2026-04-01 - Extend alert list output formats
 - State: Blocked
 - Scope: `rust/src/alert_cli_defs.rs`, `rust/src/alert_list.rs`, `rust/src/alert_rust_tests.rs`
