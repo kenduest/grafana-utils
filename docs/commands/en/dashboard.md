@@ -85,26 +85,26 @@ grafana-util dashboard inspect-live --url http://localhost:3000 --basic-user adm
 ### Inspect
 
 - [dashboard browse](./dashboard-browse.md)
-- [dashboard get](./dashboard-get.md)
-- [dashboard clone-live](./dashboard-clone-live.md)
 - [dashboard list](./dashboard-list.md)
-- [dashboard inspect-export](./dashboard-inspect-export.md)
+- [dashboard get](./dashboard-get.md)
 - [dashboard inspect-live](./dashboard-inspect-live.md)
+- [dashboard inspect-export](./dashboard-inspect-export.md)
 - [dashboard inspect-vars](./dashboard-inspect-vars.md)
 
 ### Move
 
+- [dashboard clone-live](./dashboard-clone-live.md)
 - [dashboard export](./dashboard-export.md)
 - [dashboard import](./dashboard-import.md)
 - [dashboard raw-to-prompt](./dashboard-raw-to-prompt.md)
 - [dashboard patch-file](./dashboard-patch-file.md)
-- [dashboard publish](./dashboard-publish.md)
-- [dashboard delete](./dashboard-delete.md)
-- [dashboard diff](./dashboard-diff.md)
 
 ### Review Before Mutate
 
+- [dashboard diff](./dashboard-diff.md)
 - [dashboard review](./dashboard-review.md)
+- [dashboard publish](./dashboard-publish.md)
+- [dashboard delete](./dashboard-delete.md)
 - [dashboard governance-gate](./dashboard-governance-gate.md)
 - [dashboard topology](./dashboard-topology.md)
 - [dashboard impact](./dashboard-impact.md)

@@ -123,7 +123,7 @@ class PublicDocsEvidenceTests(unittest.TestCase):
     def test_command_root_pages_group_related_commands_by_workflow(self):
         expectations = {
             REPO_ROOT / "docs" / "commands" / "en" / "dashboard.md": ["### Inspect", "### Move", "### Review Before Mutate", "### Capture"],
-            REPO_ROOT / "docs" / "commands" / "en" / "alert.md": ["### Inspect", "### Move", "### Review Before Mutate"],
+            REPO_ROOT / "docs" / "commands" / "en" / "alert.md": ["### Inspect", "### Move", "### Review Before Mutate", "### Related Surface"],
             REPO_ROOT / "docs" / "commands" / "en" / "access.md": ["### Inspect", "### Review Before Mutate"],
             REPO_ROOT / "docs" / "commands" / "en" / "datasource.md": ["### Inspect", "### Move", "### Review Before Mutate"],
             REPO_ROOT / "docs" / "commands" / "zh-TW" / "dashboard.md": ["### 盤點", "### 搬移", "### 變更前檢查", "### 截圖與素材"],

@@ -89,22 +89,22 @@ grafana-util alert export --url http://localhost:3000 --token "$GRAFANA_API_TOKE
 
 - [alert export](./alert-export.md)
 - [alert import](./alert-import.md)
-- [alert new-rule](./alert-new-rule.md)
 - [alert add-rule](./alert-add-rule.md)
 - [alert clone-rule](./alert-clone-rule.md)
-- [alert new-contact-point](./alert-new-contact-point.md)
 - [alert add-contact-point](./alert-add-contact-point.md)
-- [alert new-template](./alert-new-template.md)
 - [alert set-route](./alert-set-route.md)
+- [alert new-rule](./alert-new-rule.md)
+- [alert new-contact-point](./alert-new-contact-point.md)
+- [alert new-template](./alert-new-template.md)
 
 ### Review Before Mutate
 
 - [alert diff](./alert-diff.md)
 - [alert plan](./alert-plan.md)
-- [alert apply](./alert-apply.md)
 - [alert preview-route](./alert-preview-route.md)
+- [alert apply](./alert-apply.md)
 - [alert delete](./alert-delete.md)
 
-### Related
+### Related Surface
 
 - [access](./access.md)
