@@ -12,6 +12,7 @@
 把它當成通用查詢工具，不是日常 mutation 的主入口。
 
 ## 使用方式
+- 先用 `resource describe` 看各 kind 的 selector 格式與 endpoint 形狀。
 - 先用 `resource kinds` 看目前支援哪些 live resource kinds。
 - 需要盤點某一類資源時，用 `resource list <kind>`。
 - 需要抓某一筆完整 live payload 時，用 `resource get <kind>/<identity>`。
@@ -30,7 +31,12 @@
 
 ## 範例
 ```bash
-# 用途：顯示目前支援的低階 resource kinds。
+# 用途：說明目前支援的 live resource kinds 與 selector 格式。
+grafana-util resource describe
+```
+
+```bash
+# 用途：顯示目前支援的 resource kinds。
 grafana-util resource kinds
 ```
 
@@ -45,6 +51,7 @@ grafana-util resource get datasources/prom-main --profile prod --output-format y
 ```
 
 ## 相關指令
+- [resource describe](./resource-describe.md)
 - [resource kinds](./resource-kinds.md)
 - [resource list](./resource-list.md)
 - [resource get](./resource-get.md)

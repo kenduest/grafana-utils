@@ -12,16 +12,18 @@
 - `--script-format`：把 `--script` stdout 解析成 `json` 或 `yaml`。
 - `--watch`：額外要監看的本地檔案或目錄。
 - `--no-watch`：停用背景 polling reload。
+- `--open-browser`：在 server 啟動後，使用預設瀏覽器開啟 preview URL。
 - `--address`、`--port`：本地 preview server 的綁定位址與埠號。
 
 ## 補充說明
 - 這是一個輕量的草稿 preview / 文件檢視介面，不是完整內嵌 Grafana renderer。
 - `--input` 與 `--script` 互斥。編修本地草稿時用 `--input`，generator 已經能直接產出 payload 時再用 `--script`。
+- reload 失敗時，錯誤會留在預覽頁上，方便你繼續修草稿而不用重啟 server。
 
 ## 範例
 ```bash
 # 用途：提供單一本地草稿檔案。
-grafana-util dashboard serve --input ./drafts/cpu-main.json --port 18080
+grafana-util dashboard serve --input ./drafts/cpu-main.json --port 18080 --open-browser
 ```
 
 ```bash

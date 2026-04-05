@@ -779,6 +779,7 @@ code[class*="language-"],pre[class*="language-"]{color:#ccc;background:none;font
 <h2 id="適用時機">適用時機</h2>
 <ul><li>當 preview 與 review 都已經完成時。</li><li>如果你需要 approval evidence 或 machine-readable apply intent，先用預設的 staged 形式。</li><li>只有真的準備好動手改 Grafana 時，才加上 <code>--execute-live</code>。</li><li>現在建議使用 <code>--preview-file</code>；<code>--plan-file</code> 仍保留為相容舊 staged workflows 的 alias。</li></ul>
 <h2 id="採用前後對照">採用前後對照</h2>
+<p>排序契約會保留在已審核的 preview 上：<code>ordering.mode</code>、<code>operations[].orderIndex</code> / <code>orderGroup</code> / <code>kindOrder</code>、以及 <code>summary.blocked_reasons</code> 都是用來描述操作順序與受阻工作量的 preview 欄位。</p>
 <ul><li><strong>採用前</strong>：preview 已存在，但 review 到 mutation 之間最後那一步仍然很依賴操作人判斷。</li><li><strong>採用後</strong>：apply 會把這一步拆成清楚的 staged intent 或 live execution result，並把 approval 帶進去。</li></ul>
 <h2 id="主要旗標">主要旗標</h2>
 <ul><li><code>--preview-file</code>：要 apply 的 reviewed preview artifact。</li><li><code>--plan-file</code>：舊 plan-based staged workflows 的相容 alias。</li><li><code>--approve</code>：明確表示這一步可以繼續。</li><li><code>--execute-live</code>：從 staged intent 轉成真的 live 執行。</li><li><code>--approval-reason</code>、<code>--apply-note</code>：把人工核准背景帶進輸出。</li><li><code>--output-format</code>：輸出成 <code>text</code> 或 <code>json</code>。</li></ul>

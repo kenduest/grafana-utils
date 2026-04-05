@@ -15,10 +15,12 @@ Add \-\-execute\-live only when you are ready to mutate Grafana for real.
 .IP \(bu 2
 \-\-preview\-file is the preferred input, while \-\-plan\-file still works as a compatibility alias for older staged workflows.
 .SH BEFORE / AFTER
-.IP \(bu 2
-Before: preview exists, but the last mile between review and mutation is still a risky operator step.
-.IP \(bu 2
-After: apply becomes either a clear staged intent artifact or a clear live execution result with approval attached.
+.PP
+\- Before: preview exists, but the last mile between review and mutation is still a risky operator step.
+.PP
+\- After: apply becomes either a clear staged intent artifact or a clear live execution result with approval attached.
+.PP
+The ordering contract stays on the reviewed preview: ordering.mode, operations[].orderIndex / orderGroup / kindOrder, and summary.blocked_reasons are preview fields that document operation order and blocked work before apply.
 .SH COMMON OPTIONS
 .TP
 .B \-\-preview\-file

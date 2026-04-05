@@ -797,14 +797,18 @@ grafana-util change preview --desired-file ./desired.json --live-file ./live.jso
 <pre><code>{
   &quot;kind&quot;: &quot;grafana-utils-sync-plan&quot;,
   &quot;reviewed&quot;: false,
+  &quot;ordering&quot;: {
+    &quot;mode&quot;: &quot;dependency-aware&quot;
+  },
   &quot;summary&quot;: {
     &quot;would_create&quot;: 1,
     &quot;would_update&quot;: 4,
-    &quot;would_delete&quot;: 0
+    &quot;would_delete&quot;: 0,
+    &quot;blocked_reasons&quot;: []
   },
   &quot;operations&quot;: []
 }</code></pre>
-<p>這是正常的 task-first preview contract。<code>reviewed: false</code> 代表 preview 已存在，但還沒進到 apply 可接受的審核狀態。</p>
+<p>這是正常的 task-first preview contract。<code>reviewed: false</code> 代表 preview 已存在，但還沒進到 apply 可接受的審核狀態。 這份 public preview contract 也會帶上排序資訊：<code>ordering.mode</code>、每筆 operation 的 <code>orderIndex</code> / <code>orderGroup</code> / <code>kindOrder</code>，以及在有未接管工作時會出現的 <code>summary.blocked_reasons</code>。<code>change apply</code> 只是消費這份已審核的 preview，不會另外發明一套排序契約。</p>
 <h2 id="成功判準">成功判準</h2>
 <ul><li><code>summary</code> 的 create / update / delete 計數和你的預期相符</li><li>preview 可以直接交給別人做 review</li><li>輸出足夠明確，後續能拿來對照 apply 行為</li></ul>
 <h2 id="失敗時先檢查">失敗時先檢查</h2>

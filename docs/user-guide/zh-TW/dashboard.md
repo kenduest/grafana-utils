@@ -39,7 +39,7 @@
 - 如果你要一邊編修一邊在瀏覽器看本地草稿內容，先用 `dashboard serve` 開一個輕量 preview server。
 - 在任何 mutation 前先跑 `dashboard review`，確認 title、UID、tags、folder UID 與阻擋性驗證問題。
 - 要重寫本地草稿內容時，用 `dashboard patch-file` 原地修改或輸出成新檔。
-- 如果你想從 live dashboard 開始直接編修，但又不想預設就回寫 Grafana，請用 `dashboard edit-live`。
+- 如果你想從 live dashboard 開始直接編修，但又不想預設就回寫 Grafana，請用 `dashboard edit-live`；它會先給你 review 摘要和阻擋性驗證結果，再決定能不能回寫。
 - 草稿準備好後，用 `dashboard publish` 走和正式 import 同一條 replay pipeline。
 
 如果你的團隊是用 Jsonnet、grafanalib 或其他 generator 產 dashboard，不必每次都先落一個中繼暫存檔才能 review 或 publish。
@@ -63,7 +63,7 @@ grafana-util dashboard publish --url http://localhost:3000 --basic-user admin --
 
 ```bash
 # 用途：在本地瀏覽器裡持續檢視一份 dashboard 草稿。
-grafana-util dashboard serve --input ./drafts/cpu-main.json --port 18080
+grafana-util dashboard serve --input ./drafts/cpu-main.json --port 18080 --open-browser
 ```
 
 ```bash

@@ -22,10 +22,10 @@ If you are an SRE, Grafana operator, or responder, this page should help you dec
 
 For single-dashboard authoring, the local draft path is:
 - `get` or `clone-live` to start from one live dashboard
-- `serve` to keep one or more drafts open in a local preview browser while you edit
+- `serve` to keep one or more drafts open in a local preview browser while you edit, optionally opening the browser for you
 - `review` to verify one draft
 - `patch-file` to rewrite local metadata
-- `edit-live` to fetch one live dashboard into an editor with a safe local-draft default
+- `edit-live` to fetch one live dashboard into an editor with a safe local-draft default and a review-aware apply gate
 - `publish` to replay that draft back through the import pipeline
 
 `review`, `patch-file`, and `publish` also accept `--input -` for one wrapped or bare dashboard JSON document from standard input. Use that when an external generator already writes the dashboard JSON to stdout. `patch-file --input -` requires `--output`, and `publish --watch` is the local-file variant for repeated save-and-preview loops and does not support `--input -`.
@@ -94,7 +94,7 @@ grafana-util dashboard publish --url http://localhost:3000 --basic-user admin --
 
 ```bash
 # Purpose: Open one local dashboard draft in the local preview server.
-grafana-util dashboard serve --input ./drafts/cpu-main.json --port 18080
+grafana-util dashboard serve --input ./drafts/cpu-main.json --port 18080 --open-browser
 ```
 
 ```bash

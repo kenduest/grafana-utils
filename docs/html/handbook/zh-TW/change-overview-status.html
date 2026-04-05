@@ -845,7 +845,7 @@ grafana-util change check --workspace . --fetch-live --output-format json</code>
 grafana-util change preview --workspace . --fetch-live --profile prod</code></pre>
 <pre><code># 用途：用明確 desired/live 輸入產出 JSON preview。
 grafana-util change preview --desired-file ./desired.json --live-file ./live.json --output-format json</code></pre>
-<p>preview 是現在 task-first 路徑裡對應舊 <code>plan</code> 的入口。底層 contract 還是同一套，但對使用者來說，先想「這次會改到什麼」比先想「我要 build 哪種 plan 文件」更自然。</p>
+<p>preview 是現在 task-first 路徑裡對應舊 <code>plan</code> 的入口。底層 contract 還是同一套，但對使用者來說，先想「這次會改到什麼」比先想「我要 build 哪種 plan 文件」更自然。 這份 preview contract 也是排序契約的公開面：<code>ordering.mode</code>、每筆 operation 的 <code>orderIndex</code> / <code>orderGroup</code> / <code>kindOrder</code>，以及 <code>summary.blocked_reasons</code> 會讓審查者看出 plan 的執行順序與尚未解除的受阻工作。</p>
 <h2 id="互動模式-tui-語意">互動模式 (TUI) 語意</h2>
 <p><code>overview live --output-format interactive</code> 會透過共用的 live status 路徑顯示 live project overview。</p>
 <pre><code># 用途：overview live --output-format interactive 會透過共用的 live status 路徑顯示 live project overview。

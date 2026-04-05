@@ -33,5 +33,6 @@ grafana-util resource get orgs/1 --profile prod --output-format json
 
 ## 相關指令
 - [resource](./resource.md)
+- [resource describe](./resource-describe.md)
 - [resource kinds](./resource-kinds.md)
 - [resource list](./resource-list.md)

@@ -75,6 +75,8 @@ CLI 內建快速查詢：
 - `change advanced bundle-preflight --output-format json` -> `grafana-utils-sync-bundle-preflight`
 - `change advanced promotion-preflight --output-format json` -> `grafana-utils-sync-promotion-preflight`
 
+對於 `grafana-utils-sync-plan`，審查者與 CI 也應該直接讀取 preview 文件上的排序欄位：`ordering.mode`、`operations[].orderIndex`、`operations[].orderGroup`、`operations[].kindOrder`，以及 `summary.blocked_reasons`。
+
 如果你需要每種文件的 top-level 欄位細節，直接看 [change 指令頁](../../commands/zh-TW/change.md) 會最快。
 
 ### 給 CI 用的 `dashboard history` JSON 文件

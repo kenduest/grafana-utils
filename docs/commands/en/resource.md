@@ -12,7 +12,8 @@ This namespace is intentionally narrower and more generic than the main operator
 Treat it as a read-only utility surface, not as the primary entrypoint for day-to-day mutation work.
 
 ## Workflow
-- Start with `resource kinds` to see the currently supported live resource kinds.
+- Start with `resource describe` to see the supported selector patterns and endpoint shape for each kind.
+- Use `resource kinds` to see the currently supported live resource kinds.
 - Use `resource list <kind>` when you need inventory for one kind.
 - Use `resource get <kind>/<identity>` when you need the full live payload for one item.
 
@@ -30,6 +31,11 @@ Treat it as a read-only utility surface, not as the primary entrypoint for day-t
 
 ## Examples
 ```bash
+# Purpose: Describe the supported live resource kinds and selector patterns.
+grafana-util resource describe
+```
+
+```bash
 # Purpose: Show the currently supported generic resource kinds.
 grafana-util resource kinds
 ```
@@ -45,6 +51,7 @@ grafana-util resource get datasources/prom-main --profile prod --output-format y
 ```
 
 ## Related commands
+- [resource describe](./resource-describe.md)
 - [resource kinds](./resource-kinds.md)
 - [resource list](./resource-list.md)
 - [resource get](./resource-get.md)

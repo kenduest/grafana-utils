@@ -846,7 +846,7 @@ grafana-util change check --workspace . --fetch-live --output-format json</code>
 grafana-util change preview --workspace . --fetch-live --profile prod</code></pre>
 <pre><code># Purpose: Preview one explicit desired/live pair as JSON.
 grafana-util change preview --desired-file ./desired.json --live-file ./live.json --output-format json</code></pre>
-<p>Preview is the task-first replacement for the common <code>plan</code> step. It still emits the same reviewable staged contract underneath, but the operator entrypoint is now “preview what would change” instead of “build a plan document.”</p>
+<p>Preview is the task-first replacement for the common <code>plan</code> step. It still emits the same reviewable staged contract underneath, but the operator entrypoint is now “preview what would change” instead of “build a plan document.” That preview contract is also where ordering lives: <code>ordering.mode</code>, <code>operations[].orderIndex</code> / <code>orderGroup</code> / <code>kindOrder</code>, and <code>summary.blocked_reasons</code> tell reviewers how the plan is sequenced and which operations remain blocked before apply.</p>
 <h2 id="interactive-mode-tui-semantics">Interactive Mode (TUI) Semantics</h2>
 <p><code>overview live --output-format interactive</code> opens the live project overview through the shared status live path.</p>
 <pre><code># Purpose: overview live --output-format interactive opens the live project overview through the shared status live path.

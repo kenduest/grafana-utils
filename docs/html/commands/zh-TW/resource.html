@@ -782,20 +782,22 @@ code[class*="language-"],pre[class*="language-"]{color:#ccc;background:none;font
 <p>這個命名空間刻意比主要維運工作流更通用、更窄。它的目的不是取代既有的高階操作，而是提供一條唯讀資源查詢路徑，讓你能先檢查少數支援的 live Grafana resource kinds。</p>
 <p>把它當成通用查詢工具，不是日常 mutation 的主入口。</p>
 <h2 id="使用方式">使用方式</h2>
-<ul><li>先用 <code>resource kinds</code> 看目前支援哪些 live resource kinds。</li><li>需要盤點某一類資源時，用 <code>resource list &lt;kind&gt;</code>。</li><li>需要抓某一筆完整 live payload 時，用 <code>resource get &lt;kind&gt;/&lt;identity&gt;</code>。</li></ul>
+<ul><li>先用 <code>resource describe</code> 看各 kind 的 selector 格式與 endpoint 形狀。</li><li>先用 <code>resource kinds</code> 看目前支援哪些 live resource kinds。</li><li>需要盤點某一類資源時，用 <code>resource list &lt;kind&gt;</code>。</li><li>需要抓某一筆完整 live payload 時，用 <code>resource get &lt;kind&gt;/&lt;identity&gt;</code>。</li></ul>
 <h2 id="目前支援的-kinds">目前支援的 kinds</h2>
 <ul><li><code>dashboards</code></li><li><code>folders</code></li><li><code>datasources</code></li><li><code>alert-rules</code></li><li><code>orgs</code></li></ul>
 <h2 id="輸出">輸出</h2>
 <ul><li><code>kinds</code> 支援 <code>text</code>、<code>table</code>、<code>json</code>、<code>yaml</code></li><li><code>list</code> 支援 <code>text</code>、<code>table</code>、<code>json</code>、<code>yaml</code></li><li><code>get</code> 支援 <code>text</code>、<code>table</code>、<code>json</code>、<code>yaml</code></li></ul>
 <h2 id="範例">範例</h2>
-<pre><code># 用途：顯示目前支援的低階 resource kinds。
+<pre><code># 用途：說明目前支援的 live resource kinds 與 selector 格式。
+grafana-util resource describe</code></pre>
+<pre><code># 用途：顯示目前支援的 resource kinds。
 grafana-util resource kinds</code></pre>
 <pre><code># 用途：從本機 Grafana 列出 live dashboards。
 grafana-util resource list dashboards --url http://localhost:3000 --basic-user admin --basic-password admin</code></pre>
 <pre><code># 用途：以 YAML 取得單一 datasource payload。
 grafana-util resource get datasources/prom-main --profile prod --output-format yaml</code></pre>
 <h2 id="相關指令">相關指令</h2>
-<ul><li><a href="resource-kinds.html">resource kinds</a></li><li><a href="resource-list.html">resource list</a></li><li><a href="resource-get.html">resource get</a></li><li><a href="dashboard.html">dashboard</a></li></ul>
+<ul><li><a href="resource-describe.html">resource describe</a></li><li><a href="resource-kinds.html">resource kinds</a></li><li><a href="resource-list.html">resource list</a></li><li><a href="resource-get.html">resource get</a></li><li><a href="dashboard.html">dashboard</a></li></ul>
     
   </article>
   <aside class="sidebar">

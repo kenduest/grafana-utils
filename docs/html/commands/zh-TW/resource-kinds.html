@@ -766,18 +766,18 @@ code[class*="language-"],pre[class*="language-"]{color:#ccc;background:none;font
     <section class="command-intro">
   <div class="command-intro-grid"><div class="command-intro-block">
   <p class="command-intro-label">這頁在說什麼</p>
-  <p class="command-intro-text">列出低階 resource 命名空間目前支援的 live resource kinds。</p>
+  <p class="command-intro-text">列出 resource 命名空間目前支援的 live resource kinds。</p>
 </div>
 <div class="command-intro-block">
   <p class="command-intro-label">什麼時候看這頁</p>
-  <ul class="command-intro-list"><li>當你要先確認通用資源查詢介面是否已經支援你想查的 live Grafana resource kind 時，使用這個指令。</li></ul>
+  <ul class="command-intro-list"><li>當你要先確認通用資源查詢介面是否已經支援你想查的 live Grafana resource kind 時，使用這個指令。如果你想看 selector 格式或 endpoint 形狀，請改用 resource describe。</li></ul>
 </div>
 </div>
 </section>
 <h2 id="用途">用途</h2>
-<p>列出低階 <code>resource</code> 命名空間目前支援的 live resource kinds。</p>
+<p>列出 <code>resource</code> 命名空間目前支援的 live resource kinds。</p>
 <h2 id="何時使用">何時使用</h2>
-<p>當你要先確認通用資源查詢介面是否已經支援你想查的 live Grafana resource kind 時，使用這個指令。</p>
+<p>當你要先確認通用資源查詢介面是否已經支援你想查的 live Grafana resource kind 時，使用這個指令。如果你想看 selector 格式或 endpoint 形狀，請改用 <code>resource describe</code>。</p>
 <h2 id="重點旗標">重點旗標</h2>
 <ul><li><code>--output-format</code>：選擇 <code>text</code>、<code>table</code>、<code>json</code> 或 <code>yaml</code>。</li></ul>
 <h2 id="範例">範例</h2>
@@ -786,7 +786,7 @@ grafana-util resource kinds</code></pre>
 <pre><code># 用途：以 JSON 輸出相同的支援清單。
 grafana-util resource kinds --output-format json</code></pre>
 <h2 id="相關指令">相關指令</h2>
-<ul><li><a href="resource.html">resource</a></li><li><a href="resource-list.html">resource list</a></li><li><a href="resource-get.html">resource get</a></li></ul>
+<ul><li><a href="resource.html">resource</a></li><li><a href="resource-describe.html">resource describe</a></li><li><a href="resource-list.html">resource list</a></li><li><a href="resource-get.html">resource get</a></li></ul>
     
   </article>
   <aside class="sidebar">

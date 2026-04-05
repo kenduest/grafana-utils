@@ -135,6 +135,7 @@ The checked-in `docs/html/commands/en/*.html` files are generated from the same 
 ## Generic Resource Query
 
 - [resource](./resource.md)
+- [resource describe](./resource-describe.md)
 - [resource kinds](./resource-kinds.md)
 - [resource list](./resource-list.md)
 - [resource get](./resource-get.md)

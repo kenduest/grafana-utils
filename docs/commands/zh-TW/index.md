@@ -143,6 +143,7 @@
 ## 通用資源查詢
 
 - [resource](./resource.md)
+- [resource describe](./resource-describe.md)
 - [resource kinds](./resource-kinds.md)
 - [resource list](./resource-list.md)
 - [resource get](./resource-get.md)

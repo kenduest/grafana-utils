@@ -788,7 +788,7 @@ code[class*="language-"],pre[class*="language-"]{color:#ccc;background:none;font
 <h2 id="workflow-lanes">Workflow lanes</h2>
 <ul><li><strong>Inspect</strong>: browse, list, get, inspect-live, inspect-export, inspect-vars, and topology checks.</li><li><strong>Move</strong>: export, import, clone-live, raw-to-prompt, diff, and publish paths.</li><li><strong>Author</strong>: get, clone-live, serve, patch-file, edit-live, review, and publish around one dashboard draft.</li><li><strong>Review Before Mutate</strong>: review, governance-gate, and impact analysis.</li><li><strong>History</strong>: list, restore, and export revision history before you recover or promote a dashboard.</li><li><strong>Capture</strong>: screenshot flows for reproducible visual proof.</li></ul>
 <p>For single-dashboard authoring, the local draft path is:</p>
-<ul><li><code>get</code> or <code>clone-live</code> to start from one live dashboard</li><li><code>serve</code> to keep one or more drafts open in a local preview browser while you edit</li><li><code>review</code> to verify one draft</li><li><code>patch-file</code> to rewrite local metadata</li><li><code>edit-live</code> to fetch one live dashboard into an editor with a safe local-draft default</li><li><code>publish</code> to replay that draft back through the import pipeline</li></ul>
+<ul><li><code>get</code> or <code>clone-live</code> to start from one live dashboard</li><li><code>serve</code> to keep one or more drafts open in a local preview browser while you edit, optionally opening the browser for you</li><li><code>review</code> to verify one draft</li><li><code>patch-file</code> to rewrite local metadata</li><li><code>edit-live</code> to fetch one live dashboard into an editor with a safe local-draft default and a review-aware apply gate</li><li><code>publish</code> to replay that draft back through the import pipeline</li></ul>
 <p><code>review</code>, <code>patch-file</code>, and <code>publish</code> also accept <code>--input -</code> for one wrapped or bare dashboard JSON document from standard input. Use that when an external generator already writes the dashboard JSON to stdout. <code>patch-file --input -</code> requires <code>--output</code>, and <code>publish --watch</code> is the local-file variant for repeated save-and-preview loops and does not support <code>--input -</code>.</p>
 <p>Choose this page when the task is dashboard work but you are still deciding whether the next step is to inspect, move, review, or capture.</p>
 <h2 id="before-after">Before / After</h2>
@@ -815,7 +815,7 @@ jsonnet dashboards/cpu.jsonnet | grafana-util dashboard review --input - --outpu
 <pre><code># Purpose: Watch one local draft file and rerun publish dry-run after each save.
 grafana-util dashboard publish --url http://localhost:3000 --basic-user admin --basic-password admin --input ./drafts/cpu-main.json --dry-run --watch</code></pre>
 <pre><code># Purpose: Open one local dashboard draft in the local preview server.
-grafana-util dashboard serve --input ./drafts/cpu-main.json --port 18080</code></pre>
+grafana-util dashboard serve --input ./drafts/cpu-main.json --port 18080 --open-browser</code></pre>
 <pre><code># Purpose: Pull one live dashboard into an external editor and keep the result as a local draft by default.
 grafana-util dashboard edit-live --profile prod --dashboard-uid cpu-main --output ./drafts/cpu-main.edited.json</code></pre>
 <pre><code># Purpose: Inspect live dashboard governance data for downstream review.

@@ -180,6 +180,7 @@ grafana-util change preview --desired-file ./desired.json --live-file ./live.jso
 ```
 
 preview 是現在 task-first 路徑裡對應舊 `plan` 的入口。底層 contract 還是同一套，但對使用者來說，先想「這次會改到什麼」比先想「我要 build 哪種 plan 文件」更自然。
+這份 preview contract 也是排序契約的公開面：`ordering.mode`、每筆 operation 的 `orderIndex` / `orderGroup` / `kindOrder`，以及 `summary.blocked_reasons` 會讓審查者看出 plan 的執行順序與尚未解除的受阻工作。
 
 ---
 

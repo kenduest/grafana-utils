@@ -182,6 +182,7 @@ grafana-util change preview --desired-file ./desired.json --live-file ./live.jso
 ```
 
 Preview is the task-first replacement for the common `plan` step. It still emits the same reviewable staged contract underneath, but the operator entrypoint is now “preview what would change” instead of “build a plan document.”
+That preview contract is also where ordering lives: `ordering.mode`, `operations[].orderIndex` / `orderGroup` / `kindOrder`, and `summary.blocked_reasons` tell reviewers how the plan is sequenced and which operations remain blocked before apply.
 
 ---
 

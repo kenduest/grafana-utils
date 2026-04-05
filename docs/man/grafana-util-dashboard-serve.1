@@ -25,13 +25,16 @@ extra local files or directories to watch for reloads.
 .B \-\-no\-watch
 disable background polling reloads.
 .TP
+.B \-\-open\-browser
+open the preview URL in your default browser after the server starts.
+.TP
 .B \-\-address, \-\-port
 bind address and port for the local preview server.
 .SH EXAMPLES
 .PP
 Serve one or more dashboard drafts through a lightweight local preview server.
 .EX
-grafana-util dashboard serve --input ./drafts/cpu-main.json --port 18080
+grafana-util dashboard serve --input ./drafts/cpu-main.json --port 18080 --open-browser
 .EE
 .SH SEE ALSO
 \fBgrafana-util\fR(1)

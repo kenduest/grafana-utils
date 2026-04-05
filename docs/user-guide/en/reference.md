@@ -76,6 +76,8 @@ Practical mapping:
 - `change advanced bundle-preflight --output-format json` -> `grafana-utils-sync-bundle-preflight`
 - `change advanced promotion-preflight --output-format json` -> `grafana-utils-sync-promotion-preflight`
 
+For `grafana-utils-sync-plan`, reviewers and CI should also expect ordering metadata on the reviewed preview document itself: `ordering.mode`, `operations[].orderIndex`, `operations[].orderGroup`, `operations[].kindOrder`, and `summary.blocked_reasons`.
+
 Use the dedicated [change command reference](../../commands/en/change.md) when you need the exact top-level keys for each document.
 
 ### `dashboard history` JSON documents for CI

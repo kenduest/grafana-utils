@@ -785,7 +785,7 @@ code[class*="language-"],pre[class*="language-"]{color:#ccc;background:none;font
 <h2 id="重點旗標">重點旗標</h2>
 <ul><li><code>--dashboard-uid</code>：要編修的 live Grafana dashboard UID。</li><li><code>--output</code>：編修後要寫出的本地草稿路徑。未指定時，預設是 <code>./&lt;uid&gt;.edited.json</code>。</li><li><code>--apply-live</code>：把編修後的 payload 直接寫回 Grafana，而不是寫成本地草稿。</li><li><code>--yes</code>：搭配 <code>--apply-live</code> 必填，因為它會變更 live Grafana。</li><li><code>--message</code>：<code>--apply-live</code> 寫回 Grafana 時使用的 revision message。</li><li><code>--profile</code>、<code>--url</code>、<code>--token</code>、<code>--basic-user</code>、<code>--basic-password</code>：live Grafana 連線設定。</li></ul>
 <h2 id="補充說明">補充說明</h2>
-<ul><li>指令會依序使用 <code>$VISUAL</code>、<code>$EDITOR</code>，最後回退到 <code>vi</code>。</li><li>沒有帶 <code>--apply-live</code> 時，這個指令一定會把結果寫成本地草稿。</li><li>編修後的 payload 仍必須保留 <code>dashboard.uid</code>。</li></ul>
+<ul><li>指令會依序使用 <code>$VISUAL</code>、<code>$EDITOR</code>，最後回退到 <code>vi</code>。</li><li>沒有帶 <code>--apply-live</code> 時，這個指令一定會把結果寫成本地草稿。</li><li>編修完成後，指令會印出 review 摘要，包含阻擋性驗證問題與建議的下一步。</li><li><code>--apply-live</code> 只有在編修後的草稿維持 <code>dashboard.id</code> 為 null、保留原始 dashboard UID、且沒有阻擋性 review 問題時才會繼續。</li><li>編修後的 payload 仍必須保留 <code>dashboard.uid</code>。</li></ul>
 <h2 id="範例">範例</h2>
 <pre><code># 用途：編修一份 live dashboard，並把結果保留成本地草稿。
 grafana-util dashboard edit-live --profile prod --dashboard-uid cpu-main --output ./drafts/cpu-main.edited.json</code></pre>

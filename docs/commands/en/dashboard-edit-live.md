@@ -17,6 +17,8 @@ Use this when Grafana already has the closest source dashboard and you want to e
 ## Notes
 - The command opens `$VISUAL`, then `$EDITOR`, then falls back to `vi`.
 - Without `--apply-live`, this command always writes a local draft after the edit session.
+- After editing, the command prints a review summary that includes blocking validation issues and the suggested next action.
+- `--apply-live` only proceeds when the edited draft keeps `dashboard.id` null, preserves the source dashboard UID, and has no blocking review issues.
 - The edited payload must still contain `dashboard.uid`.
 
 ## Examples

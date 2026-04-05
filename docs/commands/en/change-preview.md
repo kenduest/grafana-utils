@@ -52,16 +52,21 @@ grafana-util change preview --desired-file ./desired.json --live-file ./live.jso
 {
   "kind": "grafana-utils-sync-plan",
   "reviewed": false,
+  "ordering": {
+    "mode": "dependency-aware"
+  },
   "summary": {
     "would_create": 1,
     "would_update": 4,
-    "would_delete": 0
+    "would_delete": 0,
+    "blocked_reasons": []
   },
   "operations": []
 }
 ```
 
 This is the normal task-first preview contract. `reviewed: false` means the preview exists, but it has not been approved for apply yet.
+The public preview contract also carries ordering metadata: `ordering.mode`, per-operation `orderIndex` / `orderGroup` / `kindOrder`, and `summary.blocked_reasons` when unmanaged work is present. `change apply` consumes that reviewed preview; it does not invent a new ordering contract of its own.
 
 ## What success looks like
 

@@ -783,12 +783,12 @@ code[class*="language-"],pre[class*="language-"]{color:#ccc;background:none;font
 <h2 id="何時使用">何時使用</h2>
 <p>當你正在反覆編修單一 dashboard 草稿、草稿目錄，或外部 generator 輸出，想先在本地瀏覽器檢視內容，而不是每次都直接 publish 回 Grafana 時，使用這個指令。</p>
 <h2 id="重點旗標">重點旗標</h2>
-<ul><li><code>--input</code>：要載入到 preview server 的本地 dashboard 檔案或目錄。</li><li><code>--script</code>：外部 generator 指令；其 stdout 必須輸出一份 dashboard JSON/YAML，或一組 dashboard 文件陣列。</li><li><code>--script-format</code>：把 <code>--script</code> stdout 解析成 <code>json</code> 或 <code>yaml</code>。</li><li><code>--watch</code>：額外要監看的本地檔案或目錄。</li><li><code>--no-watch</code>：停用背景 polling reload。</li><li><code>--address</code>、<code>--port</code>：本地 preview server 的綁定位址與埠號。</li></ul>
+<ul><li><code>--input</code>：要載入到 preview server 的本地 dashboard 檔案或目錄。</li><li><code>--script</code>：外部 generator 指令；其 stdout 必須輸出一份 dashboard JSON/YAML，或一組 dashboard 文件陣列。</li><li><code>--script-format</code>：把 <code>--script</code> stdout 解析成 <code>json</code> 或 <code>yaml</code>。</li><li><code>--watch</code>：額外要監看的本地檔案或目錄。</li><li><code>--no-watch</code>：停用背景 polling reload。</li><li><code>--open-browser</code>：在 server 啟動後，使用預設瀏覽器開啟 preview URL。</li><li><code>--address</code>、<code>--port</code>：本地 preview server 的綁定位址與埠號。</li></ul>
 <h2 id="補充說明">補充說明</h2>
-<ul><li>這是一個輕量的草稿 preview / 文件檢視介面，不是完整內嵌 Grafana renderer。</li><li><code>--input</code> 與 <code>--script</code> 互斥。編修本地草稿時用 <code>--input</code>，generator 已經能直接產出 payload 時再用 <code>--script</code>。</li></ul>
+<ul><li>這是一個輕量的草稿 preview / 文件檢視介面，不是完整內嵌 Grafana renderer。</li><li><code>--input</code> 與 <code>--script</code> 互斥。編修本地草稿時用 <code>--input</code>，generator 已經能直接產出 payload 時再用 <code>--script</code>。</li><li>reload 失敗時，錯誤會留在預覽頁上，方便你繼續修草稿而不用重啟 server。</li></ul>
 <h2 id="範例">範例</h2>
 <pre><code># 用途：提供單一本地草稿檔案。
-grafana-util dashboard serve --input ./drafts/cpu-main.json --port 18080</code></pre>
+grafana-util dashboard serve --input ./drafts/cpu-main.json --port 18080 --open-browser</code></pre>
 <pre><code># 用途：提供一個目錄下的所有 dashboard 草稿。
 grafana-util dashboard serve --input ./dashboards/raw</code></pre>
 <pre><code># 用途：提供一份生成儀表板，並監看 generator 輸入路徑以便自動 reload。

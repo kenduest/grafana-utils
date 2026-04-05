@@ -770,7 +770,7 @@ code[class*="language-"],pre[class*="language-"]{color:#ccc;background:none;font
 <h2 id="說明">說明</h2>
 <p><code>grafana-util dashboard</code> 把 dashboard 相關工作收在同一個入口：從瀏覽、草稿、匯出、匯入、比對，到拓樸、影響面和截圖。它也可用 <code>grafana-util db</code> 呼叫。</p>
 <p>如果是單一 dashboard 的 authoring 路徑，建議把它想成：</p>
-<ul><li><code>get</code> 或 <code>clone-live</code>：先做草稿</li><li><code>serve</code>：用本地 preview server 持續檢視草稿內容</li><li><code>review</code>：先驗證草稿內容</li><li><code>patch-file</code>：改寫本地中繼資料</li><li><code>edit-live</code>：從 live 拉一份進 editor，預設仍先落回本地草稿</li><li><code>publish</code>：沿用 import pipeline 發回 Grafana</li></ul>
+<ul><li><code>get</code> 或 <code>clone-live</code>：先做草稿</li><li><code>serve</code>：用本地 preview server 持續檢視草稿內容，必要時也能自動打開瀏覽器</li><li><code>review</code>：先驗證草稿內容</li><li><code>patch-file</code>：改寫本地中繼資料</li><li><code>edit-live</code>：從 live 拉一份進 editor，預設仍先落回本地草稿，而且會依 review 結果決定能不能回寫 live</li><li><code>publish</code>：沿用 import pipeline 發回 Grafana</li></ul>
 <p><code>review</code>、<code>patch-file</code>、<code>publish</code> 也都支援 <code>--input -</code>，可以直接吃標準輸入的一份 wrapped 或 bare dashboard JSON。這適合外部 generator 已經把 JSON 寫到 stdout 的情況。<code>patch-file --input -</code> 必須搭配 <code>--output</code>，若你是在本地反覆編修同一份檔案，則改用 <code>publish --watch</code>；它只支援本地檔案路徑，不支援 <code>--input -</code>。</p>
 <h2 id="歷史與還原工作流">歷史與還原工作流</h2>
 <p>如果你的問題不是「現在這份 dashboard 長什麼樣」，而是「哪個舊版本應該被救回來並變成新的最新版本」，就看這一組。</p>
@@ -798,7 +798,7 @@ jsonnet dashboards/cpu.jsonnet | grafana-util dashboard review --input - --outpu
 <pre><code># 編修本地草稿時，每次儲存後自動重跑 publish dry-run。
 grafana-util dashboard publish --url http://localhost:3000 --basic-user admin --basic-password admin --input ./drafts/cpu-main.json --dry-run --watch</code></pre>
 <pre><code># 開一個本地 preview server，持續檢視單一 dashboard 草稿。
-grafana-util dashboard serve --input ./drafts/cpu-main.json --port 18080</code></pre>
+grafana-util dashboard serve --input ./drafts/cpu-main.json --port 18080 --open-browser</code></pre>
 <pre><code># 從 live dashboard 開始編修，但預設先輸出成新的本地草稿。
 grafana-util dashboard edit-live --profile prod --dashboard-uid cpu-main --output ./drafts/cpu-main.edited.json</code></pre>
 <h2 id="相關指令">相關指令</h2>

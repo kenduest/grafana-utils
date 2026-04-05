@@ -17,6 +17,8 @@
 ## 補充說明
 - 指令會依序使用 `$VISUAL`、`$EDITOR`，最後回退到 `vi`。
 - 沒有帶 `--apply-live` 時，這個指令一定會把結果寫成本地草稿。
+- 編修完成後，指令會印出 review 摘要，包含阻擋性驗證問題與建議的下一步。
+- `--apply-live` 只有在編修後的草稿維持 `dashboard.id` 為 null、保留原始 dashboard UID、且沒有阻擋性 review 問題時才會繼續。
 - 編修後的 payload 仍必須保留 `dashboard.uid`。
 
 ## 範例

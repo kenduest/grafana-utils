@@ -52,16 +52,21 @@ grafana-util change preview --desired-file ./desired.json --live-file ./live.jso
 {
   "kind": "grafana-utils-sync-plan",
   "reviewed": false,
+  "ordering": {
+    "mode": "dependency-aware"
+  },
   "summary": {
     "would_create": 1,
     "would_update": 4,
-    "would_delete": 0
+    "would_delete": 0,
+    "blocked_reasons": []
   },
   "operations": []
 }
 ```
 
 這是正常的 task-first preview contract。`reviewed: false` 代表 preview 已存在，但還沒進到 apply 可接受的審核狀態。
+這份 public preview contract 也會帶上排序資訊：`ordering.mode`、每筆 operation 的 `orderIndex` / `orderGroup` / `kindOrder`，以及在有未接管工作時會出現的 `summary.blocked_reasons`。`change apply` 只是消費這份已審核的 preview，不會另外發明一套排序契約。
 
 ## 成功判準
 

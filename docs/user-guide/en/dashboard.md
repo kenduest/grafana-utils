@@ -39,7 +39,7 @@ Use the authoring lane when the work starts from one dashboard draft instead of 
 - Use `dashboard serve` when you want a lightweight local preview browser for one draft file, one draft directory, or one generator script output while you edit.
 - Use `dashboard review` before mutation to confirm title, UID, tags, folder UID, and any blocking validation issues.
 - Use `dashboard patch-file` when you need to rewrite one local draft in place or write a new patched file.
-- Use `dashboard edit-live` when you want to fetch one live dashboard into an external editor but still keep a safe local-draft default instead of immediately mutating Grafana.
+- Use `dashboard edit-live` when you want to fetch one live dashboard into an external editor, get a review summary with validation blockers, and keep a safe local-draft default instead of immediately mutating Grafana.
 - Use `dashboard publish` when the draft is ready to go back through the same import pipeline used by the broader replay path.
 
 Generator-driven teams do not need to stop at an intermediate temp file for every review or publish step.
@@ -63,7 +63,7 @@ grafana-util dashboard publish --url http://localhost:3000 --basic-user admin --
 
 ```bash
 # Purpose: Keep one draft open in a lightweight local preview browser while you edit.
-grafana-util dashboard serve --input ./drafts/cpu-main.json --port 18080
+grafana-util dashboard serve --input ./drafts/cpu-main.json --port 18080 --open-browser
 ```
 
 ```bash

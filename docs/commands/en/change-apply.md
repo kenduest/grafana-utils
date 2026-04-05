@@ -15,6 +15,7 @@ Turn a reviewed preview into a staged apply intent, or execute it live when you 
 
 - **Before**: preview exists, but the last mile between review and mutation is still a risky operator step.
 - **After**: apply becomes either a clear staged intent artifact or a clear live execution result with approval attached.
+  The ordering contract stays on the reviewed preview: `ordering.mode`, `operations[].orderIndex` / `orderGroup` / `kindOrder`, and `summary.blocked_reasons` are preview fields that document operation order and blocked work before apply.
 
 ## Key flags
 

@@ -29,5 +29,6 @@ grafana-util resource list alert-rules --profile prod --output-format json
 
 ## Related commands
 - [resource](./resource.md)
+- [resource describe](./resource-describe.md)
 - [resource kinds](./resource-kinds.md)
 - [resource get](./resource-get.md)

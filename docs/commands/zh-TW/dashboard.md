@@ -28,10 +28,10 @@
 
 如果是單一 dashboard 的 authoring 路徑，建議把它想成：
 - `get` 或 `clone-live`：先做草稿
-- `serve`：用本地 preview server 持續檢視草稿內容
+- `serve`：用本地 preview server 持續檢視草稿內容，必要時也能自動打開瀏覽器
 - `review`：先驗證草稿內容
 - `patch-file`：改寫本地中繼資料
-- `edit-live`：從 live 拉一份進 editor，預設仍先落回本地草稿
+- `edit-live`：從 live 拉一份進 editor，預設仍先落回本地草稿，而且會依 review 結果決定能不能回寫 live
 - `publish`：沿用 import pipeline 發回 Grafana
 
 `review`、`patch-file`、`publish` 也都支援 `--input -`，可以直接吃標準輸入的一份 wrapped 或 bare dashboard JSON。這適合外部 generator 已經把 JSON 寫到 stdout 的情況。`patch-file --input -` 必須搭配 `--output`，若你是在本地反覆編修同一份檔案，則改用 `publish --watch`；它只支援本地檔案路徑，不支援 `--input -`。
@@ -105,7 +105,7 @@ grafana-util dashboard publish --url http://localhost:3000 --basic-user admin --
 
 ```bash
 # 開一個本地 preview server，持續檢視單一 dashboard 草稿。
-grafana-util dashboard serve --input ./drafts/cpu-main.json --port 18080
+grafana-util dashboard serve --input ./drafts/cpu-main.json --port 18080 --open-browser
 ```
 
 ```bash

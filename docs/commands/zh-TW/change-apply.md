@@ -15,6 +15,7 @@
 
 - **採用前**：preview 已存在，但 review 到 mutation 之間最後那一步仍然很依賴操作人判斷。
 - **採用後**：apply 會把這一步拆成清楚的 staged intent 或 live execution result，並把 approval 帶進去。
+  排序契約會保留在已審核的 preview 上：`ordering.mode`、`operations[].orderIndex` / `orderGroup` / `kindOrder`、以及 `summary.blocked_reasons` 都是用來描述操作順序與受阻工作量的 preview 欄位。
 
 ## 主要旗標
 

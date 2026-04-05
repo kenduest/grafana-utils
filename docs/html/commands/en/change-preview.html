@@ -801,14 +801,18 @@ grafana-util change preview --desired-file ./desired.json --live-file ./live.jso
 <pre><code>{
   &quot;kind&quot;: &quot;grafana-utils-sync-plan&quot;,
   &quot;reviewed&quot;: false,
+  &quot;ordering&quot;: {
+    &quot;mode&quot;: &quot;dependency-aware&quot;
+  },
   &quot;summary&quot;: {
     &quot;would_create&quot;: 1,
     &quot;would_update&quot;: 4,
-    &quot;would_delete&quot;: 0
+    &quot;would_delete&quot;: 0,
+    &quot;blocked_reasons&quot;: []
   },
   &quot;operations&quot;: []
 }</code></pre>
-<p>This is the normal task-first preview contract. <code>reviewed: false</code> means the preview exists, but it has not been approved for apply yet.</p>
+<p>This is the normal task-first preview contract. <code>reviewed: false</code> means the preview exists, but it has not been approved for apply yet. The public preview contract also carries ordering metadata: <code>ordering.mode</code>, per-operation <code>orderIndex</code> / <code>orderGroup</code> / <code>kindOrder</code>, and <code>summary.blocked_reasons</code> when unmanaged work is present. <code>change apply</code> consumes that reviewed preview; it does not invent a new ordering contract of its own.</p>
 <h2 id="what-success-looks-like">What success looks like</h2>
 <ul><li>the summary counts match the operator’s expectation of creates, updates, and deletes</li><li>the preview can be handed to another person as the review artifact</li><li>the output is explicit enough to compare against later apply behavior</li></ul>
 <h2 id="failure-checks">Failure checks</h2>
