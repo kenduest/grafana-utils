@@ -5,7 +5,7 @@
 //! documents so they remain reusable from tests and offline inputs.
 
 use super::*;
-use crate::common::{render_json_value, should_print_stdout, write_plain_output_file};
+use crate::common::{emit_plain_output, render_json_value};
 use crate::sync::live::load_apply_intent_operations;
 
 fn emit_text_or_json(document: &Value, lines: &[String], output: SyncOutputFormat) -> Result<()> {
@@ -515,16 +515,16 @@ pub fn run_sync_cli(command: SyncGroupCommand) -> Result<()> {
         SyncGroupCommand::Bundle(args) => {
             let output = execute_sync_bundle(&args)?;
             if let Some(output_file) = args.output_file.as_ref() {
-                write_plain_output_file(
-                    output_file,
+                emit_plain_output(
                     &serde_json::to_string_pretty(&output.document)?,
+                    Some(output_file.as_path()),
+                    false,
                 )?;
             }
-            if should_print_stdout(args.output_file.as_deref(), args.also_stdout) {
-                emit_text_or_json(&output.document, &output.text_lines, args.output_format)
-            } else {
-                Ok(())
+            if args.output_file.is_none() || args.also_stdout {
+                emit_text_or_json(&output.document, &output.text_lines, args.output_format)?;
             }
+            Ok(())
         }
     }
 }
