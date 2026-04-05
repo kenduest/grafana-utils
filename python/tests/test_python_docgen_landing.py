@@ -27,12 +27,12 @@ class DocgenLandingTests(unittest.TestCase):
 
         page = module.load_landing_page("en")
 
-        self.assertEqual(page.title, "grafana-util Docs")
+        self.assertEqual(page.title, "grafana-util")
         self.assertEqual(page.search.title, "Quick jump")
         self.assertEqual(len(page.sections), 4)
         self.assertEqual(page.sections[0].title, "Quick Start")
-        self.assertEqual(page.sections[0].tasks[0].title, "First connection and read-only checks")
-        self.assertEqual(page.sections[0].tasks[0].links[0].target, "../user-guide/en/getting-started.md")
+        self.assertEqual(page.sections[0].tasks[0].title, "What this tool is for")
+        self.assertEqual(page.sections[0].tasks[0].links[0].target, "../user-guide/en/what-is-grafana-util.md")
         self.assertEqual(page.maintainer.links[0].target, "../DEVELOPER.md")
 
     def test_parse_landing_text_requires_search_and_maintainer_sections(self):
@@ -40,7 +40,7 @@ class DocgenLandingTests(unittest.TestCase):
 
         with self.assertRaisesRegex(ValueError, "Search and Maintainer sections"):
             module.parse_landing_text(
-                "# grafana-util Docs\n\nSummary only.\n",
+                "# grafana-util\n\nSummary only.\n",
                 locale="en",
                 source_path=REPO_ROOT / "docs" / "landing" / "broken.md",
             )
@@ -52,7 +52,7 @@ class DocgenLandingTests(unittest.TestCase):
             landing_root = Path(tmp_dir)
             page = module.load_landing_page("en", landing_root=landing_root)
 
-            self.assertEqual(page.title, "grafana-util Docs")
+            self.assertEqual(page.title, "grafana-util")
             self.assertEqual(page.source_path, landing_root / "en.md")
             self.assertEqual(page.maintainer.links[0].target, "../DEVELOPER.md")
 

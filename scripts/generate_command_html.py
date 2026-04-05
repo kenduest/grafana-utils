@@ -816,7 +816,7 @@ def render_landing_page(config):
 </div>
 """
     return page_shell(
-        page_title="grafana-util Docs",
+        page_title="grafana-util docs",
         html_lang="en",
         home_href=relative_href(prefixed_output_rel(config, "index.html"), prefixed_output_rel(config, "index.html")),
         hero_title="",
