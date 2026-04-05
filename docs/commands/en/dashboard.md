@@ -11,6 +11,32 @@ Open this page first when the work is about the full dashboard workflow rather t
 
 If you are an SRE, Grafana operator, or responder, this page should help you decide which dashboard path to open next. If you already know the exact action, jump from here into the matching subcommand page for the concrete flags and examples.
 
+## Workflow lanes
+
+- **Inspect**: browse, list, get, inspect-live, inspect-export, inspect-vars, and topology checks.
+- **Move**: export, import, clone-live, raw-to-prompt, diff, and publish paths.
+- **Review Before Mutate**: review, governance-gate, and impact analysis.
+- **Capture**: screenshot flows for reproducible visual proof.
+
+Choose this page when the task is dashboard work but you are still deciding whether the next step is to inspect, move, review, or capture.
+
+## Before / After
+
+- **Before**: dashboard work is often split across UI browsing, one-off exports, local JSON edits, and ad hoc screenshot or review steps.
+- **After**: the `dashboard` namespace keeps browse, inspect, move, review, and capture in one place, so you can pick the lane first and then jump to the matching subcommand.
+
+## What success looks like
+
+- you can tell whether the task is inspect, move, review, or capture before opening a subcommand
+- inventory reads, export/import flows, and review surfaces share the same auth and bundle conventions
+- screenshot and topology paths stay available when you need proof instead of only a final JSON blob
+
+## Failure checks
+
+- if browse output looks incomplete, verify the profile, auth flags, and target org before retrying
+- if live inspect or topology output looks stale, confirm you are pointing at the current Grafana and not at an older local export
+- if a result is going into automation, set `--output-format` explicitly so the downstream step knows the contract
+
 ## Key flags
 - `--url`: Grafana base URL.
 - `--token`, `--basic-user`, `--basic-password`: shared live Grafana credentials.
@@ -25,51 +51,64 @@ If you are an SRE, Grafana operator, or responder, this page should help you dec
 
 ## Examples
 ```bash
-# Purpose: `grafana-util dashboard` is the namespace for live dashboard workflows, local draft handling, export/import review, inspection, topology, and screenshots. The same namespace is also available as `grafana-util db`.
+# Purpose: Inspect the dashboard namespace before choosing a lane.
 grafana-util dashboard --help
 ```
 
 ```bash
-# Purpose: `grafana-util dashboard` is the namespace for live dashboard workflows, local draft handling, export/import review, inspection, topology, and screenshots. The same namespace is also available as `grafana-util db`.
+# Purpose: Browse live dashboards from a saved profile.
 grafana-util dashboard browse --profile prod
 ```
 
 ```bash
-# Purpose: `grafana-util dashboard` is the namespace for live dashboard workflows, local draft handling, export/import review, inspection, topology, and screenshots. The same namespace is also available as `grafana-util db`.
+# Purpose: Browse a local Grafana instance with explicit credentials.
 grafana-util dashboard browse --url http://localhost:3000 --basic-user admin --basic-password admin
 ```
 
 ```bash
-# Purpose: `grafana-util dashboard` is the namespace for live dashboard workflows, local draft handling, export/import review, inspection, topology, and screenshots. The same namespace is also available as `grafana-util db`.
+# Purpose: Convert a legacy dashboard export into prompt-friendly JSON.
 grafana-util dashboard raw-to-prompt --input-file ./legacy/cpu-main.json --profile prod --org-id 2
 ```
 
 ```bash
-# Purpose: `grafana-util dashboard` is the namespace for live dashboard workflows, local draft handling, export/import review, inspection, topology, and screenshots. The same namespace is also available as `grafana-util db`.
+# Purpose: Inspect live dashboard governance data for downstream review.
 grafana-util dashboard inspect-live --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-format governance-json
 ```
 
 ```bash
-# Purpose: `grafana-util dashboard` is the namespace for live dashboard workflows, local draft handling, export/import review, inspection, topology, and screenshots. The same namespace is also available as `grafana-util db`.
+# Purpose: Open the interactive inspector for a live dashboard.
 grafana-util dashboard inspect-live --url http://localhost:3000 --basic-user admin --basic-password admin --interactive
 ```
 
 ## Related commands
+
+### Inspect
+
 - [dashboard browse](./dashboard-browse.md)
 - [dashboard get](./dashboard-get.md)
 - [dashboard clone-live](./dashboard-clone-live.md)
 - [dashboard list](./dashboard-list.md)
+- [dashboard inspect-export](./dashboard-inspect-export.md)
+- [dashboard inspect-live](./dashboard-inspect-live.md)
+- [dashboard inspect-vars](./dashboard-inspect-vars.md)
+
+### Move
+
 - [dashboard export](./dashboard-export.md)
 - [dashboard import](./dashboard-import.md)
 - [dashboard raw-to-prompt](./dashboard-raw-to-prompt.md)
 - [dashboard patch-file](./dashboard-patch-file.md)
-- [dashboard review](./dashboard-review.md)
 - [dashboard publish](./dashboard-publish.md)
 - [dashboard delete](./dashboard-delete.md)
 - [dashboard diff](./dashboard-diff.md)
-- [dashboard inspect-export](./dashboard-inspect-export.md)
-- [dashboard inspect-live](./dashboard-inspect-live.md)
-- [dashboard inspect-vars](./dashboard-inspect-vars.md)
+
+### Review Before Mutate
+
+- [dashboard review](./dashboard-review.md)
 - [dashboard governance-gate](./dashboard-governance-gate.md)
 - [dashboard topology](./dashboard-topology.md)
+- [dashboard impact](./dashboard-impact.md)
+
+### Capture
+
 - [dashboard screenshot](./dashboard-screenshot.md)

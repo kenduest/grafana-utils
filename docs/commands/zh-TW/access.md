@@ -1,40 +1,38 @@
-# `grafana-util access`
+# access
 
-## 目的
+## 這一頁對應的工作流
 
-執行 access-management 指令介面，涵蓋使用者、組織、團隊與服務帳號。
+| 工作流 | 常用子命令 |
+| --- | --- |
+| 盤點使用者 / org / team / service account | `user`、`org`、`team`、`service-account`、`service-account token` |
+| 管理成員與權限 | `user`、`org`、`team` |
+| 管理 service account 與 token | `service-account`、`service-account token` |
 
-## 使用時機
+## 從這裡開始
 
-- 列出或瀏覽 access 清單。
-- 建立、修改、匯出、匯入、比對或刪除 access 資源。
-- 管理 service-account token。
+- 先看現況：`access user list`、`access org list`、`access team list`
+- 要處理 service account：直接進 `access service-account`
+- 要追 token：直接進 `access service-account token`
+- 要先確認範圍：先看對應的 list，再做新增、修改或刪除
 
 ## 說明
-如果你現在處理的是 Grafana 身分與存取整體工作，而不是單一 user 命令，先看這一頁最合適。`access` 指令群組不是只管使用者，而是把 org、user、team、service account 和 service-account token 的整套生命週期放在一起。
 
-這頁是給管理者先判斷自己應該往哪個操作面走。只要你的工作牽涉成員、org 結構、service account 輪替，或 access 快照與比對，就先從這裡進來。
+`grafana-util access` 把身分與存取工作收在同一個入口：`user`、`org`、`team`、`service account` 和 `service-account token` 的生命週期都在這裡處理。這頁適合先判斷自己應該往哪個操作面走，而不是直接猜一個命令名。
 
 ## 主要旗標
 
-- `--profile`, `--url`, `--token`, `--basic-user`, `--basic-password`
-- `--prompt-password`, `--prompt-token`, `--timeout`, `--verify-ssl`, `--insecure`, `--ca-cert`
-- 使用巢狀子命令處理 `user`、`org`、`team` 或 `group`，以及 `service-account`。
-
-## 驗證說明
-
-- 可重複的 inventory 讀取優先用 `--profile`。
-- org、user、team 與 service-account lifecycle 往往需要管理員權限，直接 Basic auth 是最穩妥的 fallback。
-- 即使 token 能執行部分 list 指令，也不代表足夠支援整個 access 管理面。
+- `--profile`、`--url`、`--token`、`--basic-user`、`--basic-password`
+- `--prompt-password`、`--prompt-token`、`--timeout`、`--verify-ssl`、`--insecure`、`--ca-cert`
+- 巢狀子命令處理 `user`、`org`、`team` 或 `group`，以及 `service-account`
 
 ## 採用前後對照
 
-- **採用前**：access 工作常常散在 UI 點擊、一次性的 API 呼叫，或不容易重跑的 shell 指令裡。
-- **採用後**：同一個 access 面被整理成一個 CLI 命令群組，inventory、生命週期、token 與快照都能用一致設定重複執行。
+- **採用前**：成員、org、team 與 token 工作常散在 UI 點擊、一次性的 API 呼叫，或很難重跑的 shell 指令裡。
+- **採用後**：同一個 CLI 命令群組能把盤點、生命週期與 token 管理收斂到同一套設定。
 
 ## 成功判準
 
-- 你能在動到 production 前，先判斷這件事是屬於 `user`、`org`、`team` 還是 `service-account`
+- 你在動手前就能先判斷這件事是屬於 `user`、`org`、`team`，還是 `service-account`
 - inventory 讀取會因為 profile 與驗證設定清楚而可重複
 - token 與生命週期變更有足夠證據，可以交給另一位維護者或 CI
 
@@ -47,24 +45,29 @@
 ## 範例
 
 ```bash
-# 用途：執行 access-management 指令介面，涵蓋使用者、組織、團隊與服務帳號。
+# 先盤點目前有哪些 user。
 grafana-util access user list --profile prod --json
 ```
 
 ```bash
-# 用途：執行 access-management 指令介面，涵蓋使用者、組織、團隊與服務帳號。
+# 先建立或更新 service account token。
 grafana-util access service-account token add --url http://localhost:3000 --basic-user admin --basic-password admin --name deploy-bot --token-name nightly
 ```
 
 ```bash
-# 用途：執行 access-management 指令介面，涵蓋使用者、組織、團隊與服務帳號。
+# 先看 service account 與 token 的現況。
 grafana-util access service-account list --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-format text
 ```
 
 ## 相關命令
 
+### 盤點
+
 - [access user](./access-user.md)
 - [access org](./access-org.md)
 - [access team](./access-team.md)
+
+### 服務帳號與 token
+
 - [access service-account](./access-service-account.md)
 - [access service-account token](./access-service-account-token.md)

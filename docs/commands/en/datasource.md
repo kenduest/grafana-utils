@@ -11,16 +11,13 @@ Open this page when your task is about the full data source lifecycle rather tha
 
 This page is especially useful when you need to decide whether the next step is inventory, export/import, diff, or a live add/modify/delete action.
 
-## Key flags
-- `--url`: Grafana base URL.
-- `--token`, `--basic-user`, `--basic-password`: shared live Grafana credentials.
-- `--profile`: load repo-local defaults from `grafana-util.yaml`.
-- `--color`: control JSON color output for the namespace.
+## Workflow lanes
 
-## Auth notes
-- Prefer `--profile` for repeatable datasource inventory and change flows.
-- Use direct Basic auth for org-spanning or admin-level mutation work.
-- Token auth is acceptable for scoped reads and diffs when the token can see the target org.
+- **Inspect**: types, browse, list, and inspect-export paths.
+- **Move**: export, import, and diff paths when you are carrying datasource state between environments.
+- **Review Before Mutate**: add, modify, and delete flows before a live datasource changes.
+
+Choose this page when the work might turn into inventory, migration, or a reviewed datasource change and you want to decide the lane first.
 
 ## Before / After
 
@@ -39,9 +36,20 @@ This page is especially useful when you need to decide whether the next step is 
 - if export or diff results look stale, verify that you are pointing at the correct Grafana and not at an older local bundle
 - if a live mutation fails, compare the intended input with the current live data source before retrying the same command
 
+## Key flags
+- `--url`: Grafana base URL.
+- `--token`, `--basic-user`, `--basic-password`: shared live Grafana credentials.
+- `--profile`: load repo-local defaults from `grafana-util.yaml`.
+- `--color`: control JSON color output for the namespace.
+
+## Auth notes
+- Prefer `--profile` for repeatable datasource inventory and change flows.
+- Use direct Basic auth for org-spanning or admin-level mutation work.
+- Token auth is acceptable for scoped reads and diffs when the token can see the target org.
+
 ## Examples
 ```bash
-# Purpose: Show the datasource namespace help and its subcommands.
+# Purpose: Inspect datasource types before choosing a lane.
 grafana-util datasource --help
 ```
 
@@ -61,13 +69,22 @@ grafana-util datasource browse --url http://localhost:3000 --basic-user admin --
 ```
 
 ## Related commands
+
+### Inspect
+
 - [datasource types](./datasource-types.md)
 - [datasource list](./datasource-list.md)
 - [datasource browse](./datasource-browse.md)
 - [datasource inspect-export](./datasource-inspect-export.md)
+
+### Move
+
 - [datasource export](./datasource-export.md)
 - [datasource import](./datasource-import.md)
 - [datasource diff](./datasource-diff.md)
+
+### Review Before Mutate
+
 - [datasource add](./datasource-add.md)
 - [datasource modify](./datasource-modify.md)
 - [datasource delete](./datasource-delete.md)
