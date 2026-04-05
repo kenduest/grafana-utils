@@ -4,17 +4,16 @@ use std::env;
 use std::path::{Path, PathBuf};
 
 use super::{
+    attach_lineage, attach_trace_id, build_alert_sync_specs, build_sync_plan_document,
     cli::{
         execute_sync_bundle_preflight, execute_sync_plan, execute_sync_promotion_preflight,
         load_sync_live_array, render_and_emit_sync_command_output,
     },
-    attach_lineage, attach_trace_id, build_alert_sync_specs, build_sync_plan_document,
     load_alerting_bundle_section, load_dashboard_bundle_sections,
     load_dashboard_provisioning_bundle_sections, load_datasource_provisioning_records,
-    load_json_array_file, load_json_value, normalize_datasource_bundle_item,
-    render_sync_plan_text, ChangeCheckArgs, ChangeInspectArgs, ChangePreviewArgs,
-    ChangeStagedInputsArgs, Result, SyncBundlePreflightArgs, SyncPlanArgs,
-    SyncPromotionPreflightArgs, SyncCommandOutput,
+    load_json_array_file, load_json_value, normalize_datasource_bundle_item, render_sync_plan_text,
+    ChangeCheckArgs, ChangeInspectArgs, ChangePreviewArgs, ChangeStagedInputsArgs, Result,
+    SyncBundlePreflightArgs, SyncCommandOutput, SyncPlanArgs, SyncPromotionPreflightArgs,
 };
 use crate::common::{emit_plain_output, message};
 use crate::overview::{run_overview, OverviewArgs, OverviewOutputFormat};
@@ -193,7 +192,10 @@ fn build_status_args(
             .availability_file
             .clone()
             .or(discovered.availability_file.clone()),
-        mapping_file: args.mapping_file.clone().or(discovered.mapping_file.clone()),
+        mapping_file: args
+            .mapping_file
+            .clone()
+            .or(discovered.mapping_file.clone()),
         output_format: match args.output.output_format {
             super::SyncOutputFormat::Text => ProjectStatusOutputFormat::Text,
             super::SyncOutputFormat::Json => ProjectStatusOutputFormat::Json,
@@ -220,18 +222,33 @@ fn emit_preview_output(
     Ok(())
 }
 
+fn select_preview_dashboard_sources<'a>(
+    inputs: &'a ChangeStagedInputsArgs,
+    discovered: &'a DiscoveredChangeInputs,
+) -> Result<(Option<&'a PathBuf>, Option<&'a PathBuf>)> {
+    if inputs.dashboard_export_dir.is_some() && inputs.dashboard_provisioning_dir.is_some() {
+        return Err(message(
+            "Change preview accepts only one dashboard source: --dashboard-export-dir or --dashboard-provisioning-dir.",
+        ));
+    }
+    if let Some(path) = inputs.dashboard_export_dir.as_ref() {
+        return Ok((Some(path), None));
+    }
+    if let Some(path) = inputs.dashboard_provisioning_dir.as_ref() {
+        return Ok((None, Some(path)));
+    }
+    if let Some(path) = discovered.dashboard_export_dir.as_ref() {
+        return Ok((Some(path), None));
+    }
+    Ok((None, discovered.dashboard_provisioning_dir.as_ref()))
+}
+
 fn build_change_bundle_specs(
     inputs: &ChangeStagedInputsArgs,
     discovered: &DiscoveredChangeInputs,
 ) -> Result<Option<Vec<Value>>> {
-    let dashboard_export_dir = inputs
-        .dashboard_export_dir
-        .as_ref()
-        .or(discovered.dashboard_export_dir.as_ref());
-    let dashboard_provisioning_dir = inputs
-        .dashboard_provisioning_dir
-        .as_ref()
-        .or(discovered.dashboard_provisioning_dir.as_ref());
+    let (dashboard_export_dir, dashboard_provisioning_dir) =
+        select_preview_dashboard_sources(inputs, discovered)?;
     let alert_export_dir = inputs
         .alert_export_dir
         .as_ref()
@@ -247,11 +264,6 @@ fn build_change_bundle_specs(
         && datasource_provisioning_file.is_none()
     {
         return Ok(None);
-    }
-    if dashboard_export_dir.is_some() && dashboard_provisioning_dir.is_some() {
-        return Err(message(
-            "Change preview accepts only one dashboard source: --dashboard-export-dir or --dashboard-provisioning-dir.",
-        ));
     }
 
     let mut dashboards = Vec::new();
@@ -370,8 +382,14 @@ pub(crate) fn run_sync_preview(args: ChangePreviewArgs) -> Result<()> {
         .source_bundle
         .clone()
         .or(discovered.source_bundle.clone());
-    let target_inventory = args.target_inventory.clone().or(discovered.target_inventory.clone());
-    let mapping_file = args.mapping_file.clone().or(discovered.mapping_file.clone());
+    let target_inventory = args
+        .target_inventory
+        .clone()
+        .or(discovered.target_inventory.clone());
+    let mapping_file = args
+        .mapping_file
+        .clone()
+        .or(discovered.mapping_file.clone());
     let availability_file = args
         .availability_file
         .clone()
@@ -462,4 +480,68 @@ pub(crate) fn run_sync_preview(args: ChangePreviewArgs) -> Result<()> {
         args.output.also_stdout,
         args.output.output_format,
     )
+}
+
+#[cfg(test)]
+mod guided_rust_tests {
+    use super::*;
+
+    fn staged_inputs(
+        dashboard_export_dir: Option<&str>,
+        dashboard_provisioning_dir: Option<&str>,
+    ) -> ChangeStagedInputsArgs {
+        ChangeStagedInputsArgs {
+            workspace: PathBuf::from("."),
+            desired_file: None,
+            source_bundle: None,
+            dashboard_export_dir: dashboard_export_dir.map(PathBuf::from),
+            dashboard_provisioning_dir: dashboard_provisioning_dir.map(PathBuf::from),
+            alert_export_dir: None,
+            datasource_export_file: None,
+            datasource_provisioning_file: None,
+        }
+    }
+
+    #[test]
+    fn select_preview_dashboard_sources_prefers_explicit_export_input() {
+        let inputs = staged_inputs(Some("./dashboards/raw"), None);
+        let discovered = DiscoveredChangeInputs {
+            dashboard_provisioning_dir: Some(PathBuf::from("./dashboards/provisioning")),
+            ..DiscoveredChangeInputs::default()
+        };
+
+        let (export_dir, provisioning_dir) =
+            select_preview_dashboard_sources(&inputs, &discovered).unwrap();
+
+        assert_eq!(export_dir, Some(&PathBuf::from("./dashboards/raw")));
+        assert!(provisioning_dir.is_none());
+    }
+
+    #[test]
+    fn select_preview_dashboard_sources_prefers_discovered_export_over_provisioning() {
+        let inputs = staged_inputs(None, None);
+        let discovered = DiscoveredChangeInputs {
+            dashboard_export_dir: Some(PathBuf::from("./dashboards/raw")),
+            dashboard_provisioning_dir: Some(PathBuf::from("./dashboards/provisioning")),
+            ..DiscoveredChangeInputs::default()
+        };
+
+        let (export_dir, provisioning_dir) =
+            select_preview_dashboard_sources(&inputs, &discovered).unwrap();
+
+        assert_eq!(export_dir, Some(&PathBuf::from("./dashboards/raw")));
+        assert!(provisioning_dir.is_none());
+    }
+
+    #[test]
+    fn select_preview_dashboard_sources_rejects_two_explicit_dashboard_inputs() {
+        let inputs = staged_inputs(Some("./dashboards/raw"), Some("./dashboards/provisioning"));
+        let error = select_preview_dashboard_sources(&inputs, &DiscoveredChangeInputs::default())
+            .unwrap_err();
+
+        assert_eq!(
+            error.to_string(),
+            "Change preview accepts only one dashboard source: --dashboard-export-dir or --dashboard-provisioning-dir."
+        );
+    }
 }

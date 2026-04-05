@@ -354,6 +354,7 @@ where
                 )?);
             }
         }
+        Some(Value::Null) => {}
         Some(_) => return Err(message("Unexpected template list response from Grafana.")),
         None => {}
     }
