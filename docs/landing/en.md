@@ -1,4 +1,4 @@
-# grafana-util Docs
+# grafana-util
 
 Jump straight into the handbook, command docs, or a common workflow.
 
@@ -9,6 +9,12 @@ Type a page or command name and jump to the closest matching doc.
 ## Quick Start
 
 Start with the entry points most people need on day one.
+
+### What this tool is for
+
+Read this first if you want the product framing before you jump into commands or workflow chapters.
+
+- [Read chapter](../user-guide/en/what-is-grafana-util.md)
 
 ### First connection and read-only checks
 

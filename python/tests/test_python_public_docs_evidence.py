@@ -105,6 +105,37 @@ class PublicDocsEvidenceTests(unittest.TestCase):
             text = path.read_text(encoding="utf-8")
             self.assertIn(marker, text, path.name)
 
+    def test_command_root_pages_include_workflow_lane_maps(self):
+        expectations = {
+            REPO_ROOT / "docs" / "commands" / "en" / "dashboard.md": "## Workflow lanes",
+            REPO_ROOT / "docs" / "commands" / "en" / "alert.md": "## Workflow lanes",
+            REPO_ROOT / "docs" / "commands" / "en" / "access.md": "## Workflow lanes",
+            REPO_ROOT / "docs" / "commands" / "en" / "datasource.md": "## Workflow lanes",
+            REPO_ROOT / "docs" / "commands" / "zh-TW" / "dashboard.md": "## 這一頁對應的工作流",
+            REPO_ROOT / "docs" / "commands" / "zh-TW" / "alert.md": "## 這一頁對應的工作流",
+            REPO_ROOT / "docs" / "commands" / "zh-TW" / "access.md": "## 這一頁對應的工作流",
+            REPO_ROOT / "docs" / "commands" / "zh-TW" / "datasource.md": "## 這一頁對應的工作流",
+        }
+        for path, marker in expectations.items():
+            text = path.read_text(encoding="utf-8")
+            self.assertIn(marker, text, path.name)
+
+    def test_command_root_pages_group_related_commands_by_workflow(self):
+        expectations = {
+            REPO_ROOT / "docs" / "commands" / "en" / "dashboard.md": ["### Inspect", "### Move", "### Review Before Mutate", "### Capture"],
+            REPO_ROOT / "docs" / "commands" / "en" / "alert.md": ["### Inspect", "### Move", "### Review Before Mutate", "### Related Surface"],
+            REPO_ROOT / "docs" / "commands" / "en" / "access.md": ["### Inspect", "### Review Before Mutate"],
+            REPO_ROOT / "docs" / "commands" / "en" / "datasource.md": ["### Inspect", "### Move", "### Review Before Mutate"],
+            REPO_ROOT / "docs" / "commands" / "zh-TW" / "dashboard.md": ["### 盤點", "### 搬移", "### 變更前檢查", "### 截圖與素材"],
+            REPO_ROOT / "docs" / "commands" / "zh-TW" / "alert.md": ["### 盤點", "### 搬移", "### 變更前檢查", "### 規則與路由撰寫"],
+            REPO_ROOT / "docs" / "commands" / "zh-TW" / "access.md": ["### 盤點", "### 服務帳號與 token"],
+            REPO_ROOT / "docs" / "commands" / "zh-TW" / "datasource.md": ["### 盤點", "### 搬移", "### 變更前檢查"],
+        }
+        for path, markers in expectations.items():
+            text = path.read_text(encoding="utf-8")
+            for marker in markers:
+                self.assertIn(marker, text, path.name)
+
     def test_alert_command_pages_include_before_after_guidance(self):
         expectations = {
             REPO_ROOT / "docs" / "commands" / "en" / "alert-export.md": ["## Before / After", "## What success looks like", "## Failure checks"],
