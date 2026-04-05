@@ -39,7 +39,7 @@
 | :--- | :--- |
 | 想看 Grafana 全貌時，只能一直切 UI 或自己拼 API。 | 先跑 `overview live` 或 `status live`，快速知道下一步該看哪裡。 |
 | 匯出/匯入像一次性動作，缺少中間檢查點。 | 先匯出、再盤點依賴、再 dry-run，最後才決定要不要回放。 |
-| 告警變更很難在套用前說清楚會改到什麼。 | 先看 `change summary`、`change preflight`、`alert plan`，再決定要不要套用。 |
+| Grafana 變更很難在套用前說清楚會改到什麼。 | 先跑 `change inspect`、`change check`、`change preview`，再決定要不要做 live mutation。 |
 | 認證資訊容易散落在 shell history 或平面檔案裡。 | 改用 prompt、環境變數或 profile secret 模式整理起來。 |
 
 重點不是多幾個 command，而是把維運順序收斂成比較安全、可審查的流程。

@@ -16,7 +16,7 @@ use crate::datasource::DatasourceGroupCommand;
 use crate::overview::OverviewOutputFormat;
 use crate::profile_cli::{root_command as profile_root_command, ProfileCommand};
 use crate::snapshot::root_command as snapshot_root_command;
-use crate::sync::{SyncGroupCommand, SyncOutputFormat, DEFAULT_REVIEW_TOKEN};
+use crate::sync::{SyncAdvancedCommand, SyncGroupCommand, SyncOutputFormat, DEFAULT_REVIEW_TOKEN};
 use clap::{CommandFactory, Parser};
 use std::cell::RefCell;
 use std::path::{Path, PathBuf};
@@ -719,6 +719,73 @@ fn parse_cli_supports_dashboard_group_graph_alias() {
                 assert_eq!(topology_args.governance, PathBuf::from("./governance.json"));
             }
             _ => panic!("expected dashboard topology"),
+        },
+        _ => panic!("expected dashboard group"),
+    }
+}
+
+#[test]
+fn parse_cli_supports_dashboard_history_list() {
+    let args: CliArgs = parse_cli_from([
+        "grafana-util",
+        "dashboard",
+        "history",
+        "list",
+        "--dashboard-uid",
+        "cpu-main",
+        "--limit",
+        "15",
+        "--output-format",
+        "yaml",
+    ]);
+
+    match args.command {
+        UnifiedCommand::Dashboard { command } => match command {
+            super::DashboardGroupCommand::History(history_args) => match history_args.command {
+                crate::dashboard::DashboardHistorySubcommand::List(inner) => {
+                    assert_eq!(inner.dashboard_uid, "cpu-main");
+                    assert_eq!(inner.limit, 15);
+                    assert_eq!(
+                        inner.output_format,
+                        crate::dashboard::HistoryOutputFormat::Yaml
+                    );
+                }
+                _ => panic!("expected dashboard history list"),
+            },
+            _ => panic!("expected dashboard history"),
+        },
+        _ => panic!("expected dashboard group"),
+    }
+}
+
+#[test]
+fn parse_cli_supports_dashboard_history_export() {
+    let args: CliArgs = parse_cli_from([
+        "grafana-util",
+        "dashboard",
+        "history",
+        "export",
+        "--dashboard-uid",
+        "cpu-main",
+        "--output",
+        "./cpu-main.history.json",
+        "--limit",
+        "30",
+        "--overwrite",
+    ]);
+
+    match args.command {
+        UnifiedCommand::Dashboard { command } => match command {
+            super::DashboardGroupCommand::History(history_args) => match history_args.command {
+                crate::dashboard::DashboardHistorySubcommand::Export(inner) => {
+                    assert_eq!(inner.dashboard_uid, "cpu-main");
+                    assert_eq!(inner.output, PathBuf::from("./cpu-main.history.json"));
+                    assert_eq!(inner.limit, 30);
+                    assert!(inner.overwrite);
+                }
+                _ => panic!("expected dashboard history export"),
+            },
+            _ => panic!("expected dashboard history"),
         },
         _ => panic!("expected dashboard group"),
     }
@@ -1598,9 +1665,9 @@ fn unified_help_mentions_alert_access_and_shims() {
     assert!(help.contains("[Change Planning]"));
     assert!(help.contains("[Change Apply]"));
     assert!(help.contains("datasource"));
-    assert!(help.contains("grafana-util change plan --desired-file ./desired.json --fetch-live"));
+    assert!(help.contains("grafana-util change preview --fetch-live"));
     assert!(help.contains(
-        "grafana-util change apply --plan-file ./sync-plan-reviewed.json --approve --execute-live"
+        "grafana-util change apply --preview-file ./change-preview.json --approve --execute-live"
     ));
     assert!(help.contains(
         "Run review-first change workflows with optional live Grafana fetch/apply paths."
@@ -1643,7 +1710,7 @@ fn unified_help_full_appends_extended_examples() {
     assert!(help.contains("[Dashboard Inspect Export]"));
     assert!(help.contains("[Datasource Diff]"));
     assert!(help.contains("--input-format provisioning"));
-    assert!(help.contains("grafana-util change review --plan-file ./sync-plan.json"));
+    assert!(help.contains("grafana-util change advanced review --plan-file ./sync-plan.json"));
 }
 
 #[test]
@@ -1831,7 +1898,7 @@ fn maybe_render_unified_help_from_os_args_supports_change_schema_root() {
     assert!(help.contains("grafana-utils-sync-plan"));
     assert!(help.contains("grafana-utils-sync-apply-intent"));
     assert!(help.contains("grafana-utils-alert-sync-plan"));
-    assert!(help.contains("grafana-util change plan --help-schema"));
+    assert!(help.contains("grafana-util change preview --help-schema"));
 }
 
 #[test]
@@ -1950,20 +2017,23 @@ fn parse_cli_supports_change_group_command() {
     let args: CliArgs = parse_cli_from([
         "grafana-util",
         "change",
-        "summary",
-        "--desired-file",
-        "./desired.json",
+        "inspect",
+        "--dashboard-export-dir",
+        "./dashboards/raw",
         "--output-format",
         "json",
     ]);
 
     match args.command {
         UnifiedCommand::Change { command } => match command {
-            SyncGroupCommand::Summary(inner) => {
-                assert_eq!(inner.desired_file, Path::new("./desired.json"));
-                assert_eq!(inner.output_format, SyncOutputFormat::Json);
+            SyncGroupCommand::Inspect(inner) => {
+                assert_eq!(
+                    inner.inputs.dashboard_export_dir,
+                    Some(Path::new("./dashboards/raw").to_path_buf())
+                );
+                assert_eq!(inner.output.output_format, SyncOutputFormat::Json);
             }
-            _ => panic!("expected change summary"),
+            _ => panic!("expected change inspect"),
         },
         _ => panic!("expected change group"),
     }
@@ -1974,6 +2044,7 @@ fn parse_cli_supports_change_assess_alerts_group_command() {
     let args: CliArgs = parse_cli_from([
         "grafana-util",
         "change",
+        "advanced",
         "assess-alerts",
         "--alerts-file",
         "./alerts.json",
@@ -1983,11 +2054,14 @@ fn parse_cli_supports_change_assess_alerts_group_command() {
 
     match args.command {
         UnifiedCommand::Change { command } => match command {
-            SyncGroupCommand::AssessAlerts(inner) => {
-                assert_eq!(inner.alerts_file, Path::new("./alerts.json"));
-                assert_eq!(inner.output_format, SyncOutputFormat::Json);
-            }
-            _ => panic!("expected change assess-alerts"),
+            SyncGroupCommand::Advanced(inner) => match inner.command {
+                SyncAdvancedCommand::AssessAlerts(inner) => {
+                    assert_eq!(inner.alerts_file, Path::new("./alerts.json"));
+                    assert_eq!(inner.output_format, SyncOutputFormat::Json);
+                }
+                _ => panic!("expected change advanced assess-alerts"),
+            },
+            _ => panic!("expected change advanced"),
         },
         _ => panic!("expected change group"),
     }
@@ -1998,7 +2072,7 @@ fn parse_cli_supports_change_plan_group_command() {
     let args: CliArgs = parse_cli_from([
         "grafana-util",
         "change",
-        "plan",
+        "preview",
         "--desired-file",
         "./desired.json",
         "--live-file",
@@ -2011,16 +2085,19 @@ fn parse_cli_supports_change_plan_group_command() {
 
     match args.command {
         UnifiedCommand::Change { command } => match command {
-            SyncGroupCommand::Plan(inner) => {
-                assert_eq!(inner.desired_file, Path::new("./desired.json"));
+            SyncGroupCommand::Preview(inner) => {
+                assert_eq!(
+                    inner.inputs.desired_file,
+                    Some(Path::new("./desired.json").to_path_buf())
+                );
                 assert_eq!(
                     inner.live_file,
                     Some(Path::new("./live.json").to_path_buf())
                 );
                 assert_eq!(inner.trace_id, Some("trace-explicit".to_string()));
-                assert_eq!(inner.output_format, SyncOutputFormat::Json);
+                assert_eq!(inner.output.output_format, SyncOutputFormat::Json);
             }
-            _ => panic!("expected change plan"),
+            _ => panic!("expected change preview"),
         },
         _ => panic!("expected change group"),
     }
@@ -2031,7 +2108,7 @@ fn parse_cli_supports_change_plan_fetch_live_group_command() {
     let args: CliArgs = parse_cli_from([
         "grafana-util",
         "change",
-        "plan",
+        "preview",
         "--desired-file",
         "./desired.json",
         "--fetch-live",
@@ -2047,15 +2124,18 @@ fn parse_cli_supports_change_plan_fetch_live_group_command() {
 
     match args.command {
         UnifiedCommand::Change { command } => match command {
-            SyncGroupCommand::Plan(inner) => {
-                assert_eq!(inner.desired_file, Path::new("./desired.json"));
+            SyncGroupCommand::Preview(inner) => {
+                assert_eq!(
+                    inner.inputs.desired_file,
+                    Some(Path::new("./desired.json").to_path_buf())
+                );
                 assert!(inner.fetch_live);
                 assert_eq!(inner.org_id, Some(7));
                 assert_eq!(inner.page_size, 250);
                 assert_eq!(inner.common.url, "http://localhost:3000");
                 assert_eq!(inner.common.api_token, Some("token-value".to_string()));
             }
-            _ => panic!("expected change plan"),
+            _ => panic!("expected change preview"),
         },
         _ => panic!("expected change group"),
     }
@@ -2113,7 +2193,7 @@ fn parse_cli_supports_change_apply_execute_live_group_command() {
     match args.command {
         UnifiedCommand::Change { command } => match command {
             SyncGroupCommand::Apply(inner) => {
-                assert_eq!(inner.plan_file, Path::new("./plan.json"));
+                assert_eq!(inner.plan_file.as_deref(), Some(Path::new("./plan.json")));
                 assert!(inner.approve);
                 assert!(inner.execute_live);
                 assert!(inner.allow_folder_delete);
@@ -2132,6 +2212,7 @@ fn parse_cli_supports_change_review_group_command() {
     let args: CliArgs = parse_cli_from([
         "grafana-util",
         "change",
+        "advanced",
         "review",
         "--plan-file",
         "./plan.json",
@@ -2143,15 +2224,18 @@ fn parse_cli_supports_change_review_group_command() {
 
     match args.command {
         UnifiedCommand::Change { command } => match command {
-            SyncGroupCommand::Review(inner) => {
-                assert_eq!(inner.plan_file, Path::new("./plan.json"));
-                assert_eq!(inner.review_token, DEFAULT_REVIEW_TOKEN);
-                assert_eq!(inner.output_format, SyncOutputFormat::Json);
-                assert_eq!(inner.reviewed_by, None);
-                assert_eq!(inner.reviewed_at, None);
-                assert_eq!(inner.review_note, None);
-            }
-            _ => panic!("expected change review"),
+            SyncGroupCommand::Advanced(inner) => match inner.command {
+                SyncAdvancedCommand::Review(inner) => {
+                    assert_eq!(inner.plan_file, Path::new("./plan.json"));
+                    assert_eq!(inner.review_token, DEFAULT_REVIEW_TOKEN);
+                    assert_eq!(inner.output_format, SyncOutputFormat::Json);
+                    assert_eq!(inner.reviewed_by, None);
+                    assert_eq!(inner.reviewed_at, None);
+                    assert_eq!(inner.review_note, None);
+                }
+                _ => panic!("expected change advanced review"),
+            },
+            _ => panic!("expected change advanced"),
         },
         _ => panic!("expected change group"),
     }

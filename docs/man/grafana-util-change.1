@@ -5,10 +5,22 @@ grafana\-util\-change \- review\-first sync, preflight, audit, and apply workflo
 .SH SYNOPSIS
 .B grafana-util change [\fISUBCOMMAND\fR] [\fIOPTIONS\fR]
 .SH DESCRIPTION
-review\-first sync workflows with optional live Grafana fetch and apply paths.
+task\-first staged change workflow with optional live Grafana preview and apply paths.
 .PP
-when you need to summarize desired resources, plan against live state, review a plan, apply a reviewed plan, audit drift, or build bundle and promotion preflight documents.
+when you need to inspect a staged package, check whether it looks safe to continue, preview what would change, apply an approved preview, or drop into lower\-level advanced review contracts.
 .SH SUBCOMMANDS
+.TP
+.B inspect
+inspect the staged package from discovered or explicit inputs. Use when: Want the shortest path to see what the staged package contains before any live comparison.
+.TP
+.B check
+check whether the staged package looks structurally safe to continue. Use when: Need one readiness gate before preview or apply.
+.TP
+.B preview
+preview what would change from discovered or explicit staged inputs. Use when: Want the actionable staged preview but do not want to think in terms of low\-level plan or bundle\-preflight builders.
+.TP
+.B advanced
+expose lower\-level staged contracts and specialized sync workflows. Use when: Need explicit summary, plan, review, preflight, audit, bundle, or promotion handoff documents instead of the task\-first lane.
 .TP
 .B summary
 summarize local desired sync resources. Use when: Want a quick size check before planning or applying.
@@ -39,6 +51,27 @@ build a staged bundle\-level sync preflight document from a source bundle and ta
 .TP
 .B promotion\-preflight
 build a staged promotion review handoff from a source bundle and target inventory. Use when: Are preparing a promotion review and want an explicit mapping and availability view.
+.SH EXAMPLES
+.PP
+inspect: inspect the staged package from discovered or explicit inputs.
+.EX
+grafana-util change inspect --workspace .
+.EE
+.PP
+check: check whether the staged package looks structurally safe to continue.
+.EX
+grafana-util change check --workspace . --output-format json
+.EE
+.PP
+preview: preview what would change from discovered or explicit staged inputs.
+.EX
+grafana-util change preview --workspace . --fetch-live --profile prod
+.EE
+.PP
+advanced: expose lower\-level staged contracts and specialized sync workflows.
+.EX
+grafana-util change advanced review --plan-file ./sync-plan.json --review-note 'peer-reviewed'
+.EE
 .SH SEE ALSO
 \fBgrafana-util\fR(1),
 \fBgrafana-util-status\fR(1),

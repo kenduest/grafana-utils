@@ -39,7 +39,7 @@ If you already know tools such as `grafanactl` or `grizzly`, the difference here
 | :--- | :--- |
 | You click through Grafana UI screens or piece together raw API calls just to understand what exists. | Start with `overview live` or `status live`, then decide where to drill in. |
 | Export/import is a one-off action with weak review points. | Export to a reviewable tree, inspect dependencies, dry-run replay, then import. |
-| Alerting changes are hard to explain before apply. | Use `change summary`, `change preflight`, and `alert plan` before live mutation. |
+| Grafana changes are hard to explain before apply. | Start with `change inspect`, `change check`, and `change preview` before any live mutation. |
 | Secrets get copied into shell history or flat files. | Keep auth in prompt flows, env variables, or repo-local profiles with explicit secret modes. |
 
 This is the main shift: the tool does not just give you commands. It gives you a safer operating sequence.

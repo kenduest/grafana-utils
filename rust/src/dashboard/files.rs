@@ -277,6 +277,9 @@ fn collect_json_files(root: &Path, files: &mut Vec<PathBuf>) -> Result<()> {
         let entry = entry?;
         let path = entry.path();
         if path.is_dir() {
+            if path.file_name().and_then(|value| value.to_str()) == Some("history") {
+                continue;
+            }
             collect_json_files(&path, files)?;
             continue;
         }

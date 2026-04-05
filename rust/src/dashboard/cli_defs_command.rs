@@ -10,8 +10,8 @@ use super::cli_defs_inspect::{
     ScreenshotArgs, TopologyArgs, ValidateExportArgs,
 };
 use super::cli_defs_shared::{
-    CommonCliArgs, DryRunOutputFormat, RawToPromptLogFormat, RawToPromptOutputFormat,
-    RawToPromptResolution, SimpleOutputFormat,
+    CommonCliArgs, DryRunOutputFormat, HistoryOutputFormat, RawToPromptLogFormat,
+    RawToPromptOutputFormat, RawToPromptResolution, SimpleOutputFormat,
 };
 use super::dashboard_runtime::{
     parse_dashboard_import_output_column, parse_dashboard_list_output_column,
@@ -808,6 +808,120 @@ pub struct DiffArgs {
     pub context_lines: usize,
 }
 
+/// Arguments for dashboard history list.
+#[derive(Debug, Clone, Args)]
+pub struct HistoryListArgs {
+    #[command(flatten)]
+    pub common: CommonCliArgs,
+    #[arg(long, help = "Dashboard UID to inspect in Grafana history.")]
+    pub dashboard_uid: String,
+    #[arg(
+        long,
+        default_value_t = 20,
+        help = "Maximum number of recent versions to request from Grafana."
+    )]
+    pub limit: usize,
+    #[arg(
+        long,
+        value_enum,
+        default_value_t = HistoryOutputFormat::Table,
+        help = "Render history as text, table, json, or yaml."
+    )]
+    pub output_format: HistoryOutputFormat,
+}
+
+/// Arguments for dashboard history restore.
+#[derive(Debug, Clone, Args)]
+pub struct HistoryRestoreArgs {
+    #[command(flatten)]
+    pub common: CommonCliArgs,
+    #[arg(long, help = "Dashboard UID to restore from Grafana history.")]
+    pub dashboard_uid: String,
+    #[arg(long, help = "Dashboard history version number to restore.")]
+    pub version: i64,
+    #[arg(
+        long,
+        default_value_t = false,
+        help = "Preview the restore without writing a new Grafana revision."
+    )]
+    pub dry_run: bool,
+    #[arg(
+        long,
+        value_enum,
+        default_value_t = HistoryOutputFormat::Text,
+        help = "Render restore preview or result as text, table, json, or yaml."
+    )]
+    pub output_format: HistoryOutputFormat,
+    #[arg(
+        long,
+        help = "Revision message to attach to the new Grafana revision. Default: 'Restored by grafana-util dashboard history to version <n>'."
+    )]
+    pub message: Option<String>,
+    #[arg(
+        long,
+        default_value_t = false,
+        help = "Confirm the live restore. Required unless --dry-run is set."
+    )]
+    pub yes: bool,
+}
+
+/// Arguments for exporting dashboard history into a reusable JSON artifact.
+#[derive(Debug, Clone, Args)]
+pub struct HistoryExportArgs {
+    #[command(flatten)]
+    pub common: CommonCliArgs,
+    #[arg(long, help = "Dashboard UID to export from Grafana history.")]
+    pub dashboard_uid: String,
+    #[arg(
+        long,
+        value_name = "FILE",
+        help = "Write the exported dashboard history artifact to this JSON file."
+    )]
+    pub output: PathBuf,
+    #[arg(
+        long,
+        default_value_t = 20,
+        help = "Maximum number of recent versions to include in the exported history artifact."
+    )]
+    pub limit: usize,
+    #[arg(
+        long,
+        default_value_t = false,
+        help = "Overwrite an existing history artifact file."
+    )]
+    pub overwrite: bool,
+}
+
+/// Dashboard history subcommands.
+#[derive(Debug, Clone, Subcommand)]
+pub enum DashboardHistorySubcommand {
+    #[command(
+        name = "list",
+        about = "List Grafana revision history for one dashboard UID.",
+        after_help = "Examples:\n\n  List the last 20 versions as a table:\n    grafana-util dashboard history list --url http://localhost:3000 --basic-user admin --basic-password admin --dashboard-uid cpu-main --limit 20 --output-format table\n\n  Render the same history as JSON for automation:\n    grafana-util dashboard history list --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --dashboard-uid cpu-main --output-format json"
+    )]
+    List(HistoryListArgs),
+    #[command(
+        name = "restore",
+        about = "Restore one historical dashboard version as a new latest Grafana revision.",
+        after_help = "Examples:\n\n  Preview a restore without changing Grafana:\n    grafana-util dashboard history restore --url http://localhost:3000 --basic-user admin --basic-password admin --dashboard-uid cpu-main --version 17 --dry-run --output-format table\n\n  Restore a historical version and record a new revision message:\n    grafana-util dashboard history restore --url http://localhost:3000 --basic-user admin --basic-password admin --dashboard-uid cpu-main --version 17 --message 'Restore known good CPU dashboard after regression' --yes"
+    )]
+    Restore(HistoryRestoreArgs),
+    #[command(
+        name = "export",
+        about = "Export dashboard revision history into a reusable JSON artifact.",
+        after_help = "Examples:\n\n  Export the last 20 revisions to a JSON artifact:\n    grafana-util dashboard history export --url http://localhost:3000 --basic-user admin --basic-password admin --dashboard-uid cpu-main --output ./cpu-main.history.json\n\n  Overwrite an existing history artifact and raise the export limit:\n    grafana-util dashboard history export --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --dashboard-uid cpu-main --limit 50 --output ./cpu-main.history.json --overwrite"
+    )]
+    Export(HistoryExportArgs),
+}
+
+/// Dashboard history namespace arguments.
+#[derive(Debug, Clone, Args)]
+pub struct DashboardHistoryArgs {
+    #[command(subcommand)]
+    pub command: DashboardHistorySubcommand,
+}
+
 /// Enum definition for DashboardCommand.
 #[derive(Debug, Clone, Subcommand)]
 pub enum DashboardCommand {
@@ -853,6 +967,11 @@ pub enum DashboardCommand {
         after_help = "Examples:\n\n  Browse the full dashboard tree from the current org:\n    grafana-util dashboard browse --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\"\n\n  Open the browser at one folder subtree:\n    grafana-util dashboard browse --url http://localhost:3000 --basic-user admin --basic-password admin --path 'Platform / Infra'\n\n  Browse one explicit org:\n    grafana-util dashboard browse --url http://localhost:3000 --basic-user admin --basic-password admin --org-id 2\n\n  Browse all visible orgs with Basic auth:\n    grafana-util dashboard browse --url http://localhost:3000 --basic-user admin --basic-password admin --all-orgs"
     )]
     Browse(BrowseArgs),
+    #[command(
+        name = "history",
+        about = "List or restore dashboard revision history from Grafana."
+    )]
+    History(DashboardHistoryArgs),
     #[command(
         name = "delete",
         about = "Delete live dashboards by UID or folder path.",

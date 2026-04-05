@@ -52,7 +52,7 @@ render shared project\-wide staged or live status. Use when: Need the final gate
 summarize staged artifacts into one project\-wide overview. Use when: Want a single readout across dashboard, datasource, access, alert, and change artifacts before checking status or promoting changes.
 .TP
 .B change
-review\-first sync workflows with optional live Grafana fetch and apply paths. Use when: Need to summarize desired resources, plan against live state, review a plan, apply a reviewed plan, audit drift, or build bundle and promotion preflight documents.
+task\-first staged change workflow with optional live Grafana preview and apply paths. Use when: Need to inspect a staged package, check whether it looks safe to continue, preview what would change, apply an approved preview, or drop into lower\-level advanced review contracts.
 .TP
 .B snapshot
 export and review Grafana snapshot inventory bundles. Use when: Want a local snapshot root that captures dashboard and datasource inventory for later inspection.
@@ -239,6 +239,18 @@ render project status from live Grafana read surfaces. Use when: Need current Gr
 .B grafana\-util\-overview\-live(1)
 render the live overview by delegating to the shared status live path. Use when: Need the same live readout that status live uses, but want it under the overview namespace.
 .SS change
+.TP
+.B grafana\-util\-change\-inspect(1)
+inspect the staged package from discovered or explicit inputs. Use when: Want the shortest path to see what the staged package contains before any live comparison.
+.TP
+.B grafana\-util\-change\-check(1)
+check whether the staged package looks structurally safe to continue. Use when: Need one readiness gate before preview or apply.
+.TP
+.B grafana\-util\-change\-preview(1)
+preview what would change from discovered or explicit staged inputs. Use when: Want the actionable staged preview but do not want to think in terms of low\-level plan or bundle\-preflight builders.
+.TP
+.B grafana\-util\-change\-advanced(1)
+expose lower\-level staged contracts and specialized sync workflows. Use when: Need explicit summary, plan, review, preflight, audit, bundle, or promotion handoff documents instead of the task\-first lane.
 .TP
 .B grafana\-util\-change\-summary(1)
 summarize local desired sync resources. Use when: Want a quick size check before planning or applying.

@@ -38,10 +38,10 @@ use crate::cli_help::{
 use crate::cli_help_examples::UNIFIED_HELP_TEXT;
 use crate::common::{json_color_choice, set_json_color_choice, CliColorChoice, Result};
 use crate::dashboard::{
-    run_dashboard_cli, BrowseArgs, CloneLiveArgs, DashboardCliArgs, DashboardCommand, DeleteArgs,
-    DiffArgs, ExportArgs, GetArgs, GovernanceGateArgs, ImportArgs, InspectExportArgs,
-    InspectLiveArgs, InspectVarsArgs, ListArgs, PatchFileArgs, PublishArgs, RawToPromptArgs,
-    ReviewArgs, ScreenshotArgs, TopologyArgs,
+    run_dashboard_cli, BrowseArgs, CloneLiveArgs, DashboardCliArgs, DashboardCommand,
+    DashboardHistoryArgs, DeleteArgs, DiffArgs, ExportArgs, GetArgs, GovernanceGateArgs,
+    ImportArgs, InspectExportArgs, InspectLiveArgs, InspectVarsArgs, ListArgs, PatchFileArgs,
+    PublishArgs, RawToPromptArgs, ReviewArgs, ScreenshotArgs, TopologyArgs,
 };
 use crate::datasource::{run_datasource_cli, DatasourceGroupCommand};
 use crate::overview::{run_overview_cli, OverviewCliArgs};
@@ -143,6 +143,11 @@ pub enum DashboardGroupCommand {
         after_help = DASHBOARD_TOPOLOGY_HELP_TEXT
     )]
     Topology(TopologyArgs),
+    #[command(
+        about = "List, restore, or export live dashboard revision history.",
+        after_help = "Examples:\n\n  List recent revisions for one dashboard:\n    grafana-util dashboard history list --url http://localhost:3000 --basic-user admin --basic-password admin --dashboard-uid cpu-main --output-format table\n\n  Restore one historical revision as a new latest Grafana version:\n    grafana-util dashboard history restore --url http://localhost:3000 --basic-user admin --basic-password admin --dashboard-uid cpu-main --version 17 --dry-run\n\n  Export recent revision history into a reusable JSON artifact:\n    grafana-util dashboard history export --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --dashboard-uid cpu-main --output ./cpu-main.history.json"
+    )]
+    History(DashboardHistoryArgs),
     #[command(
         about = "Open one dashboard in a headless browser and capture image or PDF output.",
         after_help = DASHBOARD_SCREENSHOT_HELP_TEXT
@@ -297,6 +302,7 @@ fn wrap_dashboard_group(command: DashboardGroupCommand) -> DashboardCliArgs {
             wrap_dashboard(DashboardCommand::GovernanceGate(inner))
         }
         DashboardGroupCommand::Topology(inner) => wrap_dashboard(DashboardCommand::Topology(inner)),
+        DashboardGroupCommand::History(inner) => wrap_dashboard(DashboardCommand::History(inner)),
         DashboardGroupCommand::Screenshot(inner) => {
             wrap_dashboard(DashboardCommand::Screenshot(inner))
         }

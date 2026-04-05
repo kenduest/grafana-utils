@@ -146,13 +146,13 @@ pub(crate) const UNIFIED_HELP_TEXT: &str = help_block!(
     ),
     (
         "[Change Planning]",
-        "Build a change plan directly from live Grafana state:",
-        r#"grafana-util change plan --desired-file ./desired.json --fetch-live --url http://localhost:3000 --token "$GRAFANA_API_TOKEN"#
+        "Preview a staged change directly against live Grafana:",
+        r#"grafana-util change preview --fetch-live --url http://localhost:3000 --token "$GRAFANA_API_TOKEN"#
     ),
     (
         "[Change Apply]",
-        "Apply a reviewed change plan back to Grafana:",
-        r#"grafana-util change apply --plan-file ./sync-plan-reviewed.json --approve --execute-live --url http://localhost:3000 --token "$GRAFANA_API_TOKEN"#
+        "Apply a reviewed change preview back to Grafana:",
+        r#"grafana-util change apply --preview-file ./change-preview.json --approve --execute-live --url http://localhost:3000 --token "$GRAFANA_API_TOKEN"#
     )
 );
 
@@ -226,7 +226,7 @@ pub(crate) const UNIFIED_HELP_FULL_TEXT: &str = help_block!(
     (
         "[Change Review]",
         "Stamp a plan as reviewed before apply:",
-        "grafana-util change review --plan-file ./sync-plan.json --review-note 'peer-reviewed' --output-format json"
+        "grafana-util change advanced review --plan-file ./sync-plan.json --review-note 'peer-reviewed' --output-format json"
     ),
     (
         "[Overview Staged]",
@@ -392,7 +392,7 @@ pub(crate) const SYNC_HELP_FULL_TEXT: &str = help_block!(
     (
         "[Change Summary]",
         "Render the desired resource summary as JSON:",
-        "grafana-util change summary --desired-file ./desired.json --output-format json"
+        "grafana-util change inspect --dashboard-export-dir ./dashboards/raw --output-format json"
     ),
     (
         "[Change Audit]",
@@ -412,12 +412,12 @@ pub(crate) const SYNC_HELP_FULL_TEXT: &str = help_block!(
     (
         "[Change Plan]",
         "Build a live-backed plan with prune candidates:",
-        r#"grafana-util change plan --desired-file ./desired.json --fetch-live --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --allow-prune --output-format json"#
+        r#"grafana-util change preview --desired-file ./desired.json --fetch-live --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --allow-prune --output-format json"#
     ),
     (
         "[Change Review]",
         "Stamp a reviewed plan with reviewer metadata:",
-        "grafana-util change review --plan-file ./sync-plan.json --review-note 'peer-reviewed' --reviewed-by ops-user --output-format json"
+        "grafana-util change advanced review --plan-file ./sync-plan.json --review-note 'peer-reviewed' --reviewed-by ops-user --output-format json"
     ),
     (
         "[Change Apply]",

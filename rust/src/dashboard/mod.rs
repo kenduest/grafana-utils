@@ -97,14 +97,15 @@ pub(crate) use authoring::{
 pub use cli_defs::{
     build_auth_context, build_http_client, build_http_client_for_org, normalize_dashboard_cli_args,
     parse_cli_from, BrowseArgs, CloneLiveArgs, CommonCliArgs, DashboardAuthContext,
-    DashboardCliArgs, DashboardCommand, DashboardImportInputFormat, DeleteArgs, DiffArgs,
-    ExportArgs, GetArgs, GovernanceGateArgs, GovernanceGateOutputFormat, GovernancePolicySource,
-    ImpactArgs, ImpactOutputFormat, ImportArgs, InspectExportArgs, InspectExportReportFormat,
-    InspectLiveArgs, InspectOutputFormat, InspectVarsArgs, ListArgs, PatchFileArgs, PublishArgs,
-    RawToPromptArgs, RawToPromptLogFormat, RawToPromptOutputFormat, RawToPromptResolution,
-    ReviewArgs, ScreenshotArgs, ScreenshotFullPageOutput, ScreenshotOutputFormat, ScreenshotTheme,
-    SimpleOutputFormat, TopologyArgs, TopologyOutputFormat, ValidateExportArgs,
-    ValidationOutputFormat,
+    DashboardCliArgs, DashboardCommand, DashboardHistoryArgs, DashboardHistorySubcommand,
+    DashboardImportInputFormat, DeleteArgs, DiffArgs, ExportArgs, GetArgs, GovernanceGateArgs,
+    GovernanceGateOutputFormat, GovernancePolicySource, HistoryExportArgs, HistoryListArgs,
+    HistoryOutputFormat, HistoryRestoreArgs, ImpactArgs, ImpactOutputFormat, ImportArgs,
+    InspectExportArgs, InspectExportReportFormat, InspectLiveArgs, InspectOutputFormat,
+    InspectVarsArgs, ListArgs, PatchFileArgs, PublishArgs, RawToPromptArgs, RawToPromptLogFormat,
+    RawToPromptOutputFormat, RawToPromptResolution, ReviewArgs, ScreenshotArgs,
+    ScreenshotFullPageOutput, ScreenshotOutputFormat, ScreenshotTheme, SimpleOutputFormat,
+    TopologyArgs, TopologyOutputFormat, ValidateExportArgs, ValidationOutputFormat,
 };
 pub use export::{build_export_variant_dirs, build_output_path, export_dashboards_with_client};
 pub use help::{
@@ -123,6 +124,10 @@ pub(crate) use raw_to_prompt::run_raw_to_prompt;
 use browse::browse_dashboards_with_org_client;
 use delete::delete_dashboards_with_org_clients;
 use export::export_dashboards_with_org_clients;
+use history::{
+    export_dashboard_history_with_request, run_dashboard_history_list,
+    run_dashboard_history_restore,
+};
 use inspect::analyze_export_dir;
 use inspect_live::inspect_live_dashboards_with_client;
 use list::list_dashboards_with_org_clients;
@@ -130,6 +135,16 @@ use screenshot::capture_dashboard_screenshot;
 use topology::{run_dashboard_impact, run_dashboard_topology};
 use validate::run_dashboard_validate_export;
 use vars::inspect_dashboard_variables;
+
+fn request_json_with_client(
+    client: &JsonHttpClient,
+    method: reqwest::Method,
+    path: &str,
+    params: &[(String, String)],
+    payload: Option<&Value>,
+) -> Result<Option<Value>> {
+    client.request_json(method, path, params, payload)
+}
 
 pub(crate) use files::{
     build_dashboard_index_item, build_export_metadata, build_import_payload,
@@ -577,6 +592,28 @@ pub fn run_dashboard_cli_with_client(
         }
         DashboardCommand::Topology(topology_args) => run_dashboard_topology(&topology_args),
         DashboardCommand::Impact(impact_args) => run_dashboard_impact(&impact_args),
+        DashboardCommand::History(history_args) => match history_args.command {
+            DashboardHistorySubcommand::List(list_args) => run_dashboard_history_list(
+                |method, path, params, payload| {
+                    request_json_with_client(client, method, path, params, payload)
+                },
+                &list_args,
+            ),
+            DashboardHistorySubcommand::Restore(restore_args) => run_dashboard_history_restore(
+                |method, path, params, payload| {
+                    request_json_with_client(client, method, path, params, payload)
+                },
+                &restore_args,
+            ),
+            DashboardHistorySubcommand::Export(export_args) => {
+                export_dashboard_history_with_request(
+                    |method, path, params, payload| {
+                        request_json_with_client(client, method, path, params, payload)
+                    },
+                    &export_args,
+                )
+            }
+        },
         DashboardCommand::ValidateExport(validate_args) => {
             run_dashboard_validate_export(&validate_args)
         }
@@ -678,6 +715,35 @@ pub fn run_dashboard_cli(args: DashboardCliArgs) -> Result<()> {
         }
         DashboardCommand::Topology(topology_args) => run_dashboard_topology(&topology_args),
         DashboardCommand::Impact(impact_args) => run_dashboard_impact(&impact_args),
+        DashboardCommand::History(history_args) => match history_args.command {
+            DashboardHistorySubcommand::List(list_args) => {
+                let client = build_http_client(&list_args.common)?;
+                run_dashboard_history_list(
+                    |method, path, params, payload| {
+                        request_json_with_client(&client, method, path, params, payload)
+                    },
+                    &list_args,
+                )
+            }
+            DashboardHistorySubcommand::Restore(restore_args) => {
+                let client = build_http_client(&restore_args.common)?;
+                run_dashboard_history_restore(
+                    |method, path, params, payload| {
+                        request_json_with_client(&client, method, path, params, payload)
+                    },
+                    &restore_args,
+                )
+            }
+            DashboardHistorySubcommand::Export(export_args) => {
+                let client = build_http_client(&export_args.common)?;
+                export_dashboard_history_with_request(
+                    |method, path, params, payload| {
+                        request_json_with_client(&client, method, path, params, payload)
+                    },
+                    &export_args,
+                )
+            }
+        },
         DashboardCommand::ValidateExport(validate_args) => {
             run_dashboard_validate_export(&validate_args)
         }
@@ -696,6 +762,9 @@ mod dashboard_cli_rust_tests;
 #[cfg(test)]
 #[path = "rust_tests.rs"]
 mod dashboard_rust_tests;
+#[cfg(test)]
+#[path = "history_cli_rust_tests.rs"]
+mod history_cli_rust_tests;
 #[cfg(test)]
 #[path = "import_rust_tests.rs"]
 mod import_rust_tests;
