@@ -3,17 +3,21 @@
 use std::env;
 use std::fs;
 use std::path::{Path, PathBuf};
-use std::process::Command;
+use std::process::{self, Command};
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use serde_json::{Map, Value};
+use serde_json::Value;
 
 use crate::common::{message, string_field, value_as_object, Result};
 use crate::http::JsonHttpClient;
 
+use super::authoring::{
+    build_live_dashboard_authoring_document,
+    review_dashboard_file as build_dashboard_review_from_path, DashboardAuthoringReviewResult,
+};
 use super::{
-    extract_dashboard_object, fetch_dashboard, import_dashboard_request, EditLiveArgs,
-    DEFAULT_IMPORT_MESSAGE,
+    extract_dashboard_object, fetch_dashboard, import_dashboard_request,
+    render_dashboard_review_text, EditLiveArgs, DEFAULT_IMPORT_MESSAGE,
 };
 
 fn temp_edit_path(uid: &str) -> PathBuf {
@@ -28,38 +32,6 @@ fn temp_edit_path(uid: &str) -> PathBuf {
 
 fn default_output_path(uid: &str) -> PathBuf {
     PathBuf::from(format!("{uid}.edited.json"))
-}
-
-fn build_wrapped_live_document(payload: &Value) -> Result<Value> {
-    let object = value_as_object(payload, "Unexpected dashboard payload from Grafana.")?;
-    let dashboard = extract_dashboard_object(object)?.clone();
-    let mut document = Map::new();
-    document.insert("dashboard".to_string(), Value::Object(dashboard));
-    if let Some(folder_uid) = object
-        .get("meta")
-        .and_then(Value::as_object)
-        .map(|meta| string_field(meta, "folderUid", ""))
-        .filter(|value| !value.is_empty())
-    {
-        document.insert("folderUid".to_string(), Value::String(folder_uid));
-    }
-    Ok(Value::Object(document))
-}
-
-fn validate_edited_document(value: &Value) -> Result<()> {
-    let object = value_as_object(value, "Edited dashboard payload must be a JSON object.")?;
-    let dashboard = extract_dashboard_object(object)?;
-    if dashboard
-        .get("uid")
-        .and_then(Value::as_str)
-        .filter(|uid| !uid.trim().is_empty())
-        .is_none()
-    {
-        return Err(message(
-            "Edited dashboard payload must include dashboard.uid.",
-        ));
-    }
-    Ok(())
 }
 
 fn write_temp_payload(path: &Path, value: &Value) -> Result<()> {
@@ -107,7 +79,6 @@ fn edit_payload_in_external_editor(uid: &str, value: &Value) -> Result<Option<Va
                 temp_path.display()
             ))
         })?;
-        validate_edited_document(&parsed)?;
         if parsed == *value {
             Ok(None)
         } else {
@@ -118,6 +89,28 @@ fn edit_payload_in_external_editor(uid: &str, value: &Value) -> Result<Option<Va
     result
 }
 
+fn edited_dashboard_review(
+    source_uid: &str,
+    temp_path: &Path,
+) -> Result<DashboardAuthoringReviewResult> {
+    let mut review = build_dashboard_review_from_path(temp_path)?;
+    review.input_file = format!("edited draft for {source_uid}");
+    Ok(review)
+}
+
+fn join_tags(value: &Value) -> String {
+    value
+        .as_array()
+        .map(|tags| {
+            tags.iter()
+                .filter_map(Value::as_str)
+                .collect::<Vec<_>>()
+                .join(", ")
+        })
+        .filter(|value| !value.is_empty())
+        .unwrap_or_else(|| "-".to_string())
+}
+
 fn summarize_changes(original: &Value, edited: &Value) -> Result<Vec<String>> {
     let original_object = value_as_object(
         original,
@@ -126,6 +119,8 @@ fn summarize_changes(original: &Value, edited: &Value) -> Result<Vec<String>> {
     let edited_object = value_as_object(edited, "Edited dashboard payload must be an object.")?;
     let original_dashboard = extract_dashboard_object(original_object)?;
     let edited_dashboard = extract_dashboard_object(edited_object)?;
+    let original_tags = join_tags(original_dashboard.get("tags").unwrap_or(&Value::Null));
+    let edited_tags = join_tags(edited_dashboard.get("tags").unwrap_or(&Value::Null));
     Ok(vec![
         format!(
             "Dashboard edit review uid={} title={} -> {}",
@@ -134,11 +129,43 @@ fn summarize_changes(original: &Value, edited: &Value) -> Result<Vec<String>> {
             string_field(edited_dashboard, "title", "")
         ),
         format!(
+            "Dashboard UID: {} -> {}",
+            string_field(original_dashboard, "uid", ""),
+            string_field(edited_dashboard, "uid", "")
+        ),
+        format!(
             "Folder UID: {} -> {}",
             string_field(original_object, "folderUid", "-"),
             string_field(edited_object, "folderUid", "-"),
         ),
+        format!("Tags: {} -> {}", original_tags, edited_tags),
     ])
+}
+
+fn validate_live_apply_review(
+    review: &DashboardAuthoringReviewResult,
+    source_uid: &str,
+) -> Result<()> {
+    if !review.blocking_issues.is_empty() {
+        return Err(message(format!(
+            "Cannot apply live dashboard {} because review still has blocking issues: {}",
+            source_uid,
+            review.blocking_issues.join(" | ")
+        )));
+    }
+    if !review.dashboard_id_is_null {
+        return Err(message(format!(
+            "Cannot apply live dashboard {} because dashboard.id must stay null in the edited draft.",
+            source_uid
+        )));
+    }
+    if review.uid != source_uid {
+        return Err(message(format!(
+            "Cannot apply live dashboard {} because the edited draft changed dashboard.uid to {}.",
+            source_uid, review.uid
+        )));
+    }
+    Ok(())
 }
 
 pub(crate) fn run_dashboard_edit_live(
@@ -154,7 +181,7 @@ pub(crate) fn run_dashboard_edit_live(
     }
 
     let live_payload = fetch_dashboard(client, &args.dashboard_uid)?;
-    let wrapped = build_wrapped_live_document(&live_payload)?;
+    let wrapped = build_live_dashboard_authoring_document(&live_payload, None, None, None)?;
     let Some(edited) = edit_payload_in_external_editor(&args.dashboard_uid, &wrapped)? else {
         println!(
             "No dashboard changes detected for {}. Nothing written.",
@@ -167,7 +194,31 @@ pub(crate) fn run_dashboard_edit_live(
         println!("{line}");
     }
 
+    let review_temp_dir = std::env::temp_dir().join(format!(
+        "grafana-dashboard-edit-live-review-{}-{}",
+        process::id(),
+        SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .map_err(|error| message(format!("Failed to build review temp path: {error}")))?
+            .as_nanos()
+    ));
+    fs::create_dir_all(&review_temp_dir)?;
+    let review_path = review_temp_dir.join("dashboard.json");
+    let review = (|| -> Result<DashboardAuthoringReviewResult> {
+        write_temp_payload(&review_path, &edited)?;
+        let mut review = edited_dashboard_review(&args.dashboard_uid, &review_path)?;
+        review.input_file = format!("edited draft for {}", args.dashboard_uid);
+        Ok(review)
+    })();
+    let _ = fs::remove_file(&review_path);
+    let _ = fs::remove_dir_all(&review_temp_dir);
+    let review = review?;
+    for line in render_dashboard_review_text(&review) {
+        println!("{line}");
+    }
+
     if args.apply_live {
+        validate_live_apply_review(&review, &args.dashboard_uid)?;
         let payload = value_as_object(&edited, "Edited dashboard payload must be an object.")?;
         let mut import_payload = payload.clone();
         import_payload.insert("overwrite".to_string(), Value::Bool(true));
@@ -201,4 +252,78 @@ pub(crate) fn run_dashboard_edit_live(
         output.display()
     );
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    fn review_fixture() -> DashboardAuthoringReviewResult {
+        DashboardAuthoringReviewResult {
+            input_file: "edited draft for cpu-main".to_string(),
+            document_kind: "wrapped".to_string(),
+            title: "CPU Main".to_string(),
+            uid: "cpu-main".to_string(),
+            folder_uid: Some("infra".to_string()),
+            tags: vec!["ops".to_string(), "sre".to_string()],
+            dashboard_id_is_null: true,
+            meta_message_present: true,
+            blocking_issues: Vec::new(),
+            suggested_next_action: "publish --dry-run".to_string(),
+        }
+    }
+
+    #[test]
+    fn summarize_changes_reports_uid_title_folder_and_tags() {
+        let original = json!({
+            "dashboard": {
+                "id": null,
+                "uid": "cpu-main",
+                "title": "CPU Main",
+                "tags": ["ops"]
+            },
+            "folderUid": "infra"
+        });
+        let edited = json!({
+            "dashboard": {
+                "id": null,
+                "uid": "cpu-main",
+                "title": "CPU Main Updated",
+                "tags": ["ops", "sre"]
+            },
+            "folderUid": "platform"
+        });
+
+        let lines = summarize_changes(&original, &edited).unwrap();
+        assert!(lines.iter().any(|line| line
+            .contains("Dashboard edit review uid=cpu-main title=CPU Main -> CPU Main Updated")));
+        assert!(lines
+            .iter()
+            .any(|line| line.contains("Dashboard UID: cpu-main -> cpu-main")));
+        assert!(lines
+            .iter()
+            .any(|line| line.contains("Folder UID: infra -> platform")));
+        assert!(lines
+            .iter()
+            .any(|line| line.contains("Tags: ops -> ops, sre")));
+    }
+
+    #[test]
+    fn validate_live_apply_review_blocks_on_validation_and_uid_drift() {
+        let review = review_fixture();
+        validate_live_apply_review(&review, "cpu-main").unwrap();
+
+        let mut blocked = review.clone();
+        blocked.blocking_issues = vec!["missing datasource".to_string()];
+        assert!(validate_live_apply_review(&blocked, "cpu-main").is_err());
+
+        let mut non_null_id = review.clone();
+        non_null_id.dashboard_id_is_null = false;
+        assert!(validate_live_apply_review(&non_null_id, "cpu-main").is_err());
+
+        let mut uid_drift = review;
+        uid_drift.uid = "cpu-main-clone".to_string();
+        assert!(validate_live_apply_review(&uid_drift, "cpu-main").is_err());
+    }
 }

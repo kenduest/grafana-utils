@@ -215,7 +215,9 @@ pub enum UnifiedCommand {
         after_help = UNIFIED_PROFILE_HELP_TEXT
     )]
     Profile(ProfileCliArgs),
-    #[command(about = "Read live Grafana resources through a generic read-only query surface.")]
+    #[command(
+        about = "Run resource describe, kinds, list, and get workflows through a generic read-only query surface."
+    )]
     Resource(ResourceCliArgs),
     #[command(
         about = "Export and review live dashboard snapshots.",

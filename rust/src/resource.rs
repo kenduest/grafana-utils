@@ -69,6 +69,36 @@ impl ResourceKind {
             Self::Orgs => "Grafana org inventory from /api/orgs and /api/orgs/{id}.",
         }
     }
+
+    fn selector_pattern(self) -> &'static str {
+        match self {
+            Self::Dashboards => "dashboards/<uid>",
+            Self::Folders => "folders/<uid>",
+            Self::Datasources => "datasources/<uid>",
+            Self::AlertRules => "alert-rules/<uid>",
+            Self::Orgs => "orgs/<id>",
+        }
+    }
+
+    fn list_endpoint(self) -> &'static str {
+        match self {
+            Self::Dashboards => "GET /api/search",
+            Self::Folders => "GET /api/folders",
+            Self::Datasources => "GET /api/datasources",
+            Self::AlertRules => "GET /api/v1/provisioning/alert-rules",
+            Self::Orgs => "GET /api/orgs",
+        }
+    }
+
+    fn get_endpoint(self) -> &'static str {
+        match self {
+            Self::Dashboards => "GET /api/dashboards/uid/{uid}",
+            Self::Folders => "GET /api/folders/{uid}",
+            Self::Datasources => "GET /api/datasources/uid/{uid}",
+            Self::AlertRules => "GET /api/v1/provisioning/alert-rules/{uid}",
+            Self::Orgs => "GET /api/orgs/{id}",
+        }
+    }
 }
 
 #[derive(Debug, Clone, Args)]
@@ -83,10 +113,29 @@ pub struct ResourceKindsArgs {
 }
 
 #[derive(Debug, Clone, Args)]
+pub struct ResourceDescribeArgs {
+    #[arg(
+        value_enum,
+        help = "Optional resource kind to describe. Omit this to describe every supported kind."
+    )]
+    pub kind: Option<ResourceKind>,
+    #[arg(
+        long,
+        value_enum,
+        default_value_t = ResourceOutputFormat::Table,
+        help = "Render resource descriptions as text, table, json, or yaml."
+    )]
+    pub output_format: ResourceOutputFormat,
+}
+
+#[derive(Debug, Clone, Args)]
 pub struct ResourceListArgs {
     #[command(flatten)]
     pub common: CommonCliArgs,
-    #[arg(value_enum, help = "Grafana resource kind to list.")]
+    #[arg(
+        value_enum,
+        help = "Grafana resource kind to list. Use grafana-util resource describe to see the current selector patterns and endpoints."
+    )]
     pub kind: ResourceKind,
     #[arg(
         long,
@@ -103,7 +152,7 @@ pub struct ResourceGetArgs {
     pub common: CommonCliArgs,
     #[arg(
         value_name = "SELECTOR",
-        help = "Fetch one live resource by selector. Use <kind>/<identity>, for example dashboards/cpu-main or folders/infra."
+        help = "Fetch one live resource by selector. Use <kind>/<identity>, for example dashboards/cpu-main or folders/infra. Run grafana-util resource describe first if you need the supported selector patterns."
     )]
     pub selector: String,
     #[arg(
@@ -123,6 +172,12 @@ pub enum ResourceCommand {
         after_help = "Examples:\n\n  Show supported resource kinds as a table:\n    grafana-util resource kinds\n\n  Render the same kind catalog as JSON:\n    grafana-util resource kinds --output-format json"
     )]
     Kinds(ResourceKindsArgs),
+    #[command(
+        name = "describe",
+        about = "Describe the supported live Grafana resource kinds and selector patterns.",
+        after_help = "Examples:\n\n  Describe every supported kind as a table:\n    grafana-util resource describe\n\n  Describe one supported kind as JSON:\n    grafana-util resource describe dashboards --output-format json"
+    )]
+    Describe(ResourceDescribeArgs),
     #[command(
         name = "list",
         about = "List one supported live Grafana resource kind.",
@@ -164,13 +219,30 @@ struct ResourceKindRecord {
 }
 
 #[derive(Debug, Clone, Serialize)]
+struct ResourceDescribeRecord {
+    kind: &'static str,
+    singular: &'static str,
+    selector: &'static str,
+    list_endpoint: &'static str,
+    get_endpoint: &'static str,
+    description: &'static str,
+}
+
+#[derive(Debug, Clone, Serialize)]
 struct ResourceListDocument {
     kind: &'static str,
     count: usize,
     items: Vec<Map<String, Value>>,
 }
 
-fn supported_kind_records() -> Vec<ResourceKindRecord> {
+#[derive(Debug, Clone, Serialize)]
+struct ResourceDescribeDocument {
+    kind: Option<&'static str>,
+    count: usize,
+    items: Vec<ResourceDescribeRecord>,
+}
+
+fn supported_kinds() -> [ResourceKind; 5] {
     [
         ResourceKind::Dashboards,
         ResourceKind::Folders,
@@ -178,21 +250,58 @@ fn supported_kind_records() -> Vec<ResourceKindRecord> {
         ResourceKind::AlertRules,
         ResourceKind::Orgs,
     ]
-    .into_iter()
-    .map(|kind| ResourceKindRecord {
-        kind: kind.as_str(),
-        singular: kind.singular_label(),
-        description: kind.description(),
-    })
-    .collect()
+}
+
+fn supported_kind_names() -> String {
+    supported_kinds()
+        .into_iter()
+        .map(|kind| kind.as_str())
+        .collect::<Vec<_>>()
+        .join(", ")
+}
+
+fn supported_kind_records() -> Vec<ResourceKindRecord> {
+    supported_kinds()
+        .into_iter()
+        .map(|kind| ResourceKindRecord {
+            kind: kind.as_str(),
+            singular: kind.singular_label(),
+            description: kind.description(),
+        })
+        .collect()
+}
+
+fn describe_records(kind: Option<ResourceKind>) -> Vec<ResourceDescribeRecord> {
+    let kinds = kind
+        .map(|item| vec![item])
+        .unwrap_or_else(|| supported_kinds().to_vec());
+    kinds
+        .into_iter()
+        .map(|kind| ResourceDescribeRecord {
+            kind: kind.as_str(),
+            singular: kind.singular_label(),
+            selector: kind.selector_pattern(),
+            list_endpoint: kind.list_endpoint(),
+            get_endpoint: kind.get_endpoint(),
+            description: kind.description(),
+        })
+        .collect()
 }
 
 fn parse_selector(input: &str) -> Result<ResourceSelector> {
     let (kind, identity) = input
         .split_once('/')
-        .ok_or_else(|| message("Resource selector must use <kind>/<identity>."))?;
-    if identity.trim().is_empty() {
-        return Err(message("Resource selector identity cannot be empty."));
+        .ok_or_else(|| {
+            message(
+                "Resource selector must use <kind>/<identity>. Use grafana-util resource describe to see selector patterns and grafana-util resource kinds to list supported kinds.",
+            )
+        })?;
+    let kind = kind.trim();
+    let identity = identity.trim();
+    if kind.is_empty() || identity.is_empty() {
+        return Err(message(
+            "Resource selector kind and identity cannot be empty.",
+        ));
     }
     let kind = match kind {
         "dashboards" => ResourceKind::Dashboards,
@@ -202,13 +311,14 @@ fn parse_selector(input: &str) -> Result<ResourceSelector> {
         "orgs" => ResourceKind::Orgs,
         _ => {
             return Err(message(format!(
-                "Unsupported resource selector kind '{kind}'. Supported kinds: dashboards, folders, datasources, alert-rules, orgs."
+                "Unsupported resource selector kind '{kind}'. Use grafana-util resource describe to see selector patterns. Supported kinds: {}.",
+                supported_kind_names()
             )))
         }
     };
     Ok(ResourceSelector {
         kind,
-        identity: identity.trim().to_string(),
+        identity: identity.to_string(),
     })
 }
 
@@ -373,6 +483,71 @@ fn render_kind_catalog(args: &ResourceKindsArgs) -> Result<()> {
     Ok(())
 }
 
+fn render_describe(args: &ResourceDescribeArgs) -> Result<()> {
+    let items = describe_records(args.kind);
+    let document = ResourceDescribeDocument {
+        kind: args.kind.map(|kind| kind.as_str()),
+        count: items.len(),
+        items,
+    };
+    match args.output_format {
+        ResourceOutputFormat::Text => {
+            let mut lines = Vec::new();
+            if let Some(kind) = document.kind {
+                lines.push(format!("Resource kind: {kind}"));
+            } else {
+                lines.push("Resource kinds:".to_string());
+            }
+            for (index, record) in document.items.iter().enumerate() {
+                if index > 0 {
+                    lines.push(String::new());
+                }
+                lines.push(format!("Kind: {}", record.kind));
+                lines.push(format!("Singular: {}", record.singular));
+                lines.push(format!("Selector: {}", record.selector));
+                lines.push(format!("List endpoint: {}", record.list_endpoint));
+                lines.push(format!("Get endpoint: {}", record.get_endpoint));
+                lines.push(format!("Description: {}", record.description));
+            }
+            print_lines(&lines);
+        }
+        ResourceOutputFormat::Table => {
+            let rows = document
+                .items
+                .iter()
+                .map(|record| {
+                    vec![
+                        record.kind.to_string(),
+                        record.singular.to_string(),
+                        record.selector.to_string(),
+                        record.list_endpoint.to_string(),
+                        record.get_endpoint.to_string(),
+                        record.description.to_string(),
+                    ]
+                })
+                .collect::<Vec<_>>();
+            print_lines(&render_table(
+                &[
+                    "kind",
+                    "singular",
+                    "selector",
+                    "list_endpoint",
+                    "get_endpoint",
+                    "description",
+                ],
+                &rows,
+            ));
+        }
+        ResourceOutputFormat::Json => {
+            print!("{}", render_json_value(&document)?);
+        }
+        ResourceOutputFormat::Yaml => {
+            print!("{}", render_yaml(&document)?);
+        }
+    }
+    Ok(())
+}
+
 fn render_list(args: &ResourceListArgs) -> Result<()> {
     let client = build_client(&args.common)?;
     let items = list_resource_items(&client, args.kind)?;
@@ -464,6 +639,7 @@ pub fn run_resource_cli(args: ResourceCliArgs) -> Result<()> {
     set_json_color_choice(args.color);
     match args.command {
         ResourceCommand::Kinds(inner) => render_kind_catalog(&inner),
+        ResourceCommand::Describe(inner) => render_describe(&inner),
         ResourceCommand::List(inner) => render_list(&inner),
         ResourceCommand::Get(inner) => render_get(&inner),
     }
@@ -477,6 +653,15 @@ mod tests {
     fn parse_selector_requires_kind_and_identity() {
         let error = parse_selector("dashboards").unwrap_err().to_string();
         assert!(error.contains("<kind>/<identity>"));
+        assert!(error.contains("resource describe"));
+        assert!(error.contains("resource kinds"));
+    }
+
+    #[test]
+    fn parse_selector_trims_whitespace() {
+        let selector = parse_selector(" dashboards / cpu-main ").unwrap();
+        assert_eq!(selector.kind, ResourceKind::Dashboards);
+        assert_eq!(selector.identity, "cpu-main");
     }
 
     #[test]
@@ -484,5 +669,24 @@ mod tests {
         let selector = parse_selector("datasources/prom-main").unwrap();
         assert_eq!(selector.kind, ResourceKind::Datasources);
         assert_eq!(selector.identity, "prom-main");
+    }
+
+    #[test]
+    fn parse_selector_rejects_unsupported_kind_with_help() {
+        let error = parse_selector("widgets/demo").unwrap_err().to_string();
+        assert!(error.contains("Unsupported resource selector kind 'widgets'."));
+        assert!(error.contains("resource describe"));
+        assert!(error.contains("dashboards, folders, datasources, alert-rules, orgs"));
+    }
+
+    #[test]
+    fn describe_records_include_selector_and_endpoints() {
+        let records = describe_records(Some(ResourceKind::Dashboards));
+        assert_eq!(records.len(), 1);
+        let record = &records[0];
+        assert_eq!(record.kind, "dashboards");
+        assert_eq!(record.selector, "dashboards/<uid>");
+        assert_eq!(record.list_endpoint, "GET /api/search");
+        assert_eq!(record.get_endpoint, "GET /api/dashboards/uid/{uid}");
     }
 }

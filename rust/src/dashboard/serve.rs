@@ -36,6 +36,7 @@ struct DashboardServeDocument {
     item_count: usize,
     items: Vec<DashboardServeItem>,
     last_reload_millis: u128,
+    last_error: Option<String>,
 }
 
 fn walk_dashboard_files(root: &Path, files: &mut Vec<PathBuf>) -> Result<()> {
@@ -206,7 +207,8 @@ fn serve_html() -> &'static str {
     nav button.active { border-color: #58a6ff; background: #0d2238; }
     section { padding: 16px; }
     pre { white-space: pre-wrap; word-break: break-word; background: #161b22; padding: 12px; border: 1px solid #30363d; border-radius: 6px; overflow: auto; }
-    .meta { color: #8b949e; margin-bottom: 16px; }
+    .meta { color: #8b949e; margin-bottom: 12px; }
+    .error { color: #ffa198; background: #2d1117; border: 1px solid #8b2f2f; padding: 10px 12px; border-radius: 6px; margin-bottom: 12px; }
   </style>
 </head>
 <body>
@@ -215,6 +217,7 @@ fn serve_html() -> &'static str {
     <nav id="list"></nav>
     <section>
       <div class="meta" id="meta"></div>
+      <div id="error" class="error" hidden></div>
       <pre id="payload">Loading…</pre>
     </section>
   </main>
@@ -226,6 +229,7 @@ fn serve_html() -> &'static str {
       window.document.title = 'grafana-util dashboard serve';
       const list = window.document.getElementById('list');
       const meta = window.document.getElementById('meta');
+      const error = window.document.getElementById('error');
       const payload = window.document.getElementById('payload');
       const status = window.document.getElementById('status');
       if (selectedIndex >= payloadDocument.items.length) selectedIndex = 0;
@@ -238,6 +242,13 @@ fn serve_html() -> &'static str {
         list.appendChild(button);
       });
       status.textContent = 'items=' + payloadDocument.item_count + ' reload=' + new Date(payloadDocument.last_reload_millis).toLocaleTimeString();
+      if (payloadDocument.last_error) {
+        error.hidden = false;
+        error.textContent = 'Last reload error: ' + payloadDocument.last_error;
+      } else {
+        error.hidden = true;
+        error.textContent = '';
+      }
       const current = payloadDocument.items[selectedIndex];
       if (!current) {
         meta.textContent = 'No dashboards loaded.';
@@ -263,6 +274,50 @@ fn serve_document(state: &Arc<Mutex<DashboardServeDocument>>) -> Result<String> 
         .map_err(|error| message(format!("Dashboard serve JSON rendering failed: {error}")))
 }
 
+fn current_reload_millis() -> u128 {
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|duration| duration.as_millis())
+        .unwrap_or(0)
+}
+
+fn update_reload_state(
+    state: &Arc<Mutex<DashboardServeDocument>>,
+    items: Vec<DashboardServeItem>,
+    last_error: Option<String>,
+) -> Result<()> {
+    let mut guard = state
+        .lock()
+        .map_err(|_| message("Dashboard serve state lock is poisoned."))?;
+    guard.item_count = items.len();
+    guard.items = items;
+    guard.last_reload_millis = current_reload_millis();
+    guard.last_error = last_error;
+    Ok(())
+}
+
+fn open_preview_browser(url: &str) -> Result<()> {
+    let status = if cfg!(target_os = "macos") {
+        Command::new("open").arg(url).status()
+    } else if cfg!(target_os = "windows") {
+        Command::new("cmd").args(["/C", "start", "", url]).status()
+    } else if cfg!(target_family = "unix") {
+        Command::new("xdg-open").arg(url).status()
+    } else {
+        return Err(message(
+            "Dashboard serve cannot open a browser automatically on this platform.",
+        ));
+    }
+    .map_err(|error| message(format!("Dashboard serve browser launch failed: {error}")))?;
+    if status.success() {
+        Ok(())
+    } else {
+        Err(message(format!(
+            "Dashboard serve browser launch exited with status {status}."
+        )))
+    }
+}
+
 fn response(status: &str, content_type: &str, body: &str) -> String {
     format!(
         "HTTP/1.1 {status}\r\nContent-Type: {content_type}\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}",
@@ -272,20 +327,13 @@ fn response(status: &str, content_type: &str, body: &str) -> String {
 }
 
 pub(crate) fn run_dashboard_serve(args: &ServeArgs) -> Result<()> {
+    let items = load_input_items(args)?;
     let state = Arc::new(Mutex::new(DashboardServeDocument {
-        items: load_input_items(args)?,
-        item_count: 0,
-        last_reload_millis: SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .map(|duration| duration.as_millis())
-            .unwrap_or(0),
+        item_count: items.len(),
+        items,
+        last_reload_millis: current_reload_millis(),
+        last_error: None,
     }));
-    {
-        let mut guard = state
-            .lock()
-            .map_err(|_| message("Dashboard serve state lock is poisoned."))?;
-        guard.item_count = guard.items.len();
-    }
 
     let watch_paths = collect_watch_paths(args);
     if !args.no_watch && !watch_paths.is_empty() {
@@ -329,17 +377,25 @@ pub(crate) fn run_dashboard_serve(args: &ServeArgs) -> Result<()> {
                 }
                 match load_input_items(&args) {
                     Ok(items) => {
-                        if let Ok(mut guard) = state.lock() {
-                            guard.item_count = items.len();
-                            guard.items = items;
-                            guard.last_reload_millis = SystemTime::now()
-                                .duration_since(UNIX_EPOCH)
-                                .map(|duration| duration.as_millis())
-                                .unwrap_or(0);
+                        if let Err(error) = update_reload_state(&state, items, None) {
+                            eprintln!("Dashboard serve reload state update failed: {error}");
+                            continue;
                         }
                         eprintln!("Reloaded dashboard preview from watched inputs.");
                     }
                     Err(error) => {
+                        let existing_items = match state.lock() {
+                            Ok(guard) => guard.items.clone(),
+                            Err(_) => {
+                                eprintln!("Dashboard serve state lock is poisoned.");
+                                Vec::new()
+                            }
+                        };
+                        if let Err(state_error) =
+                            update_reload_state(&state, existing_items, Some(error.to_string()))
+                        {
+                            eprintln!("Dashboard serve reload state update failed: {state_error}");
+                        }
                         eprintln!("Dashboard serve reload failed: {error}");
                     }
                 }
@@ -355,7 +411,14 @@ pub(crate) fn run_dashboard_serve(args: &ServeArgs) -> Result<()> {
             "Dashboard serve could not enable nonblocking accept: {error}"
         ))
     })?;
-    println!("Dashboard preview available at http://{bind}");
+    let preview_url = format!("http://{bind}");
+    println!("Dashboard preview available at {preview_url}");
+    if args.open_browser {
+        match open_preview_browser(&preview_url) {
+            Ok(()) => eprintln!("Opened dashboard preview in your default browser."),
+            Err(error) => eprintln!("Dashboard serve browser launch failed: {error}"),
+        }
+    }
 
     loop {
         match listener.accept() {
@@ -424,5 +487,40 @@ pub(crate) fn run_dashboard_serve(args: &ServeArgs) -> Result<()> {
                 )));
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn serve_document_serializes_last_error_state() {
+        let state = Arc::new(Mutex::new(DashboardServeDocument {
+            item_count: 1,
+            items: vec![DashboardServeItem {
+                title: "CPU Main".to_string(),
+                uid: "cpu-main".to_string(),
+                source: "./drafts/cpu-main.json".to_string(),
+                document_kind: "wrapped".to_string(),
+                dashboard: json!({
+                    "dashboard": {
+                        "id": null,
+                        "uid": "cpu-main",
+                        "title": "CPU Main"
+                    }
+                }),
+            }],
+            last_reload_millis: 123,
+            last_error: Some("failed to reload".to_string()),
+        }));
+
+        let document: serde_json::Value =
+            serde_json::from_str(&serve_document(&state).unwrap()).expect("serve document json");
+        assert_eq!(document["item_count"], 1);
+        assert_eq!(document["last_reload_millis"], 123);
+        assert_eq!(document["last_error"], "failed to reload");
+        assert_eq!(document["items"][0]["title"], "CPU Main");
     }
 }

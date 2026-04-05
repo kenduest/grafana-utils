@@ -15,7 +15,7 @@ use crate::dashboard::{
 use crate::datasource::DatasourceGroupCommand;
 use crate::overview::OverviewOutputFormat;
 use crate::profile_cli::{root_command as profile_root_command, ProfileCommand};
-use crate::resource::{ResourceCommand, ResourceKind, ResourceOutputFormat};
+use crate::resource::{ResourceCliArgs, ResourceCommand, ResourceKind, ResourceOutputFormat};
 use crate::snapshot::root_command as snapshot_root_command;
 use crate::sync::{SyncAdvancedCommand, SyncGroupCommand, SyncOutputFormat, DEFAULT_REVIEW_TOKEN};
 use clap::{CommandFactory, Parser};
@@ -63,6 +63,19 @@ fn render_snapshot_subcommand_help(path: &[&str]) -> String {
         current = current
             .find_subcommand_mut(segment)
             .unwrap_or_else(|| panic!("missing snapshot subcommand help for {segment}"));
+    }
+    let mut output = Vec::new();
+    current.write_long_help(&mut output).unwrap();
+    String::from_utf8(output).unwrap()
+}
+
+fn render_resource_subcommand_help(path: &[&str]) -> String {
+    let mut command = ResourceCliArgs::command();
+    let mut current = &mut command;
+    for segment in path {
+        current = current
+            .find_subcommand_mut(segment)
+            .unwrap_or_else(|| panic!("missing resource subcommand help for {segment}"));
     }
     let mut output = Vec::new();
     current.write_long_help(&mut output).unwrap();
@@ -158,9 +171,45 @@ fn parse_cli_supports_resource_list_command() {
 }
 
 #[test]
+fn parse_cli_supports_resource_describe_command() {
+    let args: CliArgs = parse_cli_from([
+        "grafana-util",
+        "resource",
+        "describe",
+        "dashboards",
+        "--output-format",
+        "json",
+    ]);
+
+    match args.command {
+        UnifiedCommand::Resource(inner) => match inner.command {
+            ResourceCommand::Describe(describe_args) => {
+                assert_eq!(describe_args.kind, Some(ResourceKind::Dashboards));
+                assert_eq!(describe_args.output_format, ResourceOutputFormat::Json);
+            }
+            _ => panic!("expected resource describe"),
+        },
+        _ => panic!("expected resource command"),
+    }
+}
+
+#[test]
+fn resource_help_mentions_describe() {
+    let help = render_resource_subcommand_help(&[]);
+    assert!(help.contains("describe"));
+    assert!(help.contains(
+        "List the resource kinds supported by the generic read-only resource query surface."
+    ));
+    assert!(
+        help.contains("Describe the supported live Grafana resource kinds and selector patterns.")
+    );
+}
+
+#[test]
 fn unified_help_mentions_resource_escape_hatch() {
     let help = render_unified_help();
     assert!(help.contains("resource"));
+    assert!(help.contains("resource describe"));
     assert!(help.contains("generic read-only query surface"));
 }
 

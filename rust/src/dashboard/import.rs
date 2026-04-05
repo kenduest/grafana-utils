@@ -7,9 +7,9 @@ mod import_apply;
 #[path = "import_dry_run.rs"]
 mod import_dry_run;
 
-use crate::common::Result;
 #[cfg(feature = "tui")]
 use crate::common::message;
+use crate::common::Result;
 #[cfg(feature = "tui")]
 use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};

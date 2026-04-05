@@ -967,6 +967,7 @@ fn parse_cli_supports_dashboard_serve_command() {
         "./dashboards",
         "--port",
         "18080",
+        "--open-browser",
     ]);
 
     match args.command {
@@ -978,6 +979,7 @@ fn parse_cli_supports_dashboard_serve_command() {
             assert_eq!(serve_args.port, 18080);
             assert_eq!(serve_args.watch, vec![PathBuf::from("./dashboards")]);
             assert!(serve_args.input.is_none());
+            assert!(serve_args.open_browser);
         }
         _ => panic!("expected serve command"),
     }
@@ -989,6 +991,7 @@ fn serve_help_mentions_local_preview_server() {
     assert!(help.contains("--input"));
     assert!(help.contains("--script"));
     assert!(help.contains("--watch"));
+    assert!(help.contains("--open-browser"));
     assert!(help.contains("--port"));
     assert!(help.contains("local preview server"));
 }
@@ -1027,6 +1030,7 @@ fn edit_live_help_mentions_safe_local_draft_default() {
     assert!(help.contains("--output"));
     assert!(help.contains("--apply-live"));
     assert!(help.contains("local draft"));
+    assert!(help.contains("review output"));
 }
 
 #[test]

@@ -1,14 +1,14 @@
 //! Datasource inspect-export support helpers.
 
 use serde_json::{Map, Value};
-use std::io::{self, IsTerminal};
 #[cfg(not(feature = "tui"))]
 use std::io::Write;
+use std::io::{self, IsTerminal};
 use std::path::{Path, PathBuf};
 
-use crate::common::{load_json_object_file, message, render_json_value, Result};
 #[cfg(any(feature = "tui", test))]
 use crate::common::string_field;
+use crate::common::{load_json_object_file, message, render_json_value, Result};
 #[cfg(any(feature = "tui", test))]
 use crate::interactive_browser::BrowserItem;
 use crate::tabular_output::render_yaml;

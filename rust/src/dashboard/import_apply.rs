@@ -7,9 +7,7 @@ use std::path::PathBuf;
 
 use crate::common::{message, Result};
 #[cfg(feature = "tui")]
-use crate::dashboard::{
-    import_interactive,
-};
+use crate::dashboard::import_interactive;
 use crate::dashboard::{
     build_http_client_for_org, build_import_payload, extract_dashboard_object,
     import_dashboard_request_with_request, load_export_metadata, load_folder_inventory,

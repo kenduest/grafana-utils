@@ -686,6 +686,12 @@ pub struct ServeArgs {
         help = "Extra local paths to watch for preview reloads. Repeat --watch for multiple paths."
     )]
     pub watch: Vec<PathBuf>,
+    #[arg(
+        long = "open-browser",
+        default_value_t = false,
+        help = "Open the preview URL in your default browser after the server starts."
+    )]
+    pub open_browser: bool,
 }
 
 /// Arguments for editing one live dashboard through an external editor.
@@ -1043,13 +1049,13 @@ pub enum DashboardCommand {
     #[command(
         name = "serve",
         about = "Serve dashboard drafts through a local preview server.",
-        after_help = "Examples:\n\n  Serve one local draft file:\n    grafana-util dashboard serve --input ./drafts/cpu-main.json\n\n  Serve a directory of dashboard drafts:\n    grafana-util dashboard serve --input ./dashboards/raw\n\n  Serve one generated dashboard and watch the generator inputs:\n    grafana-util dashboard serve --script 'jsonnet dashboards/cpu.jsonnet' --watch ./dashboards --watch ./lib"
+        after_help = "Examples:\n\n  Serve one local draft file and open the browser:\n    grafana-util dashboard serve --input ./drafts/cpu-main.json --open-browser\n\n  Serve a directory of dashboard drafts:\n    grafana-util dashboard serve --input ./dashboards/raw\n\n  Serve one generated dashboard and watch the generator inputs:\n    grafana-util dashboard serve --script 'jsonnet dashboards/cpu.jsonnet' --watch ./dashboards --watch ./lib"
     )]
     Serve(ServeArgs),
     #[command(
         name = "edit-live",
-        about = "Fetch one live dashboard into an external editor and save the result as a local draft or explicit live writeback.",
-        after_help = "Examples:\n\n  Edit one live dashboard and write the result to the default local draft path:\n    grafana-util dashboard edit-live --url http://localhost:3000 --basic-user admin --basic-password admin --dashboard-uid cpu-main\n\n  Edit one live dashboard into an explicit output file:\n    grafana-util dashboard edit-live --profile prod --dashboard-uid cpu-main --output ./drafts/cpu-main.edited.json\n\n  Edit one live dashboard and write it back to Grafana after explicit acknowledgement:\n    grafana-util dashboard edit-live --profile prod --dashboard-uid cpu-main --apply-live --yes --message 'Hotfix CPU dashboard'"
+        about = "Fetch one live dashboard into an external editor, review the edited draft, and save the result as a local draft or explicit live writeback.",
+        after_help = "Examples:\n\n  Edit one live dashboard and write the result to the default local draft path:\n    grafana-util dashboard edit-live --url http://localhost:3000 --basic-user admin --basic-password admin --dashboard-uid cpu-main\n\n  Edit one live dashboard into an explicit output file:\n    grafana-util dashboard edit-live --profile prod --dashboard-uid cpu-main --output ./drafts/cpu-main.edited.json\n\n  Edit one live dashboard and write it back to Grafana after explicit acknowledgement:\n    grafana-util dashboard edit-live --profile prod --dashboard-uid cpu-main --apply-live --yes --message 'Hotfix CPU dashboard'\n\n  Edit one live dashboard and inspect the review output before deciding whether to publish:\n    grafana-util dashboard edit-live --profile prod --dashboard-uid cpu-main"
     )]
     EditLive(EditLiveArgs),
     #[command(

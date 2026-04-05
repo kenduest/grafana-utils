@@ -167,8 +167,9 @@ where
         let action = apply_folder_path_guard_to_action(action, folder_paths_match);
         let needs_dry_run_folder_path = args.table || args.json || args.verbose || args.progress;
         let folder_path = if needs_dry_run_folder_path {
-            let prefer_live_folder_path =
-                folder_uid_override.is_some() && args.import_folder_uid.is_none() && !uid.is_empty();
+            let prefer_live_folder_path = folder_uid_override.is_some()
+                && args.import_folder_uid.is_none()
+                && !uid.is_empty();
             resolve_dashboard_import_folder_path_with_request(
                 &mut request_json,
                 &mut lookup_cache,
@@ -347,8 +348,9 @@ pub(crate) fn collect_import_dry_run_report_with_client(
         let action = apply_folder_path_guard_to_action(action, folder_paths_match);
         let needs_dry_run_folder_path = args.table || args.json || args.verbose || args.progress;
         let folder_path = if needs_dry_run_folder_path {
-            let prefer_live_folder_path =
-                folder_uid_override.is_some() && args.import_folder_uid.is_none() && !uid.is_empty();
+            let prefer_live_folder_path = folder_uid_override.is_some()
+                && args.import_folder_uid.is_none()
+                && !uid.is_empty();
             resolve_dashboard_import_folder_path_with_client(
                 &dashboard_client,
                 &mut lookup_cache,
