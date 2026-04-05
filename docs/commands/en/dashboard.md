@@ -16,6 +16,7 @@ If you are an SRE, Grafana operator, or responder, this page should help you dec
 - **Inspect**: browse, list, get, inspect-live, inspect-export, inspect-vars, and topology checks.
 - **Move**: export, import, clone-live, raw-to-prompt, diff, and publish paths.
 - **Review Before Mutate**: review, governance-gate, and impact analysis.
+- **History**: list, restore, and export revision history before you recover or promote a dashboard.
 - **Capture**: screenshot flows for reproducible visual proof.
 
 Choose this page when the task is dashboard work but you are still deciding whether the next step is to inspect, move, review, or capture.
@@ -108,6 +109,10 @@ grafana-util dashboard inspect-live --url http://localhost:3000 --basic-user adm
 - [dashboard governance-gate](./dashboard-governance-gate.md)
 - [dashboard topology](./dashboard-topology.md)
 - [dashboard impact](./dashboard-impact.md)
+
+### History
+
+- [dashboard history](./dashboard-history.md)
 
 ### Capture
 

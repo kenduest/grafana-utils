@@ -59,6 +59,7 @@ The checked-in `docs/html/commands/en/*.html` files are generated from the same 
 - [dashboard governance-gate](./dashboard-governance-gate.md)
 - [dashboard topology](./dashboard-topology.md)
 - [dashboard impact](./dashboard-impact.md)
+- [dashboard history](./dashboard-history.md)
 - [dashboard screenshot](./dashboard-screenshot.md)
 
 ## Datasource

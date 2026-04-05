@@ -176,12 +176,12 @@ Move alerting changes through a reviewed lifecycle.
 
 ```bash
 # Purpose: Move alerting changes through a reviewed lifecycle.
-grafana-util change summary --desired-file ./desired.json
+grafana-util change inspect --desired-file ./desired.json
 ```
 
 ```bash
 # Purpose: Move alerting changes through a reviewed lifecycle.
-grafana-util change preflight --desired-file ./desired.json --output-format json
+grafana-util change check --desired-file ./desired.json --fetch-live --output-format json
 ```
 
 ```bash
@@ -203,7 +203,7 @@ PREFLIGHT CHECK:
   "plan_id": "plan-2026-04-02-abc"
 }
 ```
-Run `change summary` first when you want to understand the size of the change, then `change preflight` when you need to confirm the staged inputs are structurally sound before alert-specific planning.
+Run `change inspect` first when you want to understand the size and shape of the staged package, then `change check` when you need to confirm the staged inputs are structurally sound before alert-specific planning.
 
 ---
 

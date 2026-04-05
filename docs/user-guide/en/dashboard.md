@@ -31,6 +31,17 @@ This guide is for operators who need to inventory dashboards, export or import t
 - If inspect output shows missing queries or variables, stop and resolve that before import.
 - If you cannot explain what a screenshot or topology output is proving, you are probably in the wrong workflow lane.
 
+## History and recovery
+
+When you are trying to recover a known-good dashboard version, use the history lane instead of rebuilding JSON by hand.
+
+- [dashboard history](../../commands/en/dashboard-history.md)
+- `dashboard history list` shows the recent revisions for one dashboard UID.
+- `dashboard history restore` copies one historical version forward as a new latest Grafana revision.
+- `dashboard history export` writes a reusable revision-history artifact for review or CI.
+
+Restore is not a destructive overwrite. The selected historical version stays in history, and the restored copy becomes the new current revision.
+
 > **Operator-First Design**: This tool treats dashboards as version-controlled assets. The goal is to move and govern dashboard state safely, with enough visibility to decide whether a file is ready to replay, patch, or promote.
 
 ## 🔗 Command Pages
@@ -53,6 +64,7 @@ Need the command-by-command surface instead of the workflow guide?
 - [dashboard inspect-export](../../commands/en/dashboard-inspect-export.md)
 - [dashboard inspect-live](../../commands/en/dashboard-inspect-live.md)
 - [dashboard inspect-vars](../../commands/en/dashboard-inspect-vars.md)
+- [dashboard history](../../commands/en/dashboard-history.md)
 - [dashboard governance-gate](../../commands/en/dashboard-governance-gate.md)
 - [dashboard topology](../../commands/en/dashboard-topology.md)
 - [dashboard screenshot](../../commands/en/dashboard-screenshot.md)

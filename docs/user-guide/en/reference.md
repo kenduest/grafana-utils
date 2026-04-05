@@ -58,22 +58,23 @@ The `change` family emits several different JSON contracts. The safest routing r
 Fast lookups from the CLI:
 
 - `grafana-util change --help-schema`
-- `grafana-util change plan --help-schema`
+- `grafana-util change preview --help-schema`
 - `grafana-util change apply --help-schema`
-- `grafana-util change audit --help-schema`
+- `grafana-util change advanced audit --help-schema`
 
 Practical mapping:
 
-- `change summary --output-format json` -> `grafana-utils-sync-summary`
-- `change plan --output-format json` -> `grafana-utils-sync-plan`
-- `change review --output-format json` -> `grafana-utils-sync-plan`
+- `change inspect --output-format json` -> staged change summary or overview-style inspection output, depending on selected inputs
+- `change preview --output-format json` -> `grafana-utils-sync-plan`
 - `change apply --output-format json` -> `grafana-utils-sync-apply-intent`
 - `change apply --execute-live --output-format json` -> live apply result
-- `change audit --output-format json` -> `grafana-utils-sync-audit`
-- `change preflight --output-format json` -> `grafana-utils-sync-preflight`
-- `change assess-alerts --output-format json` -> `grafana-utils-alert-sync-plan`
-- `change bundle-preflight --output-format json` -> `grafana-utils-sync-bundle-preflight`
-- `change promotion-preflight --output-format json` -> `grafana-utils-sync-promotion-preflight`
+- `change advanced summary --output-format json` -> `grafana-utils-sync-summary`
+- `change advanced review --output-format json` -> `grafana-utils-sync-plan`
+- `change advanced audit --output-format json` -> `grafana-utils-sync-audit`
+- `change advanced preflight --output-format json` -> `grafana-utils-sync-preflight`
+- `change advanced assess-alerts --output-format json` -> `grafana-utils-alert-sync-plan`
+- `change advanced bundle-preflight --output-format json` -> `grafana-utils-sync-bundle-preflight`
+- `change advanced promotion-preflight --output-format json` -> `grafana-utils-sync-promotion-preflight`
 
 Use the dedicated [change command reference](../../commands/en/change.md) when you need the exact top-level keys for each document.
 

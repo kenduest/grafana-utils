@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>grafana-util-change-check.1 · grafana-util docs</title>
+  <title>grafana-util-dashboard-history.1 · grafana-util docs</title>
   <style>:root {
   color-scheme: light dark;
   --font-scale: 1;
@@ -758,14 +758,14 @@ code[class*="language-"],pre[class*="language-"]{color:#ccc;background:none;font
 </aside>
 
   <article class="article">
-    <div class="breadcrumbs"><a href="../index.html">Home</a> / <a href="index.html">Manpages</a> / grafana-util-change-check.1</div>
+    <div class="breadcrumbs"><a href="../index.html">Home</a> / <a href="index.html">Manpages</a> / grafana-util-dashboard-history.1</div>
 
-    <h1><span class="hero-title-main">grafana-util-change-check.1</span></h1>
+    <h1><span class="hero-title-main">grafana-util-dashboard-history.1</span></h1>
 <p class="hero-summary">Browser-readable rendering of a generated roff manpage.</p>
 
     <div class="manpage-intro">
   <p>This page renders the generated roff manpage into readable HTML for browser use. For richer per-subcommand detail, prefer the command-reference pages.</p>
-  <div class="manpage-rendered"><section class="man-section"><h2>NAME</h2><p>grafana-util-change-check - check whether the staged package looks structurally safe to continue.</p></section><section class="man-section"><h2>SYNOPSIS</h2><p><strong>grafana-util change check [<em>OPTIONS</em>]</strong></p></section><section class="man-section"><h2>DESCRIPTION</h2><p>check whether the staged package looks structurally safe to continue.</p><p>when you need one readiness gate before preview or apply.</p></section><section class="man-section"><h2>SEE ALSO</h2><p><strong>grafana-util</strong>(1), <strong>grafana-util-change</strong>(1)</p></section></div>
+  <div class="manpage-rendered"><section class="man-section"><h2>NAME</h2><p>grafana-util-dashboard-history - List, restore, or export live dashboard revision history for one dashboard UID.</p></section><section class="man-section"><h2>SYNOPSIS</h2><p><strong>grafana-util dashboard history [<em>OPTIONS</em>]</strong></p></section><section class="man-section"><h2>DESCRIPTION</h2><p>List, restore, or export live dashboard revision history for one dashboard UID.</p><p>Use this when you need to inspect earlier dashboard versions, recover a known-good revision, or export dashboard history into a reusable artifact for review or CI.</p></section><section class="man-section"><h2>BEFORE / AFTER</h2><ul class="man-bullets"><li>Before: dashboard revision recovery often meant guessing which old version to trust, then manually rebuilding it or editing JSON by hand.</li><li>After: one history namespace covers list, restore, and export, so operators can inspect old versions, recover a known-good revision, and hand the same artifact to review or CI.</li></ul></section><section class="man-section"><h2>COMMON OPTIONS</h2><dl class="man-definitions"><dt><strong>--dashboard-uid</strong></dt><dd>the dashboard UID whose revision history you want.</dd><dt><strong>--limit</strong></dt><dd>how many recent versions to include in list or export views.</dd><dt><strong>--version</strong></dt><dd>the historical version number to restore.</dd><dt><strong>--message</strong></dt><dd>revision message for the new restored revision.</dd><dt><strong>--dry-run</strong></dt><dd>preview a restore without changing Grafana.</dd><dt><strong>--yes</strong></dt><dd>confirm a real restore.</dd><dt><strong>--output-format</strong></dt><dd>render list or restore output as text, table, json, or yaml.</dd><dt><strong>--output</strong></dt><dd>write exported history artifacts to a JSON file.</dd><dt><strong>--overwrite</strong></dt><dd>replace an existing export artifact.</dd></dl></section><section class="man-section"><h2>SUCCESS CRITERIA</h2><ul class="man-bullets"><li>list output shows the revision numbers and messages you expected for the target dashboard UID</li><li>restore dry-run clearly shows the version that would become the new latest revision</li><li>a real restore leaves the old version in history and adds a new current revision</li><li>export writes a reusable JSON artifact that can be inspected later without Grafana</li></ul></section><section class="man-section"><h2>FAILURE CHECKS</h2><ul class="man-bullets"><li>if list output is empty, confirm the dashboard UID and whether your credentials can see that dashboard</li><li>if restore fails, verify that the target version exists and that you supplied --yes for a live restore</li><li>if export writes the wrong file or seems stale, confirm the output path and whether --overwrite was intended</li></ul></section><section class="man-section"><h2>EXAMPLES</h2><p>List, restore, or export live dashboard revision history for one dashboard UID.</p><pre class="man-example"><code>grafana-util dashboard history list --url http://localhost:3000 --basic-user admin --basic-password admin --dashboard-uid cpu-main --limit 20 --output-format table</code></pre></section><section class="man-section"><h2>SEE ALSO</h2><p><strong>grafana-util</strong>(1)</p></section></div>
 </div>
 
     
@@ -780,7 +780,7 @@ code[class*="language-"],pre[class*="language-"]{color:#ccc;background:none;font
 </div>
 
     </div>
-    <footer class="site-footer">Source: <code>docs/man/grafana-util-change-check.1</code><br>Generated by <code>scripts/generate_command_html.py</code>.</footer>
+    <footer class="site-footer">Source: <code>docs/man/grafana-util-dashboard-history.1</code><br>Generated by <code>scripts/generate_command_html.py</code>.</footer>
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js" async></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js" async></script>

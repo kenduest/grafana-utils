@@ -851,9 +851,9 @@ ops-user    Viewer  create   missing</code></pre>
 <h2 id="5-告警治理流程-planapply">5. 告警治理流程 (Plan/Apply)</h2>
 <p>告警變更應遵循受審查的生命週期。</p>
 <pre><code># 用途：告警變更應遵循受審查的生命週期。
-grafana-util change summary --desired-file ./desired.json</code></pre>
+grafana-util change inspect --desired-file ./desired.json</code></pre>
 <pre><code># 用途：告警變更應遵循受審查的生命週期。
-grafana-util change preflight --desired-file ./desired.json --output-format json</code></pre>
+grafana-util change check --desired-file ./desired.json --fetch-live --output-format json</code></pre>
 <pre><code># 用途：告警變更應遵循受審查的生命週期。
 grafana-util alert plan --profile prod --desired-dir ./alerts/desired --output-format json</code></pre>
 <p><strong>預期輸出 (摘要片段)：</strong></p>
@@ -869,7 +869,7 @@ PREFLIGHT CHECK:
   &quot;summary&quot;: { &quot;modified&quot;: 2, &quot;added&quot;: 1, &quot;deleted&quot;: 0 },
   &quot;plan_id&quot;: &quot;plan-2026-04-02-abc&quot;
 }</code></pre>
-<p>想先了解變更包規模時，先跑 <code>change summary</code>；要確認 staged 輸入結構正確時，再跑 <code>change preflight</code>；最後才進入 alert-specific planning。</p>
+<p>想先了解變更包規模與形狀時，先跑 <code>change inspect</code>；要確認 staged 輸入結構正確時，再跑 <code>change check</code>；最後才進入 alert-specific planning。</p>
 <h2 id="6-身份快照回放-access-management">6. 身份快照回放 (Access Management)</h2>
 <p>透過快照管理使用者、team 與 service account。</p>
 <pre><code># 用途：透過快照管理使用者、team 與 service account。

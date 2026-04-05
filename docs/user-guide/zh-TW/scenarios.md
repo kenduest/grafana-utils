@@ -176,12 +176,12 @@ ops-user    Viewer  create   missing
 
 ```bash
 # 用途：告警變更應遵循受審查的生命週期。
-grafana-util change summary --desired-file ./desired.json
+grafana-util change inspect --desired-file ./desired.json
 ```
 
 ```bash
 # 用途：告警變更應遵循受審查的生命週期。
-grafana-util change preflight --desired-file ./desired.json --output-format json
+grafana-util change check --desired-file ./desired.json --fetch-live --output-format json
 ```
 
 ```bash
@@ -203,7 +203,7 @@ PREFLIGHT CHECK:
   "plan_id": "plan-2026-04-02-abc"
 }
 ```
-想先了解變更包規模時，先跑 `change summary`；要確認 staged 輸入結構正確時，再跑 `change preflight`；最後才進入 alert-specific planning。
+想先了解變更包規模與形狀時，先跑 `change inspect`；要確認 staged 輸入結構正確時，再跑 `change check`；最後才進入 alert-specific planning。
 
 ---
 

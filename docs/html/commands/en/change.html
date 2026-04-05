@@ -815,31 +815,39 @@ grafana-util change apply \
 <p>When to use: when you want the shortest path to see what the staged package contains before any live comparison.</p>
 <p>Key flags: <code>--workspace</code>, <code>--desired-file</code>, <code>--dashboard-export-dir</code>, <code>--dashboard-provisioning-dir</code>, <code>--alert-export-dir</code>, <code>--datasource-provisioning-file</code>, <code>--source-bundle</code>, <code>--output-format</code>, <code>--output-file</code>, <code>--also-stdout</code>.</p>
 <p>Examples:</p>
-<pre><code>grafana-util change inspect --workspace .</code></pre>
-<pre><code>grafana-util change inspect --dashboard-export-dir ./dashboards/raw --alert-export-dir ./alerts/raw --output-format json</code></pre>
+<pre><code># Purpose: Inspect the staged package from discovered or explicit inputs.
+grafana-util change inspect --workspace .</code></pre>
+<pre><code># Purpose: Inspect the staged package from explicit staged inputs.
+grafana-util change inspect --dashboard-export-dir ./dashboards/raw --alert-export-dir ./alerts/raw --output-format json</code></pre>
 <p>Related commands: <code>change check</code>, <code>change preview</code>, <code>overview</code>.</p>
 <h2 id="check"><code>check</code></h2>
 <p>Purpose: check whether the staged package looks structurally safe to continue.</p>
 <p>When to use: when you need one readiness gate before preview or apply.</p>
 <p>Key flags: <code>--workspace</code>, <code>--availability-file</code>, <code>--target-inventory</code>, <code>--mapping-file</code>, <code>--fetch-live</code>, <code>--output-format</code>.</p>
 <p>Examples:</p>
-<pre><code>grafana-util change check --workspace . --output-format json</code></pre>
-<pre><code>grafana-util change check --workspace . --fetch-live --availability-file ./availability.json</code></pre>
+<pre><code># Purpose: Check whether the staged package looks structurally safe to continue.
+grafana-util change check --workspace . --output-format json</code></pre>
+<pre><code># Purpose: Check whether the staged package looks structurally safe to continue.
+grafana-util change check --workspace . --fetch-live --availability-file ./availability.json</code></pre>
 <p>Related commands: <code>change inspect</code>, <code>change preview</code>, <code>status staged</code>.</p>
 <h2 id="preview"><code>preview</code></h2>
 <p>Purpose: preview what would change from discovered or explicit staged inputs.</p>
 <p>When to use: when you want the actionable staged preview but do not want to think in terms of low-level plan or bundle-preflight builders.</p>
 <p>Key flags: <code>--workspace</code>, <code>--desired-file</code>, <code>--source-bundle</code>, <code>--target-inventory</code>, <code>--mapping-file</code>, <code>--availability-file</code>, <code>--live-file</code>, <code>--fetch-live</code>, <code>--allow-prune</code>, <code>--trace-id</code>, <code>--output-format</code>, <code>--output-file</code>.</p>
 <p>Examples:</p>
-<pre><code>grafana-util change preview --workspace . --fetch-live --profile prod</code></pre>
-<pre><code>grafana-util change preview --desired-file ./desired.json --live-file ./live.json --output-format json</code></pre>
+<pre><code># Purpose: Preview what would change from discovered or explicit staged inputs.
+grafana-util change preview --workspace . --fetch-live --profile prod</code></pre>
+<pre><code># Purpose: Preview what would change from discovered or explicit staged inputs.
+grafana-util change preview --desired-file ./desired.json --live-file ./live.json --output-format json</code></pre>
 <p>Related commands: <code>change apply</code>, <code>change advanced plan</code>, <code>change advanced bundle-preflight</code>.</p>
 <h2 id="advanced"><code>advanced</code></h2>
 <p>Purpose: expose lower-level staged contracts and specialized sync workflows.</p>
 <p>When to use: when you need explicit <code>summary</code>, <code>plan</code>, <code>review</code>, <code>preflight</code>, <code>audit</code>, <code>bundle</code>, or promotion handoff documents instead of the task-first lane.</p>
 <p>Examples:</p>
-<pre><code>grafana-util change advanced review --plan-file ./sync-plan.json --review-note &#x27;peer-reviewed&#x27;</code></pre>
-<pre><code>grafana-util change advanced bundle-preflight --source-bundle ./bundle.json --target-inventory ./target.json --output-format json</code></pre>
+<pre><code># Purpose: Expose lower-level staged contracts and specialized sync workflows.
+grafana-util change advanced review --plan-file ./sync-plan.json --review-note &#x27;peer-reviewed&#x27;</code></pre>
+<pre><code># Purpose: Expose lower-level staged contracts and specialized sync workflows.
+grafana-util change advanced bundle-preflight --source-bundle ./bundle.json --target-inventory ./target.json --output-format json</code></pre>
 <h2 id="summary"><code>summary</code></h2>
 <p>Purpose: summarize local desired sync resources.</p>
 <p>When to use: when you want a quick size check before planning or applying.</p>

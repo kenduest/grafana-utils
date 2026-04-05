@@ -51,27 +51,6 @@ build a staged bundle\-level sync preflight document from a source bundle and ta
 .TP
 .B promotion\-preflight
 build a staged promotion review handoff from a source bundle and target inventory. Use when: Are preparing a promotion review and want an explicit mapping and availability view.
-.SH EXAMPLES
-.PP
-inspect: inspect the staged package from discovered or explicit inputs.
-.EX
-grafana-util change inspect --workspace .
-.EE
-.PP
-check: check whether the staged package looks structurally safe to continue.
-.EX
-grafana-util change check --workspace . --output-format json
-.EE
-.PP
-preview: preview what would change from discovered or explicit staged inputs.
-.EX
-grafana-util change preview --workspace . --fetch-live --profile prod
-.EE
-.PP
-advanced: expose lower\-level staged contracts and specialized sync workflows.
-.EX
-grafana-util change advanced review --plan-file ./sync-plan.json --review-note 'peer-reviewed'
-.EE
 .SH SEE ALSO
 \fBgrafana-util\fR(1),
 \fBgrafana-util-status\fR(1),

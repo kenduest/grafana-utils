@@ -851,9 +851,9 @@ ops-user    Viewer  create   missing</code></pre>
 <h2 id="5-alert-governance-planapply">5. Alert Governance (Plan/Apply)</h2>
 <p>Move alerting changes through a reviewed lifecycle.</p>
 <pre><code># Purpose: Move alerting changes through a reviewed lifecycle.
-grafana-util change summary --desired-file ./desired.json</code></pre>
+grafana-util change inspect --desired-file ./desired.json</code></pre>
 <pre><code># Purpose: Move alerting changes through a reviewed lifecycle.
-grafana-util change preflight --desired-file ./desired.json --output-format json</code></pre>
+grafana-util change check --desired-file ./desired.json --fetch-live --output-format json</code></pre>
 <pre><code># Purpose: Move alerting changes through a reviewed lifecycle.
 grafana-util alert plan --profile prod --desired-dir ./alerts/desired --output-format json</code></pre>
 <p><strong>Expected Output (Snippet):</strong></p>
@@ -869,7 +869,7 @@ PREFLIGHT CHECK:
   &quot;summary&quot;: { &quot;modified&quot;: 2, &quot;added&quot;: 1, &quot;deleted&quot;: 0 },
   &quot;plan_id&quot;: &quot;plan-2026-04-02-abc&quot;
 }</code></pre>
-<p>Run <code>change summary</code> first when you want to understand the size of the change, then <code>change preflight</code> when you need to confirm the staged inputs are structurally sound before alert-specific planning.</p>
+<p>Run <code>change inspect</code> first when you want to understand the size and shape of the staged package, then <code>change check</code> when you need to confirm the staged inputs are structurally sound before alert-specific planning.</p>
 <h2 id="6-identity-replay-access-management">6. Identity Replay (Access Management)</h2>
 <p>Manage users, teams, and service accounts through snapshots.</p>
 <pre><code># Purpose: Manage users, teams, and service accounts through snapshots.

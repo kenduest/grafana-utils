@@ -88,9 +88,9 @@ grafana-util dashboard list -v
 
 | 症狀 | 真正發生的事 | 建議修補方式 |
 | :--- | :--- | :--- |
-| `status staged` 看起來健康，但 live apply 仍失敗 | staged 檔案結構正確，不代表 live state 或權限也正確 | 先跑 `status live`，再跑 `change preflight` 或 command-specific dry-run |
-| `overview live` 看起來正常，就直接略過 preflight / plan | live 可讀性不等於 staged 套件正確 | apply 前仍要跑 staged gate 與 review path |
-| import 或 apply 比預期改得更多 | staged 套件從來沒有先做 summary 或 plan | 執行前先用 `change summary`、`change plan` 與 `--dry-run` |
+| `status staged` 看起來健康，但 live apply 仍失敗 | staged 檔案結構正確，不代表 live state 或權限也正確 | 先跑 `status live`，再跑 `change check`、`change preview` 或 command-specific dry-run |
+| `overview live` 看起來正常，就直接略過 change review | live 可讀性不等於 staged 套件正確 | apply 前仍要跑 staged gate 與 preview path |
+| import 或 apply 比預期改得更多 | staged 套件從來沒有先做 inspect 或 preview | 執行前先用 `change inspect`、`change preview` 與 `--dry-run` |
 
 ### 5. profile 與 secret 問題
 

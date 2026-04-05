@@ -97,10 +97,12 @@ Key flags: `--workspace`, `--desired-file`, `--dashboard-export-dir`, `--dashboa
 Examples:
 
 ```bash
+# Purpose: Inspect the staged package from discovered or explicit inputs.
 grafana-util change inspect --workspace .
 ```
 
 ```bash
+# Purpose: Inspect the staged package from explicit staged inputs.
 grafana-util change inspect --dashboard-export-dir ./dashboards/raw --alert-export-dir ./alerts/raw --output-format json
 ```
 
@@ -117,10 +119,12 @@ Key flags: `--workspace`, `--availability-file`, `--target-inventory`, `--mappin
 Examples:
 
 ```bash
+# Purpose: Check whether the staged package looks structurally safe to continue.
 grafana-util change check --workspace . --output-format json
 ```
 
 ```bash
+# Purpose: Check whether the staged package looks structurally safe to continue.
 grafana-util change check --workspace . --fetch-live --availability-file ./availability.json
 ```
 
@@ -137,10 +141,12 @@ Key flags: `--workspace`, `--desired-file`, `--source-bundle`, `--target-invento
 Examples:
 
 ```bash
+# Purpose: Preview what would change from discovered or explicit staged inputs.
 grafana-util change preview --workspace . --fetch-live --profile prod
 ```
 
 ```bash
+# Purpose: Preview what would change from discovered or explicit staged inputs.
 grafana-util change preview --desired-file ./desired.json --live-file ./live.json --output-format json
 ```
 
@@ -155,10 +161,12 @@ When to use: when you need explicit `summary`, `plan`, `review`, `preflight`, `a
 Examples:
 
 ```bash
+# Purpose: Expose lower-level staged contracts and specialized sync workflows.
 grafana-util change advanced review --plan-file ./sync-plan.json --review-note 'peer-reviewed'
 ```
 
 ```bash
+# Purpose: Expose lower-level staged contracts and specialized sync workflows.
 grafana-util change advanced bundle-preflight --source-bundle ./bundle.json --target-inventory ./target.json --output-format json
 ```
 

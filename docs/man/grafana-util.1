@@ -290,6 +290,10 @@ export dashboard and datasource inventory into a local snapshot bundle. Use when
 review a local snapshot inventory without touching Grafana. Use when: Want to inspect an exported snapshot root as table, csv, text, json, yaml, or interactive output.
 .SS dashboard
 .TP
+.B grafana\-util\-dashboard\-history(1)
+List, restore, or export live dashboard revision history for one dashboard UID. Use when: You need to inspect earlier dashboard versions, recover a known\-good revision, or export dashboard history into a reusable artifact for review or CI.
+.SS dashboard
+.TP
 .B grafana\-util\-dashboard\-impact(1)
 Estimate the blast radius of one datasource from dashboard governance artifacts. Use when: You are about to change, migrate, or troubleshoot one datasource and need to know which dashboards and alert resources depend on it before you touch the live system.
 .SS dashboard

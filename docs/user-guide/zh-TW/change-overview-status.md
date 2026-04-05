@@ -5,7 +5,7 @@
 ## 適用對象
 
 - 要先看 live / staged 狀態再決定下一步的人
-- 負責變更審查、preflight 或 apply gate 的人
+- 負責變更審查、check 或 apply gate 的人
 - 需要把 status / overview / change 串成固定流程的人
 
 ## 主要目標
@@ -36,12 +36,12 @@
 如果你現在要查的是指令細節，而不是整段工作流程，直接跳到下面這些指令頁就可以：
 
 - [change](../../commands/zh-TW/change.md)
-- [change summary](../../commands/zh-TW/change.md#summary)
-- [change plan](../../commands/zh-TW/change.md#plan)
+- [change inspect](../../commands/zh-TW/change.md#inspect)
+- [change check](../../commands/zh-TW/change.md#check)
+- [change preview](../../commands/zh-TW/change.md#preview)
 - [change review](../../commands/zh-TW/change.md#review)
 - [change apply](../../commands/zh-TW/change.md#apply)
 - [change audit](../../commands/zh-TW/change.md#audit)
-- [change preflight](../../commands/zh-TW/change.md#preflight)
 - [change assess-alerts](../../commands/zh-TW/change.md#assess-alerts)
 - [change bundle](../../commands/zh-TW/change.md#bundle)
 - [change bundle-preflight](../../commands/zh-TW/change.md#bundle-preflight)
@@ -116,16 +116,16 @@ grafana-util status staged --dashboard-export-dir ./dashboards/raw --alert-expor
 
 管理從 Git 到正式 Grafana 環境的過渡。
 
-### 1. 變更摘要 (Change Summary)
-獲取目前變更包的高階摘要。
+### 1. 變更檢視 (Change Inspect)
+先看目前變更包的高階摘要與輸入形狀。
 ```bash
-# 用途：獲取目前變更包的高階摘要。
-grafana-util change summary --desired-file ./desired.json
+# 用途：先看目前變更包的高階摘要與輸入形狀。
+grafana-util change inspect --desired-file ./desired.json
 ```
 
 ```bash
-# 用途：獲取目前變更包的高階摘要。
-grafana-util change summary --desired-file ./desired.json --output-format json
+# 用途：先看目前變更包的高階摘要與輸入形狀。
+grafana-util change inspect --desired-file ./desired.json --output-format json
 ```
 **預期輸出：**
 ```text
@@ -135,18 +135,18 @@ CHANGE PACKAGE SUMMARY:
 - access: 1 added
 - total impact: 11 operations
 ```
-先用 summary 看整個變更包的規模，再往下看 plan。若總數異常偏大，應先停下來檢查 staged 輸入。
+先用 inspect 看整個變更包的規模與輸入形狀，再往下看 preview。若總數異常偏大，應先停下來檢查 staged 輸入。
 
-### 2. 預檢驗證 (Preflight Validation)
-驗證匯出 / 匯入目錄結構的完整性。
+### 2. 變更檢查 (Change Check)
+驗證匯出 / 匯入目錄結構與 staged readiness。
 ```bash
-# 用途：驗證匯出 / 匯入目錄結構的完整性。
-grafana-util change preflight --desired-file ./desired.json --availability-file ./availability.json
+# 用途：驗證匯出 / 匯入目錄結構與 staged readiness。
+grafana-util change check --desired-file ./desired.json --availability-file ./availability.json
 ```
 
 ```bash
-# 用途：驗證匯出 / 匯入目錄結構的完整性。
-grafana-util change preflight --desired-file ./desired.json --fetch-live --output-format json
+# 用途：驗證匯出 / 匯入目錄結構與 staged readiness。
+grafana-util change check --desired-file ./desired.json --fetch-live --output-format json
 ```
 **預期輸出：**
 ```text
@@ -155,7 +155,7 @@ PREFLIGHT CHECK:
 - datasources: valid (1 inventory found)
 - result: 0 errors, 0 blockers
 ```
-preflight 適合放在規劃或套用前，做結構層的檢查。通過只代表輸入形狀合理，不代表 live 狀態已經完全吻合。
+check 適合放在 preview 或 apply 前，做 staged readiness 與結構層檢查。通過只代表輸入形狀合理，不代表 live 狀態已經完全吻合。
 
 ---
 

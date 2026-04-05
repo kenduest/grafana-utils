@@ -57,22 +57,23 @@
 CLI 內建快速查詢：
 
 - `grafana-util change --help-schema`
-- `grafana-util change plan --help-schema`
+- `grafana-util change preview --help-schema`
 - `grafana-util change apply --help-schema`
-- `grafana-util change audit --help-schema`
+- `grafana-util change advanced audit --help-schema`
 
 常見對應：
 
-- `change summary --output-format json` -> `grafana-utils-sync-summary`
-- `change plan --output-format json` -> `grafana-utils-sync-plan`
-- `change review --output-format json` -> `grafana-utils-sync-plan`
+- `change inspect --output-format json` -> 依輸入類型輸出 staged 變更摘要或 overview 風格的 inspection 結果
+- `change preview --output-format json` -> `grafana-utils-sync-plan`
 - `change apply --output-format json` -> `grafana-utils-sync-apply-intent`
 - `change apply --execute-live --output-format json` -> live apply result
-- `change audit --output-format json` -> `grafana-utils-sync-audit`
-- `change preflight --output-format json` -> `grafana-utils-sync-preflight`
-- `change assess-alerts --output-format json` -> `grafana-utils-alert-sync-plan`
-- `change bundle-preflight --output-format json` -> `grafana-utils-sync-bundle-preflight`
-- `change promotion-preflight --output-format json` -> `grafana-utils-sync-promotion-preflight`
+- `change advanced summary --output-format json` -> `grafana-utils-sync-summary`
+- `change advanced review --output-format json` -> `grafana-utils-sync-plan`
+- `change advanced audit --output-format json` -> `grafana-utils-sync-audit`
+- `change advanced preflight --output-format json` -> `grafana-utils-sync-preflight`
+- `change advanced assess-alerts --output-format json` -> `grafana-utils-alert-sync-plan`
+- `change advanced bundle-preflight --output-format json` -> `grafana-utils-sync-bundle-preflight`
+- `change advanced promotion-preflight --output-format json` -> `grafana-utils-sync-promotion-preflight`
 
 如果你需要每種文件的 top-level 欄位細節，直接看 [change 指令頁](../../commands/zh-TW/change.md) 會最快。
 

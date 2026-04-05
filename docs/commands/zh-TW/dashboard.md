@@ -8,6 +8,7 @@
 | 匯出 / 匯入 / 比對 | `get`、`clone-live`、`export`、`import`、`diff`、`review`、`patch-file`、`publish`、`delete` |
 | 變更前檢查 | `inspect-export`、`inspect-vars`、`governance-gate` |
 | 拓樸與影響面 | `topology`、`impact` |
+| 歷史與還原 | `history list`、`history restore`、`history export` |
 | 截圖與素材 | `screenshot`、`raw-to-prompt` |
 
 ## 從這裡開始
@@ -17,11 +18,23 @@
 - 先做比對：`dashboard diff`、`dashboard review`
 - 先做上線前檢查：`dashboard inspect-export`、`dashboard inspect-vars`、`dashboard governance-gate`
 - 先看影響面：`dashboard topology`、`dashboard impact`
+- 先處理歷史版本：`dashboard history list`、`dashboard history restore`、`dashboard history export`
 - 先拿素材：`dashboard screenshot`、`dashboard raw-to-prompt`
 
 ## 說明
 
 `grafana-util dashboard` 把 dashboard 相關工作收在同一個入口：從瀏覽、草稿、匯出、匯入、比對，到拓樸、影響面和截圖。它也可用 `grafana-util db` 呼叫。
+
+## 歷史與還原工作流
+
+如果你的問題不是「現在這份 dashboard 長什麼樣」，而是「哪個舊版本應該被救回來並變成新的最新版本」，就看這一組。
+
+- [dashboard history](./dashboard-history.md)
+- `dashboard history list`：列出單一 dashboard UID 的最近版本歷史。
+- `dashboard history restore`：把某個歷史版本複製成新的最新 Grafana 版本。
+- `dashboard history export`：把歷史版本匯出成可重用的 JSON 成品，方便審查或 CI。
+
+這條路徑最適合要找回已知可用版本，但不想手動重建 dashboard 的情況。
 
 ## 採用前後對照
 

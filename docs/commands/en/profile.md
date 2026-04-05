@@ -59,7 +59,7 @@ grafana-util profile example --mode full
 grafana-util profile init --overwrite
 ```
 
-Related commands: `grafana-util status live`, `grafana-util overview live`, `grafana-util change plan`.
+Related commands: `grafana-util status live`, `grafana-util overview live`, `grafana-util change preview`.
 
 ## `list`
 

@@ -66,6 +66,7 @@
 - [dashboard governance-gate](./dashboard-governance-gate.md)
 - [dashboard topology](./dashboard-topology.md)
 - [dashboard impact](./dashboard-impact.md)
+- [dashboard history](./dashboard-history.md)
 - [dashboard screenshot](./dashboard-screenshot.md)
 
 ## Datasource

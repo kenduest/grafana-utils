@@ -31,6 +31,17 @@
 - 如果 inspect 顯示查詢或變數缺失，先處理這些問題，再進入匯入流程。
 - 如果你說不出 screenshot 或 topology 在證明什麼，可能是開錯工作流了。
 
+## 歷史與還原工作流
+
+當您要找回一個已知可用的 dashboard 版本時，請直接走 history 這條路，不要手動重建 JSON。
+
+- [dashboard history](../../commands/zh-TW/dashboard-history.md)
+- `dashboard history list`：列出單一 dashboard UID 的最近版本歷史。
+- `dashboard history restore`：把某個歷史版本複製成新的最新 Grafana revision。
+- `dashboard history export`：把版本歷史匯出成可重用的成品，方便審查或 CI。
+
+還原不是破壞性覆蓋。您選到的舊版本會繼續保留在 history 裡，而還原出來的副本會變成新的最新版本。
+
 > **維運優先設計**：本工具把 Dashboard 視為版本控制資產。目標是讓搬移、比對與審查流程更安全，並在變更碰到即時環境前先看清楚會發生什麼事。
 
 ## 🔗 指令頁面
@@ -53,6 +64,7 @@
 - [dashboard inspect-export](../../commands/zh-TW/dashboard-inspect-export.md)
 - [dashboard inspect-live](../../commands/zh-TW/dashboard-inspect-live.md)
 - [dashboard inspect-vars](../../commands/zh-TW/dashboard-inspect-vars.md)
+- [dashboard history](../../commands/zh-TW/dashboard-history.md)
 - [dashboard governance-gate](../../commands/zh-TW/dashboard-governance-gate.md)
 - [dashboard topology](../../commands/zh-TW/dashboard-topology.md)
 - [dashboard screenshot](../../commands/zh-TW/dashboard-screenshot.md)
