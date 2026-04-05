@@ -6,8 +6,13 @@ use std::thread;
 use std::time::Duration;
 
 use crate::grafana_api::connection::auth_mode_from_headers;
-use crate::grafana_api::{AccessResourceClient, AuthInputs, GrafanaApiClient, GrafanaConnection};
+use crate::grafana_api::{
+    AccessResourceClient, AuthInputs, GrafanaApiClient, GrafanaConnection, SyncLiveClient,
+};
 use crate::profile_config::ConnectionMergeInput;
+use crate::sync::live::{
+    execute_live_apply_with_client, fetch_live_availability_with_client, SyncApplyOperation,
+};
 use serde_json::json;
 
 fn http_response(status: &str, body: &str) -> String {
@@ -229,6 +234,79 @@ fn access_resource_client_lists_orgs_and_current_org() {
     assert_eq!(requests.len(), 2);
     assert!(requests[0].starts_with("GET /api/org "));
     assert!(requests[1].starts_with("GET /api/orgs "));
+}
+
+#[test]
+fn sync_live_client_fetches_availability_with_shared_transport() {
+    let responses = vec![
+        http_response(
+            "200 OK",
+            r#"[{"uid":"prom-main","name":"Prometheus Main"}]"#,
+        ),
+        http_response("200 OK", r#"[{"id":"prometheus"}]"#),
+        http_response(
+            "200 OK",
+            r#"[{"uid":"cp-main","name":"PagerDuty Primary"}]"#,
+        ),
+    ];
+    let (base_url, requests, handle) = spawn_sequence_server(responses);
+    let api = build_test_api(base_url);
+    let client = SyncLiveClient::new(&api);
+
+    let availability = fetch_live_availability_with_client(&client).unwrap();
+
+    handle.join().unwrap();
+
+    assert_eq!(availability["datasourceUids"], json!(["prom-main"]));
+    assert_eq!(availability["pluginIds"], json!(["prometheus"]));
+    assert_eq!(
+        availability["contactPoints"],
+        json!(["PagerDuty Primary", "cp-main"])
+    );
+
+    let requests = requests.lock().unwrap().clone();
+    assert_eq!(requests.len(), 3);
+    assert!(requests[0].starts_with("GET /api/datasources "));
+    assert!(requests[1].starts_with("GET /api/plugins "));
+    assert!(requests[2].starts_with("GET /api/v1/provisioning/contact-points "));
+}
+
+#[test]
+fn sync_live_client_applies_alert_create_with_shared_transport() {
+    let responses = vec![http_response(
+        "200 OK",
+        r#"{"uid":"cpu-high","status":"created"}"#,
+    )];
+    let (base_url, requests, handle) = spawn_sequence_server(responses);
+    let api = build_test_api(base_url);
+    let client = SyncLiveClient::new(&api);
+    let operations = vec![SyncApplyOperation {
+        kind: "alert".to_string(),
+        identity: "cpu-high".to_string(),
+        action: "would-create".to_string(),
+        desired: serde_json::json!({
+            "uid": "cpu-high",
+            "title": "CPU High",
+            "folderUID": "general",
+            "ruleGroup": "CPU Alerts",
+            "condition": "A",
+            "data": [{"refId": "A"}]
+        })
+        .as_object()
+        .expect("alert payload should be an object")
+        .clone(),
+    }];
+
+    let result = execute_live_apply_with_client(&client, &operations, false, false).unwrap();
+
+    handle.join().unwrap();
+
+    assert_eq!(result["mode"], json!("live-apply"));
+    assert_eq!(result["appliedCount"], json!(1));
+
+    let requests = requests.lock().unwrap().clone();
+    assert_eq!(requests.len(), 1);
+    assert!(requests[0].starts_with("POST /api/v1/provisioning/alert-rules "));
 }
 
 #[test]

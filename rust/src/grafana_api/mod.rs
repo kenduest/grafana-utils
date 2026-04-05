@@ -10,6 +10,8 @@ mod client;
 mod connection;
 mod dashboard;
 mod datasource;
+pub(crate) mod project_status_live;
+mod sync_live;
 
 pub(crate) use access::AccessResourceClient;
 pub(crate) use alerting::{
@@ -19,6 +21,13 @@ pub(crate) use client::GrafanaApiClient;
 pub(crate) use connection::{AuthInputs, GrafanaConnection};
 pub(crate) use dashboard::DashboardResourceClient;
 pub(crate) use datasource::DatasourceResourceClient;
+#[cfg(test)]
+pub(crate) use sync_live::{
+    execute_live_apply_with_request as execute_sync_live_apply_with_request,
+    fetch_live_availability_with_request as fetch_sync_live_availability_with_request,
+    fetch_live_resource_specs_with_request as fetch_sync_live_resource_specs_with_request,
+};
+pub(crate) use sync_live::{merge_availability as merge_sync_live_availability, SyncLiveClient};
 
 #[cfg(test)]
 #[path = "tests.rs"]
