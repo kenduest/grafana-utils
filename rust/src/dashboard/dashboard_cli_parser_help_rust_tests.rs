@@ -715,6 +715,29 @@ fn parse_cli_supports_patch_file_command() {
 }
 
 #[test]
+fn parse_cli_supports_patch_file_stdin_input() {
+    let args = parse_cli_from([
+        "grafana-util",
+        "patch-file",
+        "--input",
+        "-",
+        "--output",
+        "./drafts/cpu-main.json",
+    ]);
+
+    match args.command {
+        DashboardCommand::PatchFile(patch_args) => {
+            assert_eq!(patch_args.input, PathBuf::from("-"));
+            assert_eq!(
+                patch_args.output,
+                Some(PathBuf::from("./drafts/cpu-main.json"))
+            );
+        }
+        _ => panic!("expected patch-file command"),
+    }
+}
+
+#[test]
 fn parse_cli_supports_publish_command() {
     let args = parse_cli_from([
         "grafana-util",
@@ -744,8 +767,46 @@ fn parse_cli_supports_publish_command() {
             assert_eq!(publish_args.folder_uid.as_deref(), Some("infra"));
             assert_eq!(publish_args.message, "Promote CPU dashboard");
             assert!(publish_args.dry_run);
+            assert!(!publish_args.watch);
             assert!(publish_args.table);
             assert!(!publish_args.json);
+        }
+        _ => panic!("expected publish command"),
+    }
+}
+
+#[test]
+fn parse_cli_supports_publish_watch_and_stdin_input() {
+    let watch_args = parse_cli_from([
+        "grafana-util",
+        "publish",
+        "--url",
+        "https://grafana.example.com",
+        "--input",
+        "./drafts/cpu-main.json",
+        "--watch",
+    ]);
+    let stdin_args = parse_cli_from([
+        "grafana-util",
+        "publish",
+        "--url",
+        "https://grafana.example.com",
+        "--input",
+        "-",
+    ]);
+
+    match watch_args.command {
+        DashboardCommand::Publish(publish_args) => {
+            assert_eq!(publish_args.input, PathBuf::from("./drafts/cpu-main.json"));
+            assert!(publish_args.watch);
+        }
+        _ => panic!("expected publish command"),
+    }
+
+    match stdin_args.command {
+        DashboardCommand::Publish(publish_args) => {
+            assert_eq!(publish_args.input, PathBuf::from("-"));
+            assert!(!publish_args.watch);
         }
         _ => panic!("expected publish command"),
     }
@@ -772,6 +833,7 @@ fn patch_file_help_mentions_in_place_and_output_paths() {
     assert!(help.contains("--tag"));
     assert!(help.contains("Patch a raw export file in place"));
     assert!(help.contains("Patch one draft file into a new output path"));
+    assert!(help.contains("Patch one dashboard from standard input into an explicit output file"));
 }
 
 #[test]
@@ -856,6 +918,8 @@ fn review_help_mentions_local_file_only_output_modes() {
     assert!(help.contains("yaml"));
     assert!(help.contains("Review one local dashboard JSON file without touching Grafana."));
     assert!(help.contains("grafana-util dashboard review"));
+    assert!(help.contains("standard input"));
+    assert!(help.contains("Review one generated dashboard from standard input"));
 }
 
 #[test]
@@ -865,9 +929,12 @@ fn publish_help_mentions_dry_run_preview() {
     assert!(help.contains("--folder-uid"));
     assert!(help.contains("--message"));
     assert!(help.contains("--dry-run"));
+    assert!(help.contains("--watch"));
     assert!(help.contains("--table"));
     assert!(help.contains("Publish one draft file to the current Grafana org"));
     assert!(help.contains("Preview the same publish without writing to Grafana"));
+    assert!(help.contains("Publish one generated dashboard from standard input"));
+    assert!(help.contains("Watch one local draft file and rerun dry-run after each save"));
 }
 
 #[test]

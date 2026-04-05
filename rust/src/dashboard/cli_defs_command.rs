@@ -517,7 +517,7 @@ pub struct ImportArgs {
 pub struct PatchFileArgs {
     #[arg(
         long,
-        help = "Input dashboard JSON file to patch. The file may be a wrapped export document or a bare dashboard object."
+        help = "Input dashboard JSON file to patch. Use - to read one wrapped or bare dashboard JSON document from standard input."
     )]
     pub input: PathBuf,
     #[arg(
@@ -551,7 +551,7 @@ pub struct PatchFileArgs {
 pub struct ReviewArgs {
     #[arg(
         long,
-        help = "Input dashboard JSON file to review locally. Review never contacts Grafana."
+        help = "Input dashboard JSON file to review locally. Use - to read one wrapped or bare dashboard JSON document from standard input. Review never contacts Grafana."
     )]
     pub input: PathBuf,
     #[arg(
@@ -583,7 +583,7 @@ pub struct PublishArgs {
     pub common: CommonCliArgs,
     #[arg(
         long,
-        help = "Dashboard JSON file to stage and publish. The file may be a wrapped export document or a bare dashboard object."
+        help = "Dashboard JSON file to stage and publish. Use - to read one wrapped or bare dashboard JSON document from standard input."
     )]
     pub input: PathBuf,
     #[arg(
@@ -609,6 +609,12 @@ pub struct PublishArgs {
         help = "Preview the publish through the existing import dry-run flow without changing Grafana."
     )]
     pub dry_run: bool,
+    #[arg(
+        long,
+        default_value_t = false,
+        help = "Watch the local input file and rerun publish or dry-run each time it changes. This only supports file input, not --input -."
+    )]
+    pub watch: bool,
     #[arg(
         long,
         default_value_t = false,
@@ -986,19 +992,19 @@ pub enum DashboardCommand {
     #[command(
         name = "patch-file",
         about = "Patch one local dashboard JSON file in place or to a new path.",
-        after_help = "Examples:\n\n  Patch a raw export file in place:\n    grafana-util dashboard patch-file --input ./dashboards/raw/cpu-main.json --name 'CPU Overview' --folder-uid infra --tag prod --tag sre\n\n  Patch one draft file into a new output path:\n    grafana-util dashboard patch-file --input ./drafts/cpu-main.json --output ./drafts/cpu-main-patched.json --uid cpu-main --message 'Add folder metadata before publish'"
+        after_help = "Examples:\n\n  Patch a raw export file in place:\n    grafana-util dashboard patch-file --input ./dashboards/raw/cpu-main.json --name 'CPU Overview' --folder-uid infra --tag prod --tag sre\n\n  Patch one draft file into a new output path:\n    grafana-util dashboard patch-file --input ./drafts/cpu-main.json --output ./drafts/cpu-main-patched.json --uid cpu-main --message 'Add folder metadata before publish'\n\n  Patch one dashboard from standard input into an explicit output file:\n    jsonnet dashboards/cpu.jsonnet | grafana-util dashboard patch-file --input - --output ./drafts/cpu-main.json --folder-uid infra"
     )]
     PatchFile(PatchFileArgs),
     #[command(
         name = "review",
         about = "Review one local dashboard JSON file without touching Grafana.",
-        after_help = "Examples:\n\n  Review one local dashboard file in text mode:\n    grafana-util dashboard review --input ./drafts/cpu-main.json\n\n  Review one local dashboard file as YAML:\n    grafana-util dashboard review --input ./drafts/cpu-main.json --output-format yaml"
+        after_help = "Examples:\n\n  Review one local dashboard file in text mode:\n    grafana-util dashboard review --input ./drafts/cpu-main.json\n\n  Review one local dashboard file as YAML:\n    grafana-util dashboard review --input ./drafts/cpu-main.json --output-format yaml\n\n  Review one generated dashboard from standard input:\n    jsonnet dashboards/cpu.jsonnet | grafana-util dashboard review --input - --output-format json"
     )]
     Review(ReviewArgs),
     #[command(
         name = "publish",
         about = "Publish one local dashboard JSON file through the existing dashboard import pipeline.",
-        after_help = "Examples:\n\n  Publish one draft file to the current Grafana org:\n    grafana-util dashboard publish --url http://localhost:3000 --basic-user admin --basic-password admin --input ./drafts/cpu-main.json --folder-uid infra --message 'Promote CPU dashboard'\n\n  Preview the same publish without writing to Grafana:\n    grafana-util dashboard publish --url http://localhost:3000 --basic-user admin --basic-password admin --input ./drafts/cpu-main.json --dry-run --table"
+        after_help = "Examples:\n\n  Publish one draft file to the current Grafana org:\n    grafana-util dashboard publish --url http://localhost:3000 --basic-user admin --basic-password admin --input ./drafts/cpu-main.json --folder-uid infra --message 'Promote CPU dashboard'\n\n  Preview the same publish without writing to Grafana:\n    grafana-util dashboard publish --url http://localhost:3000 --basic-user admin --basic-password admin --input ./drafts/cpu-main.json --dry-run --table\n\n  Publish one generated dashboard from standard input:\n    jsonnet dashboards/cpu.jsonnet | grafana-util dashboard publish --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --input - --replace-existing\n\n  Watch one local draft file and rerun dry-run after each save:\n    grafana-util dashboard publish --url http://localhost:3000 --basic-user admin --basic-password admin --input ./drafts/cpu-main.json --dry-run --watch"
     )]
     Publish(PublishArgs),
     #[command(

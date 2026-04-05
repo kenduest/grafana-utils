@@ -1,9 +1,12 @@
 //! Dashboard authoring regression tests for local patch and publish wrappers.
 use super::make_common_args;
-use crate::dashboard::authoring::publish_dashboard_with_request;
+use crate::dashboard::authoring::{
+    load_dashboard_input_document_from_reader, publish_dashboard_with_request,
+};
 use crate::dashboard::{patch_dashboard_file, PatchFileArgs, PublishArgs};
 use serde_json::{json, Value};
 use std::fs;
+use std::io::Cursor;
 use std::sync::{Arc, Mutex};
 use tempfile::tempdir;
 
@@ -116,6 +119,7 @@ fn publish_dashboard_with_request_posts_staged_single_file() {
         folder_uid: Some("infra".to_string()),
         message: "Promote CPU dashboard".to_string(),
         dry_run: false,
+        watch: false,
         table: false,
         json: false,
     };
@@ -152,4 +156,64 @@ fn publish_dashboard_with_request_posts_staged_single_file() {
     assert_eq!(payloads[0]["folderUid"], "infra");
     assert_eq!(payloads[0]["overwrite"], true);
     assert_eq!(payloads[0]["message"], "Promote CPU dashboard");
+}
+
+#[test]
+fn patch_dashboard_file_rejects_stdin_without_output() {
+    let error = patch_dashboard_file(&PatchFileArgs {
+        input: std::path::PathBuf::from("-"),
+        output: None,
+        name: Some("CPU Overview".to_string()),
+        uid: None,
+        folder_uid: None,
+        message: None,
+        tags: Vec::new(),
+    })
+    .unwrap_err();
+
+    assert!(error
+        .to_string()
+        .contains("patch-file --input - requires --output"));
+}
+
+#[test]
+fn load_dashboard_input_document_from_reader_supports_stdin_style_payloads() {
+    let loaded = load_dashboard_input_document_from_reader(
+        Cursor::new(
+            serde_json::to_string(&json!({
+                "uid": "cpu-main",
+                "title": "CPU Overview",
+                "schemaVersion": 38,
+                "panels": []
+            }))
+            .unwrap(),
+        ),
+        "<stdin>",
+        std::path::PathBuf::from("<stdin>"),
+    )
+    .unwrap();
+
+    assert_eq!(loaded.display_label, "<stdin>");
+    assert_eq!(loaded.validation_path, std::path::PathBuf::from("<stdin>"));
+    assert_eq!(loaded.document["uid"], "cpu-main");
+}
+
+#[test]
+fn publish_dashboard_with_request_rejects_watch_with_stdin() {
+    let args = PublishArgs {
+        common: make_common_args("http://127.0.0.1:3000".to_string()),
+        input: std::path::PathBuf::from("-"),
+        replace_existing: true,
+        folder_uid: Some("infra".to_string()),
+        message: "Promote CPU dashboard".to_string(),
+        dry_run: true,
+        watch: true,
+        table: false,
+        json: false,
+    };
+
+    let error = publish_dashboard_with_request(|_, _, _, _| Ok(None), &args).unwrap_err();
+    assert!(error
+        .to_string()
+        .contains("--watch cannot be combined with --input -"));
 }
