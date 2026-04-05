@@ -174,6 +174,13 @@ make man-check
 make html-check
 ```
 
+Live dashboard authoring validation:
+
+- `make test-rust-live`
+  - runs the repo-owned Docker-backed Rust live smoke path
+  - now includes dashboard stdin review/patch/publish coverage plus `publish --watch` recovery behavior
+  - treat this as the maintained end-to-end validation entrypoint for the dashboard authoring lane instead of ad hoc one-off localhost checks
+
 Release and artifact guidance:
 
 - keep version bumps and release validation in the standard maintainer flow documented by the `Makefile`, repo scripts, and release notes
@@ -186,6 +193,12 @@ Browser-enabled build policy:
 - the default Rust build should stay lean and omit the `browser` feature
 - browser support is an explicit secondary build lane
 - only the `*-browser` build targets and release assets should include `headless_chrome`
+
+Dashboard watch implementation policy:
+
+- keep `dashboard publish --watch` as a repo-owned polling watcher for now
+- do not switch to an event-based watcher unless repeated live usage shows a concrete polling problem such as missed saves, unacceptable latency, or platform-specific instability
+- if that lane ever changes, preserve the current operator-facing behavior: local-file-only scope, stdin rejection, transient-failure recovery, and explicit status messages
 
 ## High-Signal Project Rules
 

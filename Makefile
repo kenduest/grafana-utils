@@ -73,7 +73,7 @@ help:
 	printf '  %b\n' "$${GREEN}make seed-grafana-sample-data$${RESET}  Seed a local Grafana with reusable developer sample orgs, datasources, folders, and dashboards"; \
 	printf '  %b\n' "$${GREEN}make destroy-grafana-sample-data$${RESET}  Remove the developer sample orgs, datasources, folders, and dashboards seeded by the repo script"; \
 	printf '  %b%s%b%s\n' "$${GREEN}make reset-grafana-all-data$${RESET}  " "$${YELLOW}Danger:$${RESET}" " " "delete repo-relevant test data from a disposable local Grafana instance"; \
-	printf '  %b\n' "$${GREEN}make test-rust-live$${RESET}  Start Grafana in Docker and run the Rust live smoke test"; \
+	printf '  %b\n' "$${GREEN}make test-rust-live$${RESET}  Start Grafana in Docker and run the Rust live smoke test, including dashboard stdin/watch authoring"; \
 	printf '  %b\n' "$${GREEN}make test-sync-live$${RESET}  Start Grafana in Docker and run the Rust sync live smoke path"; \
 	printf '  %b\n' "$${GREEN}make test-alert-live$${RESET}  Start Grafana in Docker and run the Rust alert live smoke path"; \
 	printf '  %b\n' "$${GREEN}make test-alert-live-artifact$${RESET}  Start Grafana in Docker and run the Rust alert artifact live smoke path"; \

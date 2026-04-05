@@ -194,8 +194,6 @@ grafana-util dashboard publish \
   --watch
 ```
 
-這條路適合從單一 dashboard 草稿開始的工作，而不是整棵 export tree。`patch-file --input -` 必須搭配 `--output`，`publish --watch` 也只接受本地檔案路徑。另外，如果你把 `--folder-uid` 指到 Grafana 預設的 General folder，`grafana-util` 現在會把它正規化回 root/default publish 路徑，而不是硬送出字面上的 `general` folder UID。
-
 ### 6. 告警變更先審查，再套用
 
 ```bash

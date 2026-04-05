@@ -149,6 +149,27 @@ fn current_file_watch_fingerprint(path: &Path) -> Result<Option<FileWatchFingerp
     }
 }
 
+pub(crate) fn watch_start_message(path: &Path) -> String {
+    format!(
+        "Watching {} for dashboard publish changes. Press Ctrl-C to stop.",
+        path.display()
+    )
+}
+
+pub(crate) fn watch_change_detected_message(path: &Path) -> String {
+    format!(
+        "Detected dashboard input change for {}; waiting for a stable save.",
+        path.display()
+    )
+}
+
+pub(crate) fn watch_change_unstable_message(path: &Path) -> String {
+    format!(
+        "Dashboard input changed again before it stabilized; still watching {}.",
+        path.display()
+    )
+}
+
 fn set_meta_folder_uid(document: &mut Map<String, Value>, folder_uid: &str) -> Result<()> {
     if folder_uid.is_empty() {
         return Ok(());
@@ -553,10 +574,7 @@ where
 fn watch_publish_dashboard_with_client(client: &JsonHttpClient, args: &PublishArgs) -> Result<()> {
     validate_publish_args(args)?;
     let input_path = &args.input;
-    eprintln!(
-        "Watching {} for dashboard publish changes. Press Ctrl-C to stop.",
-        input_path.display()
-    );
+    eprintln!("{}", watch_start_message(input_path));
 
     match publish_dashboard_once_with_request(
         &mut |method, path, params, payload| client.request_json(method, path, params, payload),
@@ -574,19 +592,13 @@ fn watch_publish_dashboard_with_client(client: &JsonHttpClient, args: &PublishAr
             continue;
         }
 
-        eprintln!(
-            "Detected dashboard input change for {}; waiting for a stable save.",
-            input_path.display()
-        );
+        eprintln!("{}", watch_change_detected_message(input_path));
 
         thread::sleep(Duration::from_millis(300));
         let stabilized = current_file_watch_fingerprint(input_path)?;
         if stabilized != current {
             last_seen = stabilized;
-            eprintln!(
-                "Dashboard input changed again before it stabilized; still watching {}.",
-                input_path.display()
-            );
+            eprintln!("{}", watch_change_unstable_message(input_path));
             continue;
         }
 

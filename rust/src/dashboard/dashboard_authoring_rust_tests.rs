@@ -2,6 +2,7 @@
 use super::make_common_args;
 use crate::dashboard::authoring::{
     load_dashboard_input_document_from_reader, publish_dashboard_with_request,
+    watch_change_detected_message, watch_change_unstable_message, watch_start_message,
 };
 use crate::dashboard::{patch_dashboard_file, PatchFileArgs, PublishArgs};
 use serde_json::{json, Value};
@@ -270,4 +271,22 @@ fn publish_dashboard_with_request_rejects_watch_with_stdin() {
     assert!(error
         .to_string()
         .contains("--watch cannot be combined with --input -"));
+}
+
+#[test]
+fn watch_status_messages_match_expected_operator_text() {
+    let input = std::path::PathBuf::from("/tmp/cpu-main.json");
+
+    assert_eq!(
+        watch_start_message(&input),
+        "Watching /tmp/cpu-main.json for dashboard publish changes. Press Ctrl-C to stop."
+    );
+    assert_eq!(
+        watch_change_detected_message(&input),
+        "Detected dashboard input change for /tmp/cpu-main.json; waiting for a stable save."
+    );
+    assert_eq!(
+        watch_change_unstable_message(&input),
+        "Dashboard input changed again before it stabilized; still watching /tmp/cpu-main.json."
+    );
 }

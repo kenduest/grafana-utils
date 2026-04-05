@@ -2564,7 +2564,7 @@ run_alert_authoring_smoke() {
     --url "${GRAFANA_URL}" \
     --token "${GRAFANA_API_TOKEN}" \
     --desired-dir "${desired_dir}" \
-    --output json >"${plan_create_json}"
+    --output-format json >"${plan_create_json}"
   jq -e --arg cp "${authoring_contact_name}" --arg rule "${authoring_rule_name}" '
     (.rows | any(.kind == "grafana-contact-point" and .identity == $cp and .action == "create"))
     and (.rows | any(.kind == "grafana-alert-rule" and .identity == $rule and .action == "create"))
@@ -2578,7 +2578,7 @@ run_alert_authoring_smoke() {
     --token "${GRAFANA_API_TOKEN}" \
     --plan-file "${plan_create_json}" \
     --approve \
-    --output json >"${apply_create_json}"
+    --output-format json >"${apply_create_json}"
   jq -e --arg cp "${authoring_contact_name}" --arg rule "${authoring_rule_name}" '
     (.appliedCount >= 3)
     and (.results | any(.kind == "grafana-contact-point" and .identity == $cp and .action == "create"))
@@ -2597,7 +2597,7 @@ run_alert_authoring_smoke() {
     --url "${GRAFANA_URL}" \
     --token "${GRAFANA_API_TOKEN}" \
     --desired-dir "${desired_dir}" \
-    --output json >"${plan_post_apply_json}"
+    --output-format json >"${plan_post_apply_json}"
   jq -e --arg cp "${authoring_contact_name}" --arg rule "${authoring_rule_name}" '
     (.rows | any(.kind == "grafana-contact-point" and .identity == $cp and .action == "noop"))
     and (.rows | any(.kind == "grafana-notification-policies" and .identity == $cp and .action == "noop"))
@@ -2613,7 +2613,7 @@ run_alert_authoring_smoke() {
     --token "${GRAFANA_API_TOKEN}" \
     --desired-dir "${desired_dir}" \
     --prune \
-    --output json >"${plan_delete_json}"
+    --output-format json >"${plan_delete_json}"
   jq -e --arg rule "${authoring_rule_name}" '
     (.rows | any(.kind == "grafana-alert-rule" and .identity == $rule and .action == "delete" and .reason == "missing-from-desired-state"))
   ' "${plan_delete_json}" >/dev/null \
@@ -2625,7 +2625,7 @@ run_alert_authoring_smoke() {
     --token "${GRAFANA_API_TOKEN}" \
     --plan-file "${plan_delete_json}" \
     --approve \
-    --output json >"${apply_delete_json}"
+    --output-format json >"${apply_delete_json}"
   jq -e --arg rule "${authoring_rule_name}" '
     (.results | any(.kind == "grafana-alert-rule" and .identity == $rule and .action == "delete"))
   ' "${apply_delete_json}" >/dev/null \
@@ -2662,11 +2662,11 @@ prepare_sync_smoke_fixture() {
 run_sync_smoke() {
   prepare_sync_smoke_fixture
 
-  "$(sync_bin)" sync bundle \
+  "$(sync_bin)" change advanced bundle \
     --dashboard-export-dir "${DASHBOARD_EXPORT_DIR}/raw" \
     --alert-export-dir "${ALERT_EXPORT_DIR}/raw" \
     --output-file "${SYNC_BUNDLE_FILE}" \
-    --output json >/dev/null
+    --output-format json >/dev/null
 
   [[ -f "${SYNC_BUNDLE_FILE}" ]] || fail "sync bundle did not write source bundle output"
   jq -e '.kind == "grafana-utils-sync-source-bundle"' "${SYNC_BUNDLE_FILE}" >/dev/null \
@@ -2678,10 +2678,10 @@ run_sync_smoke() {
 
   printf '{}\n' >"${SYNC_TARGET_INVENTORY_FILE}"
 
-  "$(sync_bin)" sync bundle-preflight \
+  "$(sync_bin)" change advanced bundle-preflight \
     --source-bundle "${SYNC_BUNDLE_FILE}" \
     --target-inventory "${SYNC_TARGET_INVENTORY_FILE}" \
-    --output json >"${SYNC_BUNDLE_PREFLIGHT_FILE}"
+    --output-format json >"${SYNC_BUNDLE_PREFLIGHT_FILE}"
 
   jq -e '.kind == "grafana-utils-sync-bundle-preflight"' "${SYNC_BUNDLE_PREFLIGHT_FILE}" >/dev/null \
     || fail "sync bundle-preflight did not emit the expected document kind"

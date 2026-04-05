@@ -194,8 +194,6 @@ grafana-util dashboard publish \
   --watch
 ```
 
-Use this lane when the work starts from one dashboard draft instead of a full export tree. `patch-file --input -` requires `--output`, and `publish --watch` only accepts a local file path. If you point `--folder-uid` at Grafana's default General folder, `grafana-util` now normalizes that back to the root/default publish path instead of sending a literal `general` folder UID.
-
 ### 6. Review alerting changes before apply
 
 ```bash
