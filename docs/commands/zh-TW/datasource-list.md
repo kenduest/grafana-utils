@@ -17,7 +17,15 @@
 ```bash
 # 用途：列出線上 Grafana datasource inventory。
 grafana-util datasource list --profile prod --output-format text
+```
+
+```bash
+# 用途：列出線上 Grafana datasource inventory。
 grafana-util datasource list --url http://localhost:3000 --basic-user admin --basic-password admin --all-orgs --output-format yaml
+```
+
+```bash
+# 用途：列出線上 Grafana datasource inventory。
 grafana-util datasource list --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --json
 ```
 

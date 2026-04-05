@@ -18,6 +18,10 @@
 ```bash
 # 用途：將線上 Grafana datasource inventory 匯出成標準化 JSON 與 provisioning 檔案。
 grafana-util datasource export --url http://localhost:3000 --basic-user admin --basic-password admin --export-dir ./datasources --overwrite
+```
+
+```bash
+# 用途：將線上 Grafana datasource inventory 匯出成標準化 JSON 與 provisioning 檔案。
 grafana-util datasource export --url http://localhost:3000 --basic-user admin --basic-password admin --all-orgs --export-dir ./datasources --overwrite
 ```
 

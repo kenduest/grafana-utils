@@ -14,6 +14,10 @@ Use this when you want a concise live-versus-local difference report before impo
 ```bash
 # Purpose: Compare datasource inventory from a local bundle against live Grafana and print an operator-summary diff report.
 grafana-util datasource diff --url http://localhost:3000 --basic-user admin --basic-password admin --diff-dir ./datasources --input-format inventory
+```
+
+```bash
+# Purpose: Compare datasource inventory from a local bundle against live Grafana and print an operator-summary diff report.
 grafana-util datasource diff --profile prod --diff-dir ./datasources/provisioning --input-format provisioning
 ```
 

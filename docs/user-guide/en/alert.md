@@ -92,7 +92,7 @@ Use `plan` to build a preview of the delta between your local files and live Gra
 grafana-util alert plan \
   --url http://localhost:3000 \
   --basic-user admin --basic-password admin \
-  --desired-dir ./alerts/desired --prune --output json
+  --desired-dir ./alerts/desired --prune --output-format json
 ```
 
 **How to Read the Plan Output:**
@@ -106,7 +106,7 @@ Only execute after the plan has been reviewed and saved.
 # Purpose: Only execute after the plan has been reviewed and saved.
 grafana-util alert apply \
   --plan-file ./alert-plan-reviewed.json \
-  --approve --output json
+  --approve --output-format json
 ```
 
 ---
@@ -117,7 +117,7 @@ grafana-util alert apply \
 | :--- | :--- |
 | **List Rules** | `grafana-util alert list-rules --all-orgs --table` |
 | **Export** | `grafana-util alert export --export-dir ./alerts --overwrite` |
-| **Plan** | `grafana-util alert plan --desired-dir ./alerts/desired --prune --output json` |
+| **Plan** | `grafana-util alert plan --desired-dir ./alerts/desired --prune --output-format json` |
 | **Apply** | `grafana-util alert apply --plan-file ./plan.json --approve` |
 | **Set Route** | `grafana-util alert set-route --desired-dir ./alerts/desired --receiver pagerduty` |
 | **New Rule** | `grafana-util alert new-rule --name <NAME> --folder <FOLDER> --output <FILE>` |
@@ -131,7 +131,7 @@ grafana-util alert apply \
 ### 1. Alert Plan Excerpt
 ```bash
 # Purpose: 1. Alert Plan Excerpt.
-grafana-util alert plan --desired-dir ./alerts/desired --prune --output json
+grafana-util alert plan --desired-dir ./alerts/desired --prune --output-format json
 ```
 **Output Excerpt:**
 ```json

@@ -26,7 +26,15 @@ List, browse, create, modify, export, import, diff, or delete Grafana users.
 ```bash
 # Purpose: List, browse, create, modify, export, import, diff, or delete Grafana users.
 grafana-util access user list --url http://localhost:3000 --basic-user admin --basic-password admin --scope org --output-format text
+```
+
+```bash
+# Purpose: List, browse, create, modify, export, import, diff, or delete Grafana users.
 grafana-util access user add --url http://localhost:3000 --basic-user admin --basic-password admin --login alice --email alice@example.com --name Alice --password secret
+```
+
+```bash
+# Purpose: List, browse, create, modify, export, import, diff, or delete Grafana users.
 grafana-util access user delete --url http://localhost:3000 --basic-user admin --basic-password admin --login temp-user --scope global --yes --json
 ```
 

@@ -62,10 +62,26 @@ profile 的價值是把重複的連線資訊收斂起來，不是代表前面那
 ```bash
 # 用途：建議先執行的 5 個指令。
 grafana-util --version
-grafana-util status live --url http://localhost:3000 --basic-user admin --prompt-password --output yaml
+```
+
+```bash
+# 用途：建議先執行的 5 個指令。
+grafana-util status live --url http://localhost:3000 --basic-user admin --prompt-password --output-format yaml
+```
+
+```bash
+# 用途：建議先執行的 5 個指令。
 grafana-util profile init --overwrite
+```
+
+```bash
+# 用途：建議先執行的 5 個指令。
 grafana-util profile add dev --url http://127.0.0.1:3000 --basic-user admin --prompt-password
-grafana-util status live --profile dev --output yaml
+```
+
+```bash
+# 用途：建議先執行的 5 個指令。
+grafana-util status live --profile dev --output-format yaml
 ```
 
 這個順序不是隨便排的：
@@ -80,14 +96,14 @@ grafana-util status live --profile dev --output yaml
 
 ```bash
 # 用途：如果你暫時還沒有 profile，這就是最短的安全起手式。
-grafana-util status live --url http://localhost:3000 --basic-user admin --prompt-password --output yaml
+grafana-util status live --url http://localhost:3000 --basic-user admin --prompt-password --output-format yaml
 ```
 
 如果你手邊已有範圍明確的 token，也可以直接做同一類唯讀檢查：
 
 ```bash
 # 用途：如果你手邊已有範圍明確的 token，也可以直接做同一類唯讀檢查。
-grafana-util overview live --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output json
+grafana-util overview live --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-format json
 ```
 
 如果你的 shell 已經有環境變數，也可以不先建 profile，直接這樣跑：
@@ -96,7 +112,7 @@ grafana-util overview live --url http://localhost:3000 --token "$GRAFANA_API_TOK
 # 用途：如果你的 shell 已經有環境變數，也可以不先建 profile，直接這樣跑。
 export GRAFANA_USERNAME=admin
 export GRAFANA_PASSWORD=admin
-grafana-util status live --url http://localhost:3000 --output yaml
+grafana-util status live --url http://localhost:3000 --output-format yaml
 ```
 
 ## 學習進度檢核

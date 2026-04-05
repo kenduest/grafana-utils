@@ -20,6 +20,10 @@ Author a staged alert contact point from the higher-level authoring surface.
 ```bash
 # Purpose: Author a staged alert contact point from the higher-level authoring surface.
 grafana-util alert add-contact-point --desired-dir ./alerts/desired --name pagerduty-primary
+```
+
+```bash
+# Purpose: Author a staged alert contact point from the higher-level authoring surface.
 grafana-util alert add-contact-point --desired-dir ./alerts/desired --name pagerduty-primary --dry-run
 ```
 

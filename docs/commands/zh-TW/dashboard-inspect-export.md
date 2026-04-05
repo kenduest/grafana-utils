@@ -20,6 +20,10 @@
 ```bash
 # 用途：以 operator-summary 與 report-contract 檢視角度分析儀表板匯出目錄。
 grafana-util dashboard inspect-export --import-dir ./dashboards/raw --input-format raw --table
+```
+
+```bash
+# 用途：以 operator-summary 與 report-contract 檢視角度分析儀表板匯出目錄。
 grafana-util dashboard inspect-export --import-dir ./dashboards/provisioning --input-format provisioning --report governance-json
 ```
 

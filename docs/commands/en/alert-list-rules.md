@@ -26,7 +26,15 @@ List live Grafana alert rules.
 ```bash
 # Purpose: List live Grafana alert rules.
 grafana-util alert list-rules --profile prod --table
+```
+
+```bash
+# Purpose: List live Grafana alert rules.
 grafana-util alert list-rules --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --json
+```
+
+```bash
+# Purpose: List live Grafana alert rules.
 grafana-util alert list-rules --url http://localhost:3000 --basic-user admin --basic-password admin --all-orgs --output-format yaml
 ```
 

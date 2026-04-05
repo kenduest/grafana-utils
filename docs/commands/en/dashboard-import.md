@@ -20,6 +20,10 @@ Use this when you have a local export tree or provisioning tree and need to push
 ```bash
 # Purpose: Import dashboard JSON files through the Grafana API.
 grafana-util dashboard import --url http://localhost:3000 --basic-user admin --basic-password admin --import-dir ./dashboards/raw --replace-existing
+```
+
+```bash
+# Purpose: Import dashboard JSON files through the Grafana API.
 grafana-util dashboard import --url http://localhost:3000 --basic-user admin --basic-password admin --import-dir ./dashboards/raw --dry-run --table
 ```
 

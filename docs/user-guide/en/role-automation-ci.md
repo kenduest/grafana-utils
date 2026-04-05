@@ -34,10 +34,26 @@ Use a profile first, with env-backed secrets for CI.
 ```bash
 # Purpose: First commands to run.
 grafana-util profile add ci --url https://grafana.example.com --token-env GRAFANA_CI_TOKEN
+```
+
+```bash
+# Purpose: First commands to run.
 grafana-util profile show --profile ci --output-format yaml
-grafana-util status staged --desired-file ./desired.json --output json
-grafana-util change preflight --desired-file ./desired.json --fetch-live --output json
-grafana-util overview live --profile ci --output yaml
+```
+
+```bash
+# Purpose: First commands to run.
+grafana-util status staged --desired-file ./desired.json --output-format json
+```
+
+```bash
+# Purpose: First commands to run.
+grafana-util change preflight --desired-file ./desired.json --fetch-live --output-format json
+```
+
+```bash
+# Purpose: First commands to run.
+grafana-util overview live --profile ci --output-format yaml
 ```
 
 If the job only needs to validate one live surface, you can replace the last line with an equivalent direct Basic-auth or narrow-token read, but do not ask the credential to see more than its real scope.
@@ -46,14 +62,14 @@ If you need a bootstrap check before the profile is wired, use Basic auth with a
 
 ```bash
 # Purpose: If you need a bootstrap check before the profile is wired, use Basic auth with a prompted password.
-grafana-util status live --url http://localhost:3000 --basic-user admin --prompt-password --output yaml
+grafana-util status live --url http://localhost:3000 --basic-user admin --prompt-password --output-format yaml
 ```
 
 If the job already receives a scoped token, you can call the live surface directly:
 
 ```bash
 # Purpose: If the job already receives a scoped token, you can call the live surface directly.
-grafana-util overview live --url https://grafana.example.com --token "$GRAFANA_CI_TOKEN" --output json
+grafana-util overview live --url https://grafana.example.com --token "$GRAFANA_CI_TOKEN" --output-format json
 ```
 
 ## What a stable automation path looks like

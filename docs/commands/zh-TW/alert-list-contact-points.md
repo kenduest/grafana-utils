@@ -26,7 +26,15 @@
 ```bash
 # 用途：列出目前 Grafana 線上的 alert 聯絡點。
 grafana-util alert list-contact-points --profile prod --table
+```
+
+```bash
+# 用途：列出目前 Grafana 線上的 alert 聯絡點。
 grafana-util alert list-contact-points --url http://localhost:3000 --basic-user admin --basic-password admin --all-orgs --output-format yaml
+```
+
+```bash
+# 用途：列出目前 Grafana 線上的 alert 聯絡點。
 grafana-util alert list-contact-points --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --json
 ```
 

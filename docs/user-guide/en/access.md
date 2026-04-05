@@ -36,7 +36,15 @@ Use `access org` when you need Basic-auth-backed inventory, export, or replay fo
 ```bash
 # Purpose: 1. List, Export, and Replay orgs.
 grafana-util access org list --table
+```
+
+```bash
+# Purpose: 1. List, Export, and Replay orgs.
 grafana-util access org export --export-dir ./access-orgs
+```
+
+```bash
+# Purpose: 1. List, Export, and Replay orgs.
 grafana-util access org import --import-dir ./access-orgs --dry-run
 ```
 **Expected Output:**
@@ -83,7 +91,15 @@ Use `--prompt-password` when you do not want a password in shell history. `--sco
 ```bash
 # Purpose: 2. Discover and Sync Teams.
 grafana-util access team list --org-id 1 --table
+```
+
+```bash
+# Purpose: 2. Discover and Sync Teams.
 grafana-util access team export --export-dir ./access-teams --with-members
+```
+
+```bash
+# Purpose: 2. Discover and Sync Teams.
 grafana-util access team import --import-dir ./access-teams --replace-existing --dry-run --table
 ```
 **Expected Output:**
@@ -110,6 +126,10 @@ Service accounts are the foundation of repeatable automation, CI jobs, and scope
 ```bash
 # Purpose: 1. List and Export Service Accounts.
 grafana-util access service-account list --json
+```
+
+```bash
+# Purpose: 1. List and Export Service Accounts.
 grafana-util access service-account export --export-dir ./access-sa
 ```
 **Expected Output:**
@@ -172,7 +192,15 @@ Compare your local identity snapshots against the live Grafana server.
 ```bash
 # Purpose: Compare your local identity snapshots against the live Grafana server.
 grafana-util access user diff --import-dir ./access-users
+```
+
+```bash
+# Purpose: Compare your local identity snapshots against the live Grafana server.
 grafana-util access team diff --diff-dir ./access-teams
+```
+
+```bash
+# Purpose: Compare your local identity snapshots against the live Grafana server.
 grafana-util access service-account diff --diff-dir ./access-sa
 ```
 **Expected Output:**

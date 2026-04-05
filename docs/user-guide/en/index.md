@@ -38,7 +38,7 @@ grafana-util --version
 ### 3. Run Your First Global Audit
 ```bash
 # Generates a high-level health and inventory report of your Grafana estate
-grafana-util overview live --url http://localhost:3000 --basic-user admin --prompt-password --output interactive
+grafana-util overview live --url http://localhost:3000 --basic-user admin --prompt-password --output-format interactive
 ```
 
 **Why this matters:** In 30 seconds, you have confirmed connectivity, checked dashboards and alerts, and found the first obvious data source problems before you make changes.

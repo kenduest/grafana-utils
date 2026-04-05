@@ -90,7 +90,7 @@ grafana-util alert add-rule \
 grafana-util alert plan \
   --url http://localhost:3000 \
   --basic-user admin --basic-password admin \
-  --desired-dir ./alerts/desired --prune --output json
+  --desired-dir ./alerts/desired --prune --output-format json
 ```
 
 **如何解讀計畫輸出：**
@@ -104,7 +104,7 @@ grafana-util alert plan \
 # 用途：僅在計畫審查完成並保存後執行。
 grafana-util alert apply \
   --plan-file ./alert-plan-reviewed.json \
-  --approve --output json
+  --approve --output-format json
 ```
 
 ---
@@ -115,7 +115,7 @@ grafana-util alert apply \
 | :--- | :--- |
 | **列出規則 (List)** | `grafana-util alert list-rules --all-orgs --table` |
 | **匯出 (Export)** | `grafana-util alert export --export-dir ./alerts --overwrite` |
-| **計畫 (Plan)** | `grafana-util alert plan --desired-dir ./alerts/desired --prune --output json` |
+| **計畫 (Plan)** | `grafana-util alert plan --desired-dir ./alerts/desired --prune --output-format json` |
 | **套用 (Apply)** | `grafana-util alert apply --plan-file ./plan.json --approve` |
 | **設定路由 (Set Route)** | `grafana-util alert set-route --desired-dir ./alerts/desired --receiver pagerduty` |
 | **新增規則 (New)** | `grafana-util alert new-rule --name <NAME> --folder <FOLDER> --output <FILE>` |
@@ -129,7 +129,7 @@ grafana-util alert apply \
 ### 1. 告警計畫摘錄
 ```bash
 # 用途：1. 告警計畫摘錄。
-grafana-util alert plan --desired-dir ./alerts/desired --prune --output json
+grafana-util alert plan --desired-dir ./alerts/desired --prune --output-format json
 ```
 **範例輸出：**
 ```json

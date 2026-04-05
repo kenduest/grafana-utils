@@ -15,7 +15,11 @@ Examples:
 ```bash
 # Purpose: Root.
 grafana-util snapshot export --url http://localhost:3000 --basic-user admin --basic-password admin --export-dir ./snapshot
-grafana-util snapshot review --input-dir ./snapshot --output json
+```
+
+```bash
+# Purpose: Root.
+grafana-util snapshot review --input-dir ./snapshot --output-format json
 ```
 
 Related commands: `grafana-util overview`, `grafana-util status staged`, `grafana-util change bundle`.
@@ -33,6 +37,10 @@ Examples:
 ```bash
 # Purpose: export.
 grafana-util snapshot export --url http://localhost:3000 --basic-user admin --basic-password admin --export-dir ./snapshot
+```
+
+```bash
+# Purpose: export.
 grafana-util snapshot export --profile prod --export-dir ./snapshot --overwrite
 ```
 
@@ -50,7 +58,11 @@ Examples:
 
 ```bash
 # Purpose: review.
-grafana-util snapshot review --input-dir ./snapshot --output table
+grafana-util snapshot review --input-dir ./snapshot --output-format table
+```
+
+```bash
+# Purpose: review.
 grafana-util snapshot review --input-dir ./snapshot --interactive
 ```
 

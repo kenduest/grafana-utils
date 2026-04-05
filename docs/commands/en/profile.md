@@ -15,10 +15,30 @@ Examples:
 ```bash
 # Purpose: Root.
 grafana-util profile list
+```
+
+```bash
+# Purpose: Root.
 grafana-util profile show --profile prod --output-format yaml
+```
+
+```bash
+# Purpose: Root.
 grafana-util profile add prod --url https://grafana.example.com --basic-user admin --prompt-password --store-secret encrypted-file
+```
+
+```bash
+# Purpose: Root.
 grafana-util profile add ci --url https://grafana.example.com --token-env GRAFANA_CI_TOKEN --store-secret os
+```
+
+```bash
+# Purpose: Root.
 grafana-util profile example --mode full
+```
+
+```bash
+# Purpose: Root.
 grafana-util profile init --overwrite
 ```
 
@@ -57,7 +77,15 @@ Examples:
 ```bash
 # Purpose: show.
 grafana-util profile show --profile prod --output-format yaml
+```
+
+```bash
+# Purpose: show.
 grafana-util profile show --profile prod --output-format json
+```
+
+```bash
+# Purpose: show.
 grafana-util profile show --profile prod --show-secrets --output-format yaml
 ```
 
@@ -85,7 +113,15 @@ Examples:
 ```bash
 # Purpose: add.
 grafana-util profile add dev --url http://127.0.0.1:3000 --basic-user admin --password-env GRAFANA_DEV_PASSWORD
+```
+
+```bash
+# Purpose: add.
 grafana-util profile add prod --url https://grafana.example.com --basic-user admin --prompt-password --store-secret os --set-default
+```
+
+```bash
+# Purpose: add.
 grafana-util profile add stage --url https://grafana-stage.example.com --token-env GRAFANA_STAGE_TOKEN --store-secret encrypted-file --prompt-secret-passphrase
 ```
 
@@ -116,7 +152,15 @@ Examples:
 ```bash
 # Purpose: example.
 grafana-util profile example
+```
+
+```bash
+# Purpose: example.
 grafana-util profile example --mode basic
+```
+
+```bash
+# Purpose: example.
 grafana-util profile example --mode full
 ```
 
@@ -141,6 +185,10 @@ Examples:
 ```bash
 # Purpose: init.
 grafana-util profile init
+```
+
+```bash
+# Purpose: init.
 grafana-util profile init --overwrite
 ```
 

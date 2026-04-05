@@ -19,6 +19,10 @@ Create a low-level staged alert contact point scaffold.
 ```bash
 # Purpose: Create a low-level staged alert contact point scaffold.
 grafana-util alert new-contact-point --desired-dir ./alerts/desired --name pagerduty-primary
+```
+
+```bash
+# Purpose: Create a low-level staged alert contact point scaffold.
 grafana-util alert add-contact-point --desired-dir ./alerts/desired --name pagerduty-primary
 ```
 

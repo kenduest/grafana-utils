@@ -32,7 +32,15 @@
 ```bash
 # 用途：執行 access-management 指令介面，涵蓋使用者、組織、團隊與服務帳號。
 grafana-util access user list --profile prod --json
+```
+
+```bash
+# 用途：執行 access-management 指令介面，涵蓋使用者、組織、團隊與服務帳號。
 grafana-util access service-account token add --url http://localhost:3000 --basic-user admin --basic-password admin --name deploy-bot --token-name nightly
+```
+
+```bash
+# 用途：執行 access-management 指令介面，涵蓋使用者、組織、團隊與服務帳號。
 grafana-util access service-account list --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-format text
 ```
 

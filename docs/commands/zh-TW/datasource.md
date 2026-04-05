@@ -26,8 +26,20 @@
 ```bash
 # 用途：`grafana-util datasource` 是處理目錄查找、線上瀏覽、匯出 / 匯入、diff，以及線上建立 / 修改 / 刪除工作流程的指令群組。這個指令群組也可用 `grafana-util ds` 呼叫。
 grafana-util datasource --help
+```
+
+```bash
+# 用途：`grafana-util datasource` 是處理目錄查找、線上瀏覽、匯出 / 匯入、diff，以及線上建立 / 修改 / 刪除工作流程的指令群組。這個指令群組也可用 `grafana-util ds` 呼叫。
 grafana-util datasource types
+```
+
+```bash
+# 用途：`grafana-util datasource` 是處理目錄查找、線上瀏覽、匯出 / 匯入、diff，以及線上建立 / 修改 / 刪除工作流程的指令群組。這個指令群組也可用 `grafana-util ds` 呼叫。
 grafana-util datasource browse --profile prod
+```
+
+```bash
+# 用途：`grafana-util datasource` 是處理目錄查找、線上瀏覽、匯出 / 匯入、diff，以及線上建立 / 修改 / 刪除工作流程的指令群組。這個指令群組也可用 `grafana-util ds` 呼叫。
 grafana-util datasource browse --url http://localhost:3000 --basic-user admin --basic-password admin
 ```
 

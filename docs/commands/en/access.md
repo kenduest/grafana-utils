@@ -32,7 +32,15 @@ This page is for administrators who first need to choose the right access surfac
 ```bash
 # Purpose: Run the access-management command surface for users, orgs, teams, and service accounts.
 grafana-util access user list --profile prod --json
+```
+
+```bash
+# Purpose: Run the access-management command surface for users, orgs, teams, and service accounts.
 grafana-util access service-account list --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-format text
+```
+
+```bash
+# Purpose: Run the access-management command surface for users, orgs, teams, and service accounts.
 grafana-util access service-account token add --url http://localhost:3000 --basic-user admin --basic-password admin --name deploy-bot --token-name nightly
 ```
 

@@ -88,7 +88,7 @@ grafana-util dashboard list -v
 | 症狀 | 常見原因 | 建議修補方式 |
 | :--- | :--- | :--- |
 | CI parser 突然壞掉 | 用到了給人看的輸出模式 | 改用 `json`、`yaml` 或其他適合腳本處理的結構化輸出 |
-| 指令不接受 `--output-format` | 這個指令實際上使用 `--output` | 直接查該 command help 或指令頁 |
+| 指令不接受某個 `--output-format` 值 | 這個指令只支援較少的輸出格式 | 直接查該 command help 或指令頁 |
 | 第一次檢查時互動式輸出太複雜 | 畫面雖然好看，但資訊不夠直接 | 先切成 `yaml` 或 `json` |
 
 ---

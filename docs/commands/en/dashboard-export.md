@@ -25,7 +25,15 @@ Use this when you need a local export tree for later import, review, diff, or fi
 ```bash
 # Purpose: Export dashboards to `raw/`, `prompt/`, and `provisioning/` files.
 grafana-util dashboard export --profile prod --export-dir ./dashboards --overwrite
+```
+
+```bash
+# Purpose: Export dashboards to `raw/`, `prompt/`, and `provisioning/` files.
 grafana-util dashboard export --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --export-dir ./dashboards --overwrite
+```
+
+```bash
+# Purpose: Export dashboards to `raw/`, `prompt/`, and `provisioning/` files.
 grafana-util dashboard export --url http://localhost:3000 --basic-user admin --basic-password admin --all-orgs --export-dir ./dashboards --overwrite
 ```
 

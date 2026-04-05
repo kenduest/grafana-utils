@@ -33,10 +33,26 @@
 
 ```bash
 # 用途：建議先跑的 5 個指令。
-grafana-util status live --profile prod --output table
-grafana-util overview live --profile prod --output interactive
+grafana-util status live --profile prod --output-format table
+```
+
+```bash
+# 用途：建議先跑的 5 個指令。
+grafana-util overview live --profile prod --output-format interactive
+```
+
+```bash
+# 用途：建議先跑的 5 個指令。
 grafana-util change summary --desired-file ./desired.json
-grafana-util change preflight --desired-file ./desired.json --fetch-live --output json
+```
+
+```bash
+# 用途：建議先跑的 5 個指令。
+grafana-util change preflight --desired-file ./desired.json --fetch-live --output-format json
+```
+
+```bash
+# 用途：建議先跑的 5 個指令。
 grafana-util dashboard export --export-dir ./backups --overwrite --progress
 ```
 

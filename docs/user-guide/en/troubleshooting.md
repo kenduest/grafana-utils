@@ -92,7 +92,7 @@ This is one of the most common operator mistakes.
 | Symptom | Likely Cause | Fix |
 | :--- | :--- | :--- |
 | parser in CI breaks unexpectedly | a human-oriented output mode was used | prefer `json`, `yaml`, or another machine-readable mode |
-| a command rejects `--output-format` | that surface uses `--output` instead | check the current command help or command-reference page |
+| a command rejects one `--output-format` value | that command only supports a narrower set of formats | check the current command help or command-reference page |
 | interactive output is confusing in a first-run check | too much presentation, not enough raw signal | switch to `yaml` or `json` first |
 
 ---

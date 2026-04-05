@@ -33,10 +33,26 @@ Use a profile backed by admin-capable credentials for day-to-day work.
 
 ```bash
 # Purpose: First commands to run.
-grafana-util status live --profile prod --output table
-grafana-util overview live --profile prod --output interactive
+grafana-util status live --profile prod --output-format table
+```
+
+```bash
+# Purpose: First commands to run.
+grafana-util overview live --profile prod --output-format interactive
+```
+
+```bash
+# Purpose: First commands to run.
 grafana-util change summary --desired-file ./desired.json
-grafana-util change preflight --desired-file ./desired.json --fetch-live --output json
+```
+
+```bash
+# Purpose: First commands to run.
+grafana-util change preflight --desired-file ./desired.json --fetch-live --output-format json
+```
+
+```bash
+# Purpose: First commands to run.
 grafana-util dashboard export --export-dir ./backups --overwrite --progress
 ```
 
@@ -51,14 +67,14 @@ If you are checking a host directly, Basic auth is the safest fallback for broad
 
 ```bash
 # Purpose: If you are checking a host directly, Basic auth is the safest fallback for broad visibility.
-grafana-util status live --url http://localhost:3000 --basic-user admin --prompt-password --all-orgs --output table
+grafana-util status live --url http://localhost:3000 --basic-user admin --prompt-password --all-orgs --output-format table
 ```
 
 Use token auth only when the scope matches the work:
 
 ```bash
 # Purpose: Use token auth only when the scope matches the work.
-grafana-util overview live --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output json
+grafana-util overview live --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-format json
 ```
 
 ## What good operator posture looks like

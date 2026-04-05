@@ -34,7 +34,15 @@ This is the right entrypoint for SREs, platform operators, and anyone who wants 
 ```bash
 # Purpose: Run the alerting command surface for exporting, importing, diffing, planning, applying, deleting, authoring, and listing Grafana alert resources.
 grafana-util alert list-rules --profile prod --json
+```
+
+```bash
+# Purpose: Run the alerting command surface for exporting, importing, diffing, planning, applying, deleting, authoring, and listing Grafana alert resources.
 grafana-util alert export --url http://localhost:3000 --basic-user admin --basic-password admin --output-dir ./alerts --overwrite
+```
+
+```bash
+# Purpose: Run the alerting command surface for exporting, importing, diffing, planning, applying, deleting, authoring, and listing Grafana alert resources.
 grafana-util alert export --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-dir ./alerts --flat
 ```
 

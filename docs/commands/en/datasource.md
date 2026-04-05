@@ -26,8 +26,20 @@ This page is especially useful when you need to decide whether the next step is 
 ```bash
 # Purpose: `grafana-util datasource` is the namespace for catalog lookup, live browsing, export/import, diff, and live create/modify/delete workflows. The same namespace is also available as `grafana-util ds`.
 grafana-util datasource --help
+```
+
+```bash
+# Purpose: `grafana-util datasource` is the namespace for catalog lookup, live browsing, export/import, diff, and live create/modify/delete workflows. The same namespace is also available as `grafana-util ds`.
 grafana-util datasource types
+```
+
+```bash
+# Purpose: `grafana-util datasource` is the namespace for catalog lookup, live browsing, export/import, diff, and live create/modify/delete workflows. The same namespace is also available as `grafana-util ds`.
 grafana-util datasource browse --profile prod
+```
+
+```bash
+# Purpose: `grafana-util datasource` is the namespace for catalog lookup, live browsing, export/import, diff, and live create/modify/delete workflows. The same namespace is also available as `grafana-util ds`.
 grafana-util datasource browse --url http://localhost:3000 --basic-user admin --basic-password admin
 ```
 

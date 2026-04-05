@@ -15,7 +15,15 @@
 ```bash
 # 用途：Root。
 grafana-util snapshot export --profile prod --export-dir ./snapshot
-grafana-util snapshot review --input-dir ./snapshot --output json
+```
+
+```bash
+# 用途：Root。
+grafana-util snapshot review --input-dir ./snapshot --output-format json
+```
+
+```bash
+# 用途：Root。
 grafana-util snapshot export --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --export-dir ./snapshot
 ```
 
@@ -34,7 +42,15 @@ grafana-util snapshot export --url http://localhost:3000 --token "$GRAFANA_API_T
 ```bash
 # 用途：export。
 grafana-util snapshot export --profile prod --export-dir ./snapshot
+```
+
+```bash
+# 用途：export。
 grafana-util snapshot export --url http://localhost:3000 --basic-user admin --basic-password admin --export-dir ./snapshot --overwrite
+```
+
+```bash
+# 用途：export。
 grafana-util snapshot export --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --export-dir ./snapshot
 ```
 
@@ -52,7 +68,11 @@ grafana-util snapshot export --url http://localhost:3000 --token "$GRAFANA_API_T
 
 ```bash
 # 用途：review。
-grafana-util snapshot review --input-dir ./snapshot --output table
+grafana-util snapshot review --input-dir ./snapshot --output-format table
+```
+
+```bash
+# 用途：review。
 grafana-util snapshot review --input-dir ./snapshot --interactive
 ```
 

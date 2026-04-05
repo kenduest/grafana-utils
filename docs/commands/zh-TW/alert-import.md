@@ -23,6 +23,10 @@
 ```bash
 # 用途：透過 Grafana API 匯入 alert 資源 JSON 檔。
 grafana-util alert import --url http://localhost:3000 --import-dir ./alerts/raw --replace-existing
+```
+
+```bash
+# 用途：透過 Grafana API 匯入 alert 資源 JSON 檔。
 grafana-util alert import --url http://localhost:3000 --import-dir ./alerts/raw --replace-existing --dry-run --json
 ```
 

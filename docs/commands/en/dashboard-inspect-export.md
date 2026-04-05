@@ -20,6 +20,10 @@ Use this when you want to read a local export tree, inspect its structure, or re
 ```bash
 # Purpose: Analyze dashboard export directories with operator-summary and report-contract views.
 grafana-util dashboard inspect-export --import-dir ./dashboards/raw --input-format raw --table
+```
+
+```bash
+# Purpose: Analyze dashboard export directories with operator-summary and report-contract views.
 grafana-util dashboard inspect-export --import-dir ./dashboards/provisioning --input-format provisioning --report governance-json
 ```
 

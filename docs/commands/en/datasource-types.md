@@ -13,6 +13,10 @@ Use this when you need to see the canonical datasource type ids that the CLI nor
 ```bash
 # Purpose: Show the built-in supported datasource type catalog.
 grafana-util datasource types
+```
+
+```bash
+# Purpose: Show the built-in supported datasource type catalog.
 grafana-util datasource types --output-format yaml
 ```
 

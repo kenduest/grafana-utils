@@ -19,7 +19,15 @@
 ```bash
 # 用途：為 Grafana service account 新增或刪除 token。
 grafana-util access service-account token add --profile prod --name deploy-bot --token-name nightly
+```
+
+```bash
+# 用途：為 Grafana service account 新增或刪除 token。
 grafana-util access service-account token delete --url http://localhost:3000 --basic-user admin --basic-password admin --name deploy-bot --token-name nightly --yes --json
+```
+
+```bash
+# 用途：為 Grafana service account 新增或刪除 token。
 grafana-util access service-account token add --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --name deploy-bot --token-name nightly
 ```
 

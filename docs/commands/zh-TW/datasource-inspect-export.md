@@ -16,6 +16,10 @@
 ```bash
 # 用途：在不連線到 Grafana 的情況下，檢查本地的 masked recovery bundle。
 grafana-util datasource inspect-export --input-dir ./datasources --table
+```
+
+```bash
+# 用途：在不連線到 Grafana 的情況下，檢查本地的 masked recovery bundle。
 grafana-util datasource inspect-export --input-dir ./datasources --json
 ```
 
