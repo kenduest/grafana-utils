@@ -347,6 +347,14 @@ def add_common_cli_args(parser: argparse.ArgumentParser) -> None:
         ),
     )
     connection_group.add_argument(
+        "--ca-cert",
+        default=None,
+        help=(
+            "CA certificate path for TLS verification. Use this when Grafana is "
+            "served with a private or internal CA."
+        ),
+    )
+    connection_group.add_argument(
         "--timeout",
         type=int,
         default=DEFAULT_TIMEOUT,
@@ -1748,7 +1756,8 @@ def build_client(args: argparse.Namespace) -> GrafanaClient:
         base_url=args.url,
         headers=headers,
         timeout=args.timeout,
-        verify_ssl=args.verify_ssl,
+        verify_ssl=bool(args.verify_ssl or getattr(args, "ca_cert", None)),
+        ca_cert=getattr(args, "ca_cert", None),
     )
 
 

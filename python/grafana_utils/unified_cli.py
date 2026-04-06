@@ -26,7 +26,19 @@ import argparse
 import sys
 from typing import Optional
 
-from . import access_cli, alert_cli, dashboard_cli, datasource_cli, sync_cli
+from . import (
+    access_cli,
+    alert_cli,
+    change_cli,
+    dashboard_cli,
+    datasource_cli,
+    overview_cli,
+    profile_cli,
+    resource_cli,
+    snapshot_cli,
+    status_cli,
+    sync_cli,
+)
 
 DASHBOARD_COMMAND_HELP = {
     "export": "Export dashboards into raw/ and prompt/ variants.",
@@ -113,6 +125,12 @@ def build_parser() -> argparse.ArgumentParser:
             "  grafana-util alert export --url http://localhost:3000 --output-dir ./alerts\n"
             '  grafana-util access user list --url http://localhost:3000 --token "$GRAFANA_API_TOKEN"\n'
             "  grafana-util datasource export --url http://localhost:3000 --export-dir ./datasources\n"
+            "  grafana-util profile list\n"
+            "  grafana-util change preview --workspace .\n"
+            "  grafana-util overview live --profile prod\n"
+            "  grafana-util status staged --desired-file ./desired.json\n"
+            "  grafana-util snapshot review --input-dir ./snapshot\n"
+            "  grafana-util resource kinds\n"
             "  grafana-util sync plan --desired-file ./desired.json --live-file ./live.json"
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -161,6 +179,36 @@ def build_parser() -> argparse.ArgumentParser:
     sync_subparsers.required = False
     for command, help_text in SYNC_COMMAND_HELP.items():
         sync_subparsers.add_parser(command, help=help_text, add_help=False)
+    subparsers.add_parser(
+        "change",
+        help="Run the review-first change workflow under grafana-util change ...",
+        add_help=False,
+    )
+    subparsers.add_parser(
+        "profile",
+        help="Manage repo-local grafana-util profile configuration.",
+        add_help=False,
+    )
+    subparsers.add_parser(
+        "resource",
+        help="Read a small set of live Grafana resources through a read-only surface.",
+        add_help=False,
+    )
+    subparsers.add_parser(
+        "overview",
+        help="Render staged or live overview summaries across surfaces.",
+        add_help=False,
+    )
+    subparsers.add_parser(
+        "status",
+        help="Render staged or live readiness and status checks.",
+        add_help=False,
+    )
+    subparsers.add_parser(
+        "snapshot",
+        help="Export and review local snapshot inventory bundles.",
+        add_help=False,
+    )
     return parser
 
 
@@ -170,6 +218,7 @@ def parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
     Flow:
     - Normalize argv from real CLI invocation.
     - Route namespaced commands (`dashboard`, `alert`, `access`, `datasource`,
+      `change`, `profile`, `resource`, `overview`, `status`, `snapshot`,
       `sync`) to their domain CLI modules.
     - Return the selected entrypoint plus domain-local argv slice for dispatch.
     """
@@ -247,6 +296,42 @@ def parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
             forwarded_argv=argv[1:],
         )
 
+    if command == "change":
+        if len(argv) == 1 or argv[1] in ("-h", "--help"):
+            change_cli.build_parser(prog="grafana-util change").print_help()
+            raise SystemExit(0)
+        return argparse.Namespace(entrypoint="change", forwarded_argv=argv[1:])
+
+    if command == "profile":
+        if len(argv) == 1 or argv[1] in ("-h", "--help"):
+            profile_cli.build_parser(prog="grafana-util profile").print_help()
+            raise SystemExit(0)
+        return argparse.Namespace(entrypoint="profile", forwarded_argv=argv[1:])
+
+    if command == "resource":
+        if len(argv) == 1 or argv[1] in ("-h", "--help"):
+            resource_cli.build_parser(prog="grafana-util resource").print_help()
+            raise SystemExit(0)
+        return argparse.Namespace(entrypoint="resource", forwarded_argv=argv[1:])
+
+    if command == "overview":
+        if len(argv) == 1 or argv[1] in ("-h", "--help"):
+            overview_cli.build_parser(prog="grafana-util overview").print_help()
+            raise SystemExit(0)
+        return argparse.Namespace(entrypoint="overview", forwarded_argv=argv[1:])
+
+    if command == "status":
+        if len(argv) == 1 or argv[1] in ("-h", "--help"):
+            status_cli.build_parser(prog="grafana-util status").print_help()
+            raise SystemExit(0)
+        return argparse.Namespace(entrypoint="status", forwarded_argv=argv[1:])
+
+    if command == "snapshot":
+        if len(argv) == 1 or argv[1] in ("-h", "--help"):
+            snapshot_cli.build_parser(prog="grafana-util snapshot").print_help()
+            raise SystemExit(0)
+        return argparse.Namespace(entrypoint="snapshot", forwarded_argv=argv[1:])
+
     parser.parse_args(argv)
     raise AssertionError("argparse should have exited for unsupported command")
 
@@ -272,6 +357,18 @@ def main(argv: Optional[list[str]] = None) -> int:
         return access_cli.main(args.forwarded_argv)
     if args.entrypoint == "datasource":
         return datasource_cli.main(args.forwarded_argv)
+    if args.entrypoint == "change":
+        return change_cli.main(args.forwarded_argv)
+    if args.entrypoint == "profile":
+        return profile_cli.main(args.forwarded_argv)
+    if args.entrypoint == "resource":
+        return resource_cli.main(args.forwarded_argv)
+    if args.entrypoint == "overview":
+        return overview_cli.main(args.forwarded_argv)
+    if args.entrypoint == "status":
+        return status_cli.main(args.forwarded_argv)
+    if args.entrypoint == "snapshot":
+        return snapshot_cli.main(args.forwarded_argv)
     if args.entrypoint == "sync":
         return sync_cli.main(args.forwarded_argv)
     raise RuntimeError("Unsupported unified CLI entrypoint.")

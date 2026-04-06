@@ -2088,12 +2088,39 @@ class ExporterTests(unittest.TestCase):
             headers={},
             timeout=30,
             verify_ssl=False,
+            ca_cert="/tmp/grafana-ca.pem",
             transport=FakeTransport(),
         )
 
         result = client.fetch_dashboard("abc")
 
         self.assertEqual(result["dashboard"]["uid"], "abc")
+        self.assertEqual(client.ca_cert, "/tmp/grafana-ca.pem")
+
+    def test_dashboard_build_client_passes_ca_cert_to_transport(self):
+        captured = {}
+
+        class FakeGrafanaClient(object):
+            def __init__(self, **kwargs):
+                captured.update(kwargs)
+
+        args = argparse.Namespace(
+            url="http://127.0.0.1:3000",
+            timeout=30,
+            verify_ssl=False,
+            ca_cert="/tmp/grafana-ca.pem",
+            api_token="token-secret",
+            prompt_token=False,
+            username=None,
+            password=None,
+            prompt_password=False,
+        )
+
+        with mock.patch.object(exporter, "GrafanaClient", FakeGrafanaClient):
+            exporter.build_client(args)
+
+        self.assertEqual(captured["ca_cert"], "/tmp/grafana-ca.pem")
+        self.assertTrue(captured["verify_ssl"])
 
     def test_dashboard_resolve_auth_supports_token_auth(self):
         args = argparse.Namespace(

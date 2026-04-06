@@ -39,6 +39,12 @@ class UnifiedCliTests(unittest.TestCase):
         self.assertIn("alert", help_text)
         self.assertIn("access", help_text)
         self.assertIn("datasource", help_text)
+        self.assertIn("change", help_text)
+        self.assertIn("profile", help_text)
+        self.assertIn("resource", help_text)
+        self.assertIn("overview", help_text)
+        self.assertIn("status", help_text)
+        self.assertIn("snapshot", help_text)
         self.assertIn("sync", help_text)
         self.assertNotIn("Compatibility direct form", help_text)
         self.assertNotIn("export-alert", help_text)
@@ -332,6 +338,44 @@ class UnifiedCliTests(unittest.TestCase):
             ["plan", "--desired-file", "./desired.json", "--live-file", "./live.json"],
         )
 
+    def test_unified_parse_args_supports_change_namespace(self):
+        args = unified_cli.parse_args(
+            ["change", "preview", "--workspace", "."]
+        )
+
+        self.assertEqual(args.entrypoint, "change")
+        self.assertEqual(args.forwarded_argv, ["preview", "--workspace", "."])
+
+    def test_unified_parse_args_supports_profile_namespace(self):
+        args = unified_cli.parse_args(["profile", "list"])
+
+        self.assertEqual(args.entrypoint, "profile")
+        self.assertEqual(args.forwarded_argv, ["list"])
+
+    def test_unified_parse_args_supports_resource_namespace(self):
+        args = unified_cli.parse_args(["resource", "kinds"])
+
+        self.assertEqual(args.entrypoint, "resource")
+        self.assertEqual(args.forwarded_argv, ["kinds"])
+
+    def test_unified_parse_args_supports_overview_namespace(self):
+        args = unified_cli.parse_args(["overview", "live", "--profile", "prod"])
+
+        self.assertEqual(args.entrypoint, "overview")
+        self.assertEqual(args.forwarded_argv, ["live", "--profile", "prod"])
+
+    def test_unified_parse_args_supports_status_namespace(self):
+        args = unified_cli.parse_args(["status", "staged", "--desired-file", "./desired.json"])
+
+        self.assertEqual(args.entrypoint, "status")
+        self.assertEqual(args.forwarded_argv, ["staged", "--desired-file", "./desired.json"])
+
+    def test_unified_parse_args_supports_snapshot_namespace(self):
+        args = unified_cli.parse_args(["snapshot", "review", "--input-dir", "./snapshot"])
+
+        self.assertEqual(args.entrypoint, "snapshot")
+        self.assertEqual(args.forwarded_argv, ["review", "--input-dir", "./snapshot"])
+
     def test_unified_parse_args_supports_sync_preflight_namespace(self):
         args = unified_cli.parse_args(
             ["sync", "preflight", "--desired-file", "./desired.json"]
@@ -491,6 +535,48 @@ class UnifiedCliTests(unittest.TestCase):
         mocked.assert_called_once_with(
             ["plan", "--desired-file", "./desired.json", "--live-file", "./live.json"]
         )
+
+    def test_unified_main_dispatches_change_passthrough(self):
+        with mock.patch.object(unified_cli.change_cli, "main", return_value=6) as mocked:
+            result = unified_cli.main(["change", "inspect", "--workspace", "."])
+
+        self.assertEqual(result, 6)
+        mocked.assert_called_once_with(["inspect", "--workspace", "."])
+
+    def test_unified_main_dispatches_profile_passthrough(self):
+        with mock.patch.object(unified_cli.profile_cli, "main", return_value=7) as mocked:
+            result = unified_cli.main(["profile", "list"])
+
+        self.assertEqual(result, 7)
+        mocked.assert_called_once_with(["list"])
+
+    def test_unified_main_dispatches_resource_passthrough(self):
+        with mock.patch.object(unified_cli.resource_cli, "main", return_value=8) as mocked:
+            result = unified_cli.main(["resource", "kinds"])
+
+        self.assertEqual(result, 8)
+        mocked.assert_called_once_with(["kinds"])
+
+    def test_unified_main_dispatches_overview_passthrough(self):
+        with mock.patch.object(unified_cli.overview_cli, "main", return_value=9) as mocked:
+            result = unified_cli.main(["overview", "live", "--profile", "prod"])
+
+        self.assertEqual(result, 9)
+        mocked.assert_called_once_with(["live", "--profile", "prod"])
+
+    def test_unified_main_dispatches_status_passthrough(self):
+        with mock.patch.object(unified_cli.status_cli, "main", return_value=10) as mocked:
+            result = unified_cli.main(["status", "staged", "--desired-file", "./desired.json"])
+
+        self.assertEqual(result, 10)
+        mocked.assert_called_once_with(["staged", "--desired-file", "./desired.json"])
+
+    def test_unified_main_dispatches_snapshot_passthrough(self):
+        with mock.patch.object(unified_cli.snapshot_cli, "main", return_value=11) as mocked:
+            result = unified_cli.main(["snapshot", "review", "--input-dir", "./snapshot"])
+
+        self.assertEqual(result, 11)
+        mocked.assert_called_once_with(["review", "--input-dir", "./snapshot"])
 
 
 if __name__ == "__main__":

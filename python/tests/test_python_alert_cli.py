@@ -740,12 +740,39 @@ class AlertUtilsTests(unittest.TestCase):
             headers={},
             timeout=30,
             verify_ssl=False,
+            ca_cert="/tmp/grafana-ca.pem",
             transport=FakeTransport(),
         )
 
         templates = client.list_templates()
 
         self.assertEqual(templates, [])
+        self.assertEqual(client.ca_cert, "/tmp/grafana-ca.pem")
+
+    def test_alert_build_client_passes_ca_cert(self):
+        captured = {}
+
+        class FakeAlertClient(object):
+            def __init__(self, **kwargs):
+                captured.update(kwargs)
+
+        args = argparse.Namespace(
+            url="http://127.0.0.1:3000",
+            timeout=30,
+            verify_ssl=False,
+            ca_cert="/tmp/grafana-ca.pem",
+            api_token="token-secret",
+            prompt_token=False,
+            username=None,
+            password=None,
+            prompt_password=False,
+        )
+
+        with mock.patch.object(alert_utils, "GrafanaAlertClient", FakeAlertClient):
+            alert_utils.build_client(args)
+
+        self.assertEqual(captured["ca_cert"], "/tmp/grafana-ca.pem")
+        self.assertTrue(captured["verify_ssl"])
 
     def test_alert_list_rules_renders_table_by_default(self):
         args = alert_utils.parse_args(["list-rules"])

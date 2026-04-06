@@ -126,6 +126,7 @@ class DatasourceClientTests(unittest.TestCase):
             headers={"Authorization": "Bearer token"},
             timeout=30,
             verify_ssl=True,
+            ca_cert="/tmp/grafana-ca.pem",
             transport=StubTransport(),
         )
 
@@ -133,3 +134,4 @@ class DatasourceClientTests(unittest.TestCase):
 
         self.assertEqual(scoped.headers["X-Grafana-Org-Id"], "9")
         self.assertEqual(client.headers, {"Authorization": "Bearer token"})
+        self.assertEqual(scoped.ca_cert, "/tmp/grafana-ca.pem")
