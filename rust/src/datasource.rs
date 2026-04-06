@@ -16,7 +16,10 @@
 use serde_json::{Map, Value};
 use std::path::Path;
 
-use crate::common::{message, render_json_value, string_field, write_json_file, Result};
+use crate::common::{
+    build_shared_diff_document, message, render_json_value, string_field, write_json_file,
+    DiffOutputFormat, Result, SharedDiffSummary,
+};
 use crate::dashboard::{
     build_api_client, build_auth_context, build_http_client, build_http_client_for_org,
     build_http_client_for_org_from_api, CommonCliArgs, SimpleOutputFormat,
@@ -256,11 +259,48 @@ fn print_datasource_diff_summary_report(report: &DatasourceDiffReport) {
     }
 }
 
+fn datasource_diff_summary(report: &DatasourceDiffReport) -> SharedDiffSummary {
+    SharedDiffSummary {
+        checked: report.summary.compared_count,
+        same: report.summary.matches_count,
+        different: report.summary.different_count,
+        missing_remote: report.summary.missing_in_live_count,
+        extra_remote: report.summary.missing_in_export_count,
+        ambiguous: report.summary.ambiguous_live_match_count,
+    }
+}
+
+fn datasource_diff_row(entry: &DatasourceDiffEntry) -> Value {
+    let identity = render_diff_identity(entry);
+    serde_json::json!({
+        "domain": "datasource",
+        "resourceKind": "datasource",
+        "identity": identity,
+        "status": entry.status.as_str(),
+        "path": Value::Null,
+        "changedFields": entry
+            .differences
+            .iter()
+            .map(|item| item.field)
+            .collect::<Vec<&str>>(),
+        "changes": entry
+            .differences
+            .iter()
+            .map(|item| serde_json::json!({
+                "field": item.field,
+                "before": item.expected,
+                "after": item.actual,
+            }))
+            .collect::<Vec<Value>>(),
+    })
+}
+
 /// Purpose: implementation note.
 pub(crate) fn diff_datasources_with_live(
     diff_dir: &Path,
     input_format: DatasourceImportInputFormat,
     live: &[Map<String, Value>],
+    output_format: DiffOutputFormat,
 ) -> Result<(usize, usize)> {
     let export_values = load_diff_record_values(diff_dir, input_format)?;
     let live_values = live
@@ -272,12 +312,32 @@ pub(crate) fn diff_datasources_with_live(
         &normalize_export_records(&export_values),
         &normalize_live_records(&live_values),
     );
-    print_datasource_diff_summary_report(&report);
+    match output_format {
+        DiffOutputFormat::Text => print_datasource_diff_summary_report(&report),
+        DiffOutputFormat::Json => {
+            let rows = report
+                .entries
+                .iter()
+                .map(datasource_diff_row)
+                .collect::<Vec<Value>>();
+            print!(
+                "{}",
+                render_json_value(&build_shared_diff_document(
+                    "grafana-util-datasource-diff",
+                    1,
+                    datasource_diff_summary(&report),
+                    &rows,
+                ))?
+            );
+        }
+    }
     let difference_count = report.summary.compared_count - report.summary.matches_count;
-    println!(
-        "Diff checked {} datasource(s); {} difference(s) found.",
-        report.summary.compared_count, difference_count
-    );
+    if matches!(output_format, DiffOutputFormat::Text) {
+        println!(
+            "Diff checked {} datasource(s); {} difference(s) found.",
+            report.summary.compared_count, difference_count
+        );
+    }
     Ok((report.summary.compared_count, difference_count))
 }
 
@@ -828,7 +888,12 @@ pub fn run_datasource_cli(command: DatasourceGroupCommand) -> Result<()> {
             let datasource_client = DatasourceResourceClient::new(&client);
             let live = datasource_client.list_datasources()?;
             let (compared_count, differences) =
-                diff_datasources_with_live(&args.diff_dir, args.input_format, &live)?;
+                diff_datasources_with_live(
+                    &args.diff_dir,
+                    args.input_format,
+                    &live,
+                    args.output_format,
+                )?;
             if differences > 0 {
                 return Err(message(format!(
                     "Found {} datasource difference(s) across {} exported datasource(s).",

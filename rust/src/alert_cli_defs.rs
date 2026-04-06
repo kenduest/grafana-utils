@@ -3,7 +3,7 @@
 use clap::{ArgAction, Args, Command, CommandFactory, Parser, Subcommand, ValueEnum};
 use std::path::PathBuf;
 
-use crate::common::{set_json_color_choice, CliColorChoice, Result};
+use crate::common::{set_json_color_choice, CliColorChoice, DiffOutputFormat, Result};
 use crate::grafana_api::{AuthInputs, GrafanaConnection};
 use crate::profile_config::ConnectionMergeInput;
 
@@ -11,7 +11,7 @@ use super::{ALERT_HELP_TEXT, DEFAULT_OUTPUT_DIR, DEFAULT_TIMEOUT, DEFAULT_URL};
 
 const ALERT_EXPORT_HELP_TEXT: &str = "Examples:\n\n  grafana-util alert export --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --output-dir ./alerts --overwrite\n  grafana-util alert export --url http://localhost:3000 --basic-user admin --basic-password admin --output-dir ./alerts --flat";
 const ALERT_IMPORT_HELP_TEXT: &str = "Examples:\n\n  grafana-util alert import --url http://localhost:3000 --input-dir ./alerts/raw --replace-existing\n  grafana-util alert import --url http://localhost:3000 --input-dir ./alerts/raw --replace-existing --dry-run --json\n  grafana-util alert import --url http://localhost:3000 --input-dir ./alerts/raw --replace-existing --dashboard-uid-map ./dashboard-map.json --panel-id-map ./panel-map.json";
-const ALERT_DIFF_HELP_TEXT: &str = "Examples:\n\n  grafana-util alert diff --url http://localhost:3000 --diff-dir ./alerts/raw\n  grafana-util alert diff --url http://localhost:3000 --diff-dir ./alerts/raw --json";
+const ALERT_DIFF_HELP_TEXT: &str = "Examples:\n\n  grafana-util alert diff --url http://localhost:3000 --diff-dir ./alerts/raw\n  grafana-util alert diff --url http://localhost:3000 --diff-dir ./alerts/raw --output-format json";
 const ALERT_PLAN_HELP_TEXT: &str = "Examples:\n\n  grafana-util alert plan --desired-dir ./alerts/desired\n  grafana-util alert plan --desired-dir ./alerts/desired --prune --dashboard-uid-map ./dashboard-map.json --panel-id-map ./panel-map.json --output-format json";
 const ALERT_APPLY_HELP_TEXT: &str = "Examples:\n\n  grafana-util alert apply --plan-file ./alert-plan-reviewed.json --approve\n  grafana-util alert apply --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --plan-file ./alert-plan-reviewed.json --approve --output-format json";
 const ALERT_DELETE_HELP_TEXT: &str = "Examples:\n\n  grafana-util alert delete --kind rule --identity cpu-main\n  grafana-util alert delete --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --kind policy-tree --identity default --allow-policy-reset --output-format json";
@@ -235,9 +235,16 @@ pub struct AlertDiffArgs {
     #[arg(
         long,
         default_value_t = false,
-        help = "Render diff output as structured JSON."
+        help = "Deprecated compatibility flag. Equivalent to --output-format json."
     )]
     pub json: bool,
+    #[arg(
+        long = "output-format",
+        value_enum,
+        default_value_t = DiffOutputFormat::Text,
+        help = "Render diff output as text or json."
+    )]
+    pub output_format: DiffOutputFormat,
     #[arg(
         long,
         help = "JSON file that maps source dashboard UIDs to target dashboard UIDs for linked alert-rule repair during import."
@@ -823,6 +830,7 @@ pub struct AlertCliArgs {
     pub resource_kind: Option<AlertResourceKind>,
     pub resource_identity: Option<String>,
     pub command_output: Option<AlertCommandOutputFormat>,
+    pub diff_output: Option<DiffOutputFormat>,
     pub scaffold_name: Option<String>,
     pub source_name: Option<String>,
     pub folder: Option<String>,
@@ -879,6 +887,7 @@ pub fn cli_args_from_common(common: AlertCommonArgs) -> AlertCliArgs {
         resource_kind: None,
         resource_identity: None,
         command_output: None,
+        diff_output: None,
         scaffold_name: None,
         source_name: None,
         folder: None,
@@ -1007,7 +1016,8 @@ pub fn normalize_alert_namespace_args(args: AlertNamespaceArgs) -> AlertCliArgs 
             let mut args = cli_args_from_common(inner.common);
             args.command_kind = Some(AlertCommandKind::Diff);
             args.diff_dir = Some(inner.diff_dir);
-            args.json = inner.json;
+            args.diff_output = Some(inner.output_format);
+            args.json = inner.json || matches!(inner.output_format, DiffOutputFormat::Json);
             args.dashboard_uid_map = inner.dashboard_uid_map;
             args.panel_id_map = inner.panel_id_map;
             args
@@ -1220,6 +1230,7 @@ pub fn normalize_alert_namespace_args(args: AlertNamespaceArgs) -> AlertCliArgs 
                 json: false,
                 yaml: false,
                 no_header: false,
+                diff_output: None,
                 desired_dir: None,
                 prune: false,
                 plan_file: None,

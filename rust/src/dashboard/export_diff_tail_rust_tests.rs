@@ -5,6 +5,7 @@ use super::{
     make_common_args, DiffArgs, FolderInventoryStatusKind, InspectExportArgs,
     EXPORT_METADATA_FILENAME, TOOL_SCHEMA_VERSION,
 };
+use crate::common::DiffOutputFormat;
 use serde_json::json;
 use std::fs;
 use std::path::PathBuf;
@@ -124,6 +125,7 @@ fn diff_dashboards_with_client_returns_zero_for_matching_dashboard() {
         input_format: test_support::DashboardImportInputFormat::Raw,
         import_folder_uid: Some("old-folder".to_string()),
         context_lines: 3,
+        output_format: DiffOutputFormat::Text,
     };
 
     let count = test_support::diff_dashboards_with_request(
@@ -173,6 +175,7 @@ fn diff_dashboards_with_client_detects_dashboard_difference() {
         input_format: test_support::DashboardImportInputFormat::Raw,
         import_folder_uid: None,
         context_lines: 3,
+        output_format: DiffOutputFormat::Text,
     };
 
     let count = test_support::diff_dashboards_with_request(

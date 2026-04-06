@@ -415,6 +415,7 @@ fn import_dashboards_with_use_export_org_round_trips_combined_export_root_into_s
             input_format: crate::dashboard::DashboardImportInputFormat::Raw,
             import_folder_uid: Some(folder_uid.to_string()),
             context_lines: 3,
+            output_format: crate::common::DiffOutputFormat::Text,
         };
         let differences = diff_dashboards_with_request(
             |_method, path, _params, _payload| {

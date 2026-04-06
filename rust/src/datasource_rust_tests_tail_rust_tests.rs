@@ -1270,9 +1270,13 @@ fn diff_datasources_with_live_returns_zero_for_matching_inventory() {
     .unwrap()
     .clone()];
 
-    let (compared_count, differences) =
-        diff_datasources_with_live(&diff_dir, DatasourceImportInputFormat::Inventory, &live)
-            .unwrap();
+    let (compared_count, differences) = diff_datasources_with_live(
+        &diff_dir,
+        DatasourceImportInputFormat::Inventory,
+        &live,
+        crate::common::DiffOutputFormat::Text,
+    )
+    .unwrap();
 
     assert_eq!(compared_count, 1);
     assert_eq!(differences, 0);
@@ -1304,9 +1308,13 @@ fn diff_datasources_with_live_detects_changed_inventory() {
     .unwrap()
     .clone()];
 
-    let (compared_count, differences) =
-        diff_datasources_with_live(&diff_dir, DatasourceImportInputFormat::Inventory, &live)
-            .unwrap();
+    let (compared_count, differences) = diff_datasources_with_live(
+        &diff_dir,
+        DatasourceImportInputFormat::Inventory,
+        &live,
+        crate::common::DiffOutputFormat::Text,
+    )
+    .unwrap();
 
     assert_eq!(compared_count, 1);
     assert_eq!(differences, 1);
@@ -1333,19 +1341,25 @@ fn diff_datasources_with_live_supports_provisioning_root_directory_and_file() {
     let provisioning_dir = diff_root.join("provisioning");
     let provisioning_file = provisioning_dir.join("datasources.yaml");
 
-    let (root_count, root_differences) =
-        diff_datasources_with_live(&diff_root, DatasourceImportInputFormat::Provisioning, &live)
-            .unwrap();
+    let (root_count, root_differences) = diff_datasources_with_live(
+        &diff_root,
+        DatasourceImportInputFormat::Provisioning,
+        &live,
+        crate::common::DiffOutputFormat::Text,
+    )
+    .unwrap();
     let (dir_count, dir_differences) = diff_datasources_with_live(
         &provisioning_dir,
         DatasourceImportInputFormat::Provisioning,
         &live,
+        crate::common::DiffOutputFormat::Text,
     )
     .unwrap();
     let (file_count, file_differences) = diff_datasources_with_live(
         &provisioning_file,
         DatasourceImportInputFormat::Provisioning,
         &live,
+        crate::common::DiffOutputFormat::Text,
     )
     .unwrap();
 

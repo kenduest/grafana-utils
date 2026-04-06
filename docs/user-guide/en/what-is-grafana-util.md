@@ -79,6 +79,13 @@ These tools can overlap. The useful question is which working style you need fir
 
 If all you need is “where do I start?”, use this table first, then move into the matching handbook chapter.
 
+## What to surface where
+
+Keep the README and handbook home pages short. Show the lanes people reach for first, then leave the deeper command tree in the docs index.
+
+- Show on the README/home page: `dashboard export/import/raw-to-prompt/review/publish`, `datasource export/import/diff`, `change inspect/check/preview/apply`, `status`, `overview`, `profile`, `alert plan/apply`, `access`, and `secrets`.
+- Keep in the docs index and per-command pages: `dashboard browse/fetch-live/clone-live/serve/edit-live/delete/history/list-vars/governance-gate/topology/impact/screenshot`, `datasource browse/types/list/add/modify/delete`, `snapshot`, `resource`, and the compatibility alias pages.
+
 ---
 
 ## Where it helps most

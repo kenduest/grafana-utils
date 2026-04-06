@@ -36,7 +36,7 @@ use super::{
     with_dashboard_import_live_preflight, write_basic_raw_export,
     write_combined_export_root_metadata,
 };
-use crate::common::api_response;
+use crate::common::{api_response, DiffOutputFormat};
 use crate::dashboard::inspect::{
     dispatch_query_analysis, extract_query_field_and_text, resolve_query_analyzer_family,
     QueryAnalysis, QueryExtractionContext,
@@ -134,6 +134,7 @@ fn diff_dashboards_with_client_returns_zero_for_matching_dashboard() {
         input_format: test_support::DashboardImportInputFormat::Raw,
         import_folder_uid: Some("old-folder".to_string()),
         context_lines: 3,
+        output_format: DiffOutputFormat::Text,
     };
 
     let count = diff_dashboards_with_request(
@@ -183,6 +184,7 @@ fn diff_dashboards_with_client_detects_dashboard_difference() {
         input_format: test_support::DashboardImportInputFormat::Raw,
         import_folder_uid: None,
         context_lines: 3,
+        output_format: DiffOutputFormat::Text,
     };
 
     let count = diff_dashboards_with_request(
@@ -220,6 +222,7 @@ fn diff_dashboards_with_client_supports_provisioning_root() {
         input_format: test_support::DashboardImportInputFormat::Provisioning,
         import_folder_uid: None,
         context_lines: 3,
+        output_format: DiffOutputFormat::Text,
     };
 
     let count = diff_dashboards_with_request(
@@ -257,6 +260,7 @@ fn diff_dashboards_with_client_supports_provisioning_dashboards_dir() {
         input_format: test_support::DashboardImportInputFormat::Provisioning,
         import_folder_uid: None,
         context_lines: 3,
+        output_format: DiffOutputFormat::Text,
     };
 
     let count = diff_dashboards_with_request(

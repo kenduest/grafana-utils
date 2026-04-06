@@ -9,6 +9,8 @@
 use crate::common::{message, tool_version, value_as_object, Result};
 use reqwest::Method;
 use serde_json::{json, Map, Value};
+
+use crate::common::{build_shared_diff_document, SharedDiffSummary};
 use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
 
@@ -414,24 +416,43 @@ pub fn build_alert_diff_document(rows: &[Value]) -> Value {
     let checked = rows.len();
     let same = rows
         .iter()
-        .filter(|row| row.get("action").and_then(Value::as_str) == Some("same"))
+        .filter(|row| {
+            row.get("status")
+                .and_then(Value::as_str)
+                .or_else(|| row.get("action").and_then(Value::as_str))
+                == Some("same")
+        })
         .count();
     let different = rows
         .iter()
-        .filter(|row| row.get("action").and_then(Value::as_str) == Some("different"))
+        .filter(|row| {
+            row.get("status")
+                .and_then(Value::as_str)
+                .or_else(|| row.get("action").and_then(Value::as_str))
+                == Some("different")
+        })
         .count();
     let missing_remote = rows
         .iter()
-        .filter(|row| row.get("action").and_then(Value::as_str) == Some("missing-remote"))
+        .filter(|row| {
+            row.get("status")
+                .and_then(Value::as_str)
+                .or_else(|| row.get("action").and_then(Value::as_str))
+                == Some("missing-remote")
+        })
         .count();
 
-    json!({
-        "summary": {
-            "checked": checked,
-            "same": same,
-            "different": different,
-            "missingRemote": missing_remote,
+    build_shared_diff_document(
+        "grafana-util-alert-diff",
+        1,
+        SharedDiffSummary {
+            checked,
+            same,
+            different,
+            missing_remote,
+            extra_remote: 0,
+            ambiguous: 0,
         },
-        "rows": rows,
-    })
+        rows,
+    )
 }

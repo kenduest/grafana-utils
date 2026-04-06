@@ -440,7 +440,8 @@ fn import_help_mentions_structured_dry_run_json() {
 fn diff_help_mentions_structured_json() {
     let help = render_alert_subcommand_help(&["diff"]);
     assert!(help.contains("--json"));
-    assert!(help.contains("Render diff output as structured JSON."));
+    assert!(help.contains("Deprecated compatibility flag. Equivalent to --output-format json."));
+    assert!(help.contains("--output-format"));
 }
 
 #[test]

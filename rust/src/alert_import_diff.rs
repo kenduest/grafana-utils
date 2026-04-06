@@ -447,12 +447,17 @@ pub(crate) fn diff_alerting_resources(args: &AlertCliArgs) -> Result<()> {
             if serialize_compare_document(&local_compare)?
                 == serialize_compare_document(&remote_compare)?
             {
-                if args.json {
+                if matches!(
+                    args.diff_output,
+                    Some(crate::common::DiffOutputFormat::Json)
+                ) {
                     diff_rows.push(json!({
-                        "path": resource_file.to_string_lossy().to_string(),
-                        "kind": kind,
+                        "domain": "alert",
+                        "resourceKind": kind,
                         "identity": identity,
-                        "action": "same",
+                        "status": "same",
+                        "path": resource_file.to_string_lossy().to_string(),
+                        "changedFields": Vec::<String>::new(),
                     }));
                     continue;
                 }
@@ -465,12 +470,17 @@ pub(crate) fn diff_alerting_resources(args: &AlertCliArgs) -> Result<()> {
                 continue;
             }
 
-            if args.json {
+            if matches!(
+                args.diff_output,
+                Some(crate::common::DiffOutputFormat::Json)
+            ) {
                 diff_rows.push(json!({
-                    "path": resource_file.to_string_lossy().to_string(),
-                    "kind": kind,
+                    "domain": "alert",
+                    "resourceKind": kind,
                     "identity": identity,
-                    "action": "different",
+                    "status": "different",
+                    "path": resource_file.to_string_lossy().to_string(),
+                    "changedFields": ["spec"],
                 }));
                 differences += 1;
                 continue;
@@ -489,12 +499,17 @@ pub(crate) fn diff_alerting_resources(args: &AlertCliArgs) -> Result<()> {
             continue;
         }
 
-        if args.json {
+        if matches!(
+            args.diff_output,
+            Some(crate::common::DiffOutputFormat::Json)
+        ) {
             diff_rows.push(json!({
-                "path": resource_file.to_string_lossy().to_string(),
-                "kind": kind,
+                "domain": "alert",
+                "resourceKind": kind,
                 "identity": identity,
-                "action": "missing-remote",
+                "status": "missing-remote",
+                "path": resource_file.to_string_lossy().to_string(),
+                "changedFields": Vec::<String>::new(),
             }));
             differences += 1;
             continue;
@@ -512,7 +527,10 @@ pub(crate) fn diff_alerting_resources(args: &AlertCliArgs) -> Result<()> {
         differences += 1;
     }
 
-    if args.json {
+    if matches!(
+        args.diff_output,
+        Some(crate::common::DiffOutputFormat::Json)
+    ) {
         print!(
             "{}",
             render_json_value(&build_alert_diff_document(&diff_rows))?

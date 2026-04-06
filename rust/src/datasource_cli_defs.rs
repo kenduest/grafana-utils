@@ -5,7 +5,7 @@ use std::path::PathBuf;
 
 #[cfg(test)]
 use crate::common::set_json_color_choice;
-use crate::common::CliColorChoice;
+use crate::common::{CliColorChoice, DiffOutputFormat};
 use crate::dashboard::{CommonCliArgs, SimpleOutputFormat};
 use crate::datasource_catalog::DatasourcePresetProfile;
 
@@ -323,6 +323,13 @@ pub struct DatasourceDiffArgs {
         help_heading = "Input Options"
     )]
     pub input_format: DatasourceImportInputFormat,
+    #[arg(
+        long = "output-format",
+        value_enum,
+        default_value_t = DiffOutputFormat::Text,
+        help = "Render diff output as text or json."
+    )]
+    pub output_format: DiffOutputFormat,
 }
 
 #[derive(Debug, Clone, Args)]

@@ -9,7 +9,7 @@ use clap::{ColorChoice, ValueEnum};
 use regex::Regex;
 use rpassword::prompt_password;
 use serde::Serialize;
-use serde_json::{Map, Value};
+use serde_json::{json, Map, Value};
 use std::cell::Cell;
 use std::env;
 use std::fs;
@@ -43,6 +43,23 @@ pub enum CliColorChoice {
     Always,
     #[value(alias = "none", alias = "off")]
     Never,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, ValueEnum)]
+pub enum DiffOutputFormat {
+    Text,
+    Json,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct SharedDiffSummary {
+    pub checked: usize,
+    pub same: usize,
+    pub different: usize,
+    pub missing_remote: usize,
+    pub extra_remote: usize,
+    pub ambiguous: usize,
 }
 
 impl From<CliColorChoice> for ColorChoice {
@@ -118,6 +135,21 @@ pub fn write_plain_output_file(path: &Path, output: &str) -> Result<()> {
     let normalized = strip_ansi_codes(output).trim_end_matches('\n').to_string();
     fs::write(path, format!("{normalized}\n"))?;
     Ok(())
+}
+
+pub fn build_shared_diff_document(
+    kind: &str,
+    schema_version: i64,
+    summary: SharedDiffSummary,
+    rows: &[Value],
+) -> Value {
+    json!({
+        "kind": kind,
+        "schemaVersion": schema_version,
+        "toolVersion": TOOL_VERSION,
+        "summary": summary,
+        "rows": rows,
+    })
 }
 
 pub fn should_print_stdout(output_file: Option<&Path>, also_stdout: bool) -> bool {
