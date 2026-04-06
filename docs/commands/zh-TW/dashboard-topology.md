@@ -52,6 +52,6 @@ grafana-util dashboard graph \
 - 如果後續視覺化工具讀不進去，先確認你輸出的是 `mermaid`、`dot`、`json` 還是一般 `text`
 
 ## 相關指令
-- [dashboard inspect-export](./dashboard-inspect-export.md)
+- [dashboard analyze-export](./dashboard-analyze-export.md)
 - [dashboard governance-gate](./dashboard-governance-gate.md)
 - [dashboard screenshot](./dashboard-screenshot.md)

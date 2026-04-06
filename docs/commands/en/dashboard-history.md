@@ -90,7 +90,7 @@ grafana-util dashboard history export --url http://localhost:3000 --token "$GRAF
 
 ## Related commands
 - [dashboard list](./dashboard-list.md)
-- [dashboard inspect-live](./dashboard-inspect-live.md)
-- [dashboard inspect-export](./dashboard-inspect-export.md)
+- [dashboard analyze-live](./dashboard-analyze-live.md)
+- [dashboard analyze-export](./dashboard-analyze-export.md)
 - [dashboard review](./dashboard-review.md)
 - [dashboard export](./dashboard-export.md)

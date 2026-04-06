@@ -1,13 +1,13 @@
-# dashboard inspect-vars
+# dashboard list-vars
 
 ## Purpose
 List dashboard templating variables and datasource-like choices from live Grafana.
 
 ## When to use
-Use this when you need to inspect variable state, feed a screenshot workflow, or debug variable-scoped dashboard URLs.
+Use this when you need to list variable state, feed a screenshot workflow, or debug variable-scoped dashboard URLs.
 
 ## Key flags
-- `--dashboard-uid` or `--dashboard-url`: choose the dashboard to inspect.
+- `--dashboard-uid` or `--dashboard-url`: choose the dashboard to inspect for variable values.
 - `--vars-query`: overlay a variable query string such as `var-env=prod&var-host=web01`.
 - `--org-id`: scope the inspection to one org.
 - `--output-format`: render table, csv, text, json, or yaml.
@@ -17,15 +17,15 @@ Use this when you need to inspect variable state, feed a screenshot workflow, or
 ## Examples
 ```bash
 # Purpose: List dashboard templating variables and datasource-like choices from live Grafana.
-grafana-util dashboard inspect-vars --dashboard-url 'https://grafana.example.com/d/cpu-main/cpu-overview?var-cluster=prod-a' --profile prod --output-format table
+grafana-util dashboard list-vars --dashboard-url 'https://grafana.example.com/d/cpu-main/cpu-overview?var-cluster=prod-a' --profile prod --output-format table
 ```
 
 ```bash
 # Purpose: List dashboard templating variables and datasource-like choices from live Grafana.
-grafana-util dashboard inspect-vars --url https://grafana.example.com --dashboard-uid cpu-main --vars-query 'var-cluster=prod-a&var-instance=node01' --basic-user admin --prompt-password --output-format json
+grafana-util dashboard list-vars --url https://grafana.example.com --dashboard-uid cpu-main --vars-query 'var-cluster=prod-a&var-instance=node01' --basic-user admin --prompt-password --output-format json
 ```
 
 ## Related commands
 - [dashboard screenshot](./dashboard-screenshot.md)
-- [dashboard inspect-live](./dashboard-inspect-live.md)
+- [dashboard analyze-live](./dashboard-analyze-live.md)
 - [dashboard browse](./dashboard-browse.md)

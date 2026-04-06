@@ -81,7 +81,7 @@
 
 ```bash
 # 用途：解決方案：匯入前先跑 pre-import inspection。
-grafana-util dashboard inspect-export --import-dir ./backups/raw --output-format report-table
+grafana-util dashboard analyze-export --import-dir ./backups/raw --output-format report-table
 ```
 
 **檢查重點**：確認報告中 `Sources` 欄位列出的每個 UID，都存在於目標環境的 `datasource list`。

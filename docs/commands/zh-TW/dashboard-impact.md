@@ -49,6 +49,6 @@ grafana-util dashboard impact \
 - 如果 JSON 要交給 CI 或外部工具，先驗證 top-level shape，再判斷「零影響」是否可信
 
 ## 相關指令
-- [dashboard inspect-export](./dashboard-inspect-export.md)
+- [dashboard analyze-export](./dashboard-analyze-export.md)
 - [dashboard topology](./dashboard-topology.md)
 - [dashboard governance-gate](./dashboard-governance-gate.md)

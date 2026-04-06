@@ -1,4 +1,4 @@
-# dashboard inspect-export
+# dashboard analyze-export
 
 ## Purpose
 Analyze dashboard export directories with operator-summary and report-contract views.
@@ -9,27 +9,27 @@ Use this when you want to read a local export tree, inspect its structure, or re
 ## Before / After
 
 - **Before**: an export tree is just a folder of JSON files, and you still have to guess which dashboards, variables, or policy checks matter.
-- **After**: one inspect pass turns that tree into operator views you can review, hand to CI, or feed into later checks such as `topology` and `governance-gate`.
+- **After**: one analysis pass turns that tree into operator views you can review, hand to CI, or feed into later checks such as `topology` and `governance-gate`.
 
 ## Key flags
-- `--import-dir`: dashboard export root to inspect.
+- `--import-dir`: dashboard export root to analyze.
 - `--input-format`: choose `raw` or `provisioning`.
 - `--input-type`: select `raw` or `source` when the export root has multiple dashboard variants.
 - `--report`: render table, csv, json, tree, tree-table, dependency, dependency-json, governance, or governance-json views.
 - `--output-format`: single-flag output selector.
-- `--interactive`: open the shared inspect workbench.
+- `--interactive`: open the shared analysis workbench.
 - `--output-file`: write the result to disk.
 - `--no-header`: suppress table-like headers.
 
 ## Examples
 ```bash
 # Purpose: Analyze dashboard export directories with operator-summary and report-contract views.
-grafana-util dashboard inspect-export --import-dir ./dashboards/raw --input-format raw --table
+grafana-util dashboard analyze-export --import-dir ./dashboards/raw --input-format raw --table
 ```
 
 ```bash
 # Purpose: Analyze dashboard export directories with operator-summary and report-contract views.
-grafana-util dashboard inspect-export --import-dir ./dashboards/provisioning --input-format provisioning --report governance-json
+grafana-util dashboard analyze-export --import-dir ./dashboards/provisioning --input-format provisioning --report governance-json
 ```
 
 ## What success looks like

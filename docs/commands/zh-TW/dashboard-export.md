@@ -61,7 +61,7 @@ grafana-util dashboard export --url http://localhost:3000 --basic-user admin --b
 ```
 
 ## 相關指令
-- [dashboard inspect-export](./dashboard-inspect-export.md)
+- [dashboard analyze-export](./dashboard-analyze-export.md)
 - [dashboard import](./dashboard-import.md)
 - [dashboard diff](./dashboard-diff.md)
 - [dashboard raw-to-prompt](./dashboard-raw-to-prompt.md)

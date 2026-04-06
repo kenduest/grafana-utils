@@ -52,6 +52,6 @@ grafana-util dashboard graph \
 - if a downstream visual tool rejects the result, double-check whether you emitted `mermaid`, `dot`, `json`, or plain `text`
 
 ## Related commands
-- [dashboard inspect-export](./dashboard-inspect-export.md)
+- [dashboard analyze-export](./dashboard-analyze-export.md)
 - [dashboard governance-gate](./dashboard-governance-gate.md)
 - [dashboard screenshot](./dashboard-screenshot.md)

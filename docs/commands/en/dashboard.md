@@ -13,7 +13,8 @@ If you are an SRE, Grafana operator, or responder, this page should help you dec
 
 ## Workflow lanes
 
-- **Inspect**: browse, list, get, inspect-live, inspect-export, inspect-vars, and topology checks.
+- **Browse and inventory**: browse, list, and get.
+- **Analyze dashboards and reports**: analyze-live, analyze-export, list-vars, and topology checks.
 - **Move**: export, import, clone-live, raw-to-prompt, diff, and publish paths.
 - **Author**: get, clone-live, serve, patch-file, edit-live, review, and publish around one dashboard draft.
 - **Review Before Mutate**: review, governance-gate, and impact analysis.
@@ -103,25 +104,25 @@ grafana-util dashboard edit-live --profile prod --dashboard-uid cpu-main --outpu
 ```
 
 ```bash
-# Purpose: Inspect live dashboard governance data for downstream review.
-grafana-util dashboard inspect-live --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-format governance-json
+# Purpose: Analyze live dashboard governance data for downstream review.
+grafana-util dashboard analyze-live --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-format governance-json
 ```
 
 ```bash
-# Purpose: Open the interactive inspector for a live dashboard.
-grafana-util dashboard inspect-live --url http://localhost:3000 --basic-user admin --basic-password admin --interactive
+# Purpose: Open the interactive analysis workbench for a live dashboard.
+grafana-util dashboard analyze-live --url http://localhost:3000 --basic-user admin --basic-password admin --interactive
 ```
 
 ## Related commands
 
-### Inspect
+### Browse and Inventory
 
 - [dashboard browse](./dashboard-browse.md)
 - [dashboard list](./dashboard-list.md)
 - [dashboard get](./dashboard-get.md)
-- [dashboard inspect-live](./dashboard-inspect-live.md)
-- [dashboard inspect-export](./dashboard-inspect-export.md)
-- [dashboard inspect-vars](./dashboard-inspect-vars.md)
+- [dashboard analyze-live](./dashboard-analyze-live.md)
+- [dashboard analyze-export](./dashboard-analyze-export.md)
+- [dashboard list-vars](./dashboard-list-vars.md)
 
 ### Move
 

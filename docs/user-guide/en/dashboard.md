@@ -107,9 +107,9 @@ Need the command-by-command surface instead of the workflow guide?
 - [dashboard publish](../../commands/en/dashboard-publish.md)
 - [dashboard delete](../../commands/en/dashboard-delete.md)
 - [dashboard diff](../../commands/en/dashboard-diff.md)
-- [dashboard inspect-export](../../commands/en/dashboard-inspect-export.md)
-- [dashboard inspect-live](../../commands/en/dashboard-inspect-live.md)
-- [dashboard inspect-vars](../../commands/en/dashboard-inspect-vars.md)
+- [dashboard analyze-export](../../commands/en/dashboard-analyze-export.md)
+- [dashboard analyze-live](../../commands/en/dashboard-analyze-live.md)
+- [dashboard list-vars](../../commands/en/dashboard-list-vars.md)
 - [dashboard history](../../commands/en/dashboard-history.md)
 - [dashboard governance-gate](../../commands/en/dashboard-governance-gate.md)
 - [dashboard topology](../../commands/en/dashboard-topology.md)
@@ -134,9 +134,9 @@ Use the dashboard area for estate-level governance:
 
 If your goal is not export or import, but understanding what a dashboard currently looks like, which dependencies it carries, and how variables resolve, start here.
 
-- `dashboard inspect-live`: inspect one live dashboard's structure, queries, and dependencies.
-- `dashboard inspect-export`: inspect an exported dashboard file offline.
-- `dashboard inspect-vars`: verify variables, datasource choices, and URL-scoped inputs.
+- `dashboard analyze-live`: analyze one live dashboard's structure, queries, and dependencies.
+- `dashboard analyze-export`: analyze an exported dashboard file offline.
+- `dashboard list-vars`: verify variables, datasource choices, and URL-scoped inputs.
 - `dashboard screenshot`: generate a reproducible dashboard or panel capture with a headless browser.
 - `dashboard topology`: trace the dashboard's upstream relationships at a glance.
 
@@ -180,7 +180,7 @@ Use `dashboard history export` when you need a standalone JSON artifact for one 
 - **Staged Work**: Local export trees, validation, offline inspection, and dry-run reviews.
 - **Live Work**: Grafana-backed inventory, live diffs, imports, and deletions.
 
-**The Golden Rule**: Start with `list` or `browse` to discover, `export` to a staged tree, `inspect` and `diff` to verify, and only then `import` or `delete` after a matching dry-run.
+**The Golden Rule**: Start with `list` or `browse` to discover, `export` to a staged tree, `analyze` and `diff` to verify, and only then `import` or `delete` after a matching dry-run.
 
 ---
 
@@ -222,9 +222,9 @@ spring-jmx-node-unified  Spring JMX + Node Unified Dashboard (VM)  Demo    ffhrm
 | **Raw to Prompt** | `grafana-util dashboard raw-to-prompt --input-dir ./dashboards/raw --output-dir ./dashboards/prompt --overwrite --progress` |
 | **Import** | `grafana-util dashboard import --import-dir ./dashboards/raw --replace-existing --dry-run --table` |
 | **Diff** | `grafana-util dashboard diff --import-dir ./dashboards/raw --input-format raw` |
-| **Inspect** | `grafana-util dashboard inspect-export --import-dir ./dashboards/raw --output-format report-table` |
+| **Analyze** | `grafana-util dashboard analyze-export --import-dir ./dashboards/raw --output-format report-table` |
 | **Delete** | `grafana-util dashboard delete --uid <UID> --url <URL> --basic-user admin --basic-password admin` |
-| **Inspect Vars** | `grafana-util dashboard inspect-vars --uid <UID> --url <URL> --table` |
+| **List Vars** | `grafana-util dashboard list-vars --uid <UID> --url <URL> --table` |
 | **Patch File** | `grafana-util dashboard patch-file --input <FILE> --name "New Title" --output <FILE>` |
 | **Publish** | `grafana-util dashboard publish --input <FILE> --url <URL> --basic-user admin --basic-password admin` |
 | **Clone Live** | `grafana-util dashboard clone-live --source-uid <UID> --output <FILE> --url <URL>` |

@@ -137,7 +137,7 @@ grafana-util dashboard export --all-orgs --export-dir ./backup --progress
 
 ```bash
 # 盤點匯出目錄中的 datasource 相依性與結構問題。
-grafana-util dashboard inspect-export \
+grafana-util dashboard analyze-export \
   --import-dir ./backup/raw \
   --output-format report-table
 ```
@@ -239,7 +239,7 @@ grafana-util datasource import \
 
 1. 用 `overview live` 確認目標 Grafana 真的連得到
 2. 用 `dashboard export` 匯出成可審查的目錄樹
-3. 用 `dashboard inspect-export` 先抓出缺少的 datasource 依賴
+3. 用 `dashboard analyze-export` 先抓出缺少的 datasource 依賴
 4. 用 `dashboard import --dry-run` 預覽回放結果，再決定要不要動 live
 
 這是最短、也最能感受到工具價值的一條公開工作流。

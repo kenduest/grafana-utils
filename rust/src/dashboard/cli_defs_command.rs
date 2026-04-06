@@ -1117,34 +1117,37 @@ pub enum DashboardCommand {
     )]
     Publish(PublishArgs),
     #[command(
-        name = "inspect-export",
+        name = "analyze-export",
+        alias = "inspect-export",
         about = "Analyze dashboard export directories with operator-summary and report-contract views.",
-        after_help = "Examples:\n\n  Render an operator-summary table from raw exports:\n    grafana-util dashboard inspect-export --import-dir ./dashboards/raw --input-format raw --table\n\n  Open the interactive inspect workbench over raw exports:\n    grafana-util dashboard inspect-export --import-dir ./dashboards/raw --input-format raw --interactive\n\n  Render the machine-readable governance contract from raw exports:\n    grafana-util dashboard inspect-export --import-dir ./dashboards/raw --input-format raw --report governance-json\n\n  Inspect a file-provisioning tree from the provisioning root:\n    grafana-util dashboard inspect-export --import-dir ./dashboards/provisioning --input-format provisioning --report tree-table"
+        after_help = "Examples:\n\n  Render an operator-summary table from raw exports:\n    grafana-util dashboard analyze-export --import-dir ./dashboards/raw --input-format raw --table\n\n  Open the interactive inspect workbench over raw exports:\n    grafana-util dashboard analyze-export --import-dir ./dashboards/raw --input-format raw --interactive\n\n  Render the machine-readable governance contract from raw exports:\n    grafana-util dashboard analyze-export --import-dir ./dashboards/raw --input-format raw --report governance-json\n\n  Inspect a file-provisioning tree from the provisioning root:\n    grafana-util dashboard analyze-export --import-dir ./dashboards/provisioning --input-format provisioning --report tree-table"
     )]
     InspectExport(InspectExportArgs),
     #[command(
-        name = "inspect-live",
+        name = "analyze-live",
+        alias = "inspect-live",
         about = "Analyze live Grafana dashboards via a temporary raw-export snapshot.",
-        after_help = "Examples:\n\n  Render governance JSON from live Grafana:\n    grafana-util dashboard inspect-live --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --output-format governance-json\n\n  Open the interactive inspect workbench over live Grafana:\n    grafana-util dashboard inspect-live --url http://localhost:3000 --basic-user admin --basic-password admin --interactive"
+        after_help = "Examples:\n\n  Render governance JSON from live Grafana:\n    grafana-util dashboard analyze-live --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --output-format governance-json\n\n  Open the interactive inspect workbench over live Grafana:\n    grafana-util dashboard analyze-live --url http://localhost:3000 --basic-user admin --basic-password admin --interactive"
     )]
     InspectLive(InspectLiveArgs),
     #[command(
-        name = "inspect-vars",
+        name = "list-vars",
+        alias = "inspect-vars",
         about = "List dashboard templating variables and datasource-like choices from live Grafana.",
-        after_help = "Examples:\n\n  Inspect variables from a browser URL directly:\n    grafana-util dashboard inspect-vars --dashboard-url 'https://grafana.example.com/d/cpu-main/cpu-overview?var-cluster=prod-a' --token \"$GRAFANA_API_TOKEN\" --output-format table\n\n  Inspect one dashboard UID with a vars-query fragment:\n    grafana-util dashboard inspect-vars --url https://grafana.example.com --dashboard-uid cpu-main --vars-query 'var-cluster=prod-a&var-instance=node01' --token \"$GRAFANA_API_TOKEN\" --output-format json\n\n  Render the same variable inventory as YAML:\n    grafana-util dashboard inspect-vars --url https://grafana.example.com --dashboard-uid cpu-main --token \"$GRAFANA_API_TOKEN\" --output-format yaml"
+        after_help = "Examples:\n\n  List variables from a browser URL directly:\n    grafana-util dashboard list-vars --dashboard-url 'https://grafana.example.com/d/cpu-main/cpu-overview?var-cluster=prod-a' --token \"$GRAFANA_API_TOKEN\" --output-format table\n\n  List one dashboard UID with a vars-query fragment:\n    grafana-util dashboard list-vars --url https://grafana.example.com --dashboard-uid cpu-main --vars-query 'var-cluster=prod-a&var-instance=node01' --token \"$GRAFANA_API_TOKEN\" --output-format json\n\n  Render the same variable inventory as YAML:\n    grafana-util dashboard list-vars --url https://grafana.example.com --dashboard-uid cpu-main --token \"$GRAFANA_API_TOKEN\" --output-format yaml"
     )]
     InspectVars(InspectVarsArgs),
     #[command(
         name = "governance-gate",
         about = "Evaluate a governance policy file or built-in policy against dashboard governance-json and query-report JSON artifacts.",
-        after_help = "Examples:\n\n  Build artifacts first with inspect-live or inspect-export, then evaluate a JSON/YAML policy file:\n    grafana-util dashboard inspect-live --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --output-format governance-json --output-file ./governance.json\n    grafana-util dashboard governance-gate --policy-source file --policy ./policy.yaml --governance ./governance.json --queries ./queries.json\n\n  Evaluate the built-in policy by name and write the normalized result JSON:\n    grafana-util dashboard governance-gate --policy-source builtin --builtin-policy default --governance ./governance.json --queries ./queries.json --output-format json --json-output ./governance-check.json"
+        after_help = "Examples:\n\n  Build artifacts first with analyze-live or analyze-export, then evaluate a JSON/YAML policy file:\n    grafana-util dashboard analyze-live --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --output-format governance-json --output-file ./governance.json\n    grafana-util dashboard governance-gate --policy-source file --policy ./policy.yaml --governance ./governance.json --queries ./queries.json\n\n  Evaluate the built-in policy by name and write the normalized result JSON:\n    grafana-util dashboard governance-gate --policy-source builtin --builtin-policy default --governance ./governance.json --queries ./queries.json --output-format json --json-output ./governance-check.json"
     )]
     GovernanceGate(GovernanceGateArgs),
     #[command(
         name = "topology",
         visible_alias = "graph",
         about = "Build a deterministic dashboard, datasource, variable, and alert topology from JSON artifacts.",
-        after_help = "Examples:\n\n  Build artifacts first with inspect-live or inspect-export, then render Mermaid:\n    grafana-util dashboard inspect-live --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --output-format governance-json --output-file ./governance.json\n    grafana-util dashboard topology --governance ./governance.json --queries ./queries.json --alert-contract ./alert-contract.json --output-format mermaid\n\n  Render the same graph through the graph alias as DOT while also writing it to disk:\n    grafana-util dashboard graph --governance ./governance.json --queries ./queries.json --alert-contract ./alert-contract.json --output-format dot --output-file ./dashboard-topology.dot"
+        after_help = "Examples:\n\n  Build artifacts first with analyze-live or analyze-export, then render Mermaid:\n    grafana-util dashboard analyze-live --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --output-format governance-json --output-file ./governance.json\n    grafana-util dashboard topology --governance ./governance.json --queries ./queries.json --alert-contract ./alert-contract.json --output-format mermaid\n\n  Render the same graph through the graph alias as DOT while also writing it to disk:\n    grafana-util dashboard graph --governance ./governance.json --queries ./queries.json --alert-contract ./alert-contract.json --output-format dot --output-file ./dashboard-topology.dot"
     )]
     Topology(TopologyArgs),
     #[command(

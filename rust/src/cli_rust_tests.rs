@@ -83,7 +83,7 @@ fn render_resource_subcommand_help(path: &[&str]) -> String {
 }
 
 #[test]
-fn unified_help_mentions_screenshot_and_inspect_vars_examples() {
+fn unified_help_mentions_screenshot_and_dashboard_analysis_examples() {
     let help = render_unified_help();
     assert!(help.contains("--version"));
     assert!(help.contains("--help-full"));
@@ -95,7 +95,7 @@ fn unified_help_mentions_screenshot_and_inspect_vars_examples() {
     assert!(help.contains("--basic-user admin --basic-password admin"));
     assert!(help.contains("--all-orgs"));
     assert!(help.contains("dashboard screenshot"));
-    assert!(help.contains("dashboard inspect-vars"));
+    assert!(help.contains("dashboard analyze-live"));
     assert!(help.contains("datasource inspect-export"));
     assert!(help.contains("--dashboard-url"));
     assert!(help.contains("dashboard review"));
@@ -723,7 +723,7 @@ fn parse_cli_supports_dashboard_group_inspect_export_command() {
     let args: CliArgs = parse_cli_from([
         "grafana-util",
         "dashboard",
-        "inspect-export",
+        "analyze-export",
         "--import-dir",
         "./dashboards/raw",
         "--json",
@@ -735,7 +735,7 @@ fn parse_cli_supports_dashboard_group_inspect_export_command() {
                 assert_eq!(inner.import_dir, Path::new("./dashboards/raw"));
                 assert!(inner.json);
             }
-            _ => panic!("expected dashboard inspect-export"),
+            _ => panic!("expected dashboard analyze-export"),
         },
         _ => panic!("expected dashboard group"),
     }
@@ -746,7 +746,7 @@ fn parse_cli_supports_dashboard_group_inspect_live_command() {
     let args: CliArgs = parse_cli_from([
         "grafana-util",
         "dashboard",
-        "inspect-live",
+        "analyze-live",
         "--url",
         "http://127.0.0.1:3000",
         "--report",
@@ -762,7 +762,7 @@ fn parse_cli_supports_dashboard_group_inspect_live_command() {
                     Some(crate::dashboard::InspectExportReportFormat::Json)
                 );
             }
-            _ => panic!("expected dashboard inspect-live"),
+            _ => panic!("expected dashboard analyze-live"),
         },
         _ => panic!("expected dashboard group"),
     }
@@ -1952,10 +1952,18 @@ fn maybe_render_unified_help_from_os_args_handles_root_help_and_help_full_flags(
         maybe_render_unified_help_from_os_args(["grafana-util", "change", "-h"], false).unwrap();
     assert!(change_short_help.contains("--help-full"));
 
-    assert!(
+    let dashboard_short_help =
         maybe_render_unified_help_from_os_args(["grafana-util", "dashboard", "--help"], false)
-            .is_none()
-    );
+            .unwrap();
+    assert!(dashboard_short_help.contains("Usage: grafana-util dashboard <COMMAND>"));
+    assert!(dashboard_short_help.contains("Choose the task first:"));
+    assert!(dashboard_short_help.contains("Browse and inventory:"));
+    assert!(dashboard_short_help.contains("Analyze dashboards and build reports:"));
+    assert!(dashboard_short_help.contains("Move dashboards:"));
+    assert!(dashboard_short_help.contains("Edit one draft:"));
+    assert!(dashboard_short_help.contains("Review risk and recover:"));
+    assert!(dashboard_short_help.contains("Capture visual proof:"));
+    assert!(dashboard_short_help.contains("grafana-util dashboard <COMMAND> --help-full"));
     assert!(maybe_render_unified_help_from_os_args(
         ["grafana-util", "dashboard", "--help-full"],
         false

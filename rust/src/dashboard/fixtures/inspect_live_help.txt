@@ -1,6 +1,6 @@
 Analyze live Grafana dashboards via a temporary raw-export snapshot.
 
-Usage: inspect-live [OPTIONS]
+Usage: analyze-live [OPTIONS]
 
 Options:
       --color <COLOR>
@@ -54,7 +54,7 @@ Options:
       --progress
           Show a progress bar while live dashboards are fetched for inspection.
       --help-full
-          Show extended help with report examples for inspect-live.
+          Show extended help with report examples for analyze-live.
       --no-header
           Do not print headers when rendering table, csv, or tree-table inspection output, including compatible --output-format values.
       --output-file <OUTPUT_FILE>
@@ -69,7 +69,7 @@ Options:
 Examples:
 
   Render governance JSON from live Grafana:
-    grafana-util dashboard inspect-live --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-format governance-json
+    grafana-util dashboard analyze-live --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-format governance-json
 
   Open the interactive inspect workbench over live Grafana:
-    grafana-util dashboard inspect-live --url http://localhost:3000 --basic-user admin --basic-password admin --interactive
+    grafana-util dashboard analyze-live --url http://localhost:3000 --basic-user admin --basic-password admin --interactive

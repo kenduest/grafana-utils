@@ -260,7 +260,7 @@ pub struct InspectVarsArgs {
     #[arg(
         long,
         value_name = "QUERY",
-        help = "Grafana variable query-string fragment, for example 'var-env=prod&var-host=web01'. This overlays current values in inspect-vars output."
+        help = "Grafana variable query-string fragment, for example 'var-env=prod&var-host=web01'. This overlays current values in list-vars output."
     )]
     pub vars_query: Option<String>,
     #[arg(
@@ -277,16 +277,16 @@ pub struct InspectVarsArgs {
     #[arg(
         long,
         default_value_t = false,
-        help = "Do not print table or CSV headers when rendering inspect-vars output."
+        help = "Do not print table or CSV headers when rendering list-vars output."
     )]
     pub no_header: bool,
-    #[arg(long, help = "Write inspect-vars output to this file.")]
+    #[arg(long, help = "Write list-vars output to this file.")]
     pub output_file: Option<PathBuf>,
     #[arg(
         long,
         default_value_t = false,
         requires = "output_file",
-        help = "When --output-file is set, also print inspect-vars output to stdout."
+        help = "When --output-file is set, also print list-vars output to stdout."
     )]
     pub also_stdout: bool,
 }
@@ -383,7 +383,7 @@ pub struct InspectExportArgs {
     #[arg(
         long,
         default_value_t = false,
-        help = "Show extended help with report examples for inspect-export."
+        help = "Show extended help with report examples for analyze-export."
     )]
     pub help_full: bool,
     #[arg(
@@ -512,7 +512,7 @@ pub struct InspectLiveArgs {
     #[arg(
         long,
         default_value_t = false,
-        help = "Show extended help with report examples for inspect-live."
+        help = "Show extended help with report examples for analyze-live."
     )]
     pub help_full: bool,
     #[arg(

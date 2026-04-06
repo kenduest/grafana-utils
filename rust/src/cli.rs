@@ -123,16 +123,22 @@ pub enum DashboardGroupCommand {
     )]
     Publish(PublishArgs),
     #[command(
+        name = "analyze-export",
+        alias = "inspect-export",
         about = "Analyze a raw dashboard export directory and summarize its structure.",
         after_help = DASHBOARD_INSPECT_EXPORT_HELP_TEXT
     )]
     InspectExport(InspectExportArgs),
     #[command(
+        name = "analyze-live",
+        alias = "inspect-live",
         about = "Analyze live Grafana dashboards without writing a persistent export.",
         after_help = DASHBOARD_INSPECT_LIVE_HELP_TEXT
     )]
     InspectLive(InspectLiveArgs),
     #[command(
+        name = "list-vars",
+        alias = "inspect-vars",
         about = "List dashboard templating variables from live Grafana.",
         after_help = DASHBOARD_INSPECT_VARS_HELP_TEXT
     )]

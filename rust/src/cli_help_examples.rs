@@ -92,7 +92,7 @@ pub(crate) const UNIFIED_HELP_TEXT: &str = help_block!(
     (
         "[Dashboard Capture]",
         "Inspect dashboard variables before capture:",
-        r#"grafana-util dashboard inspect-vars --dashboard-url 'https://grafana.example.com/d/cpu-main/cpu-overview?var-cluster=prod-a' --token "$GRAFANA_API_TOKEN""#
+        r#"grafana-util dashboard list-vars --dashboard-url 'https://grafana.example.com/d/cpu-main/cpu-overview?var-cluster=prod-a' --token "$GRAFANA_API_TOKEN""#
     ),
     (
         "[Dashboard Review]",
@@ -161,7 +161,7 @@ pub(crate) const UNIFIED_HELP_FULL_TEXT: &str = help_block!(
     (
         "[Dashboard Inspect Export]",
         "Render a grouped dashboard dependency table from raw exports:",
-        "grafana-util dashboard inspect-export --import-dir ./dashboards/raw --input-format raw --output-format report-tree-table --report-columns dashboard_uid,panel_title,datasource_uid,query"
+        "grafana-util dashboard analyze-export --import-dir ./dashboards/raw --input-format raw --output-format report-tree-table --report-columns dashboard_uid,panel_title,datasource_uid,query"
     ),
     (
         "[Dashboard Raw To Prompt]",
@@ -171,12 +171,12 @@ pub(crate) const UNIFIED_HELP_FULL_TEXT: &str = help_block!(
     (
         "[Dashboard Inspect Export]",
         "Inspect a provisioning tree from the file-provisioning root:",
-        "grafana-util dashboard inspect-export --import-dir ./dashboards/provisioning --input-format provisioning --report tree-table"
+        "grafana-util dashboard analyze-export --import-dir ./dashboards/provisioning --input-format provisioning --report tree-table"
     ),
     (
         "[Dashboard Inspect Live]",
         "Render datasource governance JSON directly from live Grafana:",
-        r#"grafana-util dashboard inspect-live --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-format governance-json"#
+        r#"grafana-util dashboard analyze-live --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-format governance-json"#
     ),
     (
         "[Datasource Import]",
@@ -465,6 +465,65 @@ pub(crate) fn colorize_help_examples(text: &str) -> String {
     for (label, color) in HELP_EXAMPLE_LABELS {
         let colored_label = format!("{color}{label}{HELP_COLOR_RESET}");
         colored = colored.replace(label, &colored_label);
+    }
+    colored
+}
+
+pub(crate) fn colorize_dashboard_short_help(text: &str) -> String {
+    let mut colored = text.to_string();
+    for heading in [
+        "Usage:",
+        "Choose the task first:",
+        "Browse and inventory:",
+        "Analyze dashboards and build reports:",
+        "Move dashboards:",
+        "Edit one draft:",
+        "Review risk and recover:",
+        "Capture visual proof:",
+        "More help:",
+    ] {
+        let colored_heading = format!("{HELP_COLOR_DASHBOARD}{heading}{HELP_COLOR_RESET}");
+        colored = colored.replace(heading, &colored_heading);
+    }
+    for lane in [
+        "browse and inventory",
+        "analyze dashboards and reports",
+        "move dashboards",
+        "edit one draft",
+        "review risk and recover",
+        "capture visual proof",
+    ] {
+        let colored_lane = format!("{HELP_COLOR_DASHBOARD}{lane}{HELP_COLOR_RESET}");
+        colored = colored.replace(lane, &colored_lane);
+    }
+    for command in [
+        "browse",
+        "list",
+        "export",
+        "import",
+        "diff",
+        "delete",
+        "get",
+        "clone-live",
+        "serve",
+        "edit-live",
+        "review",
+        "patch-file",
+        "raw-to-prompt",
+        "publish",
+        "analyze-live",
+        "analyze-export",
+        "list-vars",
+        "topology",
+        "history",
+        "screenshot",
+        "governance-gate",
+    ] {
+        let needle = format!("\n  {command}");
+        let replacement = format!(
+            "\n  {HELP_COLOR_DASHBOARD}{command}{HELP_COLOR_RESET}"
+        );
+        colored = colored.replace(&needle, &replacement);
     }
     colored
 }

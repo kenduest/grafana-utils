@@ -341,7 +341,7 @@ fn snapshot_live_dashboard_export_with_fetcher_reports_dashboard_uid_on_fetch_fa
 
     assert!(error
         .to_string()
-        .contains("Failed to fetch live dashboard uid=cpu-main during inspect-live: boom"));
+        .contains("Failed to fetch live dashboard uid=cpu-main during analyze-live: boom"));
     assert_eq!(error.kind(), "context");
 }
 

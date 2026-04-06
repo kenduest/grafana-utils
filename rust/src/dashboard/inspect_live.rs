@@ -130,7 +130,7 @@ where
             }
             Err(error) => {
                 return Err(error.with_context(format!(
-                    "Failed to fetch live dashboard uid={uid} during inspect-live"
+                    "Failed to fetch live dashboard uid={uid} during analyze-live"
                 )))
             }
         }
@@ -288,22 +288,22 @@ pub(crate) fn load_variant_index_entries(
 #[cfg(feature = "tui")]
 fn run_interactive_inspect_live_tui_from_dir(import_dir: &Path) -> Result<usize> {
     eprintln!(
-        "[inspect-live --interactive] building summary: {}",
+        "[analyze-live --interactive] building summary: {}",
         import_dir.display()
     );
     let summary = build_export_inspection_summary(import_dir)?;
     eprintln!(
-        "[inspect-live --interactive] building query report: {}",
+        "[analyze-live --interactive] building query report: {}",
         import_dir.display()
     );
     let report = build_export_inspection_query_report(import_dir)?;
     eprintln!(
-        "[inspect-live --interactive] building governance review: {}",
+        "[analyze-live --interactive] building governance review: {}",
         import_dir.display()
     );
     let governance = build_export_inspection_governance_document(&summary, &report);
     eprintln!(
-        "[inspect-live --interactive] launching inspect workbench: {}",
+        "[analyze-live --interactive] launching analysis workbench: {}",
         import_dir.display()
     );
     run_inspect_live_tui(&summary, &governance, &report)?;
@@ -312,7 +312,7 @@ fn run_interactive_inspect_live_tui_from_dir(import_dir: &Path) -> Result<usize>
 
 #[cfg(not(feature = "tui"))]
 fn run_interactive_inspect_live_tui_from_dir(_import_dir: &Path) -> Result<usize> {
-    super::tui_not_built("inspect-live --interactive")
+    super::tui_not_built("analyze-live --interactive")
 }
 
 pub(crate) fn inspect_live_dashboards_with_client(

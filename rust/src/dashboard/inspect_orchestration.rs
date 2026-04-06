@@ -694,7 +694,7 @@ fn run_interactive_export_workbench(import_dir: &Path, expected_variant: &str) -
 
 #[cfg(not(feature = "tui"))]
 fn run_interactive_export_workbench(_import_dir: &Path, _expected_variant: &str) -> Result<usize> {
-    super::super::tui_not_built("inspect-export --interactive")
+    super::super::tui_not_built("analyze-export --interactive")
 }
 
 pub(crate) fn analyze_export_dir(args: &InspectExportArgs) -> Result<usize> {

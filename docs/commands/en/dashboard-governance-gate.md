@@ -45,6 +45,6 @@ grafana-util dashboard governance-gate --policy-source builtin --builtin-policy 
 - if automation reads the result, prefer `--output-format json` and validate the contract before treating a pass/fail as final
 
 ## Related commands
-- [dashboard inspect-export](./dashboard-inspect-export.md)
-- [dashboard inspect-live](./dashboard-inspect-live.md)
+- [dashboard analyze-export](./dashboard-analyze-export.md)
+- [dashboard analyze-live](./dashboard-analyze-live.md)
 - [dashboard topology](./dashboard-topology.md)

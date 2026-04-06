@@ -49,6 +49,6 @@ grafana-util dashboard impact \
 - if the JSON is going into CI or an external tool, validate the top-level shape before you assume a zero-impact result is real
 
 ## Related commands
-- [dashboard inspect-export](./dashboard-inspect-export.md)
+- [dashboard analyze-export](./dashboard-analyze-export.md)
 - [dashboard topology](./dashboard-topology.md)
 - [dashboard governance-gate](./dashboard-governance-gate.md)

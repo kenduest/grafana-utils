@@ -81,7 +81,7 @@ This chapter provides practical solutions for common Grafana operational headach
 
 ```bash
 # Generate a report of all required datasources in your export tree
-grafana-util dashboard inspect-export --import-dir ./backups/raw --output-format report-table
+grafana-util dashboard analyze-export --import-dir ./backups/raw --output-format report-table
 ```
 
 **What to check**: Ensure every `UID` listed in the "Sources" column exists in your target Grafana's `datasource list`.

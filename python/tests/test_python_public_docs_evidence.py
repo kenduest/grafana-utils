@@ -68,7 +68,7 @@ class PublicDocsEvidenceTests(unittest.TestCase):
             REPO_ROOT / "docs" / "commands" / "en" / "dashboard-export.md": "## Before / After",
             REPO_ROOT / "docs" / "commands" / "en" / "dashboard-import.md": "## Before / After",
             REPO_ROOT / "docs" / "commands" / "en" / "alert-plan.md": "## Before / After",
-            REPO_ROOT / "docs" / "commands" / "en" / "dashboard-inspect-export.md": "## Before / After",
+            REPO_ROOT / "docs" / "commands" / "en" / "dashboard-analyze-export.md": "## Before / After",
             REPO_ROOT / "docs" / "commands" / "en" / "access-service-account-token.md": "## Before / After",
             REPO_ROOT / "docs" / "commands" / "en" / "access.md": "## Before / After",
             REPO_ROOT / "docs" / "commands" / "en" / "access-service-account.md": "## Before / After",
@@ -87,7 +87,7 @@ class PublicDocsEvidenceTests(unittest.TestCase):
             REPO_ROOT / "docs" / "commands" / "zh-TW" / "dashboard-export.md": "## 採用前後對照",
             REPO_ROOT / "docs" / "commands" / "zh-TW" / "dashboard-import.md": "## 採用前後對照",
             REPO_ROOT / "docs" / "commands" / "zh-TW" / "alert-plan.md": "## 採用前後對照",
-            REPO_ROOT / "docs" / "commands" / "zh-TW" / "dashboard-inspect-export.md": "## 採用前後對照",
+            REPO_ROOT / "docs" / "commands" / "zh-TW" / "dashboard-analyze-export.md": "## 採用前後對照",
             REPO_ROOT / "docs" / "commands" / "zh-TW" / "access-service-account-token.md": "## 採用前後對照",
             REPO_ROOT / "docs" / "commands" / "zh-TW" / "access.md": "## 採用前後對照",
             REPO_ROOT / "docs" / "commands" / "zh-TW" / "access-service-account.md": "## 採用前後對照",
@@ -122,11 +122,11 @@ class PublicDocsEvidenceTests(unittest.TestCase):
 
     def test_command_root_pages_group_related_commands_by_workflow(self):
         expectations = {
-            REPO_ROOT / "docs" / "commands" / "en" / "dashboard.md": ["### Inspect", "### Move", "### Review Before Mutate", "### Capture"],
+            REPO_ROOT / "docs" / "commands" / "en" / "dashboard.md": ["### Browse and Inventory", "### Move", "### Review Before Mutate", "### Capture"],
             REPO_ROOT / "docs" / "commands" / "en" / "alert.md": ["### Inspect", "### Move", "### Review Before Mutate", "### Related Surface"],
             REPO_ROOT / "docs" / "commands" / "en" / "access.md": ["### Inspect", "### Review Before Mutate"],
             REPO_ROOT / "docs" / "commands" / "en" / "datasource.md": ["### Inspect", "### Move", "### Review Before Mutate"],
-            REPO_ROOT / "docs" / "commands" / "zh-TW" / "dashboard.md": ["### 盤點", "### 搬移", "### 變更前檢查", "### 截圖與素材"],
+            REPO_ROOT / "docs" / "commands" / "zh-TW" / "dashboard.md": ["### 盤點", "### 分析與報表", "### 變更前檢查", "### 截圖與素材"],
             REPO_ROOT / "docs" / "commands" / "zh-TW" / "alert.md": ["### 盤點", "### 搬移", "### 變更前檢查", "### 規則與路由撰寫"],
             REPO_ROOT / "docs" / "commands" / "zh-TW" / "access.md": ["### 盤點", "### 服務帳號與 token"],
             REPO_ROOT / "docs" / "commands" / "zh-TW" / "datasource.md": ["### 盤點", "### 搬移", "### 變更前檢查"],

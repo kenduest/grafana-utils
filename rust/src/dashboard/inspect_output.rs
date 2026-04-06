@@ -72,7 +72,7 @@ pub(crate) fn render_export_inspection_summary_output(
         InspectOutputFormat::Table => {
             if !summary.import_dir.is_empty() {
                 output.push_str(&format!(
-                    "Dashboard inspect-export {}: {}\n\n",
+                    "Dashboard analyze-export {}: {}\n\n",
                     dashboard_inspect_export_summary_layer(requested_output_format),
                     summary.import_dir
                 ));
@@ -91,7 +91,7 @@ pub(crate) fn render_export_inspection_summary_output(
         }
         InspectOutputFormat::Text => {
             output.push_str(&format!(
-                "Dashboard inspect-export {}: {}\n",
+                "Dashboard analyze-export {}: {}\n",
                 dashboard_inspect_export_summary_layer(requested_output_format),
                 summary.import_dir
             ));
@@ -359,7 +359,7 @@ mod tests {
 
         let output = render_export_inspection_summary_output(&args, &make_summary()).unwrap();
 
-        assert!(output.starts_with("Dashboard inspect-export operator-summary: /tmp/demo"));
+        assert!(output.starts_with("Dashboard analyze-export operator-summary: /tmp/demo"));
         assert!(output.contains("Layer: operator-summary"));
         assert!(output.contains("# Datasource inventory"));
         assert!(output.contains("# Orphaned datasources"));

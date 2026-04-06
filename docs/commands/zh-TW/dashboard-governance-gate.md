@@ -45,6 +45,6 @@ grafana-util dashboard governance-gate --policy-source builtin --builtin-policy 
 - 如果自動化要讀結果，建議用 `--output-format json`，並先驗證 contract 再把 pass/fail 當成最終結果
 
 ## 相關指令
-- [dashboard inspect-export](./dashboard-inspect-export.md)
-- [dashboard inspect-live](./dashboard-inspect-live.md)
+- [dashboard analyze-export](./dashboard-analyze-export.md)
+- [dashboard analyze-live](./dashboard-analyze-live.md)
 - [dashboard topology](./dashboard-topology.md)

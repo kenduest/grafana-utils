@@ -4,20 +4,22 @@
 
 | 工作流 | 常用子命令 |
 | --- | --- |
-| 盤點與瀏覽 live dashboard | `browse`、`list`、`inspect-live` |
+| 盤點與瀏覽 live dashboard | `browse`、`list`、`get` |
 | 單一 dashboard 草稿 authoring | `get`、`clone-live`、`serve`、`patch-file`、`edit-live`、`review`、`publish` |
 | 匯出 / 匯入 / 比對 | `get`、`clone-live`、`export`、`import`、`diff`、`review`、`patch-file`、`publish`、`delete` |
-| 變更前檢查 | `inspect-export`、`inspect-vars`、`governance-gate` |
+| 分析與報表 | `analyze-live`、`analyze-export`、`list-vars` |
+| 變更前檢查 | `governance-gate` |
 | 拓樸與影響面 | `topology`、`impact` |
 | 歷史與還原 | `history list`、`history restore`、`history export` |
 | 截圖與素材 | `screenshot`、`raw-to-prompt` |
 
 ## 從這裡開始
 
-- 先看現況：`dashboard browse` 或 `dashboard inspect-live`
+- 先看現況：`dashboard browse` 或 `dashboard list`
 - 先做草稿：`dashboard get`、`dashboard clone-live`、`dashboard export`
 - 先做比對：`dashboard diff`、`dashboard review`
-- 先做上線前檢查：`dashboard inspect-export`、`dashboard inspect-vars`、`dashboard governance-gate`
+- 先做分析：`dashboard analyze-export`、`dashboard analyze-live`、`dashboard list-vars`
+- 先做上線前檢查：`dashboard governance-gate`
 - 先看影響面：`dashboard topology`、`dashboard impact`
 - 先處理歷史版本：`dashboard history list`、`dashboard history restore`、`dashboard history export`
 - 先拿素材：`dashboard screenshot`、`dashboard raw-to-prompt`
@@ -55,7 +57,7 @@
 ## 成功判準
 
 - 你能在開始前就判斷這次是要看 live、做草稿、跑檢查，還是直接發佈
-- export / inspect / diff 的產物能互相對得起來，不會換個步驟就失去上下文
+- export / analyze / diff 的產物能互相對得起來，不會換個步驟就失去上下文
 - 需要交給 review 或 CI 時，可以把 topology / impact / governance-gate 的結果拿去重跑
 
 ## 失敗時先檢查
@@ -84,13 +86,13 @@ grafana-util dashboard list --profile prod
 ```
 
 ```bash
-# 先做 live 檢視，再決定要不要匯出或截圖。
-grafana-util dashboard inspect-live --url http://localhost:3000 --basic-user admin --basic-password admin --interactive
+# 先做 live 分析，再決定要不要匯出或截圖。
+grafana-util dashboard analyze-live --url http://localhost:3000 --basic-user admin --basic-password admin --interactive
 ```
 
 ```bash
 # 先產生治理成品，留給 topology 或 governance-gate 接著用。
-grafana-util dashboard inspect-live --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-format governance-json
+grafana-util dashboard analyze-live --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-format governance-json
 ```
 
 ```bash
@@ -134,13 +136,16 @@ grafana-util dashboard edit-live --profile prod --dashboard-uid cpu-main --outpu
 - [dashboard serve](./dashboard-serve.md)
 - [dashboard edit-live](./dashboard-edit-live.md)
 
+### 分析與報表
+
+- [dashboard analyze-export](./dashboard-analyze-export.md)
+- [dashboard analyze-live](./dashboard-analyze-live.md)
+- [dashboard list-vars](./dashboard-list-vars.md)
+- [dashboard topology](./dashboard-topology.md)
+
 ### 變更前檢查
 
-- [dashboard inspect-export](./dashboard-inspect-export.md)
-- [dashboard inspect-live](./dashboard-inspect-live.md)
-- [dashboard inspect-vars](./dashboard-inspect-vars.md)
 - [dashboard governance-gate](./dashboard-governance-gate.md)
-- [dashboard topology](./dashboard-topology.md)
 
 ### 變更與套用
 
