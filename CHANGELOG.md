@@ -14,6 +14,30 @@ Format rule going forward:
 - keep older tagged releases below
 - use commit/tag history as the source of truth
 
+## [0.9.0] - 2026-04-07
+
+### Highlights
+
+- The public README got a cleaner operator-first introduction, with a shorter feature summary and more concrete examples for profiles, connection methods, and dashboard export/import paths.
+- Release metadata moved to `0.9.0` across the version file, package manifests, install examples, and generated docs so install and docs links stay aligned with the tagged release.
+- GitHub Pages generation now skips incomplete historical release snapshots instead of failing the entire docs site build when a release line does not have every generated command page.
+
+### Added
+
+- README and getting-started examples now show `profile add` usage for reusable connection and secret defaults.
+- Public docs now call out the common dashboard `raw`, `prompt`, and `provisioning` paths more clearly.
+
+### Changed
+
+- README examples now use `0.9.0` for pinned install instructions and release references.
+- `VERSION`, `python/pyproject.toml`, `rust/Cargo.toml`, `rust/Cargo.lock`, and the generated manpage and HTML docs were refreshed for the `0.9.0` line.
+- The public docs and generated docs were regenerated after the version bump so source docs and rendered outputs match.
+
+### Fixed
+
+- GitHub Pages assembly no longer aborts on incomplete historical version snapshots during docs-site generation.
+- The changelog, install help, and generated docs now reflect the same release version.
+
 ## [0.8.0] - 2026-04-05
 
 ### Highlights
