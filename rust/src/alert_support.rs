@@ -442,12 +442,10 @@ pub fn normalize_compare_payload(kind: &str, payload: &Map<String, Value>) -> Ma
         .expect("normalized compare payload must remain an object")
 }
 
-#[allow(dead_code)]
 pub fn stable_route_label_key() -> &'static str {
     MANAGED_ROUTE_LABEL_KEY
 }
 
-#[allow(dead_code)]
 pub fn build_stable_route_label_value(name: &str) -> String {
     let value = sanitize_path_component(name);
     if value.is_empty() {
@@ -466,12 +464,10 @@ pub fn build_stable_route_matcher(route_name: &str) -> Value {
     ])
 }
 
-#[allow(dead_code)]
 fn value_list(value: Option<&Value>) -> Vec<Value> {
     value.and_then(Value::as_array).cloned().unwrap_or_default()
 }
 
-#[allow(dead_code)]
 fn route_matcher_entries(route: &Map<String, Value>) -> Vec<Vec<String>> {
     route
         .get("object_matchers")
@@ -488,7 +484,6 @@ fn route_matcher_entries(route: &Map<String, Value>) -> Vec<Vec<String>> {
         .collect()
 }
 
-#[allow(dead_code)]
 fn normalize_route_matchers(route: &mut Map<String, Value>, route_name: &str) {
     let managed_value = build_stable_route_label_value(route_name);
     let mut matchers = route_matcher_entries(route)
@@ -503,7 +498,6 @@ fn normalize_route_matchers(route: &mut Map<String, Value>, route_name: &str) {
     route.insert("object_matchers".to_string(), Value::Array(matchers));
 }
 
-#[allow(dead_code)]
 pub fn route_matches_stable_label(route: &Map<String, Value>, route_name: &str) -> bool {
     let expected_value = build_stable_route_label_value(route_name);
     route_matcher_entries(route).into_iter().any(|matcher| {
@@ -513,7 +507,6 @@ pub fn route_matches_stable_label(route: &Map<String, Value>, route_name: &str) 
     })
 }
 
-#[allow(dead_code)]
 pub fn build_route_preview(route: &Map<String, Value>) -> Value {
     json!({
         "receiver": string_field(route, "receiver", ""),
@@ -534,7 +527,6 @@ pub fn build_folder_resolution_contract(folder_uid: &str, folder_title: Option<&
     })
 }
 
-#[allow(dead_code)]
 pub fn build_simple_rule_body(
     title: &str,
     folder_uid: &str,

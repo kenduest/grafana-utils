@@ -36,6 +36,7 @@ use ratatui::widgets::{Block, Borders, Clear, List, ListItem, ListState, Paragra
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum DatasourceInspectExportRenderFormat {
+    #[cfg_attr(not(test), allow(dead_code))]
     Text,
     Table,
     Csv,
