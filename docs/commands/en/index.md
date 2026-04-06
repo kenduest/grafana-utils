@@ -55,14 +55,17 @@ The checked-in `docs/html/commands/en/*.html` files are generated from the same 
 - [dashboard publish](./dashboard-publish.md)
 - [dashboard delete](./dashboard-delete.md)
 - [dashboard diff](./dashboard-diff.md)
-- [dashboard analyze (local)](./dashboard-analyze-export.md)
-- [dashboard analyze (live)](./dashboard-analyze-live.md)
 - [dashboard list-vars](./dashboard-list-vars.md)
 - [dashboard governance-gate](./dashboard-governance-gate.md)
 - [dashboard topology](./dashboard-topology.md)
 - [dashboard impact](./dashboard-impact.md)
 - [dashboard history](./dashboard-history.md)
 - [dashboard screenshot](./dashboard-screenshot.md)
+
+### Compatibility Alias Pages
+
+- [dashboard analyze (local alias)](./dashboard-analyze-export.md)
+- [dashboard analyze (live alias)](./dashboard-analyze-live.md)
 
 ## Datasource
 - [datasource](./datasource.md)

@@ -12,13 +12,13 @@ grafana\-util dashboard is the namespace for live dashboard workflows, local dra
 Use this namespace when you need to browse live dashboards, fetch or clone a live dashboard into a local JSON draft, compare local files with Grafana, inspect export or live metadata, convert raw dashboards into prompt JSON, or publish a prepared dashboard back to Grafana.
 .SH WORKFLOW LANES
 .PP
-\- Browse and inventory: browse, list, and get.
+\- Browse and inventory: browse, list, and fetch\-live.
 .PP
 \- Analyze dashboards and build reports: analyze, list\-vars, and topology checks.
 .PP
 \- Move: export, import, clone\-live, raw\-to\-prompt, diff, and publish paths.
 .PP
-\- Author: get, clone\-live, serve, patch\-file, edit\-live, review, and publish around one dashboard draft.
+\- Author: fetch\-live, clone\-live, serve, patch\-file, edit\-live, review, and publish around one dashboard draft.
 .PP
 \- Review Before Mutate: review, governance\-gate, and impact analysis.
 .PP
@@ -28,7 +28,7 @@ Use this namespace when you need to browse live dashboards, fetch or clone a liv
 .PP
 For single\-dashboard authoring, the local draft path is:
 .PP
-\- get or clone\-live to start from one live dashboard
+\- fetch\-live or clone\-live to start from one live dashboard
 .PP
 \- serve to keep one or more drafts open in a local preview browser while you edit, optionally opening the browser for you
 .PP

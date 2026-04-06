@@ -62,14 +62,17 @@
 - [dashboard publish](./dashboard-publish.md)
 - [dashboard delete](./dashboard-delete.md)
 - [dashboard diff](./dashboard-diff.md)
-- [dashboard analyze（本地）](./dashboard-analyze-export.md)
-- [dashboard analyze（即時）](./dashboard-analyze-live.md)
 - [dashboard list-vars](./dashboard-list-vars.md)
 - [dashboard governance-gate](./dashboard-governance-gate.md)
 - [dashboard topology](./dashboard-topology.md)
 - [dashboard impact](./dashboard-impact.md)
 - [dashboard history](./dashboard-history.md)
 - [dashboard screenshot](./dashboard-screenshot.md)
+
+### 相容別名頁面
+
+- [dashboard analyze（本地別名）](./dashboard-analyze-export.md)
+- [dashboard analyze（即時別名）](./dashboard-analyze-live.md)
 
 ## Datasource
 

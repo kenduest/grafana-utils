@@ -567,9 +567,16 @@ fn top_level_help_includes_examples() {
     assert!(help.contains("Export dashboards across all visible orgs with Basic auth"));
     assert!(help.contains("List dashboards across all visible orgs with Basic auth"));
     assert!(help.contains("Export dashboards with an API token from the current org"));
-    assert!(help.contains("grafana-util export"));
+    assert!(help.contains("grafana-util dashboard export"));
+    assert!(help.contains("grafana-util dashboard list"));
+    assert!(help.contains("grafana-util dashboard diff"));
+    assert!(help.contains("grafana-util dashboard publish"));
+    assert!(help.contains("grafana-util dashboard screenshot"));
     assert!(help.contains("--all-orgs"));
-    assert!(help.contains("grafana-util diff"));
+    assert!(!help.contains("grafana-util export"));
+    assert!(!help.contains("grafana-util list"));
+    assert!(!help.contains("grafana-util diff"));
+    assert!(!help.contains("grafana-util publish"));
 }
 
 #[test]

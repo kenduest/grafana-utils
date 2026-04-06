@@ -13,16 +13,16 @@ If you are an SRE, Grafana operator, or responder, this page should help you dec
 
 ## Workflow lanes
 
-- **Browse and inventory**: browse, list, and get.
+- **Browse and inventory**: browse, list, and fetch-live.
 - **Analyze dashboards and build reports**: analyze, list-vars, and topology checks.
 - **Move**: export, import, clone-live, raw-to-prompt, diff, and publish paths.
-- **Author**: get, clone-live, serve, patch-file, edit-live, review, and publish around one dashboard draft.
+- **Author**: fetch-live, clone-live, serve, patch-file, edit-live, review, and publish around one dashboard draft.
 - **Review Before Mutate**: review, governance-gate, and impact analysis.
 - **History**: list, restore, and export revision history before you recover or promote a dashboard.
 - **Capture**: screenshot flows for reproducible visual proof.
 
 For single-dashboard authoring, the local draft path is:
-- `get` or `clone-live` to start from one live dashboard
+- `fetch-live` or `clone-live` to start from one live dashboard
 - `serve` to keep one or more drafts open in a local preview browser while you edit, optionally opening the browser for you
 - `review` to verify one draft
 - `patch-file` to rewrite local metadata
