@@ -10,7 +10,7 @@ Use this when you want a non-interactive inventory view of live dashboards, opti
 - `--page-size`: dashboard search page size.
 - `--org-id`: list one explicit Grafana org.
 - `--all-orgs`: aggregate results across visible orgs. Prefer Basic auth.
-- `--with-sources`: include resolved datasource names for table or CSV output.
+- `--show-sources`: include resolved datasource names in the list output. `--with-sources` remains accepted as a compatibility alias.
 - `--output-columns`: choose the displayed columns.
 - `--output-format`, `--json`, `--yaml`, `--csv`, `--table`, `--text`: output mode controls.
 - `--no-header`: suppress table headers.

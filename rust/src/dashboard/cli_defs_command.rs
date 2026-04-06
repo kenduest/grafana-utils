@@ -315,11 +315,12 @@ pub struct ListArgs {
     )]
     pub all_orgs: bool,
     #[arg(
-        long,
+        long = "show-sources",
+        alias = "with-sources",
         default_value_t = false,
-        help = "For table or CSV output, fetch each dashboard payload and include resolved datasource names in the list output. JSON already includes datasource names and UIDs by default. This is slower because it makes extra API calls per dashboard."
+        help = "Fetch each dashboard payload and include resolved datasource names in the list output. This is slower because it makes extra API calls per dashboard."
     )]
-    pub with_sources: bool,
+    pub show_sources: bool,
     #[arg(
         long,
         value_delimiter = ',',

@@ -10,7 +10,7 @@
 - `--page-size`：儀表板搜尋的每頁筆數。
 - `--org-id`：列出指定的 Grafana org。
 - `--all-orgs`：彙整所有可見 org 的結果。建議使用 Basic auth。
-- `--with-sources`：在表格或 CSV 輸出中加入解析後的 datasource 名稱。
+- `--show-sources`：在清單輸出中加入解析後的 datasource 名稱。`--with-sources` 仍接受為相容別名。
 - `--output-columns`：選擇顯示欄位。
 - `--output-format`、`--json`、`--yaml`、`--csv`、`--table`、`--text`：輸出模式控制。
 - `--no-header`：隱藏表格標頭。

@@ -51,7 +51,7 @@ fn parse_cli_supports_list_mode() {
             assert_eq!(list_args.page_size, 25);
             assert_eq!(list_args.org_id, None);
             assert!(!list_args.all_orgs);
-            assert!(!list_args.with_sources);
+            assert!(!list_args.show_sources);
             assert!(list_args.output_columns.is_empty());
             assert!(!list_args.table);
             assert!(!list_args.csv);
@@ -63,13 +63,13 @@ fn parse_cli_supports_list_mode() {
 }
 
 #[test]
-fn parse_cli_supports_list_with_sources() {
+fn parse_cli_supports_list_show_sources() {
     let args = parse_cli_from([
         "grafana-util",
         "list",
         "--url",
         "https://grafana.example.com",
-        "--with-sources",
+        "--show-sources",
         "--json",
     ]);
 
@@ -77,11 +77,29 @@ fn parse_cli_supports_list_with_sources() {
         DashboardCommand::List(list_args) => {
             assert_eq!(list_args.org_id, None);
             assert!(!list_args.all_orgs);
-            assert!(list_args.with_sources);
+            assert!(list_args.show_sources);
             assert!(list_args.output_columns.is_empty());
             assert!(list_args.json);
             assert!(!list_args.table);
             assert!(!list_args.csv);
+        }
+        _ => panic!("expected list command"),
+    }
+}
+
+#[test]
+fn parse_cli_supports_list_with_sources_alias() {
+    let args = parse_cli_from([
+        "grafana-util",
+        "list",
+        "--url",
+        "https://grafana.example.com",
+        "--with-sources",
+    ]);
+
+    match args.command {
+        DashboardCommand::List(list_args) => {
+            assert!(list_args.show_sources);
         }
         _ => panic!("expected list command"),
     }
@@ -104,7 +122,7 @@ fn parse_cli_supports_list_output_columns_with_aliases() {
                 list_args.output_columns,
                 vec!["uid", "folder_uid", "org_id", "sources", "source_uids"]
             );
-            assert!(!list_args.with_sources);
+            assert!(!list_args.show_sources);
         }
         _ => panic!("expected list command"),
     }

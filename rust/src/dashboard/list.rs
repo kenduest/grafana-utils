@@ -360,7 +360,7 @@ pub(crate) fn collect_dashboard_source_metadata(
 }
 
 fn dashboard_list_needs_sources(args: &ListArgs) -> bool {
-    args.with_sources
+    args.show_sources
         || args.text
         || args.json
         || args.yaml
