@@ -6,6 +6,16 @@
 
 use super::*;
 
+fn write_local_access_bundle(dir: &std::path::Path, file_name: &str, payload: &str) {
+    fs::create_dir_all(dir).unwrap();
+    fs::write(dir.join(file_name), payload).unwrap();
+    fs::write(
+        dir.join("export-metadata.json"),
+        r#"{"kind":"grafana-utils-access-export-metadata","version":1}"#,
+    )
+    .unwrap();
+}
+
 #[test]
 fn run_access_cli_with_request_routes_user_export() {
     let args = parse_cli_from([
@@ -1157,4 +1167,158 @@ fn user_diff_with_request_reports_same_state_for_org_bundle_with_teams() {
     );
 
     assert_eq!(result.unwrap(), 0);
+}
+
+#[test]
+fn run_access_cli_with_request_routes_user_list_local_input_dir() {
+    let temp = tempdir().unwrap();
+    let input_dir = temp.path().join("access-users");
+    write_local_access_bundle(
+        &input_dir,
+        "users.json",
+        r#"{
+            "kind":"grafana-utils-access-user-export-index",
+            "version":1,
+            "records":[
+                {"login":"alice","email":"alice@example.com","name":"Alice","orgRole":"Editor","teams":["ops"]}
+            ]
+        }"#,
+    );
+
+    let args = parse_cli_from([
+        "grafana-util access",
+        "user",
+        "list",
+        "--input-dir",
+        input_dir.to_str().unwrap(),
+        "--scope",
+        "org",
+        "--output-format",
+        "json",
+    ]);
+    let mut request_called = false;
+    let result = run_access_cli_with_request(
+        |_method, _path, _params, _payload| {
+            request_called = true;
+            panic!("local user list should not hit the request layer");
+        },
+        &args,
+    );
+
+    assert!(result.is_ok());
+    assert!(!request_called);
+}
+
+#[test]
+fn run_access_cli_with_request_routes_org_list_local_input_dir() {
+    let temp = tempdir().unwrap();
+    let input_dir = temp.path().join("access-orgs");
+    write_local_access_bundle(
+        &input_dir,
+        "orgs.json",
+        r#"{
+            "kind":"grafana-utils-access-org-export-index",
+            "version":1,
+            "records":[
+                {"name":"Main Org","users":[{"login":"alice","email":"alice@example.com","orgRole":"Editor"}]}
+            ]
+        }"#,
+    );
+
+    let args = parse_cli_from([
+        "grafana-util access",
+        "org",
+        "list",
+        "--input-dir",
+        input_dir.to_str().unwrap(),
+        "--output-format",
+        "yaml",
+    ]);
+    let mut request_called = false;
+    let result = run_access_cli_with_request(
+        |_method, _path, _params, _payload| {
+            request_called = true;
+            panic!("local org list should not hit the request layer");
+        },
+        &args,
+    );
+
+    assert!(result.is_ok());
+    assert!(!request_called);
+}
+
+#[test]
+fn run_access_cli_with_request_routes_team_list_local_input_dir() {
+    let temp = tempdir().unwrap();
+    let input_dir = temp.path().join("access-teams");
+    write_local_access_bundle(
+        &input_dir,
+        "teams.json",
+        r#"{
+            "kind":"grafana-utils-access-team-export-index",
+            "version":1,
+            "records":[
+                {"name":"Ops","email":"ops@example.com","members":["alice"],"admins":["bob"]}
+            ]
+        }"#,
+    );
+
+    let args = parse_cli_from([
+        "grafana-util access",
+        "team",
+        "list",
+        "--input-dir",
+        input_dir.to_str().unwrap(),
+        "--output-format",
+        "table",
+    ]);
+    let mut request_called = false;
+    let result = run_access_cli_with_request(
+        |_method, _path, _params, _payload| {
+            request_called = true;
+            panic!("local team list should not hit the request layer");
+        },
+        &args,
+    );
+
+    assert!(result.is_ok());
+    assert!(!request_called);
+}
+
+#[test]
+fn run_access_cli_with_request_routes_service_account_list_local_input_dir() {
+    let temp = tempdir().unwrap();
+    let input_dir = temp.path().join("access-service-accounts");
+    write_local_access_bundle(
+        &input_dir,
+        "service-accounts.json",
+        r#"{
+            "kind":"grafana-utils-access-service-account-export-index",
+            "version":1,
+            "records":[
+                {"name":"deploy-bot","role":"Editor","disabled":false,"tokens":1}
+            ]
+        }"#,
+    );
+
+    let args = parse_cli_from([
+        "grafana-util access",
+        "service-account",
+        "list",
+        "--input-dir",
+        input_dir.to_str().unwrap(),
+        "--output-format",
+        "csv",
+    ]);
+    let mut request_called = false;
+    let result = run_access_cli_with_request(
+        |_method, _path, _params, _payload| {
+            request_called = true;
+            panic!("local service-account list should not hit the request layer");
+        },
+        &args,
+    );
+
+    assert!(result.is_ok());
+    assert!(!request_called);
 }

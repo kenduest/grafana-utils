@@ -2,7 +2,7 @@
 use super::super::test_support;
 use super::super::{
     parse_cli_from, DashboardCliArgs, DashboardCommand, DashboardImportInputFormat,
-    InspectOutputFormat, ValidationOutputFormat,
+    InspectOutputFormat, SimpleOutputFormat, ValidationOutputFormat,
 };
 use super::dashboard_cli_parser_help_rust_tests::render_dashboard_subcommand_help;
 use clap::{CommandFactory, Parser};
@@ -433,6 +433,55 @@ fn inspect_vars_help_mentions_all_baseline_output_formats() {
 
     assert!(help.contains("Render dashboard variables as table, csv, text, json, or yaml."));
     assert!(help.contains("output-format yaml"));
+    assert!(help.contains("local dashboard file"));
+    assert!(help.contains("local export tree"));
+}
+
+#[test]
+fn parse_cli_supports_list_vars_local_input_file() {
+    let args = parse_cli_from([
+        "grafana-util",
+        "list-vars",
+        "--input",
+        "./dashboards/raw/cpu-main.json",
+        "--output-format",
+        "yaml",
+    ]);
+
+    match args.command {
+        DashboardCommand::InspectVars(inspect_args) => {
+            assert_eq!(inspect_args.input, Some(PathBuf::from("./dashboards/raw/cpu-main.json")));
+            assert!(inspect_args.import_dir.is_none());
+            assert_eq!(inspect_args.output_format, Some(SimpleOutputFormat::Yaml));
+        }
+        other => panic!("expected list-vars command, got {other:?}"),
+    }
+}
+
+#[test]
+fn parse_cli_supports_list_vars_local_import_dir() {
+    let args = parse_cli_from([
+        "grafana-util",
+        "list-vars",
+        "--import-dir",
+        "./dashboards/raw",
+        "--dashboard-uid",
+        "cpu-main",
+        "--input-format",
+        "raw",
+        "--output-format",
+        "table",
+    ]);
+
+    match args.command {
+        DashboardCommand::InspectVars(inspect_args) => {
+            assert_eq!(inspect_args.import_dir, Some(PathBuf::from("./dashboards/raw")));
+            assert_eq!(inspect_args.input_format, DashboardImportInputFormat::Raw);
+            assert_eq!(inspect_args.dashboard_uid.as_deref(), Some("cpu-main"));
+            assert_eq!(inspect_args.output_format, Some(SimpleOutputFormat::Table));
+        }
+        other => panic!("expected list-vars command, got {other:?}"),
+    }
 }
 
 #[test]

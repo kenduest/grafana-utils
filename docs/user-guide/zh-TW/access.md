@@ -1,6 +1,7 @@
 # 身分與存取管理 (Identity & Access)
 
 這一章整理 Grafana 的身分與存取資產：org、使用者、team 與 service account。重點是先把人、組織與自動化憑證的生命週期講清楚，再談匯出、同步與回放。
+盤點可以直接來自 live Grafana，也可以來自本機匯出的套件；流程本身是一樣的。
 
 ## 適用對象
 
@@ -11,7 +12,7 @@
 ## 主要目標
 
 - 先理解 org / user / team / service account 的關係
-- 再把盤點、匯出、匯入與 diff 做成可重複流程
+- 再把盤點、匯出、匯入與 diff 做成可重複流程，而且盤點可以來自 live 或本機
 - 需要時才對 token 做輪替或刪除
 
 ## 採用前後對照
@@ -47,12 +48,17 @@
 
 ## 🏢 org 管理
 
-需要用 Basic auth 盤點、匯出或回放 org 時，請使用 `access org`。
+需要用 Basic auth 盤點、匯出或回放 org 時，請使用 `access org`。它的 `list` 也可以直接讀本機 bundle。
 
 ### 1. 列出、匯出與回放 org
 ```bash
 # 用途：1. 列出、匯出與回放 org。
 grafana-util access org list --table
+```
+
+```bash
+# 用途：1. 列出、匯出與回放 org。
+grafana-util access org list --input-dir ./access-orgs --table
 ```
 
 ```bash
@@ -83,7 +89,7 @@ PREFLIGHT IMPORT:
 
 ## 👤 使用者與 team 管理
 
-需要調整成員、管理快照或檢查漂移時，請使用 `access user` 與 `access team`。
+需要調整成員、管理快照或檢查漂移時，請使用 `access user` 與 `access team`。它們的 `list` 也可以讀本機 bundle。
 
 ### 1. 新增、修改與比對使用者
 ```bash
@@ -95,6 +101,13 @@ grafana-util access user modify --login dev-user --org-id 5 --role Editor
 
 # 將儲存的使用者快照與即時 Grafana 比對
 grafana-util access user diff --diff-dir ./access-users --scope global
+```
+
+如果要看同一份本機套件，可以改用：
+
+```bash
+# 從本機套件檢視同一份使用者 inventory
+grafana-util access user list --input-dir ./access-users
 ```
 **預期輸出：**
 ```text
@@ -108,6 +121,11 @@ No user differences across 12 user(s).
 ```bash
 # 用途：2. team 盤點與同步。
 grafana-util access team list --org-id 1 --table
+```
+
+```bash
+# 用途：2. team 盤點與同步。
+grafana-util access team list --input-dir ./access-teams --table
 ```
 
 ```bash
@@ -137,12 +155,17 @@ ops-user    Viewer  create   missing
 
 ## 🤖 service account 管理
 
-service account 是自動化流程常見的基礎元件。
+service account 是自動化流程常見的基礎元件。它的 inventory 也可以先從本機套件看，不必先碰 live Grafana。
 
 ### 1. 列出與匯出 service account
 ```bash
 # 用途：1. 列出與匯出 service account。
 grafana-util access service-account list --json
+```
+
+```bash
+# 用途：1. 列出與匯出 service account。
+grafana-util access service-account list --input-dir ./access-sa --output-format text
 ```
 
 ```bash

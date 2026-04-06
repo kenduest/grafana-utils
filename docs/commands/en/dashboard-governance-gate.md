@@ -1,7 +1,7 @@
 # dashboard governance-gate
 
 ## Purpose
-Evaluate governance policy against dashboard inspect JSON artifacts.
+Evaluate governance policy directly against live Grafana or a local export tree, with saved analysis artifacts as an advanced reuse path.
 
 ## When to use
 Use this when you want a policy pass or fail result before promotion. Prefer direct live or local analysis inputs for the common path; keep `governance-json` and `queries-json` for advanced reuse and CI pipelines.
@@ -18,8 +18,8 @@ Use this when you want a policy pass or fail result before promotion. Prefer dir
 - `--url`: analyze live Grafana directly.
 - `--import-dir`: analyze a local export tree directly.
 - `--input-format`: choose `raw` or `provisioning` when analyzing local exports.
-- `--governance`: path to dashboard inspect governance JSON.
-- `--queries`: path to dashboard inspect query-report JSON.
+- `--governance`: path to dashboard inspect governance JSON (`governance-json` artifact, advanced reuse).
+- `--queries`: path to dashboard inspect query-report JSON (`queries-json` artifact, advanced reuse).
 - `--output-format`: render text or JSON.
 - `--json-output`: optionally write the normalized result JSON.
 - `--interactive`: open the interactive terminal browser over findings.
@@ -36,7 +36,7 @@ grafana-util dashboard governance-gate --import-dir ./dashboards/raw --input-for
 ```
 
 ```bash
-# Purpose: Evaluate governance policy against reusable analysis artifacts.
+# Purpose: Advanced reuse: evaluate governance policy against reusable analysis artifacts.
 grafana-util dashboard governance-gate --policy-source builtin --builtin-policy default --governance ./governance.json --queries ./queries.json --output-format json --json-output ./governance-check.json
 ```
 

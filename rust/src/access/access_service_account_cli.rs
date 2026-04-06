@@ -28,6 +28,8 @@ pub(crate) const ACCESS_SERVICE_ACCOUNT_TOKEN_DELETE_HELP_TEXT: &str = "Examples
 pub struct ServiceAccountListArgs {
     #[command(flatten)]
     pub common: CommonCliArgs,
+    #[arg(long, help = "List service accounts from a local export bundle directory instead of live Grafana.")]
+    pub input_dir: Option<PathBuf>,
     #[arg(long, help = "Filter service accounts by a free-text search.")]
     pub query: Option<String>,
     #[arg(

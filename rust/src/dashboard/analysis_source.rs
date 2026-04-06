@@ -94,11 +94,11 @@ pub(crate) fn resolve_dashboard_analysis_artifacts(
 
     if source.governance.is_some() || source.queries.is_some() {
         let governance_path = source.governance.ok_or_else(|| {
-            message("--governance is required when reusing prebuilt analysis artifacts.")
+            message("--governance is required when reusing saved analysis artifacts.")
         })?;
         if source.require_queries && source.queries.is_none() {
             return Err(message(
-                "--queries is required when reusing artifact inputs for governance-gate.",
+                "--queries is required when reusing saved analysis artifacts for governance-gate.",
             ));
         }
         let governance = load_object(governance_path, "Dashboard governance JSON")?;
@@ -292,6 +292,6 @@ mod tests {
 
         assert!(error
             .to_string()
-            .contains("--queries is required when reusing artifact inputs for governance-gate"));
+            .contains("--queries is required when reusing saved analysis artifacts for governance-gate"));
     }
 }

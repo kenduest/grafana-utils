@@ -162,7 +162,12 @@ fn run_user_access_cli(command: &UserCommand, args: &AccessCliArgs) -> Result<()
     // auth behavior where applicable.
     match command {
         UserCommand::List(inner) => {
-            run_access_cli_with_common(&inner.common, args, build_http_client)
+            if inner.input_dir.is_some() {
+                user::list_users_from_input_dir(inner)?;
+                Ok(())
+            } else {
+                run_access_cli_with_common(&inner.common, args, build_http_client)
+            }
         }
         UserCommand::Browse(inner) => {
             run_access_cli_with_common(&inner.common, args, build_http_client)
@@ -193,7 +198,12 @@ fn run_org_access_cli(command: &OrgCommand, args: &AccessCliArgs) -> Result<()> 
     // management targets Grafana's global admin surface rather than one org.
     match command {
         OrgCommand::List(inner) => {
-            run_access_cli_with_common(&inner.common, args, build_http_client_no_org_id)
+            if inner.input_dir.is_some() {
+                org::list_orgs_from_input_dir(inner)?;
+                Ok(())
+            } else {
+                run_access_cli_with_common(&inner.common, args, build_http_client_no_org_id)
+            }
         }
         OrgCommand::Add(inner) => {
             run_access_cli_with_common(&inner.common, args, build_http_client_no_org_id)
@@ -221,7 +231,12 @@ fn run_team_access_cli(command: &TeamCommand, args: &AccessCliArgs) -> Result<()
     // resolved within the selected Grafana org scope.
     match command {
         TeamCommand::List(inner) => {
-            run_access_cli_with_common(&inner.common, args, build_http_client)
+            if inner.input_dir.is_some() {
+                team::list_teams_from_input_dir(inner)?;
+                Ok(())
+            } else {
+                run_access_cli_with_common(&inner.common, args, build_http_client)
+            }
         }
         TeamCommand::Browse(inner) => {
             run_access_cli_with_common(&inner.common, args, build_http_client)
@@ -255,7 +270,12 @@ fn run_service_account_access_cli(
     // can treat service-account management as one domain branch.
     match command {
         ServiceAccountCommand::List(inner) => {
-            run_access_cli_with_common(&inner.common, args, build_http_client)
+            if inner.input_dir.is_some() {
+                service_account::list_service_accounts_from_input_dir(inner)?;
+                Ok(())
+            } else {
+                run_access_cli_with_common(&inner.common, args, build_http_client)
+            }
         }
         ServiceAccountCommand::Add(inner) => {
             run_access_cli_with_common(&inner.common, args, build_http_client)
@@ -296,7 +316,11 @@ where
     match &args.command {
         AccessCommand::User { command } => match command {
             UserCommand::List(args) => {
-                let _ = user::list_users_with_request(&mut request_json, args)?;
+                if args.input_dir.is_some() {
+                    let _ = user::list_users_from_input_dir(args)?;
+                } else {
+                    let _ = user::list_users_with_request(&mut request_json, args)?;
+                }
             }
             UserCommand::Browse(args) => {
                 #[cfg(feature = "tui")]
@@ -349,7 +373,11 @@ where
         },
         AccessCommand::Org { command } => match command {
             OrgCommand::List(args) => {
-                let _ = org::list_orgs_with_request(&mut request_json, args)?;
+                if args.input_dir.is_some() {
+                    let _ = org::list_orgs_from_input_dir(args)?;
+                } else {
+                    let _ = org::list_orgs_with_request(&mut request_json, args)?;
+                }
             }
             OrgCommand::Add(args) => {
                 let _ = org::add_org_with_request(&mut request_json, args)?;
@@ -372,7 +400,11 @@ where
         },
         AccessCommand::Team { command } => match command {
             TeamCommand::List(args) => {
-                let _ = team::list_teams_command_with_request(&mut request_json, args)?;
+                if args.input_dir.is_some() {
+                    let _ = team::list_teams_from_input_dir(args)?;
+                } else {
+                    let _ = team::list_teams_command_with_request(&mut request_json, args)?;
+                }
             }
             TeamCommand::Browse(args) => {
                 #[cfg(feature = "tui")]
@@ -425,10 +457,14 @@ where
         },
         AccessCommand::ServiceAccount { command } => match command {
             ServiceAccountCommand::List(args) => {
-                let _ = service_account::list_service_accounts_command_with_request(
-                    &mut request_json,
-                    args,
-                )?;
+                if args.input_dir.is_some() {
+                    let _ = service_account::list_service_accounts_from_input_dir(args)?;
+                } else {
+                    let _ = service_account::list_service_accounts_command_with_request(
+                        &mut request_json,
+                        args,
+                    )?;
+                }
             }
             ServiceAccountCommand::Add(args) => {
                 let _ = service_account::add_service_account_with_request(&mut request_json, args)?;

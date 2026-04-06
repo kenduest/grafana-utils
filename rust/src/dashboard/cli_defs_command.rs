@@ -6,8 +6,8 @@ use std::path::PathBuf;
 
 use super::super::{DEFAULT_EXPORT_DIR, DEFAULT_IMPORT_MESSAGE, DEFAULT_PAGE_SIZE};
 use super::cli_defs_inspect::{
-    AnalyzeArgs, GovernanceGateArgs, ImpactArgs, InspectExportArgs, InspectLiveArgs, InspectVarsArgs,
-    ScreenshotArgs, TopologyArgs, ValidateExportArgs,
+    AnalyzeArgs, GovernanceGateArgs, ImpactArgs, InspectExportArgs, InspectLiveArgs,
+    InspectVarsArgs, ScreenshotArgs, TopologyArgs, ValidateExportArgs,
 };
 use super::cli_defs_shared::{
     CommonCliArgs, DryRunOutputFormat, HistoryOutputFormat, RawToPromptLogFormat,
@@ -857,6 +857,19 @@ pub struct BrowseArgs {
     pub common: CommonCliArgs,
     #[arg(
         long,
+        help = "Browse dashboards from this local export tree instead of live Grafana. Point this at a raw export root, an all-orgs export root, or a provisioning root when you want to inspect files without calling Grafana."
+    )]
+    pub import_dir: Option<PathBuf>,
+    #[arg(
+        long,
+        value_enum,
+        default_value_t = DashboardImportInputFormat::Raw,
+        requires = "import_dir",
+        help = "Interpret --import-dir as raw export files or Grafana file-provisioning artifacts. Use provisioning to accept either the provisioning/ root or its dashboards/ subdirectory."
+    )]
+    pub input_format: DashboardImportInputFormat,
+    #[arg(
+        long,
         default_value_t = DEFAULT_PAGE_SIZE,
         help = "Dashboard search page size used to build the live browser tree."
     )]
@@ -1095,8 +1108,8 @@ pub enum DashboardCommand {
     Import(ImportArgs),
     #[command(
         name = "browse",
-        about = "Browse the live dashboard tree in an interactive terminal UI.",
-        after_help = "Examples:\n\n  Browse the full dashboard tree from the current org:\n    grafana-util dashboard browse --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\"\n\n  Open the browser at one folder subtree:\n    grafana-util dashboard browse --url http://localhost:3000 --basic-user admin --basic-password admin --path 'Platform / Infra'\n\n  Browse one explicit org:\n    grafana-util dashboard browse --url http://localhost:3000 --basic-user admin --basic-password admin --org-id 2\n\n  Browse all visible orgs with Basic auth:\n    grafana-util dashboard browse --url http://localhost:3000 --basic-user admin --basic-password admin --all-orgs"
+        about = "Browse live Grafana or a local export tree in an interactive terminal UI.",
+        after_help = "Examples:\n\n  Browse the full dashboard tree from the current org:\n    grafana-util dashboard browse --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\"\n\n  Open the browser at one folder subtree:\n    grafana-util dashboard browse --url http://localhost:3000 --basic-user admin --basic-password admin --path 'Platform / Infra'\n\n  Browse a raw export tree from disk:\n    grafana-util dashboard browse --import-dir ./dashboards/raw --path 'Platform / Infra'\n\n  Browse one explicit org:\n    grafana-util dashboard browse --url http://localhost:3000 --basic-user admin --basic-password admin --org-id 2\n\n  Browse all visible orgs with Basic auth:\n    grafana-util dashboard browse --url http://localhost:3000 --basic-user admin --basic-password admin --all-orgs"
     )]
     Browse(BrowseArgs),
     #[command(
@@ -1158,21 +1171,21 @@ pub enum DashboardCommand {
     #[command(
         name = "list-vars",
         alias = "inspect-vars",
-        about = "List dashboard templating variables and datasource-like choices from live Grafana.",
-        after_help = "Examples:\n\n  List variables from a browser URL directly:\n    grafana-util dashboard list-vars --dashboard-url 'https://grafana.example.com/d/cpu-main/cpu-overview?var-cluster=prod-a' --token \"$GRAFANA_API_TOKEN\" --output-format table\n\n  List one dashboard UID with a vars-query fragment:\n    grafana-util dashboard list-vars --url https://grafana.example.com --dashboard-uid cpu-main --vars-query 'var-cluster=prod-a&var-instance=node01' --token \"$GRAFANA_API_TOKEN\" --output-format json\n\n  Render the same variable inventory as YAML:\n    grafana-util dashboard list-vars --url https://grafana.example.com --dashboard-uid cpu-main --token \"$GRAFANA_API_TOKEN\" --output-format yaml"
+        about = "List dashboard templating variables and datasource-like choices from live Grafana or a local dashboard file.",
+        after_help = "Examples:\n\n  List variables from a browser URL directly:\n    grafana-util dashboard list-vars --dashboard-url 'https://grafana.example.com/d/cpu-main/cpu-overview?var-cluster=prod-a' --token \"$GRAFANA_API_TOKEN\" --output-format table\n\n  List one dashboard UID with a vars-query fragment:\n    grafana-util dashboard list-vars --url https://grafana.example.com --dashboard-uid cpu-main --vars-query 'var-cluster=prod-a&var-instance=node01' --token \"$GRAFANA_API_TOKEN\" --output-format json\n\n  List variables from one local dashboard JSON file:\n    grafana-util dashboard list-vars --input ./dashboards/raw/cpu-main.json --output-format yaml\n\n  List variables from one local export tree:\n    grafana-util dashboard list-vars --import-dir ./dashboards/raw --dashboard-uid cpu-main --output-format table"
     )]
     InspectVars(InspectVarsArgs),
     #[command(
         name = "governance-gate",
-        about = "Check dashboard query and governance findings against a policy from live Grafana, an export tree, or saved artifacts.",
-        after_help = "Examples:\n\n  Check live Grafana directly with a JSON/YAML policy file:\n    grafana-util dashboard governance-gate --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --policy-source file --policy ./policy.yaml\n\n  Check an export tree without calling Grafana:\n    grafana-util dashboard governance-gate --policy-source builtin --builtin-policy default --import-dir ./dashboards/raw --input-format raw\n\n  Reuse saved analysis artifacts and write normalized JSON:\n    grafana-util dashboard governance-gate --policy-source builtin --builtin-policy default --governance ./governance.json --queries ./queries.json --output-format json --json-output ./governance-check.json"
+        about = "Check dashboard findings against a policy from live Grafana or a local export tree.",
+        after_help = "Examples:\n\n  Check live Grafana directly with a JSON/YAML policy file:\n    grafana-util dashboard governance-gate --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --policy-source file --policy ./policy.yaml\n\n  Check an export tree without calling Grafana:\n    grafana-util dashboard governance-gate --policy-source builtin --builtin-policy default --import-dir ./dashboards/raw --input-format raw\n\n  Advanced reuse: recheck saved analysis artifacts and write normalized JSON:\n    grafana-util dashboard governance-gate --policy-source builtin --builtin-policy default --governance ./governance.json --queries ./queries.json --output-format json --json-output ./governance-check.json"
     )]
     GovernanceGate(GovernanceGateArgs),
     #[command(
         name = "topology",
         visible_alias = "graph",
-        about = "Show which dashboards, variables, data sources, and alerts depend on each other.",
-        after_help = "Examples:\n\n  Analyze live Grafana directly and render Mermaid:\n    grafana-util dashboard topology --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --output-format mermaid\n\n  Analyze an export tree without calling Grafana:\n    grafana-util dashboard topology --import-dir ./dashboards/raw --input-format raw --output-format text\n\n  Reuse saved artifacts and write Graphviz DOT through the graph alias:\n    grafana-util dashboard graph --governance ./governance.json --queries ./queries.json --alert-contract ./alert-contract.json --output-format dot --output-file ./dashboard-topology.dot"
+        about = "Show dashboard dependencies directly from live Grafana or a local export tree.",
+        after_help = "Examples:\n\n  Analyze live Grafana directly and render Mermaid:\n    grafana-util dashboard topology --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --output-format mermaid\n\n  Analyze an export tree without calling Grafana:\n    grafana-util dashboard topology --import-dir ./dashboards/raw --input-format raw --output-format text\n\n  Advanced reuse: render Graphviz DOT through the graph alias from saved analysis artifacts:\n    grafana-util dashboard graph --governance ./governance.json --queries ./queries.json --alert-contract ./alert-contract.json --output-format dot --output-file ./dashboard-topology.dot"
     )]
     Topology(TopologyArgs),
     #[command(

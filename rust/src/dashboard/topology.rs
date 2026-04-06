@@ -1,4 +1,5 @@
-//! Artifact-driven topology and impact analysis for dashboards and alert contracts.
+//! Topology and impact analysis for dashboards and alert contracts.
+//! Direct live/local analysis is the common path; saved artifacts stay available for advanced reuse.
 use serde::Serialize;
 use serde_json::Value;
 use std::path::Path;

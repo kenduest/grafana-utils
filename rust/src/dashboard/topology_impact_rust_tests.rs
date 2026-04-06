@@ -62,6 +62,7 @@ fn parse_cli_supports_dashboard_governance_gate_command() {
 fn governance_gate_help_mentions_policy_and_queries_inputs() {
     let help = render_dashboard_subcommand_help("governance-gate");
 
+    assert!(help.contains("Check dashboard findings against a policy from live Grafana or a local export tree."));
     assert!(help.contains("--policy-source"));
     assert!(help.contains("--policy"));
     assert!(help.contains("--builtin-policy"));
@@ -73,6 +74,7 @@ fn governance_gate_help_mentions_policy_and_queries_inputs() {
     assert!(help.contains("--output-format"));
     assert!(help.contains("governance-gate"));
     assert!(help.contains("Check live Grafana directly"));
+    assert!(help.contains("Advanced reuse: recheck saved analysis artifacts"));
 }
 
 #[test]
@@ -206,6 +208,7 @@ fn parse_cli_supports_dashboard_topology_live_source_flags() {
 fn topology_help_mentions_alert_contract_and_visual_formats() {
     let help = render_dashboard_subcommand_help("topology");
 
+    assert!(help.contains("Show dashboard dependencies directly from live Grafana or a local export tree."));
     assert!(help.contains("--import-dir"));
     assert!(help.contains("--governance"));
     assert!(help.contains("--alert-contract"));
@@ -218,8 +221,9 @@ fn topology_help_mentions_alert_contract_and_visual_formats() {
     assert!(help.contains("mermaid"));
     assert!(help.contains("dot"));
     assert!(help.contains("graph"));
-    assert!(help.contains("depend on each other"));
+    assert!(help.contains("dashboard dependencies directly"));
     assert!(help.contains("topology"));
+    assert!(help.contains("Advanced reuse: render Graphviz DOT"));
 }
 
 #[test]

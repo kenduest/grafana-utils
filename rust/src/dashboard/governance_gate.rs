@@ -1,5 +1,5 @@
 //! Dashboard governance gate evaluator.
-//! Consumes governance-json and query-report JSON artifacts plus a small policy JSON.
+//! Direct live/local analysis is the common path; governance-json and query-report artifacts stay available for advanced reuse.
 use serde::Serialize;
 use serde_json::Value;
 #[cfg(any(feature = "tui", test))]

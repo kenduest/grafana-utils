@@ -102,6 +102,7 @@ fn unified_help_mentions_screenshot_and_dashboard_analysis_examples() {
     assert!(help.contains("snapshot export"));
     assert!(help.contains("snapshot review"));
     assert!(help.contains("Review a local snapshot inventory as JSON"));
+    assert!(help.contains("grafana-util access user list --input-dir ./access-users --json"));
     assert!(help.contains("Run profile list, show, add, example, and init workflows."));
     assert!(help.contains("[Profile Show]"));
     assert!(help.contains("[Profile Add]"));
@@ -1743,7 +1744,7 @@ fn unified_help_mentions_alert_access_and_shims() {
     assert!(help.contains(
         "Run datasource list, browse-live, export, import, and diff workflows."
     ));
-    assert!(help.contains("[Access Inventory]"));
+    assert!(help.contains("[Access Local Inventory]"));
     assert!(help.contains("[Change Planning]"));
     assert!(help.contains("[Change Apply]"));
     assert!(help.contains("datasource"));
@@ -1773,7 +1774,7 @@ fn render_unified_help_text_colorizes_example_labels_when_requested() {
     assert!(help.contains("\u{1b}[1;31m[Alert Export]\u{1b}[0m"));
     assert!(help.contains("\u{1b}[1;32m[Datasource Inventory]\u{1b}[0m"));
     assert!(help.contains("\u{1b}[1;32m[Datasource Local Inventory]\u{1b}[0m"));
-    assert!(help.contains("\u{1b}[1;33m[Access Inventory]\u{1b}[0m"));
+    assert!(help.contains("\u{1b}[1;33m[Access Local Inventory]\u{1b}[0m"));
     assert!(help.contains("\u{1b}[1;34m[Change Planning]\u{1b}[0m"));
 }
 
@@ -1801,7 +1802,7 @@ fn unified_help_full_colorizes_extended_example_labels_when_requested() {
     assert!(help.contains("\u{1b}[1;36m[Dashboard Analyze]\u{1b}[0m"));
     assert!(help.contains("\u{1b}[1;31m[Alert Import]\u{1b}[0m"));
     assert!(help.contains("\u{1b}[1;32m[Datasource Import]\u{1b}[0m"));
-    assert!(help.contains("\u{1b}[1;33m[Access Team Import]\u{1b}[0m"));
+    assert!(help.contains("\u{1b}[1;33m[Access Local Inventory]\u{1b}[0m"));
     assert!(help.contains("\u{1b}[1;34m[Change Review]\u{1b}[0m"));
 }
 

@@ -136,9 +136,9 @@ pub(crate) const UNIFIED_HELP_TEXT: &str = help_block!(
         r#"grafana-util datasource list --input-dir ./datasources --json"#
     ),
     (
-        "[Access Inventory]",
-        "List org users through the unified binary:",
-        r#"grafana-util access user list --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --json"#
+        "[Access Local Inventory]",
+        "Inspect exported access users without calling Grafana:",
+        r#"grafana-util access user list --input-dir ./access-users --json"#
     ),
     (
         "[Profile Show]",
@@ -205,9 +205,9 @@ pub(crate) const UNIFIED_HELP_FULL_TEXT: &str = help_block!(
         r#"grafana-util datasource diff --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --diff-dir ./datasources/provisioning --input-format provisioning"#
     ),
     (
-        "[Access Team Import]",
-        "Preview a destructive team sync before confirming:",
-        "grafana-util access team import --url http://localhost:3000 --basic-user admin --basic-password admin --import-dir ./access-teams --replace-existing --dry-run --output-format table"
+        "[Access Local Inventory]",
+        "Inspect exported access users without calling Grafana:",
+        "grafana-util access user list --input-dir ./access-users --json"
     ),
     (
         "[Profile Show]",
@@ -382,6 +382,11 @@ pub(crate) const DATASOURCE_HELP_FULL_TEXT: &str = help_block!(
 pub(crate) const ACCESS_HELP_FULL_TEXT: &str = help_block!(
     "Extended Examples:",
     (
+        "[Access Local Inventory]",
+        "Inspect exported access users without calling Grafana:",
+        "grafana-util access user list --input-dir ./access-users --json"
+    ),
+    (
         "[Access User Diff]",
         "Compare exported users against the Grafana global scope:",
         "grafana-util access user diff --url http://localhost:3000 --basic-user admin --basic-password admin --diff-dir ./access-users --scope global"
@@ -455,7 +460,7 @@ pub(crate) const HELP_EXAMPLE_LABELS: [(&str, &str); 30] = [
     ("[Datasource Import]", HELP_COLOR_DATASOURCE),
     ("[Datasource Local Inventory]", HELP_COLOR_DATASOURCE),
     ("[Datasource Diff]", HELP_COLOR_DATASOURCE),
-    ("[Access Inventory]", HELP_COLOR_ACCESS),
+    ("[Access Local Inventory]", HELP_COLOR_ACCESS),
     ("[Access User Diff]", HELP_COLOR_ACCESS),
     ("[Access Team Import]", HELP_COLOR_ACCESS),
     ("[Access Org Delete]", HELP_COLOR_ACCESS),

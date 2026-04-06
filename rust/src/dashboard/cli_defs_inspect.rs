@@ -247,16 +247,37 @@ pub struct InspectVarsArgs {
     pub common: CommonCliArgs,
     #[arg(
         long,
-        required_unless_present = "dashboard_url",
-        help = "Grafana dashboard UID whose templating variables should be listed. Required unless --dashboard-url is provided."
+        help = "Grafana dashboard UID whose templating variables should be listed. Use this to pick one dashboard from a local export tree or to read one live dashboard."
     )]
     pub dashboard_uid: Option<String>,
     #[arg(
         long,
-        required_unless_present = "dashboard_uid",
+        conflicts_with = "input",
         help = "Full Grafana dashboard URL. When provided, the runtime can derive the dashboard UID from the URL path."
     )]
     pub dashboard_url: Option<String>,
+    #[arg(
+        long,
+        value_name = "FILE",
+        conflicts_with = "import_dir",
+        help = "Read one local dashboard JSON file instead of calling Grafana. Use this for a raw dashboard file, a prompt file, or a file-provisioning dashboard object."
+    )]
+    pub input: Option<PathBuf>,
+    #[arg(
+        long,
+        value_name = "DIR",
+        conflicts_with = "input",
+        help = "Read one local dashboard from an export tree instead of calling Grafana. Point this at a raw/ export root, an all-orgs export root, or a provisioning/ dashboards tree."
+    )]
+    pub import_dir: Option<PathBuf>,
+    #[arg(
+        long,
+        value_enum,
+        default_value_t = DashboardImportInputFormat::Raw,
+        requires = "import_dir",
+        help = "Interpret --import-dir as raw export files or Grafana file-provisioning artifacts. Use provisioning to accept either the provisioning/ root or its dashboards/ subdirectory."
+    )]
+    pub input_format: DashboardImportInputFormat,
     #[arg(
         long,
         value_name = "QUERY",
@@ -691,14 +712,14 @@ pub struct GovernanceGateArgs {
     #[arg(
         long,
         conflicts_with_all = ["governance", "queries"],
-        help = "Analyze dashboards from this export directory instead of live Grafana or prebuilt artifact files."
+        help = "Analyze dashboards from this local export tree directly. Prefer --url for live Grafana or saved artifacts only for advanced reuse."
     )]
     pub import_dir: Option<PathBuf>,
     #[arg(
         long,
         value_enum,
         default_value_t = DashboardImportInputFormat::Raw,
-        help = "Interpret --import-dir as raw export files or Grafana file-provisioning artifacts."
+        help = "Interpret --import-dir as raw export files or Grafana file-provisioning artifacts from a local export tree."
     )]
     pub input_format: DashboardImportInputFormat,
     #[arg(
@@ -725,9 +746,15 @@ pub struct GovernanceGateArgs {
         help = "Built-in governance policy name. Use with --policy-source builtin."
     )]
     pub builtin_policy: Option<String>,
-    #[arg(long, help = "Reuse this dashboard governance JSON artifact instead of analyzing live Grafana or an export tree first.")]
+    #[arg(
+        long,
+        help = "Reuse a saved governance-json artifact. Prefer --url or --import-dir for the common path; keep this for advanced reuse."
+    )]
     pub governance: Option<PathBuf>,
-    #[arg(long, help = "Reuse this dashboard query report JSON artifact instead of analyzing live Grafana or an export tree first.")]
+    #[arg(
+        long,
+        help = "Reuse a saved queries-json artifact. Prefer --url or --import-dir for the common path; keep this for advanced reuse."
+    )]
     pub queries: Option<PathBuf>,
     #[arg(
         long,
@@ -776,14 +803,14 @@ pub struct TopologyArgs {
     #[arg(
         long,
         conflicts_with_all = ["governance", "queries"],
-        help = "Analyze dashboards from this export directory instead of live Grafana or prebuilt artifact files."
+        help = "Analyze dashboards from this local export tree directly. Prefer --url for live Grafana or saved artifacts only for advanced reuse."
     )]
     pub import_dir: Option<PathBuf>,
     #[arg(
         long,
         value_enum,
         default_value_t = DashboardImportInputFormat::Raw,
-        help = "Interpret --import-dir as raw export files or Grafana file-provisioning artifacts."
+        help = "Interpret --import-dir as raw export files or Grafana file-provisioning artifacts from a local export tree."
     )]
     pub input_format: DashboardImportInputFormat,
     #[arg(
@@ -792,11 +819,14 @@ pub struct TopologyArgs {
         help = "Disambiguate a mixed export root when --import-dir can resolve to both raw and source-style dashboard inputs."
     )]
     pub input_type: Option<InspectExportInputType>,
-    #[arg(long, help = "Reuse this dashboard governance JSON artifact instead of analyzing live Grafana or an export tree first.")]
+    #[arg(
+        long,
+        help = "Reuse a saved governance-json artifact. Prefer --url or --import-dir for the common path; keep this for advanced reuse."
+    )]
     pub governance: Option<PathBuf>,
     #[arg(
         long,
-        help = "Optional query report artifact path when reusing prebuilt analysis files. Topology itself renders from governance data plus optional alert-contract data."
+        help = "Reuse a saved queries-json artifact when you already split analysis into artifact files. Prefer --url or --import-dir for the common path; keep this for advanced reuse."
     )]
     pub queries: Option<PathBuf>,
     #[arg(
@@ -874,7 +904,10 @@ pub struct ImpactArgs {
         help = "Disambiguate a mixed export root when --import-dir can resolve to both raw and source-style dashboard inputs."
     )]
     pub input_type: Option<InspectExportInputType>,
-    #[arg(long, help = "Reuse this dashboard governance JSON artifact instead of analyzing live Grafana or an export tree first.")]
+    #[arg(
+        long,
+        help = "Reuse this dashboard governance JSON artifact instead of analyzing live Grafana or an export tree first."
+    )]
     pub governance: Option<PathBuf>,
     #[arg(
         long,

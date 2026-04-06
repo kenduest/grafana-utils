@@ -51,7 +51,7 @@ After: the dashboard namespace keeps browse, inspect, move, review, and capture 
 .SH SUBCOMMANDS
 .TP
 .B browse
-Open the live dashboard tree in an interactive terminal UI. Use when: You want to explore folders, select a dashboard, or inspect the live tree before fetching, diffing, importing, or deleting.
+Open the live dashboard tree or a local export tree in an interactive terminal UI. Use when: You want to explore folders, select a dashboard, inspect the live tree before fetching, diffing, importing, or deleting, or review a local export tree without calling Grafana.
 .TP
 .B fetch\-live
 Fetch one live dashboard into an API\-safe local JSON draft. Use when: You need a local copy of one live dashboard for review, patching, cloning, or later publish work.
@@ -90,13 +90,13 @@ Analyze dashboard export directories through the canonical dashboard analyze com
 Analyze live Grafana dashboards through the canonical dashboard analyze command. Use when: You need the same analysis views as the local export\-tree flow, but sourced from live Grafana instead of a local export tree. Prefer dashboard analyze \-\-url ... in new docs and scripts.
 .TP
 .B list\-vars
-List dashboard templating variables and datasource\-like choices from live Grafana. Use when: You need to list variable state, feed a screenshot workflow, or debug variable\-scoped dashboard URLs.
+List dashboard templating variables and datasource\-like choices from live Grafana, a local dashboard file, or a local export tree. Use when: You need to list variable state, feed a screenshot workflow, debug variable\-scoped dashboard URLs, or inspect a rendered local dashboard file.
 .TP
 .B governance\-gate
-Evaluate governance policy against dashboard inspect JSON artifacts. Use when: You want a policy pass or fail result before promotion. Prefer direct live or local analysis inputs for the common path; keep governance\-json and queries\-json for advanced reuse and CI pipelines.
+Evaluate governance policy directly against live Grafana or a local export tree, with saved analysis artifacts as an advanced reuse path. Use when: You want a policy pass or fail result before promotion. Prefer direct live or local analysis inputs for the common path; keep governance\-json and queries\-json for advanced reuse and CI pipelines.
 .TP
 .B topology
-Build a deterministic dashboard topology graph directly from live Grafana, a local export tree, or reusable JSON artifacts. Use when: You need a graph view of dashboards, folders, variables, datasource links, and optional alert contract data. Prefer \-\-url or \-\-import\-dir for the common path; keep artifact inputs for reuse or CI. The command also accepts the graph alias.
+Build a deterministic dashboard topology graph directly from live Grafana or a local export tree, with saved analysis artifacts available for advanced reuse. Use when: You need a graph view of dashboards, folders, variables, datasource links, and optional alert contract data. Prefer \-\-url or \-\-import\-dir for the common path; keep artifact inputs for advanced reuse or CI. The command also accepts the graph alias.
 .TP
 .B screenshot
 Open one dashboard in a headless browser and capture image or PDF output. Use when: You need a reproducible dashboard or panel screenshot, especially for docs, incident notes, or visual debugging.
@@ -141,7 +141,7 @@ grafana\-util dashboard is the namespace for live dashboard workflows, local dra
 grafana-util dashboard --help
 .EE
 .PP
-browse: Open the live dashboard tree in an interactive terminal UI.
+browse: Open the live dashboard tree or a local export tree in an interactive terminal UI.
 .EX
 grafana-util dashboard browse --url http://localhost:3000 --basic-user admin --basic-password admin
 .EE

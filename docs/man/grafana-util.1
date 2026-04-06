@@ -37,10 +37,10 @@ grafana\-util dashboard is the namespace for live dashboard workflows, local dra
 Run the alerting command surface for exporting, importing, diffing, planning, applying, deleting, authoring, and listing Grafana alert resources. Use when: Export local alert bundles from Grafana.; Import or diff alert bundles against live Grafana state.; Build and apply a reviewed alert management plan.; Author staged rules, contact points, routes, and templates.; List live alert rules, contact points, mute timings, and templates.
 .TP
 .B datasource
-grafana\-util datasource is the namespace for catalog lookup, live browsing, export/import, diff, and live create/modify/delete workflows. The same namespace is also available as grafana\-util ds. Use when: You want to inspect supported datasource types, browse live inventory, export a datasource bundle, compare a local bundle with Grafana, or create and maintain live datasources.
+grafana\-util datasource is the namespace for catalog lookup, inventory reads, export/import, diff, and live create/modify/delete workflows. The same namespace is also available as grafana\-util ds. Use when: You want to inspect supported datasource types, read inventory from live Grafana or a local bundle, export a datasource bundle, compare a local bundle with Grafana, or create and maintain live datasources.
 .TP
 .B access
-Run the access\-management command surface for users, orgs, teams, and service accounts. Use when: List or browse access inventory.; Create, modify, export, import, diff, or delete access resources.; Manage service\-account tokens.
+Run the access\-management command surface for users, orgs, teams, and service accounts. Use when: List live or local access inventory.; Create, modify, export, import, diff, or delete access resources.; Manage service\-account tokens.
 .TP
 .B profile
 list, inspect, add, and initialize repo\-local grafana\-util profiles. Use when: Want to keep Grafana connection defaults in the current checkout and reuse them with \-\-profile.
@@ -60,7 +60,7 @@ export and review Grafana snapshot inventory bundles. Use when: Want a local sna
 .SS dashboard
 .TP
 .B grafana\-util\-dashboard\-browse(1)
-Open the live dashboard tree in an interactive terminal UI. Use when: You want to explore folders, select a dashboard, or inspect the live tree before fetching, diffing, importing, or deleting.
+Open the live dashboard tree or a local export tree in an interactive terminal UI. Use when: You want to explore folders, select a dashboard, inspect the live tree before fetching, diffing, importing, or deleting, or review a local export tree without calling Grafana.
 .TP
 .B grafana\-util\-dashboard\-fetch\-live(1)
 Fetch one live dashboard into an API\-safe local JSON draft. Use when: You need a local copy of one live dashboard for review, patching, cloning, or later publish work.
@@ -99,13 +99,13 @@ Analyze dashboard export directories through the canonical dashboard analyze com
 Analyze live Grafana dashboards through the canonical dashboard analyze command. Use when: You need the same analysis views as the local export\-tree flow, but sourced from live Grafana instead of a local export tree. Prefer dashboard analyze \-\-url ... in new docs and scripts.
 .TP
 .B grafana\-util\-dashboard\-list\-vars(1)
-List dashboard templating variables and datasource\-like choices from live Grafana. Use when: You need to list variable state, feed a screenshot workflow, or debug variable\-scoped dashboard URLs.
+List dashboard templating variables and datasource\-like choices from live Grafana, a local dashboard file, or a local export tree. Use when: You need to list variable state, feed a screenshot workflow, debug variable\-scoped dashboard URLs, or inspect a rendered local dashboard file.
 .TP
 .B grafana\-util\-dashboard\-governance\-gate(1)
-Evaluate governance policy against dashboard inspect JSON artifacts. Use when: You want a policy pass or fail result before promotion. Prefer direct live or local analysis inputs for the common path; keep governance\-json and queries\-json for advanced reuse and CI pipelines.
+Evaluate governance policy directly against live Grafana or a local export tree, with saved analysis artifacts as an advanced reuse path. Use when: You want a policy pass or fail result before promotion. Prefer direct live or local analysis inputs for the common path; keep governance\-json and queries\-json for advanced reuse and CI pipelines.
 .TP
 .B grafana\-util\-dashboard\-topology(1)
-Build a deterministic dashboard topology graph directly from live Grafana, a local export tree, or reusable JSON artifacts. Use when: You need a graph view of dashboards, folders, variables, datasource links, and optional alert contract data. Prefer \-\-url or \-\-import\-dir for the common path; keep artifact inputs for reuse or CI. The command also accepts the graph alias.
+Build a deterministic dashboard topology graph directly from live Grafana or a local export tree, with saved analysis artifacts available for advanced reuse. Use when: You need a graph view of dashboards, folders, variables, datasource links, and optional alert contract data. Prefer \-\-url or \-\-import\-dir for the common path; keep artifact inputs for advanced reuse or CI. The command also accepts the graph alias.
 .TP
 .B grafana\-util\-dashboard\-screenshot(1)
 Open one dashboard in a headless browser and capture image or PDF output. Use when: You need a reproducible dashboard or panel screenshot, especially for docs, incident notes, or visual debugging.
@@ -170,13 +170,10 @@ List live Grafana notification templates. Use when: Inspect template inventory f
 Show the built\-in supported datasource type catalog. Use when: You need to see the canonical datasource type ids that the CLI normalizes and supports for create flows.
 .TP
 .B grafana\-util\-datasource\-list(1)
-List live Grafana datasource inventory. Use when: You need a non\-interactive inventory of datasources, either for the current org, one explicit org, or across all visible orgs.
+List datasource inventory from live Grafana or a local export bundle. Use when: You need a non\-interactive inventory of datasources, either from live Grafana for the current org, one explicit org, or across all visible orgs, or from a local export bundle on disk.
 .TP
 .B grafana\-util\-datasource\-browse(1)
 Open a live datasource browser against Grafana with in\-place modify and delete actions. Use when: You want an interactive inventory view for inspecting, editing, or deleting live datasources.
-.TP
-.B grafana\-util\-datasource\-inspect\-export(1)
-Inspect a local masked recovery bundle without connecting to Grafana. Use when: You want to read datasource export artifacts from disk and review them with text, table, CSV, JSON, YAML, or interactive output.
 .TP
 .B grafana\-util\-datasource\-export(1)
 Export live Grafana datasource inventory as normalized JSON plus provisioning files. Use when: You need a local datasource bundle for later inspection, diff, or import.
@@ -198,16 +195,16 @@ Delete one live Grafana datasource through the Grafana API. Use when: A datasour
 .SS access
 .TP
 .B grafana\-util\-access\-user(1)
-List, browse, create, modify, export, import, diff, or delete Grafana users. Use when: Inspect users in the current org or in global admin scope.; Create or update users with login, email, role, and admin settings.; Export and import user inventory bundles.; Remove users from the org membership or from the global registry.
+List live or local Grafana users, browse live, create, modify, export, import, diff, or delete Grafana users. Use when: Inspect users in the current org or in global admin scope.; Inspect users from a live Grafana server or from a local export bundle.; Create or update users with login, email, role, and admin settings.; Export and import user inventory bundles.; Remove users from the org membership or from the global registry.
 .TP
 .B grafana\-util\-access\-org(1)
-List, create, modify, export, import, diff, or delete Grafana organizations. Use when: Inspect organization inventory and org users.; Create a new organization or rename an existing one.; Export or import org bundles between environments.; Remove an organization by id or exact name.
+List live or local Grafana organizations, create, modify, export, import, diff, or delete Grafana organizations. Use when: Inspect organization inventory and org users.; Inspect organizations from a live Grafana server or from a local export bundle.; Create a new organization or rename an existing one.; Export or import org bundles between environments.; Remove an organization by id or exact name.
 .TP
 .B grafana\-util\-access\-team(1)
-List, browse, create, modify, export, import, diff, or delete Grafana teams. Use when: Inspect team inventory and team memberships.; Create or update team membership and admin assignments.; Export or import team bundles.; Remove a team by id or exact name.
+List live or local Grafana teams, browse live, create, modify, export, import, diff, or delete Grafana teams. Use when: Inspect team inventory and team memberships.; Inspect teams from a live Grafana server or from a local export bundle.; Create or update team membership and admin assignments.; Export or import team bundles.; Remove a team by id or exact name.
 .TP
 .B grafana\-util\-access\-service\-account(1)
-List, create, export, import, diff, or delete Grafana service accounts, and manage their tokens. Use when: Inspect service\-account inventory.; Create or update service\-account bundles.; Generate or delete service\-account tokens.
+List live or local Grafana service accounts, create, export, import, diff, or delete Grafana service accounts, and manage their tokens. Use when: Inspect service\-account inventory.; Inspect service accounts from a live Grafana server or from a local export bundle.; Create or update service\-account bundles.; Generate or delete service\-account tokens.
 .TP
 .B grafana\-util\-access\-service\-account\-token(1)
 Add or delete tokens for a Grafana service account. Use when: Create a new service\-account token.; Delete an existing service\-account token by service\-account name or id.

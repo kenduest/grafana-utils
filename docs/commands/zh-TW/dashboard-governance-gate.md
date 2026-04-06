@@ -1,7 +1,7 @@
 # dashboard governance-gate
 
 ## 用途
-針對儀表板 inspect JSON 成品套用治理政策檢查。
+直接針對 live Grafana 或本地匯出樹套用治理政策檢查，已保存的分析成品則作為進階重用路徑。
 
 ## 何時使用
 當您想在推進之前先得到政策通過或失敗結果時，使用這個指令。常見流程應直接用 live 或 local 輸入；只有進階重用與 CI pipeline 才保留 `governance-json` 與 `queries-json`。
@@ -18,8 +18,8 @@
 - `--url`：直接分析線上 Grafana。
 - `--import-dir`：直接分析本地匯出樹。
 - `--input-format`：分析本地匯出時選擇 `raw` 或 `provisioning`。
-- `--governance`：儀表板 inspect governance JSON 路徑。
-- `--queries`：儀表板 inspect query-report JSON 路徑。
+- `--governance`：儀表板 inspect governance JSON 路徑（`governance-json` 成品，進階重用）。
+- `--queries`：儀表板 inspect query-report JSON 路徑（`queries-json` 成品，進階重用）。
 - `--output-format`：輸出文字或 JSON。
 - `--json-output`：可選擇輸出正規化後的結果 JSON。
 - `--interactive`：在互動式終端機瀏覽器中檢視檢查結果。
@@ -36,7 +36,7 @@ grafana-util dashboard governance-gate --import-dir ./dashboards/raw --input-for
 ```
 
 ```bash
-# 用途：對可重用的分析成品套用治理政策檢查。
+# 用途：進階重用：對可重用的分析成品套用治理政策檢查。
 grafana-util dashboard governance-gate --policy-source builtin --builtin-policy default --governance ./governance.json --queries ./queries.json --output-format json --json-output ./governance-check.json
 ```
 

@@ -114,7 +114,6 @@ NAMESPACE_SPECS: tuple[NamespaceSpec, ...] = (
             "datasource-types.md",
             "datasource-list.md",
             "datasource-browse.md",
-            "datasource-inspect-export.md",
             "datasource-export.md",
             "datasource-import.md",
             "datasource-diff.md",

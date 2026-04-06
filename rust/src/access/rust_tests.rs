@@ -1100,6 +1100,7 @@ fn team_list_with_request_reads_search_and_members() {
         with_members: true,
         page: 1,
         per_page: 100,
+        input_dir: None,
         table: false,
         csv: false,
         json: false,

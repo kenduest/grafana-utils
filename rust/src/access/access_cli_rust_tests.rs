@@ -139,6 +139,7 @@ fn access_root_help_includes_examples() {
 
     assert!(help.contains("Examples:"));
     assert!(help.contains("grafana-util access user list"));
+    assert!(help.contains("grafana-util access user list --input-dir ./access-users"));
     assert!(help.contains("grafana-util access user browse"));
     assert!(help.contains("grafana-util access team import"));
 }
@@ -249,6 +250,8 @@ fn user_help_mentions_filter_and_output_flags() {
     let help = render_access_subcommand_help(&["user", "list"]);
     assert!(help.contains("--scope"));
     assert!(help.contains("current org scope"));
+    assert!(help.contains("--input-dir"));
+    assert!(help.contains("local"));
     assert!(help.contains("--with-teams"));
     assert!(help.contains("Include each user's current team memberships"));
     assert!(help.contains("--output-format text"));
@@ -285,6 +288,8 @@ fn team_and_service_account_help_mentions_membership_and_token_flags() {
     let org_help = render_access_subcommand_help(&["org", "list"]);
     assert!(org_help.contains("--with-users"));
     assert!(org_help.contains("Include org users and org roles"));
+    assert!(org_help.contains("--input-dir"));
+    assert!(org_help.contains("local"));
     assert!(org_help.contains("--output-format text"));
     assert!(org_help.contains("--output-format yaml"));
 
@@ -303,6 +308,8 @@ fn team_and_service_account_help_mentions_membership_and_token_flags() {
     assert!(service_account_help.contains("Initial org role for the service account"));
 
     let service_account_list_help = render_access_subcommand_help(&["service-account", "list"]);
+    assert!(service_account_list_help.contains("--input-dir"));
+    assert!(service_account_list_help.contains("local"));
     assert!(service_account_list_help.contains("--output-format text"));
     assert!(service_account_list_help.contains("--output-format yaml"));
 
@@ -331,6 +338,35 @@ fn parse_cli_supports_org_commands() {
             assert_eq!(list_args.query.as_deref(), Some("main"));
             assert!(list_args.with_users);
             assert!(list_args.json);
+            assert!(!list_args.yaml);
+        }
+        _ => panic!("expected org list"),
+    }
+
+    let args = parse_cli_from([
+        "grafana-util access",
+        "org",
+        "list",
+        "--input-dir",
+        "/tmp/access-orgs",
+        "--output-format",
+        "table",
+    ]);
+    match args.command {
+        AccessCommand::Org {
+            command: OrgCommand::List(list_args),
+        } => {
+            assert_eq!(
+                list_args
+                    .input_dir
+                    .as_ref()
+                    .unwrap()
+                    .to_string_lossy(),
+                "/tmp/access-orgs"
+            );
+            assert!(list_args.table);
+            assert!(!list_args.json);
+            assert!(!list_args.csv);
             assert!(!list_args.yaml);
         }
         _ => panic!("expected org list"),
@@ -452,6 +488,39 @@ fn parse_cli_supports_team_list_output_format_yaml() {
 }
 
 #[test]
+fn parse_cli_supports_team_list_local_input_dir() {
+    let args = parse_cli_from([
+        "grafana-util access",
+        "team",
+        "list",
+        "--input-dir",
+        "/tmp/access-teams",
+        "--output-format",
+        "csv",
+    ]);
+
+    match args.command {
+        AccessCommand::Team {
+            command: TeamCommand::List(list_args),
+        } => {
+            assert_eq!(
+                list_args
+                    .input_dir
+                    .as_ref()
+                    .unwrap()
+                    .to_string_lossy(),
+                "/tmp/access-teams"
+            );
+            assert!(list_args.csv);
+            assert!(!list_args.table);
+            assert!(!list_args.json);
+            assert!(!list_args.yaml);
+        }
+        _ => panic!("expected team list"),
+    }
+}
+
+#[test]
 fn parse_cli_supports_org_list_output_format_yaml() {
     let args = parse_cli_from([
         "grafana-util access",
@@ -469,6 +538,39 @@ fn parse_cli_supports_org_list_output_format_yaml() {
             assert!(!list_args.json);
             assert!(!list_args.table);
             assert!(!list_args.csv);
+        }
+        _ => panic!("expected org list"),
+    }
+}
+
+#[test]
+fn parse_cli_supports_org_list_local_input_dir() {
+    let args = parse_cli_from([
+        "grafana-util access",
+        "org",
+        "list",
+        "--input-dir",
+        "/tmp/access-orgs",
+        "--output-format",
+        "json",
+    ]);
+
+    match args.command {
+        AccessCommand::Org {
+            command: OrgCommand::List(list_args),
+        } => {
+            assert_eq!(
+                list_args
+                    .input_dir
+                    .as_ref()
+                    .unwrap()
+                    .to_string_lossy(),
+                "/tmp/access-orgs"
+            );
+            assert!(list_args.json);
+            assert!(!list_args.table);
+            assert!(!list_args.csv);
+            assert!(!list_args.yaml);
         }
         _ => panic!("expected org list"),
     }
@@ -498,6 +600,39 @@ fn parse_cli_supports_service_account_list_output_format_yaml() {
 }
 
 #[test]
+fn parse_cli_supports_service_account_list_local_input_dir() {
+    let args = parse_cli_from([
+        "grafana-util access",
+        "service-account",
+        "list",
+        "--input-dir",
+        "/tmp/access-service-accounts",
+        "--output-format",
+        "yaml",
+    ]);
+
+    match args.command {
+        AccessCommand::ServiceAccount {
+            command: ServiceAccountCommand::List(list_args),
+        } => {
+            assert_eq!(
+                list_args
+                    .input_dir
+                    .as_ref()
+                    .unwrap()
+                    .to_string_lossy(),
+                "/tmp/access-service-accounts"
+            );
+            assert!(list_args.yaml);
+            assert!(!list_args.table);
+            assert!(!list_args.csv);
+            assert!(!list_args.json);
+        }
+        _ => panic!("expected service-account list"),
+    }
+}
+
+#[test]
 fn parse_cli_supports_user_list_output_format_json() {
     let args = parse_cli_from([
         "grafana-util access",
@@ -513,6 +648,39 @@ fn parse_cli_supports_user_list_output_format_json() {
         } => {
             assert!(list_args.json);
             assert!(!list_args.table);
+            assert!(!list_args.csv);
+            assert!(!list_args.yaml);
+        }
+        _ => panic!("expected user list"),
+    }
+}
+
+#[test]
+fn parse_cli_supports_user_list_local_input_dir() {
+    let args = parse_cli_from([
+        "grafana-util access",
+        "user",
+        "list",
+        "--input-dir",
+        "/tmp/access-users",
+        "--output-format",
+        "table",
+    ]);
+
+    match args.command {
+        AccessCommand::User {
+            command: UserCommand::List(list_args),
+        } => {
+            assert_eq!(
+                list_args
+                    .input_dir
+                    .as_ref()
+                    .unwrap()
+                    .to_string_lossy(),
+                "/tmp/access-users"
+            );
+            assert!(list_args.table);
+            assert!(!list_args.json);
             assert!(!list_args.csv);
             assert!(!list_args.yaml);
         }
@@ -926,6 +1094,7 @@ fn user_list_with_request_reads_org_users() {
         with_teams: false,
         page: 1,
         per_page: 100,
+        input_dir: None,
         table: false,
         csv: false,
         json: false,

@@ -1114,6 +1114,29 @@ fn parse_cli_supports_browse_with_path() {
 }
 
 #[test]
+fn parse_cli_supports_browse_local_export_tree() {
+    let args = parse_cli_from([
+        "grafana-util",
+        "browse",
+        "--import-dir",
+        "./dashboards/raw",
+        "--input-format",
+        "raw",
+        "--path",
+        "Platform / Infra",
+    ]);
+
+    match args.command {
+        DashboardCommand::Browse(browse_args) => {
+            assert_eq!(browse_args.import_dir, Some(PathBuf::from("./dashboards/raw")));
+            assert_eq!(browse_args.input_format, DashboardImportInputFormat::Raw);
+            assert_eq!(browse_args.path.as_deref(), Some("Platform / Infra"));
+        }
+        _ => panic!("expected browse command"),
+    }
+}
+
+#[test]
 fn browse_help_mentions_live_tree_controls() {
     let help = render_dashboard_subcommand_help("browse");
     assert!(help.contains("interactive terminal UI"));
@@ -1122,6 +1145,14 @@ fn browse_help_mentions_live_tree_controls() {
     assert!(help.contains("--all-orgs"));
     assert!(help.contains("Open the browser at one folder subtree"));
     assert!(help.contains("Browse all visible orgs with Basic auth"));
+    assert!(help.contains("local export tree"));
+}
+
+#[test]
+fn browse_help_mentions_local_export_tree_examples() {
+    let help = render_dashboard_subcommand_help("browse");
+    assert!(help.contains("--import-dir ./dashboards/raw"));
+    assert!(help.contains("Browse a raw export tree from disk"));
 }
 
 #[test]

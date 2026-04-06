@@ -15,6 +15,13 @@ Current AI-maintained status only.
 - Current Update: moved local datasource inventory onto `datasource list --input-dir ...`, added local input selection and local interactive mode under `list`, removed the `inspect-export` subcommand/help/docs, and rewired unified help/tests to describe `list` as the single datasource inventory verb for both live and local sources.
 - Result: datasource inspection now chooses the task first and the source second, while `browse` stays live-only and mutation verbs remain explicit live operations.
 
+## 2026-04-06 - Document access inventory source-unification across live and local bundles
+- State: Done
+- Scope: `docs/commands/en/access.md`, `docs/commands/en/access-user.md`, `docs/commands/en/access-org.md`, `docs/commands/en/access-team.md`, `docs/commands/en/access-service-account.md`, `docs/commands/zh-TW/access.md`, `docs/commands/zh-TW/access-user.md`, `docs/commands/zh-TW/access-org.md`, `docs/commands/zh-TW/access-team.md`, `docs/commands/zh-TW/access-service-account.md`, `docs/user-guide/en/access.md`, `docs/user-guide/zh-TW/access.md`, `docs/internal/ai-status.md`, `docs/internal/ai-changes.md`
+- Baseline: the access docs still described `list` as live-only in several places, while the surrounding guides already framed export/import/diff as the bridge workflows.
+- Current Update: rewrote the access command and guide docs so `user`, `org`, `team`, and `service-account` `list` pages now describe live or local inventory via `--url`/`--profile` or `--input-dir`, added local list examples, and kept browse live-only while leaving export/import/diff and token commands in their original bridge/live lanes.
+- Result: the access documentation now matches the source-aware inventory shape that the CLI is moving toward, without changing the mutation or token story.
+
 ## 2026-04-06 - Enable the real macOS Keychain backend for the profile secret store
 - State: Done
 - Scope: `rust/Cargo.toml`, `rust/src/profile_secret_store.rs`, `docs/internal/ai-status.md`, `docs/internal/ai-changes.md`, `docs/internal/ai-learnings.md`

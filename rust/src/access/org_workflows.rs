@@ -80,6 +80,53 @@ where
     Ok(rows.len())
 }
 
+pub(crate) fn list_orgs_from_input_dir(args: &OrgListArgs) -> Result<usize> {
+    let input_dir = args
+        .input_dir
+        .as_ref()
+        .ok_or_else(|| message("Organization list local mode requires --input-dir."))?;
+    let mut rows = load_org_import_records(input_dir)?
+        .into_iter()
+        .map(|item| normalize_org_row(&item))
+        .collect::<Vec<Map<String, Value>>>();
+    rows.retain(|row| org_matches(row, args));
+    if !args.with_users {
+        for row in &mut rows {
+            row.insert("users".to_string(), Value::Array(Vec::new()));
+        }
+    }
+    if args.json {
+        println!("{}", render_objects_json(&rows)?);
+    } else if args.yaml {
+        println!("{}", render_yaml(&rows)?);
+    } else if args.table {
+        for line in format_table(&["ID", "NAME", "USER_COUNT"], &org_table_rows(&rows)) {
+            println!("{line}");
+        }
+        println!();
+        println!(
+            "Listed {} org(s) from local bundle at {}",
+            rows.len(),
+            input_dir.display()
+        );
+    } else if args.csv {
+        for line in render_csv(&["id", "name", "userCount"], &org_table_rows(&rows)) {
+            println!("{line}");
+        }
+    } else {
+        for row in &rows {
+            println!("{}", org_summary_line(row));
+        }
+        println!();
+        println!(
+            "Listed {} org(s) from local bundle at {}",
+            rows.len(),
+            input_dir.display()
+        );
+    }
+    Ok(rows.len())
+}
+
 pub(crate) fn add_org_with_request<F>(mut request_json: F, args: &OrgAddArgs) -> Result<usize>
 where
     F: FnMut(Method, &str, &[(String, String)], Option<&Value>) -> Result<Option<Value>>,

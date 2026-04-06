@@ -20,6 +20,14 @@ use super::{
     build_http_client, build_http_client_for_org, fetch_dashboard, InspectVarsArgs,
     SimpleOutputFormat,
 };
+use crate::dashboard::files::{
+    discover_dashboard_files, extract_dashboard_object, load_json_file,
+    resolve_dashboard_export_root, resolve_dashboard_import_source,
+};
+use crate::dashboard::inspect_live::{
+    prepare_inspect_export_import_dir_for_variant, TempInspectDir,
+};
+use crate::dashboard::{DashboardImportInputFormat, RAW_EXPORT_SUBDIR};
 
 /// Struct definition for DashboardVariableRow.
 #[derive(Debug, Clone, Serialize, PartialEq, Eq)]
@@ -142,6 +150,13 @@ fn render_dashboard_variable_text(document: &DashboardVariableDocument) -> Strin
 pub(crate) fn execute_dashboard_variable_inspection(
     args: &InspectVarsArgs,
 ) -> Result<DashboardVariableDocument> {
+    if args.input.is_some() || args.import_dir.is_some() {
+        let mut document = execute_dashboard_variable_inspection_local(args)?;
+        if let Some(vars_query) = args.vars_query.as_deref() {
+            apply_vars_query_overrides(&mut document.variables, vars_query)?;
+        }
+        return Ok(document);
+    }
     let dashboard_uid = resolve_dashboard_uid(args)?;
     let client = build_inspect_vars_client(args)?;
     let mut document = build_dashboard_variable_document(&client, &dashboard_uid)?;
@@ -224,6 +239,13 @@ pub(crate) fn build_dashboard_variable_document(
             "Dashboard UID {dashboard_uid} did not include a dashboard object."
         ))
     })?;
+    build_dashboard_variable_document_from_dashboard(dashboard_uid, dashboard)
+}
+
+fn build_dashboard_variable_document_from_dashboard(
+    dashboard_uid: &str,
+    dashboard: &Map<String, Value>,
+) -> Result<DashboardVariableDocument> {
     let title = string_field(dashboard, "title", dashboard_uid);
     let variables = extract_dashboard_variables(dashboard)?;
     Ok(DashboardVariableDocument {
@@ -232,6 +254,161 @@ pub(crate) fn build_dashboard_variable_document(
         variable_count: variables.len(),
         variables,
     })
+}
+
+fn execute_dashboard_variable_inspection_local(
+    args: &InspectVarsArgs,
+) -> Result<DashboardVariableDocument> {
+    let dashboard_uid_hint = resolve_dashboard_uid_hint(args)?;
+    if let Some(input) = args.input.as_deref() {
+        return build_dashboard_variable_document_from_local_file(
+            input,
+            dashboard_uid_hint.as_deref(),
+        );
+    }
+    let Some(import_dir) = args.import_dir.as_deref() else {
+        return Err(message("Local list-vars requires --input or --import-dir."));
+    };
+    let resolved = resolve_local_variable_source(import_dir, args.input_format)?;
+    let mut dashboard_files = discover_dashboard_files(&resolved.dashboard_dir)?;
+    dashboard_files.retain(|path| !is_history_artifact(path));
+    if dashboard_files.is_empty() {
+        return Err(message(format!(
+            "No dashboard JSON files found in {}",
+            resolved.dashboard_dir.display()
+        )));
+    }
+    let selected_path =
+        select_local_dashboard_file(&dashboard_files, dashboard_uid_hint.as_deref())?;
+    build_dashboard_variable_document_from_local_file(&selected_path, dashboard_uid_hint.as_deref())
+}
+
+fn resolve_local_variable_source(
+    import_dir: &std::path::Path,
+    input_format: DashboardImportInputFormat,
+) -> Result<super::files::ResolvedDashboardImportSource> {
+    match input_format {
+        DashboardImportInputFormat::Raw => {
+            if resolve_dashboard_export_root(import_dir)?
+                .map(|resolved| resolved.manifest.scope_kind.is_root())
+                .unwrap_or(false)
+            {
+                let temp_dir = TempInspectDir::new("inspect-vars-local")?;
+                let dashboard_dir = prepare_inspect_export_import_dir_for_variant(
+                    &temp_dir.path,
+                    import_dir,
+                    RAW_EXPORT_SUBDIR,
+                )?;
+                return Ok(super::files::ResolvedDashboardImportSource {
+                    dashboard_dir: dashboard_dir.clone(),
+                    metadata_dir: dashboard_dir,
+                });
+            }
+            resolve_dashboard_import_source(import_dir, input_format)
+        }
+        DashboardImportInputFormat::Provisioning => {
+            resolve_dashboard_import_source(import_dir, input_format)
+        }
+    }
+}
+
+fn select_local_dashboard_file(
+    dashboard_files: &[PathBuf],
+    dashboard_uid_hint: Option<&str>,
+) -> Result<PathBuf> {
+    if let Some(hint) = dashboard_uid_hint {
+        let mut matches = Vec::new();
+        for path in dashboard_files {
+            let document = load_json_file(path)?;
+            let object = document
+                .as_object()
+                .ok_or_else(|| message("Dashboard file must be a JSON object."))?;
+            let dashboard = extract_dashboard_object(object)?;
+            let uid = string_field(dashboard, "uid", "");
+            if uid == hint {
+                matches.push(path.clone());
+            }
+        }
+        return matches.into_iter().next().ok_or_else(|| {
+            message(format!(
+                "No local dashboard file matched UID {hint}. Provide --input or choose a different --dashboard-uid."
+            ))
+        });
+    }
+    if dashboard_files.len() == 1 {
+        return Ok(dashboard_files[0].clone());
+    }
+    Err(message(
+        "Use --dashboard-uid or --dashboard-url to choose one dashboard from --import-dir, or use --input for one local dashboard file.",
+    ))
+}
+
+fn build_dashboard_variable_document_from_local_file(
+    path: &std::path::Path,
+    dashboard_uid_hint: Option<&str>,
+) -> Result<DashboardVariableDocument> {
+    let document = load_json_file(path)?;
+    let object = document
+        .as_object()
+        .ok_or_else(|| message("Dashboard file must be a JSON object."))?;
+    let dashboard = extract_dashboard_object(object)?;
+    let uid = string_field(dashboard, "uid", "");
+    if uid.is_empty() {
+        return Err(message(format!(
+            "Dashboard file {} did not include a dashboard UID.",
+            path.display()
+        )));
+    }
+    if let Some(hint) = dashboard_uid_hint.filter(|value| !value.is_empty()) {
+        if hint != uid {
+            return Err(message(format!(
+                "Dashboard file {} contains UID {uid}, which does not match the requested UID {hint}.",
+                path.display()
+            )));
+        }
+    }
+    build_dashboard_variable_document_from_dashboard(&uid, dashboard)
+}
+
+fn resolve_dashboard_uid_hint(args: &InspectVarsArgs) -> Result<Option<String>> {
+    if let Some(dashboard_uid) = args
+        .dashboard_uid
+        .as_deref()
+        .map(str::trim)
+        .filter(|value| !value.is_empty())
+    {
+        return Ok(Some(dashboard_uid.to_string()));
+    }
+    let Some(dashboard_url) = args
+        .dashboard_url
+        .as_deref()
+        .map(str::trim)
+        .filter(|value| !value.is_empty())
+    else {
+        return Ok(None);
+    };
+    let url = Url::parse(dashboard_url)
+        .map_err(|error| message(format!("Invalid --dashboard-url: {error}")))?;
+    let segments = url
+        .path_segments()
+        .map(|values| values.map(str::to_string).collect::<Vec<String>>())
+        .unwrap_or_default();
+    if segments.len() >= 3 && (segments[0] == "d" || segments[0] == "d-solo") {
+        return Ok(Some(segments[1].clone()));
+    }
+    Err(message(
+        "Unable to derive dashboard UID from --dashboard-url. Use a /d/... or /d-solo/... Grafana URL, or pass --dashboard-uid explicitly.",
+    ))
+}
+
+fn is_history_artifact(path: &std::path::Path) -> bool {
+    path.file_name()
+        .and_then(|value| value.to_str())
+        .map(|value| value.ends_with(".history.json"))
+        .unwrap_or(false)
+        || path
+            .components()
+            .any(|component| component.as_os_str() == "history")
 }
 
 fn apply_vars_query_overrides(rows: &mut [DashboardVariableRow], vars_query: &str) -> Result<()> {

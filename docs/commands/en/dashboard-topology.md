@@ -1,10 +1,10 @@
 # dashboard topology
 
 ## Purpose
-Build a deterministic dashboard topology graph directly from live Grafana, a local export tree, or reusable JSON artifacts.
+Build a deterministic dashboard topology graph directly from live Grafana or a local export tree, with saved analysis artifacts available for advanced reuse.
 
 ## When to use
-Use this when you need a graph view of dashboards, folders, variables, datasource links, and optional alert contract data. Prefer `--url` or `--import-dir` for the common path; keep artifact inputs for reuse or CI. The command also accepts the `graph` alias.
+Use this when you need a graph view of dashboards, folders, variables, datasource links, and optional alert contract data. Prefer `--url` or `--import-dir` for the common path; keep artifact inputs for advanced reuse or CI. The command also accepts the `graph` alias.
 
 ## Before / After
 
@@ -15,8 +15,8 @@ Use this when you need a graph view of dashboards, folders, variables, datasourc
 - `--url`: analyze live Grafana directly.
 - `--import-dir`: analyze a local export tree directly.
 - `--input-format`: choose `raw` or `provisioning` when analyzing local exports.
-- `--governance`: dashboard governance JSON input (`governance-json` artifact).
-- `--queries`: optional dashboard query-report JSON input (`queries-json` artifact).
+- `--governance`: dashboard governance JSON input (`governance-json` artifact, advanced reuse).
+- `--queries`: optional dashboard query-report JSON input (`queries-json` artifact, advanced reuse).
 - `--alert-contract`: optional alert contract JSON input.
 - `--output-format`: render `text`, `json`, `mermaid`, or `dot`.
 - `--output-file`: write the rendered topology to disk.
@@ -42,7 +42,7 @@ grafana-util dashboard graph \
 ```
 
 ```bash
-# Purpose: Build a deterministic dashboard topology graph from reusable artifacts.
+# Purpose: Advanced reuse: build a deterministic dashboard topology graph from saved artifacts.
 grafana-util dashboard topology \
   --governance ./governance.json \
   --queries ./queries.json \
