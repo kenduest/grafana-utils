@@ -72,9 +72,8 @@ pub(crate) use datasource_cli_defs::{normalize_datasource_group_command, root_co
 pub use datasource_cli_defs::{
     DatasourceAddArgs, DatasourceBrowseArgs, DatasourceCliArgs, DatasourceDeleteArgs,
     DatasourceDiffArgs, DatasourceExportArgs, DatasourceGroupCommand, DatasourceImportArgs,
-    DatasourceImportInputFormat, DatasourceInspectExportArgs, DatasourceInspectExportOutputFormat,
-    DatasourceListArgs, DatasourceModifyArgs, DatasourceTypesArgs, DryRunOutputFormat,
-    ListOutputFormat,
+    DatasourceImportInputFormat, DatasourceListArgs, DatasourceModifyArgs,
+    DatasourceTypesArgs, DryRunOutputFormat, ListOutputFormat,
 };
 pub(crate) use datasource_import_export::{
     build_all_orgs_export_index, build_all_orgs_export_metadata, build_all_orgs_output_dir,
@@ -103,16 +102,15 @@ pub(crate) use datasource_import_export::{
 pub(crate) use datasource_inspect_export::{
     build_datasource_inspect_export_browser_items, load_datasource_inspect_export_source,
     prompt_datasource_inspect_export_input_format, render_datasource_inspect_export_output,
-    resolve_datasource_inspect_export_format, resolve_datasource_inspect_export_input_format,
-    DatasourceInspectExportRenderFormat, DatasourceInspectExportSource,
+    resolve_datasource_inspect_export_input_format, DatasourceInspectExportRenderFormat,
+    DatasourceInspectExportSource,
 };
 #[cfg(not(any(feature = "tui", test)))]
 #[allow(unused_imports)]
 pub(crate) use datasource_inspect_export::{
     load_datasource_inspect_export_source, prompt_datasource_inspect_export_input_format,
-    render_datasource_inspect_export_output, resolve_datasource_inspect_export_format,
-    resolve_datasource_inspect_export_input_format, DatasourceInspectExportRenderFormat,
-    DatasourceInspectExportSource,
+    render_datasource_inspect_export_output, resolve_datasource_inspect_export_input_format,
+    DatasourceInspectExportRenderFormat, DatasourceInspectExportSource,
 };
 #[cfg(test)]
 pub(crate) use datasource_mutation_support::parse_json_object_argument;
@@ -148,6 +146,68 @@ fn render_datasource_text(records: &[Map<String, Value>]) -> Vec<String> {
         lines.push(line);
     }
     lines
+}
+
+fn resolve_local_datasource_list_format(
+    args: &DatasourceListArgs,
+) -> DatasourceInspectExportRenderFormat {
+    if args.table {
+        DatasourceInspectExportRenderFormat::Table
+    } else if args.csv {
+        DatasourceInspectExportRenderFormat::Csv
+    } else if args.json {
+        DatasourceInspectExportRenderFormat::Json
+    } else if args.yaml {
+        DatasourceInspectExportRenderFormat::Yaml
+    } else {
+        DatasourceInspectExportRenderFormat::Table
+    }
+}
+
+fn run_local_datasource_list(args: &DatasourceListArgs) -> Result<()> {
+    if args.all_orgs || args.org_id.is_some() {
+        return Err(message(
+            "Datasource list with --input-dir does not support --org-id or --all-orgs.",
+        ));
+    }
+    let input_dir = args
+        .input_dir
+        .as_ref()
+        .ok_or_else(|| message("Datasource list local mode requires --input-dir."))?;
+    let input_format =
+        resolve_datasource_inspect_export_input_format(input_dir, args.input_format)?.ok_or_else(
+            || {
+                message(format!(
+                    "Datasource list could not find export-metadata.json or provisioning/datasources.yaml under {}.",
+                    input_dir.display()
+                ))
+            },
+        )?;
+    if args.interactive {
+        #[cfg(feature = "tui")]
+        {
+            let source = load_datasource_inspect_export_source(input_dir, input_format)?;
+            let summary_lines = vec![
+                "Datasource list".to_string(),
+                format!("Input: {}", source.input_path),
+                format!("Mode: {}", source.input_mode),
+                format!("Datasources: {}", source.records.len()),
+            ];
+            let items = build_datasource_inspect_export_browser_items(&source);
+            return run_interactive_browser("Datasource list", &summary_lines, &items);
+        }
+        #[cfg(not(feature = "tui"))]
+        {
+            return Err(crate::common::tui(
+                "Datasource list --interactive requires the `tui` feature.",
+            ));
+        }
+    }
+    let source = load_datasource_inspect_export_source(input_dir, input_format)?;
+    let format = resolve_local_datasource_list_format(args);
+    let rendered = render_datasource_inspect_export_output(&source, format)?;
+    print!("{rendered}");
+    Ok(())
 }
 
 fn render_diff_identity(entry: &DatasourceDiffEntry) -> String {
@@ -262,6 +322,14 @@ pub fn run_datasource_cli(command: DatasourceGroupCommand) -> Result<()> {
             Ok(())
         }
         DatasourceGroupCommand::List(args) => {
+            if args.input_dir.is_some() {
+                return run_local_datasource_list(&args);
+            }
+            if args.interactive {
+                return Err(message(
+                    "Datasource list --interactive requires --input-dir. Use datasource browse for live interactive review.",
+                ));
+            }
             let datasources = if args.all_orgs {
                 let context = build_auth_context(&args.common)?;
                 if context.auth_mode != "basic" {
@@ -329,48 +397,6 @@ pub fn run_datasource_cli(command: DatasourceGroupCommand) -> Result<()> {
         }
         DatasourceGroupCommand::Browse(args) => {
             let _ = datasource_browse::browse_datasources(&args)?;
-            Ok(())
-        }
-        DatasourceGroupCommand::InspectExport(args) => {
-            let input_format = resolve_datasource_inspect_export_input_format(
-                &args.input_dir,
-                args.input_type,
-            )?
-            .ok_or_else(|| {
-                message(format!(
-                    "Datasource inspect-export could not find export-metadata.json or provisioning/datasources.yaml under {}.",
-                    args.input_dir.display()
-                ))
-            })?;
-            if args.interactive {
-                #[cfg(feature = "tui")]
-                {
-                    let source =
-                        load_datasource_inspect_export_source(&args.input_dir, input_format)?;
-                    let summary_lines = vec![
-                        "Datasource inspect-export".to_string(),
-                        format!("Input: {}", source.input_path),
-                        format!("Mode: {}", source.input_mode),
-                        format!("Datasources: {}", source.records.len()),
-                    ];
-                    let items = build_datasource_inspect_export_browser_items(&source);
-                    return run_interactive_browser(
-                        "Datasource inspect-export",
-                        &summary_lines,
-                        &items,
-                    );
-                }
-                #[cfg(not(feature = "tui"))]
-                {
-                    return Err(crate::common::tui(
-                        "Datasource inspect-export interactive mode requires the `tui` feature.",
-                    ));
-                }
-            }
-            let source = load_datasource_inspect_export_source(&args.input_dir, input_format)?;
-            let format = resolve_datasource_inspect_export_format(&args);
-            let rendered = render_datasource_inspect_export_output(&source, format)?;
-            print!("{rendered}");
             Ok(())
         }
         DatasourceGroupCommand::Add(args) => {

@@ -77,7 +77,6 @@
 - [datasource types](./datasource-types.md)
 - [datasource list](./datasource-list.md)
 - [datasource browse](./datasource-browse.md)
-- [datasource inspect-export](./datasource-inspect-export.md)
 - [datasource export](./datasource-export.md)
 - [datasource import](./datasource-import.md)
 - [datasource diff](./datasource-diff.md)

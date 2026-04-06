@@ -684,7 +684,7 @@ pub(crate) fn load_datasource_inventory_records_from_export_root(
         }
         DatasourceExportRootScopeKind::Unknown => {
             return Err(message(format!(
-                "Datasource inspect-export only supports datasource org-root, all-orgs-root, or workspace-root manifests: {}",
+                "Datasource list local mode only supports datasource org-root, all-orgs-root, or workspace-root manifests: {}",
                 metadata_path.display()
             )));
         }

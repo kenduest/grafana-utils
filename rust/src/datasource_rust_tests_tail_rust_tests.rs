@@ -568,11 +568,9 @@ fn datasource_inspect_export_renders_inventory_root_in_multiple_output_modes() {
             .unwrap();
 
     assert!(table.contains("UID"));
-    assert!(table.contains("Datasource inspect-export:"));
     assert!(table.contains("Layer: operator-summary"));
     assert!(table.contains("Mode: inventory"));
     assert!(table.contains("Prometheus Main"));
-    assert!(text.contains("Datasource inspect-export:"));
     assert!(text.contains("Layer: operator-summary"));
     assert!(text.contains("Mode: inventory"));
     assert!(text.contains("Bundle: recovery-capable masked export"));
@@ -621,18 +619,19 @@ fn datasource_inspect_export_renders_provisioning_yaml_file_as_csv_and_yaml() {
 }
 
 #[test]
-fn datasource_inspect_export_help_mentions_masked_recovery_bundle_contract() {
+fn datasource_list_help_mentions_local_inventory_source_flags() {
     let mut command = DatasourceCliArgs::command();
     let subcommand = command
-        .find_subcommand_mut("inspect-export")
-        .unwrap_or_else(|| panic!("missing datasource inspect-export help"));
+        .find_subcommand_mut("list")
+        .unwrap_or_else(|| panic!("missing datasource list help"));
     let mut output = Vec::new();
     subcommand.write_long_help(&mut output).unwrap();
     let help = String::from_utf8(output).unwrap();
 
-    assert!(help.contains("recovery-capable masked export"));
-    assert!(help.contains("operator-summary views"));
-    assert!(help.contains("JSON or YAML for the full machine-readable bundle contract"));
+    assert!(help.contains("--input-dir"));
+    assert!(help.contains("--input-format"));
+    assert!(help.contains("local"));
+    assert!(help.contains("inventory"));
 }
 
 #[test]
@@ -770,7 +769,7 @@ fn datasource_diff_help_mentions_operator_summary_report() {
     assert!(help.contains("--input-format"));
     assert!(help.contains("provisioning"));
     assert!(help.contains("operator-summary diff report"));
-    assert!(help.contains("inspect-export --json or --yaml"));
+    assert!(help.contains("datasource list --input-dir"));
 }
 
 #[test]
@@ -992,7 +991,7 @@ fn datasource_inspect_export_requires_explicit_input_type_without_tty_for_ambigu
     let error = prompt_datasource_inspect_export_input_format(&root).unwrap_err();
     assert!(error
         .to_string()
-        .contains("--input-type inventory or --input-type provisioning"));
+        .contains("--input-format inventory or --input-format provisioning"));
 
     fs::remove_dir_all(root).unwrap();
 }

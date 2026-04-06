@@ -8,6 +8,13 @@ Current AI-maintained status only.
 - Keep this file short and current. Additive historical detail belongs in `docs/internal/archive/`.
 - Detailed 2026-03-29 through 2026-03-31 entries moved to [`archive/ai-status-archive-2026-03-31.md`](/Users/kendlee/work/grafana-utils/docs/internal/archive/ai-status-archive-2026-03-31.md).
 
+## 2026-04-06 - Fold datasource local inspection into datasource list and remove inspect-export
+- State: Done
+- Scope: `rust/src/datasource_cli_defs.rs`, `rust/src/datasource.rs`, `rust/src/datasource_inspect_export.rs`, `rust/src/cli.rs`, `rust/src/cli_help.rs`, `rust/src/cli_help_examples.rs`, `rust/src/datasource_import_export_support.rs`, `rust/src/cli_rust_tests.rs`, `rust/src/datasource_cli_mutation_rust_tests.rs`, `rust/src/datasource_rust_tests_tail_rust_tests.rs`, `docs/commands/en/datasource*.md`, `docs/commands/zh-TW/datasource*.md`, `docs/user-guide/en/datasource.md`, `docs/user-guide/zh-TW/datasource.md`, `docs/internal/ai-status.md`, `docs/internal/ai-changes.md`
+- Baseline: datasource inventory was split across `datasource list` for live Grafana and `datasource inspect-export` for local masked-recovery or provisioning artifacts, so operators had to choose different verbs for the same inspection task.
+- Current Update: moved local datasource inventory onto `datasource list --input-dir ...`, added local input selection and local interactive mode under `list`, removed the `inspect-export` subcommand/help/docs, and rewired unified help/tests to describe `list` as the single datasource inventory verb for both live and local sources.
+- Result: datasource inspection now chooses the task first and the source second, while `browse` stays live-only and mutation verbs remain explicit live operations.
+
 ## 2026-04-06 - Enable the real macOS Keychain backend for the profile secret store
 - State: Done
 - Scope: `rust/Cargo.toml`, `rust/src/profile_secret_store.rs`, `docs/internal/ai-status.md`, `docs/internal/ai-changes.md`, `docs/internal/ai-learnings.md`
@@ -412,3 +419,9 @@ Current AI-maintained status only.
 - Baseline: `import_apply.rs` still kept two large import execution flows, one for request closures and one for `DashboardResourceClient`, so behavior was aligned but the main orchestration loop was still duplicated and guarded by a temporary `#![allow(dead_code)]`.
 - Current Update: finished wiring the existing shared `LiveImportBackend`, `prepare_import_run(...)`, `run_live_import(...)`, and `render_dry_run_report(...)` helpers into the real request/client entrypoints. Dry-run rendering now uses one shared renderer, and both live paths now share the same import preparation and main loop while keeping backend-specific lookup/apply hooks.
 - Result: the dashboard import runtime no longer maintains parallel request/client main loops for the same behavior, and `import_apply.rs` no longer needs the dead-code escape hatch to compile cleanly.
+## 2026-04-06 - Recenter dashboard topology and governance-gate on live/local inputs
+- State: Done
+- Scope: `rust/src/dashboard/cli_defs_inspect.rs`, `rust/src/dashboard/cli_defs_command.rs`, `rust/src/dashboard/analysis_source.rs`, `rust/src/dashboard/topology.rs`, `rust/src/dashboard/governance_gate.rs`, `rust/src/dashboard/topology_impact_rust_tests.rs`, `docs/commands/en/dashboard-topology.md`, `docs/commands/zh-TW/dashboard-topology.md`, `docs/commands/en/dashboard-governance-gate.md`, `docs/commands/zh-TW/dashboard-governance-gate.md`, `docs/internal/ai-status.md`, `docs/internal/ai-changes.md`
+- Baseline: topology and governance-gate already supported live Grafana, local export trees, and saved analysis artifacts, but several help strings and docs still read like artifact-first commands even though the common path should be live or local.
+- Current Update: tightened the topology and governance-gate module/help/doc wording so live Grafana and local export trees are the primary public entrypoints, while governance-json and queries-json are framed as advanced reuse inputs. Also aligned the source-resolution errors and help tests with the new source-model wording.
+- Result: the dashboard analysis/gate topology surface now reads as live/local-first for operators, with saved-artifact reuse clearly demoted to CI/advanced workflows instead of the default mental model.

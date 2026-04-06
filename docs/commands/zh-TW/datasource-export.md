@@ -43,6 +43,6 @@ grafana-util datasource export --url http://localhost:3000 --basic-user admin --
 - 如果 bundle 看起來像舊資料，先確認匯出目錄與 `--overwrite` 是否有刻意使用
 
 ## 相關指令
-- [datasource inspect-export](./datasource-inspect-export.md)
+- [datasource list](./datasource-list.md)
 - [datasource import](./datasource-import.md)
 - [datasource diff](./datasource-diff.md)

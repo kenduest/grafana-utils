@@ -1,4 +1,4 @@
-//! Datasource inspect-export support helpers.
+//! Datasource local inventory support helpers.
 
 use serde_json::{Map, Value};
 #[cfg(not(feature = "tui"))]
@@ -20,8 +20,8 @@ use super::datasource_browse_terminal::TerminalSession;
 use super::{
     load_datasource_inventory_records_from_export_root, load_import_records,
     render_data_source_csv, render_data_source_table, resolve_datasource_export_root_dir,
-    DatasourceImportInputFormat, DatasourceImportRecord, DatasourceInspectExportArgs,
-    DATASOURCE_PROVISIONING_FILENAME, DATASOURCE_PROVISIONING_SUBDIR, EXPORT_METADATA_FILENAME,
+    DatasourceImportInputFormat, DatasourceImportRecord, DATASOURCE_PROVISIONING_FILENAME,
+    DATASOURCE_PROVISIONING_SUBDIR, EXPORT_METADATA_FILENAME,
 };
 #[cfg(feature = "tui")]
 use crossterm::event::{self, Event, KeyCode, KeyEventKind};
@@ -93,7 +93,7 @@ fn resolve_datasource_workspace_input_dir(input_dir: &Path) -> Result<PathBuf> {
             error
                 .to_string()
                 .replace("--import-dir", "--input-dir")
-                .replace("Datasource import", "Datasource inspect-export"),
+                .replace("Datasource import", "Datasource list"),
         )
     })
 }
@@ -162,22 +162,6 @@ fn datasource_inspect_export_record(record: &DatasourceImportRecord) -> Map<Stri
     record.to_inventory_record()
 }
 
-pub(crate) fn resolve_datasource_inspect_export_format(
-    args: &DatasourceInspectExportArgs,
-) -> DatasourceInspectExportRenderFormat {
-    if args.table {
-        DatasourceInspectExportRenderFormat::Table
-    } else if args.csv {
-        DatasourceInspectExportRenderFormat::Csv
-    } else if args.json {
-        DatasourceInspectExportRenderFormat::Json
-    } else if args.yaml {
-        DatasourceInspectExportRenderFormat::Yaml
-    } else {
-        DatasourceInspectExportRenderFormat::Text
-    }
-}
-
 pub(crate) fn load_datasource_inspect_export_source(
     input_dir: &Path,
     input_format: DatasourceImportInputFormat,
@@ -191,7 +175,7 @@ pub(crate) fn load_datasource_inspect_export_source(
             .unwrap_or_default();
         if !matches!(extension, "yaml" | "yml") {
             return Err(message(format!(
-                "Datasource inspect-export input file must be YAML (.yaml or .yml): {}",
+                "Datasource list local input file must be YAML (.yaml or .yml): {}",
                 input_dir.display()
             )));
         }
@@ -285,7 +269,7 @@ pub(crate) fn load_datasource_inspect_export_source(
     }
 
     Err(message(format!(
-        "Datasource inspect-export could not find export-metadata.json or provisioning/datasources.yaml under {}.",
+        "Datasource list could not find export-metadata.json or provisioning/datasources.yaml under {}.",
         input_dir.display()
     )))
 }
@@ -339,7 +323,7 @@ fn run_datasource_inspect_input_selector(input_dir: &Path) -> Result<DatasourceI
             frame.render_widget(
                 Block::default()
                     .borders(Borders::ALL)
-                    .title("Datasource inspect input")
+                    .title("Datasource list input")
                     .border_style(Style::default().fg(Color::LightBlue))
                     .style(Style::default().bg(Color::Black)),
                 popup,
@@ -348,7 +332,7 @@ fn run_datasource_inspect_input_selector(input_dir: &Path) -> Result<DatasourceI
                 Paragraph::new(vec![
                     Line::from(vec![
                         tui_shell::label("Title "),
-                        tui_shell::accent("Choose datasource inspect mode", Color::Cyan),
+                        tui_shell::accent("Choose datasource local input mode", Color::Cyan),
                     ]),
                     Line::from(vec![
                         tui_shell::label("Input "),
@@ -427,7 +411,7 @@ fn run_datasource_inspect_input_selector(input_dir: &Path) -> Result<DatasourceI
             }
             KeyCode::Enter => return Ok(options[selected].0),
             KeyCode::Esc | KeyCode::Char('q') => {
-                return Err(message("Datasource inspect-export selection cancelled."));
+                return Err(message("Datasource list input selection cancelled."));
             }
             _ => {}
         }
@@ -440,7 +424,7 @@ pub(crate) fn prompt_datasource_inspect_export_input_format(
 ) -> Result<DatasourceImportInputFormat> {
     if !datasource_inspect_uses_tty() {
         return Err(message(format!(
-            "Datasource inspect-export found both inventory and provisioning artifacts under {}. Re-run with --input-type inventory or --input-type provisioning.",
+            "Datasource list found both inventory and provisioning artifacts under {}. Re-run with --input-format inventory or --input-format provisioning.",
             input_dir.display()
         )));
     }
@@ -453,12 +437,12 @@ pub(crate) fn prompt_datasource_inspect_export_input_format(
 ) -> Result<DatasourceImportInputFormat> {
     if !datasource_inspect_uses_tty() {
         return Err(message(format!(
-            "Datasource inspect-export found both inventory and provisioning artifacts under {}. Re-run with --input-type inventory or --input-type provisioning.",
+            "Datasource list found both inventory and provisioning artifacts under {}. Re-run with --input-format inventory or --input-format provisioning.",
             input_dir.display()
         )));
     }
     loop {
-        println!("Title: Choose datasource inspect mode");
+        println!("Title: Choose datasource local input mode");
         println!("Input: {}", input_dir.display());
         println!();
         println!("1. inventory (Inspect datasource inventory export records)");
@@ -515,7 +499,7 @@ pub(crate) fn render_datasource_inspect_export_output(
     match format {
         DatasourceInspectExportRenderFormat::Text => {
             output.push_str(&format!(
-                "Datasource inspect-export: {}\n",
+                "Datasource list: {}\n",
                 source.input_path
             ));
             output.push_str(&format!(
@@ -555,7 +539,7 @@ pub(crate) fn render_datasource_inspect_export_output(
         }
         DatasourceInspectExportRenderFormat::Table => {
             output.push_str(&format!(
-                "Datasource inspect-export: {}\n",
+                "Datasource list: {}\n",
                 source.input_path
             ));
             output.push_str(&format!(

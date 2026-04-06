@@ -96,6 +96,16 @@ pub(crate) const UNIFIED_HELP_TEXT: &str = help_block!(
         r#"grafana-util dashboard list-vars --dashboard-url 'https://grafana.example.com/d/cpu-main/cpu-overview?var-cluster=prod-a' --token "$GRAFANA_API_TOKEN""#
     ),
     (
+        "[Dashboard Capture]",
+        "Inspect dashboard variables from a local dashboard file:",
+        "grafana-util dashboard list-vars --input ./dashboards/raw/cpu-main.json --output-format yaml"
+    ),
+    (
+        "[Dashboard Browse]",
+        "Browse a local export tree from disk:",
+        "grafana-util dashboard browse --import-dir ./dashboards/raw --path 'Platform / Infra'"
+    ),
+    (
         "[Dashboard Analyze]",
         "Analyze live Grafana before topology or governance checks:",
         r#"grafana-util dashboard analyze --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-format governance-json"#
@@ -121,9 +131,9 @@ pub(crate) const UNIFIED_HELP_TEXT: &str = help_block!(
         r#"grafana-util datasource list --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --json"#
     ),
     (
-        "[Datasource Inspect Export]",
+        "[Datasource Local Inventory]",
         "Inspect a local datasource export root without Grafana access:",
-        r#"grafana-util datasource inspect-export --input-dir ./datasources --json"#
+        r#"grafana-util datasource list --input-dir ./datasources --json"#
     ),
     (
         "[Access Inventory]",
@@ -443,7 +453,7 @@ pub(crate) const HELP_EXAMPLE_LABELS: [(&str, &str); 30] = [
     ("[Datasource List]", HELP_COLOR_DATASOURCE),
     ("[Datasource Add]", HELP_COLOR_DATASOURCE),
     ("[Datasource Import]", HELP_COLOR_DATASOURCE),
-    ("[Datasource Inspect Export]", HELP_COLOR_DATASOURCE),
+    ("[Datasource Local Inventory]", HELP_COLOR_DATASOURCE),
     ("[Datasource Diff]", HELP_COLOR_DATASOURCE),
     ("[Access Inventory]", HELP_COLOR_ACCESS),
     ("[Access User Diff]", HELP_COLOR_ACCESS),

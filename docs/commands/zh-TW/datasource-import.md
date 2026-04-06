@@ -48,6 +48,6 @@ grafana-util datasource import --url http://localhost:3000 --token "$GRAFANA_API
 - 如果 secrets 還沒解開，先檢查 placeholder 對照與提供的 secret 值
 
 ## 相關指令
+- [datasource list](./datasource-list.md)
 - [datasource export](./datasource-export.md)
 - [datasource diff](./datasource-diff.md)
-- [datasource inspect-export](./datasource-inspect-export.md)

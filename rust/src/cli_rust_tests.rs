@@ -96,7 +96,7 @@ fn unified_help_mentions_screenshot_and_dashboard_analysis_examples() {
     assert!(help.contains("--all-orgs"));
     assert!(help.contains("dashboard screenshot"));
     assert!(help.contains("dashboard analyze --url http://localhost:3000"));
-    assert!(help.contains("datasource inspect-export"));
+    assert!(help.contains("datasource list --input-dir ./datasources"));
     assert!(help.contains("--dashboard-url"));
     assert!(help.contains("dashboard review"));
     assert!(help.contains("snapshot export"));
@@ -919,11 +919,11 @@ fn parse_cli_supports_datasource_types_command() {
 }
 
 #[test]
-fn parse_cli_supports_datasource_group_inspect_export_command() {
+fn parse_cli_supports_datasource_group_list_local_input_command() {
     let args: CliArgs = parse_cli_from([
         "grafana-util",
         "datasource",
-        "inspect-export",
+        "list",
         "--input-dir",
         "./datasources",
         "--json",
@@ -931,12 +931,14 @@ fn parse_cli_supports_datasource_group_inspect_export_command() {
 
     match args.command {
         UnifiedCommand::Datasource { command, .. } => match command {
-            DatasourceGroupCommand::InspectExport(inner) => {
-                assert_eq!(inner.input_dir, Path::new("./datasources"));
+            DatasourceGroupCommand::List(inner) => {
                 assert!(inner.json);
-                assert!(!inner.interactive);
+                assert!(!inner.table);
+                assert!(!inner.csv);
+                assert!(!inner.text);
+                assert!(!inner.yaml);
             }
-            _ => panic!("expected datasource inspect-export"),
+            _ => panic!("expected datasource list"),
         },
         _ => panic!("expected datasource group"),
     }
@@ -1737,12 +1739,9 @@ fn unified_help_mentions_alert_access_and_shims() {
     assert!(help.contains("grafana-util access user list"));
     assert!(help.contains("[Alert Export]"));
     assert!(help.contains("[Datasource Inventory]"));
-    assert!(help.contains("[Datasource Inspect Export]"));
-    assert!(
-        help.contains("grafana-util datasource inspect-export --input-dir ./datasources --json")
-    );
+    assert!(help.contains("grafana-util datasource list --input-dir ./datasources --json"));
     assert!(help.contains(
-        "Run datasource browse-live, inspect-export, list, export, import, and diff workflows."
+        "Run datasource list, browse-live, export, import, and diff workflows."
     ));
     assert!(help.contains("[Access Inventory]"));
     assert!(help.contains("[Change Planning]"));
@@ -1773,7 +1772,7 @@ fn render_unified_help_text_colorizes_example_labels_when_requested() {
     assert!(help.contains("\u{1b}[1;36m[Dashboard Export]\u{1b}[0m"));
     assert!(help.contains("\u{1b}[1;31m[Alert Export]\u{1b}[0m"));
     assert!(help.contains("\u{1b}[1;32m[Datasource Inventory]\u{1b}[0m"));
-    assert!(help.contains("\u{1b}[1;32m[Datasource Inspect Export]\u{1b}[0m"));
+    assert!(help.contains("\u{1b}[1;32m[Datasource Local Inventory]\u{1b}[0m"));
     assert!(help.contains("\u{1b}[1;33m[Access Inventory]\u{1b}[0m"));
     assert!(help.contains("\u{1b}[1;34m[Change Planning]\u{1b}[0m"));
 }
@@ -1960,7 +1959,7 @@ fn maybe_render_unified_help_from_os_args_handles_root_help_and_help_full_flags(
             .unwrap();
     assert!(dashboard_short_help.contains("Usage: grafana-util dashboard <COMMAND>"));
     assert!(dashboard_short_help.contains("Choose the task first:"));
-    assert!(dashboard_short_help.contains("Work with live Grafana:"));
+    assert!(dashboard_short_help.contains("Work with dashboard trees:"));
     assert!(dashboard_short_help.contains("Work with local drafts:"));
     assert!(dashboard_short_help.contains("Analyze and review risk:"));
     assert!(dashboard_short_help.contains("analyze          Analyze live Grafana or a local export tree"));

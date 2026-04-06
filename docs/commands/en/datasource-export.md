@@ -43,6 +43,6 @@ grafana-util datasource export --url http://localhost:3000 --basic-user admin --
 - if the bundle looks stale, verify the export directory and whether `--overwrite` was used intentionally
 
 ## Related commands
-- [datasource inspect-export](./datasource-inspect-export.md)
+- [datasource list](./datasource-list.md)
 - [datasource import](./datasource-import.md)
 - [datasource diff](./datasource-diff.md)

@@ -43,6 +43,6 @@ grafana-util datasource import --url http://localhost:3000 --basic-user admin --
 - if secrets stay unresolved, check the placeholder map and the provided secret values
 
 ## Related commands
+- [datasource list](./datasource-list.md)
 - [datasource export](./datasource-export.md)
 - [datasource diff](./datasource-diff.md)
-- [datasource inspect-export](./datasource-inspect-export.md)

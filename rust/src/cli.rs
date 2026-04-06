@@ -191,7 +191,7 @@ pub enum UnifiedCommand {
         command: DashboardGroupCommand,
     },
     #[command(
-        about = "Run datasource browse-live, inspect-export, list, export, import, and diff workflows.",
+        about = "Run datasource list, browse-live, export, import, and diff workflows.",
         visible_alias = "ds",
         after_help = UNIFIED_DATASOURCE_HELP_TEXT
     )]
