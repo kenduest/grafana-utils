@@ -30,6 +30,20 @@ pub(crate) enum ExternalEditDialogAction {
     ApplyLive,
 }
 
+#[derive(Clone, Debug)]
+pub(crate) struct ExternalEditErrorState {
+    pub(crate) uid: String,
+    pub(crate) title: String,
+    pub(crate) error_message: String,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub(crate) enum ExternalEditErrorAction {
+    Continue,
+    Retry,
+    Close,
+}
+
 impl ExternalEditDialogState {
     pub(crate) fn new(
         uid: String,
@@ -248,6 +262,154 @@ impl ExternalEditDialogState {
 
     pub(crate) fn clear_busy_message(&mut self) {
         self.busy_message = None;
+    }
+}
+
+impl ExternalEditErrorState {
+    pub(crate) fn new(uid: String, title: String, error_message: String) -> Self {
+        Self {
+            uid,
+            title,
+            error_message,
+        }
+    }
+
+    pub(crate) fn handle_key(&self, key: &KeyEvent) -> ExternalEditErrorAction {
+        match key.code {
+            KeyCode::Char('r') | KeyCode::Enter => ExternalEditErrorAction::Retry,
+            KeyCode::Esc | KeyCode::Char('q') => ExternalEditErrorAction::Close,
+            _ => ExternalEditErrorAction::Continue,
+        }
+    }
+
+    pub(crate) fn render(&self, frame: &mut ratatui::Frame) {
+        let backdrop = frame.area();
+        let area = tui_shell::centered_rect(frame.area(), 76, 46);
+        frame.render_widget(Clear, backdrop);
+        frame.render_widget(
+            Block::default().style(Style::default().bg(Color::Rgb(10, 10, 14))),
+            backdrop,
+        );
+        frame.render_widget(Clear, area);
+        frame.render_widget(
+            Block::default()
+                .borders(Borders::ALL)
+                .style(Style::default().bg(Color::Rgb(24, 18, 22)))
+                .border_style(
+                    Style::default()
+                        .fg(Color::LightRed)
+                        .add_modifier(Modifier::BOLD),
+                ),
+            area,
+        );
+        let rows = Layout::default()
+            .direction(Direction::Vertical)
+            .constraints([
+                Constraint::Length(3),
+                Constraint::Length(4),
+                Constraint::Min(7),
+                Constraint::Length(3),
+            ])
+            .margin(1)
+            .split(area);
+        let header = Paragraph::new(vec![
+            Line::from(Span::styled(
+                "Raw JSON Edit Error",
+                Style::default()
+                    .fg(Color::White)
+                    .bg(Color::Rgb(116, 32, 48))
+                    .add_modifier(Modifier::BOLD),
+            )),
+            Line::from(Span::styled(
+                "The edited file could not be loaded. Fix it and retry, or abort this raw edit.",
+                Style::default()
+                    .fg(Color::White)
+                    .bg(Color::Rgb(116, 32, 48))
+                    .add_modifier(Modifier::BOLD),
+            )),
+        ])
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .style(Style::default().bg(Color::Rgb(116, 32, 48)))
+                .border_style(
+                    Style::default()
+                        .fg(Color::LightRed)
+                        .bg(Color::Rgb(116, 32, 48))
+                        .add_modifier(Modifier::BOLD),
+                ),
+        );
+        frame.render_widget(header, rows[0]);
+
+        let facts = Paragraph::new(vec![
+            Line::from(vec![
+                Span::styled(
+                    "Dashboard ",
+                    Style::default()
+                        .fg(Color::LightRed)
+                        .add_modifier(Modifier::BOLD),
+                ),
+                Span::styled(self.title.clone(), Style::default().fg(Color::White)),
+            ]),
+            Line::from(vec![
+                Span::styled(
+                    "UID ",
+                    Style::default()
+                        .fg(Color::LightRed)
+                        .add_modifier(Modifier::BOLD),
+                ),
+                Span::styled(self.uid.clone(), Style::default().fg(Color::White)),
+            ]),
+        ])
+        .wrap(Wrap { trim: false })
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .title("Context")
+                .style(Style::default().bg(Color::Rgb(28, 22, 27)))
+                .border_style(Style::default().fg(Color::LightRed)),
+        );
+        frame.render_widget(facts, rows[1]);
+
+        let details = Paragraph::new(vec![
+            Line::from(Span::styled(
+                "Parser Message",
+                Style::default()
+                    .fg(Color::LightRed)
+                    .add_modifier(Modifier::BOLD),
+            )),
+            Line::from(""),
+            Line::from(self.error_message.clone()),
+        ])
+        .wrap(Wrap { trim: false })
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .title("Details")
+                .style(Style::default().bg(Color::Rgb(20, 16, 21)))
+                .border_style(Style::default().fg(Color::LightRed)),
+        );
+        frame.render_widget(details, rows[2]);
+
+        let footer = Paragraph::new(tui_shell::control_grid(&[
+            vec![
+                ("r", Color::Rgb(24, 106, 59), "reopen editor"),
+                ("Enter", Color::Rgb(24, 106, 59), "reopen editor"),
+            ],
+            vec![
+                ("Esc", Color::Rgb(90, 98, 107), "abort raw edit"),
+                ("q", Color::Rgb(90, 98, 107), "abort raw edit"),
+            ],
+        ]))
+        .wrap(Wrap { trim: false })
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .title("Actions")
+                .style(Style::default().bg(Color::Rgb(28, 22, 27)))
+                .border_style(Style::default().fg(Color::LightRed)),
+        );
+        frame.render_widget(footer, rows[3]);
     }
 }
 

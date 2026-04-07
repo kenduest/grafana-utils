@@ -81,6 +81,9 @@ pub(crate) fn render_dashboard_browser_frame(frame: &mut ratatui::Frame, state: 
     if let Some(external_edit_state) = state.pending_external_edit.as_ref() {
         external_edit_state.render(frame);
     }
+    if let Some(external_edit_error_state) = state.pending_external_edit_error.as_ref() {
+        external_edit_error_state.render(frame);
+    }
     if let Some(history_state) = state.pending_history.as_ref() {
         history_state.render(frame);
     }

@@ -10,7 +10,7 @@ use std::collections::BTreeMap;
 use ratatui::widgets::ListState;
 
 use super::browse_edit_dialog::EditDialogState;
-use super::browse_external_edit_dialog::ExternalEditDialogState;
+use super::browse_external_edit_dialog::{ExternalEditDialogState, ExternalEditErrorState};
 use super::browse_history_dialog::HistoryDialogState;
 use super::browse_support::{
     DashboardBrowseDocument, DashboardBrowseNode, DashboardBrowseNodeKind,
@@ -63,6 +63,7 @@ pub(crate) struct BrowserState {
     pub(crate) pending_delete: Option<DeletePlan>,
     pub(crate) pending_edit: Option<EditDialogState>,
     pub(crate) pending_external_edit: Option<ExternalEditDialogState>,
+    pub(crate) pending_external_edit_error: Option<ExternalEditErrorState>,
     pub(crate) pending_history: Option<HistoryDialogState>,
     pub(crate) pending_search: Option<SearchPromptState>,
     pub(crate) last_search: Option<SearchState>,
@@ -96,6 +97,7 @@ impl BrowserState {
             pending_delete: None,
             pending_edit: None,
             pending_external_edit: None,
+            pending_external_edit_error: None,
             pending_history: None,
             pending_search: None,
             last_search: None,
@@ -126,6 +128,7 @@ impl BrowserState {
         self.pending_delete = None;
         self.pending_history = None;
         self.pending_external_edit = None;
+        self.pending_external_edit_error = None;
         self.pending_search = None;
         self.completion_notice = None;
         // Restore the operator's position by identity first, then degrade to the containing folder.

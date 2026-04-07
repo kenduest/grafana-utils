@@ -16,7 +16,9 @@ use super::browse_actions::{
     refresh_browser_document, restore_dashboard_history_version,
 };
 use super::browse_edit_dialog::EditDialogAction;
-use super::browse_external_edit_dialog::ExternalEditDialogAction;
+use super::browse_external_edit_dialog::{
+    ExternalEditDialogAction, ExternalEditErrorAction, ExternalEditErrorState,
+};
 use super::browse_history_dialog::HistoryDialogAction;
 use super::browse_render::render_dashboard_browser_frame;
 use super::browse_state::{
@@ -46,6 +48,10 @@ where
 {
     if state.completion_notice.is_some() {
         state.completion_notice = None;
+        return Ok(BrowserLoopAction::Continue);
+    }
+    if state.pending_external_edit_error.is_some() {
+        handle_external_edit_error_key(request_json, args, session, state, key)?;
         return Ok(BrowserLoopAction::Continue);
     }
     if state.pending_history.is_some() {
@@ -250,6 +256,42 @@ where
         }
         _ => Ok(BrowserLoopAction::Continue),
     }
+}
+
+fn handle_external_edit_error_key<F>(
+    request_json: &mut F,
+    args: &BrowseArgs,
+    session: &mut TerminalSession,
+    state: &mut BrowserState,
+    key: &KeyEvent,
+) -> Result<()>
+where
+    F: FnMut(Method, &str, &[(String, String)], Option<&Value>) -> Result<Option<Value>>,
+{
+    let Some(action) = state
+        .pending_external_edit_error
+        .as_ref()
+        .map(|dialog| dialog.handle_key(key))
+    else {
+        return Ok(());
+    };
+    match action {
+        ExternalEditErrorAction::Continue => {}
+        ExternalEditErrorAction::Close => {
+            let uid = state
+                .pending_external_edit_error
+                .as_ref()
+                .map(|dialog| dialog.uid.clone())
+                .unwrap_or_else(|| "dashboard".to_string());
+            state.pending_external_edit_error = None;
+            state.status = format!("Aborted raw JSON edit for {}.", uid);
+        }
+        ExternalEditErrorAction::Retry => {
+            state.pending_external_edit_error = None;
+            run_selected_external_edit(request_json, args, session, state)?;
+        }
+    }
+    Ok(())
 }
 
 fn handle_search_dialog_key(state: &mut BrowserState, key: &KeyEvent) -> Result<()> {
@@ -809,30 +851,45 @@ where
                 begin_external_dashboard_edit(request_json, &node)
             };
             session.resume()?;
-            if let Some(dialog) = raw_result? {
-                let uid = dialog.uid.clone();
-                state.status = format!("Preparing live preview for raw JSON edit on {}...", uid);
-                let preview_lines = if let Some(client) = scoped_org_client(args, &node)? {
-                    let mut scoped = |method: Method,
-                                      path: &str,
-                                      params: &[(String, String)],
-                                      payload: Option<&Value>|
-                     -> Result<Option<Value>> {
-                        client.request_json(method, path, params, payload)
+            match raw_result {
+                Ok(Some(dialog)) => {
+                    let uid = dialog.uid.clone();
+                    state.status = format!("Preparing live preview for raw JSON edit on {}...", uid);
+                    let preview_lines = if let Some(client) = scoped_org_client(args, &node)? {
+                        let mut scoped = |method: Method,
+                                          path: &str,
+                                          params: &[(String, String)],
+                                          payload: Option<&Value>|
+                         -> Result<Option<Value>> {
+                            client.request_json(method, path, params, payload)
+                        };
+                        preview_external_edit_dry_run(&mut scoped, args, &dialog.updated_payload)?
+                    } else {
+                        preview_external_edit_dry_run(request_json, args, &dialog.updated_payload)?
                     };
-                    preview_external_edit_dry_run(&mut scoped, args, &dialog.updated_payload)?
-                } else {
-                    preview_external_edit_dry_run(request_json, args, &dialog.updated_payload)?
-                };
-                let mut dialog = dialog;
-                dialog.preview_lines = Some(preview_lines);
-                state.pending_external_edit = Some(dialog);
-                state.status = format!(
-                    "Review raw JSON edit for {}. Preview is ready. a applies live, w opens draft filename input, q discards.",
-                    uid
-                );
-            } else {
-                state.status = format!("Raw JSON edit cancelled or unchanged for {}.", node.title);
+                    let mut dialog = dialog;
+                    dialog.preview_lines = Some(preview_lines);
+                    state.pending_external_edit = Some(dialog);
+                    state.status = format!(
+                        "Review raw JSON edit for {}. Preview is ready. a applies live, w opens draft filename input, q discards.",
+                        uid
+                    );
+                }
+                Ok(None) => {
+                    state.status =
+                        format!("Raw JSON edit cancelled or unchanged for {}.", node.title);
+                }
+                Err(error) => {
+                    state.pending_external_edit_error = Some(ExternalEditErrorState::new(
+                        node.uid.clone().unwrap_or_else(|| node.title.clone()),
+                        node.title.clone(),
+                        error.to_string(),
+                    ));
+                    state.status = format!(
+                        "Raw JSON edit failed for {}. Use r to retry or q to abort.",
+                        node.title
+                    );
+                }
             }
         }
     }
