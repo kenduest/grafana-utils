@@ -503,6 +503,25 @@ fn overview_summary_rows_feed_the_shared_tabular_renderer() {
 }
 
 #[test]
+fn overview_text_renderer_includes_compact_discovery_summary() {
+    let mut document = sample_overview_document();
+    document.discovery = Some(json!({
+        "workspaceRoot": "/tmp/grafana-oac-repo",
+        "inputCount": 3,
+        "inputs": {
+            "dashboardExportDir": "/tmp/grafana-oac-repo/dashboards/git-sync/raw",
+            "alertExportDir": "/tmp/grafana-oac-repo/alerts/raw",
+            "datasourceProvisioningFile": "/tmp/grafana-oac-repo/datasources/provisioning/datasources.yaml"
+        }
+    }));
+
+    let lines = render_overview_text(&document).unwrap();
+    assert!(lines.iter().any(|line| line.contains(
+        "Discovery: workspace-root=/tmp/grafana-oac-repo sources=dashboard-export, datasource-provisioning, alert-export"
+    )));
+}
+
+#[test]
 fn overview_args_support_datasource_provisioning_file() {
     let args = OverviewCliArgs::parse_from([
         "grafana-util",

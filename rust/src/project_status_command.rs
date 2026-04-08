@@ -18,6 +18,7 @@ use crate::project_status::ProjectStatus;
 use crate::project_status_live_runtime::build_live_project_status;
 use crate::project_status_staged::build_staged_project_status;
 use crate::tabular_output::{print_lines, render_summary_csv, render_summary_table, render_yaml};
+use serde_json::Value;
 
 pub(crate) const PROJECT_STATUS_DOMAIN_COUNT: usize = 6;
 const PROJECT_STATUS_HELP_TEXT: &str = "Examples:\n\n  Render staged project status as a summary table from raw dashboard artifacts:\n    grafana-util status staged --dashboard-export-dir ./dashboards/raw --desired-file ./desired.json --output-format table\n\n  Render staged project status from dashboard provisioning artifacts:\n    grafana-util status staged --dashboard-provisioning-dir ./dashboards/provisioning --output-format csv\n\n  Render staged project status from datasource provisioning YAML:\n    grafana-util status staged --datasource-provisioning-file ./datasources/provisioning/datasources.yaml --output-format yaml\n\n  Render live project status with staged sync context:\n    grafana-util status live --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --sync-summary-file ./sync-summary.json --bundle-preflight-file ./bundle-preflight.json --output-format json\n\nSchema guide:\n  grafana-util status --help-schema\n  grafana-util status staged --help-schema\n  grafana-util status live --help-schema";
@@ -315,6 +316,11 @@ pub(crate) fn render_project_status_text(status: &ProjectStatus) -> Vec<String> 
             status.overall.freshness.status,
         ),
     ];
+    if let Some(discovery) = status.discovery.as_ref().and_then(Value::as_object) {
+        if let Some(summary) = render_discovery_summary_line(discovery) {
+            lines.push(summary);
+        }
+    }
     if !status.domains.is_empty() {
         lines.push("Domains:".to_string());
         for domain in &status.domains {
@@ -353,6 +359,48 @@ pub(crate) fn render_project_status_text(status: &ProjectStatus) -> Vec<String> 
         }
     }
     lines
+}
+
+fn render_discovery_summary_line(discovery: &serde_json::Map<String, Value>) -> Option<String> {
+    let workspace_root = discovery.get("workspaceRoot").and_then(Value::as_str)?;
+    let inputs = discovery.get("inputs").and_then(Value::as_object)?;
+    let mut sources = Vec::new();
+    for key in [
+        "dashboardExportDir",
+        "dashboardProvisioningDir",
+        "datasourceProvisioningFile",
+        "alertExportDir",
+        "desiredFile",
+        "sourceBundle",
+        "targetInventory",
+        "availabilityFile",
+        "mappingFile",
+        "reviewedPlanFile",
+    ] {
+        if inputs.contains_key(key) {
+            sources.push(match key {
+                "dashboardExportDir" => "dashboard-export",
+                "dashboardProvisioningDir" => "dashboard-provisioning",
+                "datasourceProvisioningFile" => "datasource-provisioning",
+                "alertExportDir" => "alert-export",
+                "desiredFile" => "desired-file",
+                "sourceBundle" => "source-bundle",
+                "targetInventory" => "target-inventory",
+                "availabilityFile" => "availability-file",
+                "mappingFile" => "mapping-file",
+                "reviewedPlanFile" => "reviewed-plan-file",
+                _ => key,
+            });
+        }
+    }
+    if sources.is_empty() {
+        return None;
+    }
+    Some(format!(
+        "Discovery: workspace-root={} sources={}",
+        workspace_root,
+        sources.join(", ")
+    ))
 }
 
 pub(crate) fn build_project_status_summary_rows(

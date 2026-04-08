@@ -201,6 +201,26 @@ fn supports_prune_delete(_kind: &str) -> bool {
     true
 }
 
+fn is_noisy_default_alert_policy_baseline(
+    object: &serde_json::Map<String, Value>,
+    managed_fields: &[String],
+    desired: &serde_json::Map<String, Value>,
+) -> bool {
+    // Grafana's default/live baseline policy can surface as a synthetic
+    // empty/root identity with no managed fields. Keep it out of operator
+    // alert review noise unless there is authored drift.
+    let Some(kind) = object.get("kind").and_then(Value::as_str) else {
+        return false;
+    };
+    if kind != "alert-policy" || !managed_fields.is_empty() || !desired.is_empty() {
+        return false;
+    }
+    let Some(identity) = object.get("identity").and_then(Value::as_str) else {
+        return false;
+    };
+    matches!(identity.trim(), "" | "empty" | "root")
+}
+
 pub(crate) fn build_sync_alert_assessment_document(operations: &[Value]) -> Value {
     let mut alerts = Vec::new();
     let mut candidate_count = 0i64;
@@ -227,6 +247,9 @@ pub(crate) fn build_sync_alert_assessment_document(operations: &[Value]) -> Valu
             .and_then(Value::as_object)
             .cloned()
             .unwrap_or_default();
+        if is_noisy_default_alert_policy_baseline(object, &managed_fields, &desired) {
+            continue;
+        }
         let (status, live_apply_allowed, detail) = if kind == "alert" {
             let has_condition = managed_fields.iter().any(|field| field == "condition");
             let has_plan_only_fields = managed_fields
@@ -296,6 +319,42 @@ pub(crate) fn build_sync_alert_assessment_document(operations: &[Value]) -> Valu
         },
         "alerts": alerts,
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn build_sync_alert_assessment_document_skips_default_empty_policy_baseline() {
+        let document = build_sync_alert_assessment_document(&[
+            json!({
+                "kind": "alert-policy",
+                "identity": "empty",
+                "title": "empty",
+                "managedFields": [],
+                "desired": {},
+            }),
+            json!({
+                "kind": "alert-policy",
+                "identity": "grafana-default-email",
+                "title": "grafana-default-email",
+                "managedFields": ["receiver"],
+                "desired": {"receiver": "grafana-default-email"},
+            }),
+        ]);
+
+        assert_eq!(document["summary"]["alertCount"], json!(1));
+        assert_eq!(document["summary"]["candidateCount"], json!(1));
+        assert_eq!(document["summary"]["planOnlyCount"], json!(0));
+        assert_eq!(document["summary"]["blockedCount"], json!(0));
+
+        let alerts = document["alerts"].as_array().unwrap();
+        assert_eq!(alerts.len(), 1);
+        assert_eq!(alerts[0]["identity"], json!("grafana-default-email"));
+        assert_eq!(alerts[0]["title"], json!("grafana-default-email"));
+    }
 }
 
 pub(crate) fn build_sync_plan_summary_document(operations: &[Value]) -> Value {

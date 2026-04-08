@@ -331,7 +331,10 @@ fn task_first_change_lane_smoke_runs_from_git_sync_mixed_workspace_root() {
     let workspace = temp.path().join("workspace");
     fs::create_dir_all(workspace.join(".git")).unwrap();
     let dashboards_raw = workspace.join("dashboards").join("git-sync").join("raw");
-    let dashboards_provisioning = workspace.join("dashboards").join("git-sync").join("provisioning");
+    let dashboards_provisioning = workspace
+        .join("dashboards")
+        .join("git-sync")
+        .join("provisioning");
     write_dashboard_raw_fixture(&dashboards_raw);
     write_dashboard_provisioning_fixture(&dashboards_provisioning);
     write_datasource_provisioning_fixture(&workspace.join("datasources").join("provisioning"));
@@ -432,12 +435,18 @@ fn task_first_change_lane_smoke_runs_from_git_sync_mixed_workspace_root() {
     .unwrap();
     assert_eq!(project_status.scope, "staged-only");
     assert_eq!(project_status.domains.len(), 3);
-    assert!(project_status.domains.iter().any(|domain| domain.id == "dashboard"));
+    assert!(project_status
+        .domains
+        .iter()
+        .any(|domain| domain.id == "dashboard"));
     assert!(project_status
         .domains
         .iter()
         .any(|domain| domain.id == "datasource"));
-    assert!(project_status.domains.iter().any(|domain| domain.id == "alert"));
+    assert!(project_status
+        .domains
+        .iter()
+        .any(|domain| domain.id == "alert"));
 
     let preview_document: serde_json::Value =
         serde_json::from_str(&fs::read_to_string(&preview_file).unwrap()).unwrap();

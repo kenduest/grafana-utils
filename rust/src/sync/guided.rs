@@ -348,6 +348,49 @@ fn render_discovery_provenance(discovered: &DiscoveredChangeInputs) -> Option<St
     ))
 }
 
+fn render_discovery_summary(discovered: &DiscoveredChangeInputs) -> Option<String> {
+    let workspace_root = discovered.workspace_root.as_ref()?.display().to_string();
+    let mut sources = Vec::new();
+    if discovered.dashboard_export_dir.is_some() {
+        sources.push("dashboard-export");
+    }
+    if discovered.dashboard_provisioning_dir.is_some() {
+        sources.push("dashboard-provisioning");
+    }
+    if discovered.datasource_provisioning_file.is_some() {
+        sources.push("datasource-provisioning");
+    }
+    if discovered.alert_export_dir.is_some() {
+        sources.push("alert-export");
+    }
+    if discovered.desired_file.is_some() {
+        sources.push("desired-file");
+    }
+    if discovered.source_bundle.is_some() {
+        sources.push("source-bundle");
+    }
+    if discovered.target_inventory.is_some() {
+        sources.push("target-inventory");
+    }
+    if discovered.availability_file.is_some() {
+        sources.push("availability-file");
+    }
+    if discovered.mapping_file.is_some() {
+        sources.push("mapping-file");
+    }
+    if discovered.reviewed_plan_file.is_some() {
+        sources.push("reviewed-plan-file");
+    }
+    if sources.is_empty() {
+        return None;
+    }
+    Some(format!(
+        "Discovery: workspace-root={} sources={}",
+        workspace_root,
+        sources.join(", ")
+    ))
+}
+
 fn build_discovery_document(discovered: &DiscoveredChangeInputs) -> Option<Value> {
     let workspace_root = discovered.workspace_root.as_ref()?;
     let mut inputs = Map::new();
@@ -407,25 +450,16 @@ fn attach_discovery_to_sync_output(
         if let Some(object) = output.document.as_object_mut() {
             object.insert("discovery".to_string(), discovery.clone());
         }
-        output.text_lines.insert(
-            0,
-            format!(
-                "Discovery: workspace-root={}",
-                discovery
-                    .get("workspaceRoot")
-                    .and_then(Value::as_str)
-                    .unwrap_or_default()
-            ),
-        );
+        if let Some(summary) = render_discovery_summary(discovered) {
+            output.text_lines.insert(0, summary);
+        }
     }
     output
 }
 
 fn emit_discovery_provenance(discovered: &DiscoveredChangeInputs, output_format: SyncOutputFormat) {
     if let Some(note) = render_discovery_provenance(discovered) {
-        if matches!(output_format, SyncOutputFormat::Text) {
-            println!("{note}");
-        } else {
+        if !matches!(output_format, SyncOutputFormat::Text) {
             eprintln!("{note}");
         }
     }
@@ -1265,7 +1299,7 @@ mod guided_rust_tests {
         );
         assert_eq!(
             attached.text_lines.first(),
-            Some(&"Discovery: workspace-root=/tmp/grafana-oac-repo".to_string())
+            Some(&"Discovery: workspace-root=/tmp/grafana-oac-repo sources=dashboard-export".to_string())
         );
     }
 }

@@ -446,6 +446,26 @@ fn project_status_live_text_renderer_surfaces_overall_domain_and_action_sections
 }
 
 #[test]
+fn project_status_live_text_renderer_includes_compact_discovery_summary() {
+    let mut status = sample_live_project_status();
+    status.discovery = Some(json!({
+        "workspaceRoot": "/tmp/grafana-oac-repo",
+        "inputCount": 4,
+        "inputs": {
+            "dashboardExportDir": "/tmp/grafana-oac-repo/dashboards/git-sync/raw",
+            "dashboardProvisioningDir": "/tmp/grafana-oac-repo/dashboards/git-sync/provisioning",
+            "datasourceProvisioningFile": "/tmp/grafana-oac-repo/datasources/provisioning/datasources.yaml",
+            "alertExportDir": "/tmp/grafana-oac-repo/alerts/raw"
+        }
+    }));
+
+    let lines = render_project_status_text(&status);
+    assert!(lines.iter().any(|line| line.contains(
+        "Discovery: workspace-root=/tmp/grafana-oac-repo sources=dashboard-export, dashboard-provisioning, datasource-provisioning, alert-export"
+    )));
+}
+
+#[test]
 fn project_status_live_text_renderer_skips_empty_blocker_and_action_sections() {
     let lines = render_project_status_text(&empty_live_project_status());
 
