@@ -2,7 +2,15 @@
 //! Exercises the repo-local inspect/check/preview/apply lane from one staged workspace.
 
 use super::{ChangeOutputArgs, ChangePreviewArgs};
-use crate::sync::{run_sync_cli, SyncApplyArgs, SyncCliArgs, SyncGroupCommand, SyncOutputFormat};
+use crate::common::tool_version;
+use crate::overview::{execute_overview, OverviewArgs, OverviewOutputFormat};
+use crate::project_status_command::{
+    execute_project_status_staged, ProjectStatusOutputFormat, ProjectStatusStagedArgs,
+};
+use crate::sync::{
+    discover_change_staged_inputs, run_sync_cli, SyncApplyArgs, SyncCliArgs, SyncGroupCommand,
+    SyncOutputFormat,
+};
 use clap::Parser;
 use serde_json::json;
 use std::fs;
@@ -57,6 +65,50 @@ fn write_dashboard_raw_fixture(root: &Path) {
     .unwrap();
 }
 
+fn write_dashboard_provisioning_fixture(root: &Path) {
+    fs::create_dir_all(root.join("dashboards").join("team")).unwrap();
+    fs::write(
+        root.join("folders.json"),
+        serde_json::to_string_pretty(&json!([
+            {
+                "uid": "team",
+                "title": "Team",
+                "parentUid": null,
+                "path": "Team",
+                "org": "Main Org.",
+                "orgId": "1"
+            }
+        ]))
+        .unwrap(),
+    )
+    .unwrap();
+    fs::write(
+        root.join("export-metadata.json"),
+        serde_json::to_string_pretty(&json!({
+            "kind": "grafana-utils-dashboard-export-index",
+            "schemaVersion": 1,
+            "variant": "provisioning",
+            "dashboardCount": 1,
+            "indexFile": "index.json",
+            "format": "grafana-file-provisioning-dashboard"
+        }))
+        .unwrap(),
+    )
+    .unwrap();
+    fs::write(
+        root.join("dashboards").join("team").join("cpu-main.json"),
+        serde_json::to_string_pretty(&json!({
+            "dashboard": {
+                "uid": "cpu-main",
+                "title": "CPU Main",
+                "panels": []
+            }
+        }))
+        .unwrap(),
+    )
+    .unwrap();
+}
+
 fn write_datasource_provisioning_fixture(root: &Path) {
     fs::create_dir_all(root).unwrap();
     fs::write(
@@ -76,6 +128,7 @@ datasources:
 
 fn write_alert_export_fixture(root: &Path) {
     fs::create_dir_all(root).unwrap();
+    fs::create_dir_all(root.join("rules").join("general").join("cpu-alerts")).unwrap();
     fs::write(
         root.join("index.json"),
         serde_json::to_string_pretty(&json!({
@@ -90,6 +143,39 @@ fn write_alert_export_fixture(root: &Path) {
                 "ruleGroup": "cpu-alerts",
                 "path": "rules/general/cpu-alerts/CPU_High__cpu-high.json"
             }]
+        }))
+        .unwrap(),
+    )
+    .unwrap();
+    fs::write(
+        root.join("rules")
+            .join("general")
+            .join("cpu-alerts")
+            .join("CPU_High__cpu-high.json"),
+        serde_json::to_string_pretty(&json!({
+            "schemaVersion": 1,
+            "toolVersion": tool_version(),
+            "apiVersion": 1,
+            "kind": "grafana-alert-rule",
+            "metadata": {
+                "uid": "cpu-high",
+                "title": "CPU High"
+            },
+            "spec": {
+                "uid": "cpu-high",
+                "title": "CPU High",
+                "folderUID": "general",
+                "ruleGroup": "cpu-alerts",
+                "condition": "A",
+                "data": [{
+                    "refId": "A",
+                    "datasourceUid": "prom-main",
+                    "model": {
+                        "expr": "up",
+                        "refId": "A"
+                    }
+                }]
+            }
         }))
         .unwrap(),
     )
@@ -245,7 +331,9 @@ fn task_first_change_lane_smoke_runs_from_git_sync_mixed_workspace_root() {
     let workspace = temp.path().join("workspace");
     fs::create_dir_all(workspace.join(".git")).unwrap();
     let dashboards_raw = workspace.join("dashboards").join("git-sync").join("raw");
+    let dashboards_provisioning = workspace.join("dashboards").join("git-sync").join("provisioning");
     write_dashboard_raw_fixture(&dashboards_raw);
+    write_dashboard_provisioning_fixture(&dashboards_provisioning);
     write_datasource_provisioning_fixture(&workspace.join("datasources").join("provisioning"));
     write_alert_export_fixture(&workspace.join("alerts").join("raw"));
     let live_file = workspace.join("live.json");
@@ -285,6 +373,72 @@ fn task_first_change_lane_smoke_runs_from_git_sync_mixed_workspace_root() {
         _ => panic!("expected preview"),
     }
 
+    let discovered = discover_change_staged_inputs(Some(&workspace)).unwrap();
+    let overview = execute_overview(&OverviewArgs {
+        dashboard_export_dir: discovered.dashboard_export_dir.clone(),
+        dashboard_provisioning_dir: None,
+        datasource_export_dir: None,
+        datasource_provisioning_file: discovered.datasource_provisioning_file.clone(),
+        access_user_export_dir: None,
+        access_team_export_dir: None,
+        access_org_export_dir: None,
+        access_service_account_export_dir: None,
+        desired_file: discovered.desired_file.clone(),
+        source_bundle: discovered.source_bundle.clone(),
+        target_inventory: discovered.target_inventory.clone(),
+        alert_export_dir: discovered.alert_export_dir.clone(),
+        availability_file: discovered.availability_file.clone(),
+        mapping_file: discovered.mapping_file.clone(),
+        output_format: OverviewOutputFormat::Json,
+    })
+    .unwrap();
+    assert_eq!(overview.summary.artifact_count, 3);
+    assert_eq!(overview.summary.dashboard_export_count, 1);
+    assert_eq!(overview.summary.datasource_export_count, 1);
+    assert_eq!(overview.summary.alert_export_count, 1);
+    assert!(overview
+        .project_status
+        .domains
+        .iter()
+        .any(|domain| domain.id == "dashboard"));
+    assert!(overview
+        .project_status
+        .domains
+        .iter()
+        .any(|domain| domain.id == "datasource"));
+    assert!(overview
+        .project_status
+        .domains
+        .iter()
+        .any(|domain| domain.id == "alert"));
+
+    let project_status = execute_project_status_staged(&ProjectStatusStagedArgs {
+        dashboard_export_dir: discovered.dashboard_export_dir.clone(),
+        dashboard_provisioning_dir: None,
+        datasource_export_dir: None,
+        datasource_provisioning_file: discovered.datasource_provisioning_file.clone(),
+        access_user_export_dir: None,
+        access_team_export_dir: None,
+        access_org_export_dir: None,
+        access_service_account_export_dir: None,
+        desired_file: discovered.desired_file.clone(),
+        source_bundle: discovered.source_bundle.clone(),
+        target_inventory: discovered.target_inventory.clone(),
+        alert_export_dir: discovered.alert_export_dir.clone(),
+        availability_file: discovered.availability_file.clone(),
+        mapping_file: discovered.mapping_file.clone(),
+        output_format: ProjectStatusOutputFormat::Json,
+    })
+    .unwrap();
+    assert_eq!(project_status.scope, "staged-only");
+    assert_eq!(project_status.domains.len(), 3);
+    assert!(project_status.domains.iter().any(|domain| domain.id == "dashboard"));
+    assert!(project_status
+        .domains
+        .iter()
+        .any(|domain| domain.id == "datasource"));
+    assert!(project_status.domains.iter().any(|domain| domain.id == "alert"));
+
     let preview_document: serde_json::Value =
         serde_json::from_str(&fs::read_to_string(&preview_file).unwrap()).unwrap();
     assert_eq!(preview_document["kind"], json!("grafana-utils-sync-plan"));
@@ -299,4 +453,13 @@ fn task_first_change_lane_smoke_runs_from_git_sync_mixed_workspace_root() {
         .unwrap()
         .iter()
         .any(|operation| operation["kind"] == json!("datasource")));
+    assert!(preview_document["operations"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|operation| operation["kind"] == json!("alert")));
+    assert_eq!(
+        preview_document["alertAssessment"]["kind"],
+        json!("grafana-utils-alert-sync-plan")
+    );
 }
