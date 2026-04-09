@@ -17,6 +17,7 @@ use crate::overview::{self, OverviewArgs, OverviewOutputFormat};
 use crate::project_status::ProjectStatus;
 use crate::project_status_live_runtime::build_live_project_status;
 use crate::project_status_staged::build_staged_project_status;
+use crate::sync::render_discovery_summary_from_value;
 use crate::tabular_output::{print_lines, render_summary_csv, render_summary_table, render_yaml};
 use serde_json::Value;
 
@@ -317,7 +318,7 @@ pub(crate) fn render_project_status_text(status: &ProjectStatus) -> Vec<String> 
         ),
     ];
     if let Some(discovery) = status.discovery.as_ref().and_then(Value::as_object) {
-        if let Some(summary) = render_discovery_summary_line(discovery) {
+        if let Some(summary) = render_discovery_summary_from_value(discovery) {
             lines.push(summary);
         }
     }
@@ -359,48 +360,6 @@ pub(crate) fn render_project_status_text(status: &ProjectStatus) -> Vec<String> 
         }
     }
     lines
-}
-
-fn render_discovery_summary_line(discovery: &serde_json::Map<String, Value>) -> Option<String> {
-    let workspace_root = discovery.get("workspaceRoot").and_then(Value::as_str)?;
-    let inputs = discovery.get("inputs").and_then(Value::as_object)?;
-    let mut sources = Vec::new();
-    for key in [
-        "dashboardExportDir",
-        "dashboardProvisioningDir",
-        "datasourceProvisioningFile",
-        "alertExportDir",
-        "desiredFile",
-        "sourceBundle",
-        "targetInventory",
-        "availabilityFile",
-        "mappingFile",
-        "reviewedPlanFile",
-    ] {
-        if inputs.contains_key(key) {
-            sources.push(match key {
-                "dashboardExportDir" => "dashboard-export",
-                "dashboardProvisioningDir" => "dashboard-provisioning",
-                "datasourceProvisioningFile" => "datasource-provisioning",
-                "alertExportDir" => "alert-export",
-                "desiredFile" => "desired-file",
-                "sourceBundle" => "source-bundle",
-                "targetInventory" => "target-inventory",
-                "availabilityFile" => "availability-file",
-                "mappingFile" => "mapping-file",
-                "reviewedPlanFile" => "reviewed-plan-file",
-                _ => key,
-            });
-        }
-    }
-    if sources.is_empty() {
-        return None;
-    }
-    Some(format!(
-        "Discovery: workspace-root={} sources={}",
-        workspace_root,
-        sources.join(", ")
-    ))
 }
 
 pub(crate) fn build_project_status_summary_rows(

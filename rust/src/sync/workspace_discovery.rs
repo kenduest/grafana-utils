@@ -7,8 +7,12 @@ use crate::common::{message, Result};
 use crate::dashboard::DashboardSourceKind;
 use crate::overview::OverviewDocument;
 use crate::project_status::ProjectStatus;
-use serde_json::{Map, Value};
+use serde_json::Value;
 
+use super::discovery_model::{
+    render_discovery_provenance_line, render_discovery_summary_line, ChangeDiscoveryDocument,
+    DiscoveryInput, DiscoveryInputKind,
+};
 use super::{SyncCommandOutput, SyncOutputFormat};
 
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
@@ -304,115 +308,16 @@ fn overlay_direct_workspace_input(discovered: &mut DiscoveredChangeInputs, base_
 }
 
 pub(crate) fn render_discovery_provenance(discovered: &DiscoveredChangeInputs) -> Option<String> {
-    let document = build_discovery_document(discovered)?;
-    let workspace_root = document.get("workspaceRoot").and_then(Value::as_str)?;
-    let sources = document
-        .get("inputs")
-        .and_then(Value::as_object)?
-        .iter()
-        .map(|(key, value)| {
-            let label = match key.as_str() {
-                "dashboardExportDir" => "dashboard-export",
-                "dashboardProvisioningDir" => "dashboard-provisioning",
-                "datasourceProvisioningFile" => "datasource-provisioning",
-                "alertExportDir" => "alert-export",
-                "desiredFile" => "desired-file",
-                "sourceBundle" => "source-bundle",
-                "targetInventory" => "target-inventory",
-                "availabilityFile" => "availability-file",
-                "mappingFile" => "mapping-file",
-                "reviewedPlanFile" => "reviewed-plan-file",
-                _ => key.as_str(),
-            };
-            format!("{label}={}", value.as_str().unwrap_or_default())
-        })
-        .collect::<Vec<_>>();
-    Some(format!(
-        "Discovered change workspace root {} from {}.",
-        workspace_root,
-        sources.join(", ")
-    ))
+    build_change_discovery(discovered)
+        .and_then(|document| render_discovery_provenance_line(&document))
 }
 
 pub(crate) fn render_discovery_summary(discovered: &DiscoveredChangeInputs) -> Option<String> {
-    let workspace_root = discovered.workspace_root.as_ref()?.display().to_string();
-    let mut sources = Vec::new();
-    if discovered.dashboard_export_dir.is_some() {
-        sources.push("dashboard-export");
-    }
-    if discovered.dashboard_provisioning_dir.is_some() {
-        sources.push("dashboard-provisioning");
-    }
-    if discovered.datasource_provisioning_file.is_some() {
-        sources.push("datasource-provisioning");
-    }
-    if discovered.alert_export_dir.is_some() {
-        sources.push("alert-export");
-    }
-    if discovered.desired_file.is_some() {
-        sources.push("desired-file");
-    }
-    if discovered.source_bundle.is_some() {
-        sources.push("source-bundle");
-    }
-    if discovered.target_inventory.is_some() {
-        sources.push("target-inventory");
-    }
-    if discovered.availability_file.is_some() {
-        sources.push("availability-file");
-    }
-    if discovered.mapping_file.is_some() {
-        sources.push("mapping-file");
-    }
-    if discovered.reviewed_plan_file.is_some() {
-        sources.push("reviewed-plan-file");
-    }
-    if sources.is_empty() {
-        return None;
-    }
-    Some(format!(
-        "Discovery: workspace-root={} sources={}",
-        workspace_root,
-        sources.join(", ")
-    ))
+    build_change_discovery(discovered).and_then(|document| render_discovery_summary_line(&document))
 }
 
 pub(crate) fn build_discovery_document(discovered: &DiscoveredChangeInputs) -> Option<Value> {
-    let workspace_root = discovered.workspace_root.as_ref()?;
-    let mut inputs = Map::new();
-    for (key, path) in [
-        (
-            "dashboardExportDir",
-            discovered.dashboard_export_dir.as_ref(),
-        ),
-        (
-            "dashboardProvisioningDir",
-            discovered.dashboard_provisioning_dir.as_ref(),
-        ),
-        (
-            "datasourceProvisioningFile",
-            discovered.datasource_provisioning_file.as_ref(),
-        ),
-        ("alertExportDir", discovered.alert_export_dir.as_ref()),
-        ("desiredFile", discovered.desired_file.as_ref()),
-        ("sourceBundle", discovered.source_bundle.as_ref()),
-        ("targetInventory", discovered.target_inventory.as_ref()),
-        ("availabilityFile", discovered.availability_file.as_ref()),
-        ("mappingFile", discovered.mapping_file.as_ref()),
-        ("reviewedPlanFile", discovered.reviewed_plan_file.as_ref()),
-    ] {
-        if let Some(path) = path {
-            inputs.insert(key.to_string(), Value::String(path.display().to_string()));
-        }
-    }
-    Some(Value::Object(Map::from_iter([
-        (
-            "workspaceRoot".to_string(),
-            Value::String(workspace_root.display().to_string()),
-        ),
-        ("inputCount".to_string(), Value::from(inputs.len() as i64)),
-        ("inputs".to_string(), Value::Object(inputs)),
-    ])))
+    build_change_discovery(discovered).map(|document| document.to_value())
 }
 
 pub(crate) fn attach_discovery_to_overview(
@@ -468,6 +373,75 @@ pub(crate) fn discover_change_staged_inputs(
     let mut discovered = discover_from_workspace_root(&workspace_root);
     overlay_direct_workspace_input(&mut discovered, &base_dir);
     Ok(discovered)
+}
+
+fn build_change_discovery(discovered: &DiscoveredChangeInputs) -> Option<ChangeDiscoveryDocument> {
+    let workspace_root = discovered.workspace_root.clone()?;
+    let mut inputs = Vec::new();
+    if let Some(path) = discovered.dashboard_export_dir.clone() {
+        inputs.push(DiscoveryInput {
+            kind: DiscoveryInputKind::DashboardExportDir,
+            path,
+        });
+    }
+    if let Some(path) = discovered.dashboard_provisioning_dir.clone() {
+        inputs.push(DiscoveryInput {
+            kind: DiscoveryInputKind::DashboardProvisioningDir,
+            path,
+        });
+    }
+    if let Some(path) = discovered.datasource_provisioning_file.clone() {
+        inputs.push(DiscoveryInput {
+            kind: DiscoveryInputKind::DatasourceProvisioningFile,
+            path,
+        });
+    }
+    if let Some(path) = discovered.alert_export_dir.clone() {
+        inputs.push(DiscoveryInput {
+            kind: DiscoveryInputKind::AlertExportDir,
+            path,
+        });
+    }
+    if let Some(path) = discovered.desired_file.clone() {
+        inputs.push(DiscoveryInput {
+            kind: DiscoveryInputKind::DesiredFile,
+            path,
+        });
+    }
+    if let Some(path) = discovered.source_bundle.clone() {
+        inputs.push(DiscoveryInput {
+            kind: DiscoveryInputKind::SourceBundle,
+            path,
+        });
+    }
+    if let Some(path) = discovered.target_inventory.clone() {
+        inputs.push(DiscoveryInput {
+            kind: DiscoveryInputKind::TargetInventory,
+            path,
+        });
+    }
+    if let Some(path) = discovered.availability_file.clone() {
+        inputs.push(DiscoveryInput {
+            kind: DiscoveryInputKind::AvailabilityFile,
+            path,
+        });
+    }
+    if let Some(path) = discovered.mapping_file.clone() {
+        inputs.push(DiscoveryInput {
+            kind: DiscoveryInputKind::MappingFile,
+            path,
+        });
+    }
+    if let Some(path) = discovered.reviewed_plan_file.clone() {
+        inputs.push(DiscoveryInput {
+            kind: DiscoveryInputKind::ReviewedPlanFile,
+            path,
+        });
+    }
+    Some(ChangeDiscoveryDocument::from_inputs(
+        Some(workspace_root),
+        inputs,
+    ))
 }
 
 #[cfg(test)]

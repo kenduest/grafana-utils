@@ -533,59 +533,15 @@ pub(crate) fn execute_sync_bundle(args: &SyncBundleArgs) -> Result<SyncCommandOu
         Some(&alerting),
         Some(&Value::Object(metadata)),
     )?;
-    let discovery = {
-        let mut inputs = Map::new();
-        if let Some(path) = dashboard_export_dir.as_ref() {
-            inputs.insert(
-                "dashboardExportDir".to_string(),
-                Value::String(path.display().to_string()),
-            );
-        }
-        if let Some(path) = dashboard_provisioning_dir.as_ref() {
-            inputs.insert(
-                "dashboardProvisioningDir".to_string(),
-                Value::String(path.display().to_string()),
-            );
-        }
-        if let Some(path) = alert_export_dir.as_ref() {
-            inputs.insert(
-                "alertExportDir".to_string(),
-                Value::String(path.display().to_string()),
-            );
-        }
-        if let Some(path) = datasource_export_file.as_ref() {
-            inputs.insert(
-                "datasourceExportFile".to_string(),
-                Value::String(path.display().to_string()),
-            );
-        }
-        if let Some(path) = datasource_provisioning_file.as_ref() {
-            inputs.insert(
-                "datasourceProvisioningFile".to_string(),
-                Value::String(path.display().to_string()),
-            );
-        }
-        if let Some(path) = args.metadata_file.as_ref() {
-            inputs.insert(
-                "metadataFile".to_string(),
-                Value::String(path.display().to_string()),
-            );
-        }
-        if inputs.is_empty() {
-            None
-        } else {
-            let mut discovery = Map::new();
-            if let Some(workspace) = args.workspace.as_ref() {
-                discovery.insert(
-                    "workspaceRoot".to_string(),
-                    Value::String(workspace.display().to_string()),
-                );
-            }
-            discovery.insert("inputCount".to_string(), Value::from(inputs.len() as i64));
-            discovery.insert("inputs".to_string(), Value::Object(inputs));
-            Some(Value::Object(discovery))
-        }
-    };
+    let discovery = build_bundle_discovery_document(
+        args.workspace.as_ref(),
+        dashboard_export_dir.as_ref(),
+        dashboard_provisioning_dir.as_ref(),
+        alert_export_dir.as_ref(),
+        datasource_export_file.as_ref(),
+        datasource_provisioning_file.as_ref(),
+        args.metadata_file.as_ref(),
+    );
     if let Some(discovery) = discovery {
         if let Some(object) = document.as_object_mut() {
             object.insert("discovery".to_string(), discovery);
@@ -593,6 +549,37 @@ pub(crate) fn execute_sync_bundle(args: &SyncBundleArgs) -> Result<SyncCommandOu
     }
     let text_lines = render_sync_source_bundle_text(&document)?;
     Ok(sync_command_output(document, text_lines))
+}
+
+fn build_bundle_discovery_document(
+    workspace_root: Option<&PathBuf>,
+    dashboard_export_dir: Option<&PathBuf>,
+    dashboard_provisioning_dir: Option<&PathBuf>,
+    alert_export_dir: Option<&PathBuf>,
+    datasource_export_file: Option<&PathBuf>,
+    datasource_provisioning_file: Option<&PathBuf>,
+    metadata_file: Option<&PathBuf>,
+) -> Option<Value> {
+    let mut document = ChangeDiscoveryDocument::new(workspace_root.cloned());
+    if let Some(path) = dashboard_export_dir {
+        document.insert(DiscoveryInputKind::DashboardExportDir, path.clone());
+    }
+    if let Some(path) = dashboard_provisioning_dir {
+        document.insert(DiscoveryInputKind::DashboardProvisioningDir, path.clone());
+    }
+    if let Some(path) = alert_export_dir {
+        document.insert(DiscoveryInputKind::AlertExportDir, path.clone());
+    }
+    if let Some(path) = datasource_export_file {
+        document.insert(DiscoveryInputKind::DatasourceExportFile, path.clone());
+    }
+    if let Some(path) = datasource_provisioning_file {
+        document.insert(DiscoveryInputKind::DatasourceProvisioningFile, path.clone());
+    }
+    if let Some(path) = metadata_file {
+        document.insert(DiscoveryInputKind::MetadataFile, path.clone());
+    }
+    (!document.is_empty()).then(|| document.to_value())
 }
 
 /// Execute reusable sync commands without writing to stdout.

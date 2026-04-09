@@ -24,6 +24,7 @@ mod bundle_builder;
 mod bundle_inputs;
 pub mod bundle_preflight;
 pub mod cli;
+mod discovery_model;
 mod guided;
 mod input_normalization;
 mod json;
@@ -49,6 +50,9 @@ use self::audit::{
 use self::audit_tui::run_sync_audit_interactive;
 use self::bundle_preflight::{
     build_sync_bundle_preflight_document, render_sync_bundle_preflight_text,
+};
+pub(crate) use self::discovery_model::{
+    render_discovery_summary_from_value, ChangeDiscoveryDocument, DiscoveryInputKind,
 };
 pub(crate) use self::guided::{run_sync_check, run_sync_inspect, run_sync_preview};
 use self::preflight::{build_sync_preflight_document, render_sync_preflight_text};
