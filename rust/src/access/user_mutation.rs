@@ -295,10 +295,35 @@ fn user_delete_prompt_label(user: &Map<String, Value>) -> String {
     } else {
         id
     };
+    let role = {
+        let value = normalize_org_role(user.get("orgRole").or_else(|| user.get("role")));
+        if value.is_empty() {
+            "-".to_string()
+        } else {
+            value
+        }
+    };
     format_prompt_row(
         &[(&login, 18), (&email, 30), (&name, 18)],
-        &format!("id={id}"),
+        &format!("id={id} role={role}"),
     )
+}
+
+fn user_delete_summary_line(row: &Map<String, Value>) -> String {
+    let mut parts = vec![
+        format!("Deleted user {}", map_get_text(row, "login")),
+        format!("id={}", map_get_text(row, "id")),
+        format!("scope={}", map_get_text(row, "scope")),
+    ];
+    let email = map_get_text(row, "email");
+    if !email.is_empty() {
+        parts.push(format!("email={email}"));
+    }
+    let name = map_get_text(row, "name");
+    if !name.is_empty() {
+        parts.push(format!("name={name}"));
+    }
+    parts.join(" ")
 }
 
 fn prompt_resolve_user_delete_targets<F>(
@@ -586,6 +611,14 @@ where
                 Value::String(string_field(base_user, "login", "")),
             ),
             (
+                "email".to_string(),
+                Value::String(string_field(base_user, "email", "")),
+            ),
+            (
+                "name".to_string(),
+                Value::String(string_field(base_user, "name", "")),
+            ),
+            (
                 "scope".to_string(),
                 Value::String(user_scope_text(&scope).to_string()),
             ),
@@ -596,12 +629,7 @@ where
         println!("{}", render_objects_json(&rows)?);
     } else {
         for row in &rows {
-            println!(
-                "Deleted user {} -> id={} scope={}",
-                map_get_text(row, "login"),
-                map_get_text(row, "id"),
-                user_scope_text(&scope)
-            );
+            println!("{}", user_delete_summary_line(row));
         }
         if rows.len() > 1 {
             println!(
@@ -612,4 +640,45 @@ where
         }
     }
     Ok(rows.len())
+}
+
+#[cfg(test)]
+mod user_delete_prompt_tests {
+    use super::*;
+
+    #[test]
+    fn user_delete_prompt_label_includes_role_context() {
+        let user = Map::from_iter(vec![
+            ("userId".to_string(), Value::String("9".to_string())),
+            ("login".to_string(), Value::String("alice".to_string())),
+            ("email".to_string(), Value::String("alice@example.com".to_string())),
+            ("name".to_string(), Value::String("Alice".to_string())),
+            ("role".to_string(), Value::String("Editor".to_string())),
+        ]);
+
+        let label = user_delete_prompt_label(&user);
+
+        assert!(label.contains("alice"));
+        assert!(label.contains("alice@example.com"));
+        assert!(label.contains("role=Editor"));
+    }
+
+    #[test]
+    fn user_delete_summary_line_includes_identity_context() {
+        let row = Map::from_iter(vec![
+            ("id".to_string(), Value::String("9".to_string())),
+            ("login".to_string(), Value::String("alice".to_string())),
+            ("email".to_string(), Value::String("alice@example.com".to_string())),
+            ("name".to_string(), Value::String("Alice".to_string())),
+            ("scope".to_string(), Value::String("global".to_string())),
+        ]);
+
+        let line = user_delete_summary_line(&row);
+
+        assert!(line.contains("Deleted user alice"));
+        assert!(line.contains("id=9"));
+        assert!(line.contains("scope=global"));
+        assert!(line.contains("email=alice@example.com"));
+        assert!(line.contains("name=Alice"));
+    }
 }

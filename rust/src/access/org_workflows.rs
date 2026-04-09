@@ -256,6 +256,10 @@ where
                 Value::String(string_field(org, "name", "")),
             ),
             (
+                "userCount".to_string(),
+                Value::String(string_field(org, "userCount", "")),
+            ),
+            (
                 "message".to_string(),
                 Value::String(string_field(&delete_payload, "message", "")),
             ),
@@ -265,11 +269,19 @@ where
         println!("{}", render_objects_json(&rows)?);
     } else {
         for row in &rows {
-            println!(
-                "Deleted org {} -> id={}",
-                string_field(row, "name", ""),
-                scalar_text(row.get("id"))
-            );
+            let mut parts = vec![
+                format!("Deleted org {}", string_field(row, "name", "")),
+                format!("id={}", scalar_text(row.get("id"))),
+            ];
+            let user_count = string_field(row, "userCount", "");
+            if !user_count.is_empty() {
+                parts.push(format!("userCount={user_count}"));
+            }
+            let message = string_field(row, "message", "");
+            if !message.is_empty() {
+                parts.push(format!("message={message}"));
+            }
+            println!("{}", parts.join(" "));
         }
         if rows.len() > 1 {
             println!("Deleted {} organization(s).", rows.len());
@@ -281,7 +293,32 @@ where
 fn org_delete_prompt_label(org: &Map<String, Value>) -> String {
     let name = string_field(org, "name", "-");
     let id = scalar_text(org.get("id"));
-    format_prompt_row(&[(&name, 32)], &format!("id={id}"))
+    let user_count = string_field(org, "userCount", "");
+    let trailer = if user_count.is_empty() {
+        format!("id={id}")
+    } else {
+        format!("id={id} users={user_count}")
+    };
+    format_prompt_row(&[(&name, 32)], &trailer)
+}
+
+#[cfg(test)]
+mod org_delete_prompt_tests {
+    use super::*;
+
+    #[test]
+    fn org_delete_prompt_label_includes_user_count_when_present() {
+        let org = Map::from_iter(vec![
+            ("id".to_string(), Value::String("4".to_string())),
+            ("name".to_string(), Value::String("Main Org".to_string())),
+            ("userCount".to_string(), Value::String("12".to_string())),
+        ]);
+
+        let label = org_delete_prompt_label(&org);
+
+        assert!(label.contains("Main Org"));
+        assert!(label.contains("id=4 users=12"));
+    }
 }
 
 pub(crate) fn export_orgs_with_request<F>(

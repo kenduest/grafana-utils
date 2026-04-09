@@ -149,6 +149,14 @@ fn service_account_delete_summary_line(result: &Map<String, Value>) -> String {
     if !role.is_empty() {
         parts.push(format!("role={role}"));
     }
+    let disabled = map_get_text(result, "disabled");
+    if !disabled.is_empty() {
+        parts.push(format!("disabled={disabled}"));
+    }
+    let tokens = map_get_text(result, "tokens");
+    if !tokens.is_empty() {
+        parts.push(format!("tokens={tokens}"));
+    }
     let message = map_get_text(result, "message");
     if !message.is_empty() {
         parts.push(format!("message={message}"));
@@ -157,10 +165,17 @@ fn service_account_delete_summary_line(result: &Map<String, Value>) -> String {
 }
 
 fn service_account_prompt_label(service_account: &Map<String, Value>) -> String {
-    let name = string_field(service_account, "name", "-");
-    let login = string_field(service_account, "login", "-");
-    let id = scalar_text(service_account.get("id"));
-    format_prompt_row(&[(&name, 22), (&login, 22)], &format!("id={id}"))
+    let row = normalize_service_account_row(service_account);
+    let name = map_get_text(&row, "name");
+    let login = map_get_text(&row, "login");
+    let id = map_get_text(&row, "id");
+    let role = map_get_text(&row, "role");
+    let disabled = map_get_text(&row, "disabled");
+    let tokens = map_get_text(&row, "tokens");
+    format_prompt_row(
+        &[(&name, 22), (&login, 22)],
+        &format!("id={id} role={role} disabled={disabled} tokens={tokens}"),
+    )
 }
 
 fn service_account_context_label(service_account: &Map<String, Value>) -> String {
@@ -586,6 +601,26 @@ mod pending_delete_service_account_tests {
         assert!(label.contains("id=7"));
         assert!(label.contains("service-account=svc"));
         assert!(label.contains("login=sa-svc"));
+    }
+
+    #[test]
+    fn service_account_prompt_label_includes_role_disabled_and_tokens() {
+        let service_account = Map::from_iter(vec![
+            ("id".to_string(), Value::String("4".to_string())),
+            ("name".to_string(), Value::String("svc".to_string())),
+            ("login".to_string(), Value::String("sa-svc".to_string())),
+            ("role".to_string(), Value::String("Viewer".to_string())),
+            ("isDisabled".to_string(), Value::Bool(true)),
+            ("tokens".to_string(), Value::String("2".to_string())),
+        ]);
+
+        let label = service_account_prompt_label(&service_account);
+
+        assert!(label.contains("svc"));
+        assert!(label.contains("sa-svc"));
+        assert!(label.contains("role=Viewer"));
+        assert!(label.contains("disabled=true"));
+        assert!(label.contains("tokens=2"));
     }
 
     #[test]
