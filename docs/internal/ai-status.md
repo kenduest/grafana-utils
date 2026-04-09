@@ -8,6 +8,13 @@ Current AI-maintained status only.
 - Keep this file short and current. Additive historical detail belongs in `docs/internal/archive/`.
 - Detailed 2026-03-29 through 2026-03-31 entries moved to [`archive/ai-status-archive-2026-03-31.md`](/Users/kendlee/work/grafana-utils/docs/internal/archive/ai-status-archive-2026-03-31.md).
 
+## 2026-04-09 - Tighten dashboard browse workspace root detection
+- State: Done
+- Scope: `rust/src/dashboard/browse_support.rs`, `docs/internal/ai-status.md`, `docs/internal/ai-changes.md`
+- Baseline: the new `dashboard browse --workspace` entrypoint accepted a workspace path, but if that path did not expose a recognizable dashboard tree it could fall back to raw import scanning and walk unrelated repo JSON such as `fixtures/*.json`.
+- Current Update: made `--workspace` resolution strict inside dashboard browse. The command still accepts recognizable repo roots, workspace roots, `dashboards/` roots, and direct `raw` or `provisioning` variant directories, but it now fails fast with a targeted error when no browsable dashboard tree is present instead of scanning the whole path as a generic raw import directory. Added a regression test for the non-dashboard repo-root case and revalidated the real repo-root invocation.
+- Result: `dashboard browse --workspace ...` now behaves like an explicit workspace-root contract rather than a broad fallback scanner, so repo roots without a dashboard export tree produce a clear error instead of tripping over unrelated JSON files.
+
 ## 2026-04-08 - Set Docker Grafana 43011 as the repo-local live test baseline
 - State: Done
 - Scope: `docs/internal/ai-workflow-note.md`, `docs/internal/ai-status.md`, `docs/internal/ai-changes.md`

@@ -8,6 +8,12 @@ Current AI change log only.
 - Keep this file limited to the latest active architecture and maintenance changes.
 - Detailed 2026-03-29 through 2026-03-31 entries moved to [`archive/ai-changes-archive-2026-03-31.md`](/Users/kendlee/work/grafana-utils/docs/internal/archive/ai-changes-archive-2026-03-31.md).
 
+## 2026-04-09 - Tighten dashboard browse workspace resolution
+- Summary: changed `dashboard browse --workspace` so it behaves as a strict workspace/repo-root entrypoint instead of a permissive raw-import fallback. The browse loader still recognizes valid dashboard repo layouts, workspace roots, `dashboards/` roots, and direct `raw` or `provisioning` directories, but if the supplied path does not contain a browsable dashboard tree it now exits with a targeted error rather than scanning unrelated JSON files under that path.
+- Tests: `cargo test --manifest-path rust/Cargo.toml browse_support --quiet`; `cargo test --manifest-path rust/Cargo.toml dashboard_cli_parser_help_rust_tests --quiet`; `cargo run --manifest-path rust/Cargo.toml -- dashboard browse --workspace .`
+- Impact: `rust/src/dashboard/browse_support.rs`, `docs/internal/ai-status.md`, `docs/internal/ai-changes.md`
+- Rollback/Risk: low. This only tightens the new `--workspace` browse path; the older `--input-dir` behavior remains unchanged, but future workspace-layout changes should keep the accepted-root rules explicit so the browse path does not drift back into ambiguous whole-directory scanning.
+
 ## 2026-04-08 - Standardize the repo-local Docker Grafana live test port on 43011
 - Summary: documented `http://127.0.0.1:43011` as the preferred repo-local Docker Grafana port for AI-assisted live validation and disposable smoke work. The goal is workflow consistency rather than a runtime behavior change: use `43011` first for local Docker Grafana unless the task explicitly needs another port.
 - Tests: none. Internal workflow-doc update only.

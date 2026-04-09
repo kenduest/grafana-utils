@@ -81,6 +81,7 @@ where
             input_dir,
             args.input_format,
             args.path.as_deref(),
+            args.workspace.is_some(),
         );
     }
     if args.all_orgs {
@@ -93,9 +94,11 @@ fn load_dashboard_browse_document_from_local_import_dir(
     input_dir: &Path,
     input_format: DashboardImportInputFormat,
     root_path: Option<&str>,
+    strict_workspace: bool,
 ) -> Result<DashboardBrowseDocument> {
     let temp_dir = TempInspectDir::new("dashboard-browse-local")?;
-    let resolved = resolve_local_browse_source(&temp_dir.path, input_dir, input_format)?;
+    let resolved =
+        resolve_local_browse_source(&temp_dir.path, input_dir, input_format, strict_workspace)?;
     let metadata = load_export_metadata(&resolved.metadata_dir, None)?;
     let folder_inventory = load_folder_inventory(&resolved.metadata_dir, metadata.as_ref())?;
     let dashboard_files = discover_dashboard_files(&resolved.dashboard_dir)?;
@@ -133,6 +136,7 @@ fn resolve_local_browse_source(
     temp_root: &Path,
     input_dir: &Path,
     input_format: DashboardImportInputFormat,
+    strict_workspace: bool,
 ) -> Result<super::files::ResolvedDashboardImportSource> {
     match input_format {
         DashboardImportInputFormat::Raw => {
@@ -154,6 +158,12 @@ fn resolve_local_browse_source(
             if let Some(workspace_dir) = resolve_dashboard_workspace_variant_dir(input_dir, "raw") {
                 return resolve_dashboard_import_source(&workspace_dir, input_format);
             }
+            if strict_workspace {
+                return Err(message(format!(
+                    "Workspace path {} does not contain a browsable raw dashboard tree. Point --workspace at a repo root, workspace root, dashboards/ root, or raw export directory.",
+                    input_dir.display()
+                )));
+            }
             resolve_dashboard_import_source(input_dir, input_format)
         }
         DashboardImportInputFormat::Provisioning => {
@@ -161,6 +171,12 @@ fn resolve_local_browse_source(
                 resolve_dashboard_workspace_variant_dir(input_dir, "provisioning")
             {
                 return resolve_dashboard_import_source(&workspace_dir, input_format);
+            }
+            if strict_workspace {
+                return Err(message(format!(
+                    "Workspace path {} does not contain a browsable provisioning dashboard tree. Point --workspace at a repo root, workspace root, dashboards/ root, or provisioning export directory.",
+                    input_dir.display()
+                )));
             }
             resolve_dashboard_import_source(input_dir, input_format)
         }
@@ -171,6 +187,12 @@ fn resolve_dashboard_workspace_variant_dir(
     input_dir: &Path,
     variant_dir_name: &str,
 ) -> Option<PathBuf> {
+    if input_dir.file_name().and_then(|name| name.to_str()) == Some(variant_dir_name)
+        && input_dir.is_dir()
+    {
+        return Some(input_dir.to_path_buf());
+    }
+
     let direct_candidate = input_dir.join(variant_dir_name);
     if direct_candidate.is_dir() {
         return Some(direct_candidate);
@@ -988,7 +1010,43 @@ mod tests {
         .unwrap();
 
         assert_eq!(document.summary.dashboard_count, 1);
-        assert_eq!(document.summary.scope_label, format!("Local export tree ({})", raw_dir.display()));
-        assert_eq!(document.nodes.last().map(|node| node.title.as_str()), Some("CPU Main"));
+        assert_eq!(
+            document.summary.scope_label,
+            format!("Local export tree ({})", raw_dir.display())
+        );
+        assert_eq!(
+            document.nodes.last().map(|node| node.title.as_str()),
+            Some("CPU Main")
+        );
+    }
+
+    #[test]
+    fn workspace_root_browse_rejects_non_dashboard_repo_root() {
+        let temp = tempdir().unwrap();
+        fs::write(
+            temp.path().join("dashboard_like.json"),
+            serde_json::to_string_pretty(&json!({
+                "dashboard": {
+                    "uid": "cpu-main",
+                    "title": "CPU Main"
+                }
+            }))
+            .unwrap(),
+        )
+        .unwrap();
+
+        let mut args = make_browse_args(PathBuf::from("."));
+        args.input_dir = None;
+        args.workspace = Some(temp.path().to_path_buf());
+        let error = load_dashboard_browse_document_for_args(
+            &mut |_method, _path, _params, _payload| {
+                Err(message("local browse should not call Grafana"))
+            },
+            &args,
+        )
+        .unwrap_err()
+        .to_string();
+
+        assert!(error.contains("does not contain a browsable raw dashboard tree"));
     }
 }
