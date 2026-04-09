@@ -259,6 +259,340 @@ Relevant docs:
 
 2. Cross-resource review and staged governance
 
+## Do / Don't / Risk
+
+This section translates the Grafana 12.4 assessment into maintainership guidance for `grafana-util`.
+
+## Maintainer review: project purpose and why
+
+After review, the project should not be described as just another Grafana CLI or as a dashboard-only GitOps tool.
+
+The better description is:
+
+- `grafana-util` is an operator-grade review, migration, and cross-resource control layer for Grafana.
+
+That conclusion comes from how the repo is actually used and where its strongest capabilities already are.
+
+### Why this is not just a CLI wrapper
+
+A normal CLI wrapper would mainly provide:
+
+- list
+- get
+- create
+- update
+- delete
+- export/import
+
+This repo clearly goes beyond that. Its distinctive value is in workflows such as:
+
+- `change inspect/check/preview`
+- `change bundle`
+- `snapshot`
+- `dashboard browse`
+- `dashboard edit-live`
+- `dashboard history export/diff/restore`
+- prompt/TUI review and confirmation flows
+
+These are not simple API bindings. They are operator workflows that answer:
+
+- what is here now
+- where it came from
+- what a change will do
+- how to review it before mutation
+- how to move it safely across environments
+
+### Why this is not a pure IaC engine
+
+A pure IaC tool is centered on:
+
+- desired state
+- converge/apply
+- drift correction
+- idempotent reconciliation
+
+This repo is stronger in different places:
+
+- normalizing multiple input sources
+- reviewing staged inputs
+- comparing live and local state
+- mapping resources across environments
+- previewing risk before apply
+- producing handoff artifacts and source bundles
+
+That means the repo behaves more like:
+
+- a review plane
+- a migration plane
+- a control layer
+
+than a single declarative engine.
+
+### Why building a new Grafana DSL is the wrong default
+
+It is tempting to aim for:
+
+- `spec -> compile -> grafana JSON -> apply`
+
+as the main architecture.
+
+That is dangerous here because Grafana is not a clean infrastructure-spec system. It is a combination of:
+
+- a UI-first content system
+- a plugin-driven schema system
+- a runtime query system tied to datasource dialects
+
+That creates persistent pressure from:
+
+- panel plugin schema drift
+- datasource-specific query models
+- transformations, overrides, and plugin-specific fields
+- mixed-datasource panels and other UI-shaped constructs
+
+If the internal abstraction stays shallow, it adds limited value. If it becomes deep, it turns into a second Grafana language with high maintenance cost.
+
+### Why dashboards should not become the strongest IaC core
+
+Dashboards are important, but they behave differently from governance-heavy resources.
+
+They are often:
+
+- edited frequently
+- shaped by UI and design workflows
+- tied to plugin behavior and query details
+- closer to content than to infrastructure
+
+That makes dashboards better suited for:
+
+- export/import
+- history
+- browse/edit-live
+- validation
+- mapping
+- review and preview
+
+rather than becoming the strictest declarative center of the product.
+
+### Why datasource and access should carry stronger IaC expectations
+
+Datasources and access objects are closer to operational governance than dashboards are.
+
+They benefit more directly from:
+
+- deterministic import/export
+- strict mapping
+- idempotent mutation behavior
+- dry-run and confirmation
+- strong review and delete safety
+
+This is where higher declarative rigor is more valuable and more sustainable.
+
+### Why cross-resource workflows are the strategic center
+
+Grafana 12.4 strengthens official dashboard/folder Git-backed workflows. That means dashboard-only GitOps is the area where upstream pressure will keep increasing.
+
+The harder real-world problem is not a single dashboard. It is the interaction between:
+
+- dashboards
+- datasources
+- alerts
+- access and org/folder boundaries
+- live state versus repo state
+
+This is where the repo has the clearest strategic advantage:
+
+- mixed workspace discovery
+- provenance
+- cross-resource preview
+- handoff artifacts
+- migration across environments
+
+That is why `change` should remain the center of gravity.
+
+### Recommended positioning
+
+The healthiest mental model is:
+
+- core identity: migration/review toolkit
+- strong adjacent identity: operator console for live workflows
+- supporting identity: GitOps bridge and adapter layer
+
+This is better than:
+
+- a dashboard-only GitOps product
+- a generic CLI wrapper
+- a replacement Grafana authoring platform
+
+### Do
+
+#### 1. Keep the project positioned as an operator-grade control plane
+
+The project is strongest when it helps operators:
+
+- inspect live state
+- review staged changes
+- map resources across environments
+- validate risky imports before mutation
+- bridge local artifacts, mixed workspaces, and live Grafana
+
+Concrete implication:
+
+- Keep investing in `change inspect/check/preview`, mixed workspace discovery, bundle/provenance, prompt flows, live review, and migration helpers.
+
+#### 2. Treat official Grafana OaC layouts as inputs and outputs, not as the project core
+
+Git Sync, file provisioning, schema v2, and Foundation SDK should be handled through adapters.
+
+Concrete implication:
+
+- Add and extend `--input-format git-sync` and similar layout support.
+- Add validation and analysis against official repo layouts.
+- Prefer conversion, discovery, inspection, and replay-safe import over creating a second authoring universe.
+
+#### 3. Keep `change` as the cross-resource center of gravity
+
+The most defensible product value in this repo is not single-resource CRUD. It is one place to review dashboards, datasources, alerts, and related staged changes together.
+
+Concrete implication:
+
+- Continue putting mixed workspace detection and discovery provenance into `change`.
+- Prefer new review/preflight capabilities to land in `change` first, then reuse elsewhere.
+
+#### 4. Treat dashboards as weak-IaC resources with strong review tooling
+
+Dashboards should remain heavily supported, but primarily through:
+
+- history
+- browse
+- export/import
+- validation
+- mapping
+- preview/review
+
+Concrete implication:
+
+- Optimize for safe replay, migration, diffing, Git Sync compatibility, and operator visibility.
+- Do not assume dashboards should become the strongest declarative surface in the repo.
+
+#### 5. Treat datasource and access as strong-IaC resources
+
+These are closer to infrastructure and governance than UI content.
+
+Concrete implication:
+
+- Keep deterministic import/export, mapping, diff, dry-run, and delete confirmation flows strong here.
+- This is the right place for higher declarative rigor.
+
+#### 6. Treat alerts as bridge-first
+
+Alerts matter operationally, but official Grafana and ecosystem formats are fragmented.
+
+Concrete implication:
+
+- Build bridges and conversion where needed.
+- Favor review/plan/apply safety over prematurely standardizing on a single internal DSL.
+
+### Don't
+
+#### 1. Do not build a brand-new Grafana DSL
+
+Do not turn the repo into:
+
+- `spec -> compile -> grafana json -> apply`
+
+as a new first-class language for all resources.
+
+Why:
+
+- plugin schemas drift
+- query models differ by datasource
+- transformations and overrides are too product-specific
+- maintenance cost will scale faster than product value
+
+#### 2. Do not compete head-on with Grafana Git Sync as a dashboard-only GitOps product
+
+That is not the best use of project energy.
+
+Why:
+
+- Grafana owns the official dashboard/folder repo-backed surface
+- upstream compatibility pressure will keep growing
+- feature-parity competition is a losing game unless the repo narrows to that one problem
+
+#### 3. Do not force all resource types into the same IaC purity model
+
+Dashboards, datasources, alerts, and access are not the same class of object.
+
+Why:
+
+- dashboards behave like mutable content
+- datasources and access behave more like managed infrastructure
+- alerts sit in between
+
+#### 4. Do not let public command surface fragment by layout
+
+Avoid multiplying separate command families such as:
+
+- `dashboard git-sync ...`
+- `dashboard foundation ...`
+- `dashboard schema-v2 ...`
+
+Concrete implication:
+
+- Prefer stable verbs with format/layout flags and loader adapters.
+
+### Risk
+
+#### 1. Over-design risk
+
+The largest architecture risk is not missing Grafana 12.4 support. It is overreacting and turning the repo into a replacement platform.
+
+Warning signs:
+
+- adding a new internal DSL
+- inventing multiple parallel command namespaces per source format
+- building compile pipelines before review and migration workflows are solid
+
+#### 2. Plugin-schema trap
+
+Any design that tries to fully normalize all dashboard/panel/query behavior across plugins will eventually fight upstream complexity.
+
+Warning signs:
+
+- deep panel-type abstraction layers
+- typed normalization for every query dialect
+- attempting perfect round-trip semantics for all dashboard shapes
+
+#### 3. Dashboard-centric drift
+
+The repo can lose its edge if it becomes primarily about dashboard authoring while neglecting:
+
+- datasource mapping
+- access governance
+- alert review
+- mixed workspace preflight
+
+#### 4. Contract fragmentation
+
+If every new format gets a custom output contract, the repo becomes harder to operate and harder to document.
+
+Warning signs:
+
+- discovery metadata only present in some commands
+- bundle/check/preview using different source provenance contracts
+- Git Sync support added in analysis but not reflected in shared review concepts
+
+### Recommended near-term operating rule
+
+When evaluating any new Grafana 12.x feature, ask:
+
+1. Is this best handled as an adapter?
+2. Does it strengthen review, migration, mapping, or validation?
+3. Does it improve `change` as a cross-resource control surface?
+4. Does it avoid creating a new long-term DSL or command namespace?
+
+If the answer to the first three is yes and the fourth is no, it is probably worth building.
+
 - dashboards + alerts + datasources + access in one review story
 
 3. Offline artifact workflows
