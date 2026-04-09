@@ -403,6 +403,33 @@ fn build_sync_plan_document_prunes_alert_policy_when_requested() {
 }
 
 #[test]
+fn build_sync_plan_document_skips_default_empty_alert_policy_baseline() {
+    let plan = build_sync_plan_document(
+        &[],
+        &[json!({
+            "kind": "alert-policy",
+            "title": "empty",
+            "managedFields": ["receiver", "group_by"],
+            "body": {
+                "group_by": ["grafana_folder", "alertname"],
+                "receiver": "empty"
+            }
+        })],
+        false,
+    )
+    .unwrap();
+
+    assert_eq!(plan["summary"]["unmanaged"], json!(0));
+    assert_eq!(plan["summary"]["would_delete"], json!(0));
+    assert_eq!(plan["summary"]["blocked_reasons"], json!([]));
+    assert_eq!(plan["alertAssessment"]["summary"]["alertCount"], json!(0));
+    assert_eq!(
+        plan["operations"].as_array().map(Vec::len),
+        Some(0)
+    );
+}
+
+#[test]
 fn build_sync_plan_document_prunes_non_rule_alert_delete_when_supported() {
     let plan = build_sync_plan_document(
         &[],

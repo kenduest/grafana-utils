@@ -201,6 +201,38 @@ fn supports_prune_delete(_kind: &str) -> bool {
     true
 }
 
+fn is_noisy_default_alert_policy_live_spec(spec: &SyncResourceSpec) -> bool {
+    if spec.kind != "alert-policy" {
+        return false;
+    }
+    let identity = spec.identity.trim();
+    if !matches!(identity, "" | "empty" | "root") {
+        return false;
+    }
+    let receiver = spec
+        .body
+        .get("receiver")
+        .and_then(Value::as_str)
+        .map(str::trim);
+    if !matches!(receiver, Some("" | "empty" | "root")) {
+        return false;
+    }
+    let group_by = spec.body.get("group_by").and_then(Value::as_array);
+    let has_default_group_by = matches!(
+        group_by.map(|items| {
+            items.iter().filter_map(Value::as_str).collect::<Vec<_>>()
+        }),
+        Some(values) if values == vec!["grafana_folder", "alertname"]
+    );
+    let has_routes = spec
+        .body
+        .get("routes")
+        .and_then(Value::as_array)
+        .map(|items| !items.is_empty())
+        .unwrap_or(false);
+    !has_routes && has_default_group_by
+}
+
 fn is_noisy_default_alert_policy_baseline(
     object: &serde_json::Map<String, Value>,
     managed_fields: &[String],
@@ -444,6 +476,9 @@ pub fn build_sync_plan_document(
 
     for (key, live_spec) in &live_index {
         if desired_index.contains_key(key) {
+            continue;
+        }
+        if is_noisy_default_alert_policy_live_spec(live_spec) {
             continue;
         }
         let action = if allow_prune && supports_prune_delete(&live_spec.kind) {
