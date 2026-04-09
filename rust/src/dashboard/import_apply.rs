@@ -301,7 +301,7 @@ impl LiveImportBackend for ClientImportBackend<'_> {
 }
 
 struct PreparedImportRun {
-    resolved_import: super::ResolvedDashboardImportSource,
+    resolved_import: super::LoadedImportSource,
     metadata: Option<ExportMetadata>,
     folders_by_uid: BTreeMap<String, FolderInventoryItem>,
     dashboard_files: Vec<PathBuf>,
@@ -355,11 +355,11 @@ where
 {
     let resolved_import = super::resolve_import_source(args)?;
     let metadata = load_export_metadata(
-        &resolved_import.metadata_dir,
+        resolved_import.metadata_dir(),
         Some(super::import_metadata_variant(args)),
     )?;
     let folder_inventory = if args.ensure_folders || args.dry_run {
-        load_folder_inventory(&resolved_import.metadata_dir, metadata.as_ref())?
+        load_folder_inventory(resolved_import.metadata_dir(), metadata.as_ref())?
     } else {
         Vec::new()
     };
@@ -370,7 +370,7 @@ where
             .unwrap_or(FOLDER_INVENTORY_FILENAME);
         return Err(message(format!(
             "Folder inventory file not found for --ensure-folders: {}. Re-export dashboards with raw folder inventory or omit --ensure-folders.",
-            resolved_import.metadata_dir.join(folders_file).display()
+            resolved_import.metadata_dir().join(folders_file).display()
         )));
     }
     let folders_by_uid = folder_inventory
@@ -378,7 +378,7 @@ where
         .map(|item| (item.uid.clone(), item))
         .collect::<BTreeMap<String, FolderInventoryItem>>();
     let discovered_dashboard_files =
-        super::dashboard_files_for_import(&resolved_import.dashboard_dir)?;
+        super::dashboard_files_for_import(resolved_import.dashboard_dir())?;
     let dashboard_files = match select_dashboard_files(discovered_dashboard_files.clone())? {
         Some(selected) => selected,
         None if args.interactive => {
@@ -444,7 +444,7 @@ fn run_live_import<B: LiveImportBackend>(
                 super::super::import_lookup::resolve_source_dashboard_folder_path(
                     &document,
                     dashboard_file,
-                    &prepared.resolved_import.metadata_dir,
+                    prepared.resolved_import.metadata_dir(),
                     &prepared.folders_by_uid,
                 )?,
             )
@@ -770,11 +770,11 @@ where
         backend.validate_export_org(
             &mut lookup_cache,
             args,
-            &prepared.resolved_import.metadata_dir,
+            prepared.resolved_import.metadata_dir(),
             prepared.metadata.as_ref(),
         )?;
         backend.validate_dependencies(
-            &prepared.resolved_import.dashboard_dir,
+            prepared.resolved_import.dashboard_dir(),
             args.strict_schema,
             args.target_schema_version,
         )?;
@@ -821,11 +821,11 @@ pub fn import_dashboards_with_client(client: &JsonHttpClient, args: &ImportArgs)
     backend.validate_export_org(
         &mut lookup_cache,
         args,
-        &prepared.resolved_import.metadata_dir,
+        prepared.resolved_import.metadata_dir(),
         prepared.metadata.as_ref(),
     )?;
     backend.validate_dependencies(
-        &prepared.resolved_import.dashboard_dir,
+        prepared.resolved_import.dashboard_dir(),
         args.strict_schema,
         args.target_schema_version,
     )?;

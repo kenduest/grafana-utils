@@ -109,11 +109,11 @@ where
     F: FnMut(reqwest::Method, &str, &[(String, String)], Option<&Value>) -> Result<Option<Value>>,
 {
     let resolved = super::import::resolve_diff_source(args)?;
-    let expected_variant = resolved
+    let expected_variant = super::DashboardSourceKind::from_import_input_format(args.input_format)
         .expected_variant()
         .ok_or_else(|| message("Dashboard diff local mode requires an export-backed source."))?;
-    let _ = super::load_export_metadata(&resolved.metadata_dir, Some(expected_variant))?;
-    let dashboard_files = super::import::dashboard_files_for_import(&resolved.dashboard_dir)?;
+    let _ = super::load_export_metadata(resolved.metadata_dir(), Some(expected_variant))?;
+    let dashboard_files = super::import::dashboard_files_for_import(resolved.dashboard_dir())?;
     let mut differences = 0;
     let mut rows = Vec::new();
     for dashboard_file in &dashboard_files {

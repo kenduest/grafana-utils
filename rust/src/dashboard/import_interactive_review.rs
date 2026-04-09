@@ -43,11 +43,11 @@ where
     }
     let resolved_import = super::import::resolve_import_source(args)?;
     let metadata = super::load_export_metadata(
-        &resolved_import.metadata_dir,
+        resolved_import.metadata_dir(),
         Some(super::import::import_metadata_variant(args)),
     )?;
     let folder_inventory =
-        super::load_folder_inventory(&resolved_import.metadata_dir, metadata.as_ref())?;
+        super::load_folder_inventory(resolved_import.metadata_dir(), metadata.as_ref())?;
     let folders_by_uid: BTreeMap<String, super::FolderInventoryItem> = folder_inventory
         .into_iter()
         .map(|item| (item.uid.clone(), item))
@@ -154,11 +154,11 @@ pub(crate) fn build_interactive_import_review_with_client(
     }
     let resolved_import = super::import::resolve_import_source(args)?;
     let metadata = super::load_export_metadata(
-        &resolved_import.metadata_dir,
+        resolved_import.metadata_dir(),
         Some(super::import::import_metadata_variant(args)),
     )?;
     let folder_inventory =
-        super::load_folder_inventory(&resolved_import.metadata_dir, metadata.as_ref())?;
+        super::load_folder_inventory(resolved_import.metadata_dir(), metadata.as_ref())?;
     let folders_by_uid: BTreeMap<String, super::FolderInventoryItem> = folder_inventory
         .into_iter()
         .map(|item| (item.uid.clone(), item))

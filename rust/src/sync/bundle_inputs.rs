@@ -11,7 +11,7 @@ use crate::alert::{
 };
 use crate::common::{message, Result};
 use crate::dashboard::DASHBOARD_PERMISSION_BUNDLE_FILENAME;
-use crate::dashboard::{resolve_dashboard_import_source, DashboardImportInputFormat};
+use crate::dashboard::{load_dashboard_source, DashboardImportInputFormat};
 use serde::Deserialize;
 use serde_json::{Map, Value};
 use std::collections::BTreeSet;
@@ -335,13 +335,15 @@ pub(crate) fn load_dashboard_provisioning_bundle_sections(
     provisioning_dir: &Path,
     datasource_provisioning_file: Option<&Path>,
 ) -> Result<DashboardBundleSections> {
-    let resolved = resolve_dashboard_import_source(
+    let resolved = load_dashboard_source(
         provisioning_dir,
         DashboardImportInputFormat::Provisioning,
+        None,
+        false,
     )?;
     load_dashboard_bundle_sections(
-        &resolved.dashboard_dir,
-        &resolved.metadata_dir,
+        &resolved.resolved.dashboard_dir,
+        &resolved.resolved.metadata_dir,
         datasource_provisioning_file,
     )
 }

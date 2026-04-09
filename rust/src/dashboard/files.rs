@@ -127,9 +127,6 @@ pub(crate) struct ResolvedDashboardImportSource {
 }
 
 impl ResolvedDashboardImportSource {
-    pub(crate) fn expected_variant(&self) -> Option<&'static str> {
-        self.source_kind.expected_variant()
-    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
