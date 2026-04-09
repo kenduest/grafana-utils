@@ -91,3 +91,10 @@ Rules to keep:
 - keep plain export/backup flows obvious and low-friction for users who only need JSON capture and restore
 - avoid forcing review/workbench/governance-heavy flows onto the simplest inventory and backup paths
 - make the heavier plan/diff/governance lane explicitly optional and operator-intent driven
+
+4. refactor toward adapter / canonical model / workflow separation
+- keep the new `sync` split stable: `workspace_discovery`, `input_normalization`, `task_first`, and shared discovery model should absorb new behavior before any new orchestration surface is added
+- finish a focused contract pass around the dashboard source-loader and import-owned source wrapper so temp-backed sources, git-sync roots, provisioning roots, and wrapped trees stay protected by narrow regressions
+- review remaining dashboard bundle/change entry points for old path-normalization assumptions before reopening deeper dashboard-specific work
+- keep `raw-to-prompt` as a migration/repair workflow lane, not a new core authoring model or implicit repo-wide truth format
+- avoid letting new dashboard-only analysis or prompt-lane semantics become hidden dependencies for cross-resource `change` workflows
