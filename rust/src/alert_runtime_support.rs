@@ -90,6 +90,8 @@ pub fn build_alert_delete_preview_document(rows: &[Value], allow_policy_reset: b
         "kind": ALERT_DELETE_PREVIEW_KIND,
         "schemaVersion": ALERT_DELETE_PREVIEW_SCHEMA_VERSION,
         "toolVersion": tool_version(),
+        "reviewRequired": true,
+        "reviewed": false,
         "allowPolicyReset": allow_policy_reset,
         "summary": {
             "processed": rows.len(),
@@ -402,6 +404,8 @@ pub fn build_alert_import_dry_run_document(rows: &[Value]) -> Value {
         .count();
 
     json!({
+        "reviewRequired": true,
+        "reviewed": false,
         "summary": {
             "processed": processed,
             "wouldCreate": would_create,

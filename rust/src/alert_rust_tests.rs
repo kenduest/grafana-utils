@@ -801,6 +801,8 @@ fn build_alert_import_dry_run_document_reports_summary_and_rows() {
         }),
     ]);
 
+    assert_eq!(document["reviewRequired"], json!(true));
+    assert_eq!(document["reviewed"], json!(false));
     assert_eq!(document["summary"]["processed"], json!(3));
     assert_eq!(document["summary"]["wouldCreate"], json!(1));
     assert_eq!(document["summary"]["wouldUpdate"], json!(1));
@@ -2049,6 +2051,8 @@ fn build_alert_delete_preview_from_files_blocks_policy_reset_without_guard() {
     fs::write(&policy_path, "receiver: grafana-default-email\n").unwrap();
 
     let preview = build_alert_delete_preview_from_files(&[policy_path], false).unwrap();
+    assert_eq!(preview["reviewRequired"], json!(true));
+    assert_eq!(preview["reviewed"], json!(false));
     assert_eq!(preview["summary"]["delete"], json!(0));
     assert_eq!(preview["summary"]["blocked"], json!(1));
     assert_eq!(
