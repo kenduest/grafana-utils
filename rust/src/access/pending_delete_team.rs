@@ -141,7 +141,11 @@ fn team_delete_prompt_label(team: &Map<String, Value>) -> String {
     let name = string_field(team, "name", "-");
     let email = string_field(team, "email", "-");
     let id = scalar_text(team.get("id"));
-    format_prompt_row(&[(&name, 24), (&email, 30)], &format!("id={id}"))
+    let member_count = string_field(team, "memberCount", "-");
+    format_prompt_row(
+        &[(&name, 24), (&email, 30)],
+        &format!("id={id} members={member_count}"),
+    )
 }
 
 /// Delete one team after resolving identity and confirmation constraints.
@@ -222,4 +226,28 @@ where
         }
     }
     Ok(results.len())
+}
+
+#[cfg(test)]
+mod pending_delete_team_tests {
+    use super::*;
+
+    #[test]
+    fn team_delete_prompt_label_includes_member_count() {
+        let team = Map::from_iter(vec![
+            ("id".to_string(), Value::String("3".to_string())),
+            ("name".to_string(), Value::String("Ops".to_string())),
+            (
+                "email".to_string(),
+                Value::String("ops@example.com".to_string()),
+            ),
+            ("memberCount".to_string(), Value::String("2".to_string())),
+        ]);
+
+        let label = team_delete_prompt_label(&team);
+
+        assert!(label.contains("Ops"));
+        assert!(label.contains("ops@example.com"));
+        assert!(label.contains("id=3 members=2"));
+    }
 }
