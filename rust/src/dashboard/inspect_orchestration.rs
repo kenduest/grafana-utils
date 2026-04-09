@@ -17,8 +17,7 @@ use super::super::cli_defs::{
     InspectExportReportFormat, InspectOutputFormat,
 };
 use super::super::files::{
-    load_export_metadata, resolve_dashboard_export_root, resolve_dashboard_import_source,
-    DashboardSourceKind,
+    load_export_metadata, resolve_dashboard_export_root, DashboardSourceKind,
 };
 #[cfg(feature = "tui")]
 use super::super::inspect_governance::build_export_inspection_governance_document;
@@ -27,7 +26,7 @@ use super::super::inspect_report::{
     refresh_filtered_query_report_summary, report_format_supports_columns,
     resolve_report_column_ids_for_format, ExportInspectionQueryReport,
 };
-use super::super::source_loader::resolve_dashboard_workspace_variant_dir;
+use super::super::source_loader::{load_dashboard_source, resolve_dashboard_workspace_variant_dir};
 #[cfg(feature = "tui")]
 use super::super::inspect_workbench::run_inspect_workbench;
 #[cfg(feature = "tui")]
@@ -115,12 +114,10 @@ pub(crate) fn resolve_inspect_export_import_dir(
             resolve_raw_inspect_input(temp_root, input_dir, input_type, interactive)
         }
         DashboardImportInputFormat::Provisioning => {
-            let resolved = resolve_dashboard_import_source(
-                input_dir,
-                DashboardImportInputFormat::Provisioning,
-            )?;
+            let resolved =
+                load_dashboard_source(input_dir, DashboardImportInputFormat::Provisioning, None, false)?;
             Ok(ResolvedInspectExportInput {
-                input_dir: resolved.dashboard_dir,
+                input_dir: resolved.input_dir,
                 expected_variant: RAW_EXPORT_SUBDIR,
                 source_kind: Some(DashboardSourceKind::ProvisioningExport),
             })
