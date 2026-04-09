@@ -7,9 +7,10 @@
 //! - Route to Access domain handlers with a prepared HTTP client and auth headers.
 
 use clap::{Command, CommandFactory, Parser};
+use rpassword::prompt_password;
 use std::path::PathBuf;
 
-use crate::common::{set_json_color_choice, Result};
+use crate::common::{set_json_color_choice, GrafanaCliError, Result};
 use crate::grafana_api::{AuthInputs, GrafanaApiClient, GrafanaConnection};
 use crate::http::JsonHttpClient;
 use crate::profile_config::ConnectionMergeInput;
@@ -141,6 +142,66 @@ pub fn normalize_access_cli_args(mut args: AccessCliArgs) -> AccessCliArgs {
 
 pub fn root_command() -> Command {
     AccessCliRoot::command()
+}
+
+pub(crate) fn materialize_access_common_auth_with_prompt<F, G>(
+    mut common: super::CommonCliArgs,
+    mut prompt_password_reader: F,
+    mut prompt_token_reader: G,
+) -> Result<super::CommonCliArgs>
+where
+    F: FnMut() -> Result<String>,
+    G: FnMut() -> Result<String>,
+{
+    if common.prompt_password && common.password.is_none() {
+        common.password = Some(prompt_password_reader()?);
+    }
+    if common.prompt_token && common.api_token.is_none() {
+        common.api_token = Some(prompt_token_reader()?);
+    }
+    common.prompt_password = false;
+    common.prompt_token = false;
+    Ok(common)
+}
+
+pub(crate) fn materialize_access_common_auth(
+    common: super::CommonCliArgs,
+) -> Result<super::CommonCliArgs> {
+    materialize_access_common_auth_with_prompt(
+        common,
+        || prompt_password("Grafana Basic auth password: ").map_err(GrafanaCliError::from),
+        || prompt_password("Grafana API token: ").map_err(GrafanaCliError::from),
+    )
+}
+
+pub(crate) fn materialize_access_common_auth_no_org_id_with_prompt<F, G>(
+    mut common: super::CommonCliArgsNoOrgId,
+    mut prompt_password_reader: F,
+    mut prompt_token_reader: G,
+) -> Result<super::CommonCliArgsNoOrgId>
+where
+    F: FnMut() -> Result<String>,
+    G: FnMut() -> Result<String>,
+{
+    if common.prompt_password && common.password.is_none() {
+        common.password = Some(prompt_password_reader()?);
+    }
+    if common.prompt_token && common.api_token.is_none() {
+        common.api_token = Some(prompt_token_reader()?);
+    }
+    common.prompt_password = false;
+    common.prompt_token = false;
+    Ok(common)
+}
+
+pub(crate) fn materialize_access_common_auth_no_org_id(
+    common: super::CommonCliArgsNoOrgId,
+) -> Result<super::CommonCliArgsNoOrgId> {
+    materialize_access_common_auth_no_org_id_with_prompt(
+        common,
+        || prompt_password("Grafana Basic auth password: ").map_err(GrafanaCliError::from),
+        || prompt_password("Grafana API token: ").map_err(GrafanaCliError::from),
+    )
 }
 
 #[derive(Debug, Clone)]
@@ -287,4 +348,45 @@ fn build_connection_no_org_id(common: &super::CommonCliArgsNoOrgId) -> Result<Gr
         },
         false,
     )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn make_common() -> super::super::CommonCliArgs {
+        super::super::CommonCliArgs {
+            profile: None,
+            url: "http://127.0.0.1:3000".to_string(),
+            api_token: None,
+            username: Some("admin".to_string()),
+            password: None,
+            prompt_password: true,
+            prompt_token: false,
+            org_id: None,
+            timeout: 30,
+            verify_ssl: false,
+            insecure: false,
+            ca_cert: None,
+        }
+    }
+
+    #[test]
+    fn materialize_access_common_auth_prompts_password_once_and_clears_prompt_flags() {
+        let mut prompts = 0usize;
+        let resolved = materialize_access_common_auth_with_prompt(
+            make_common(),
+            || {
+                prompts += 1;
+                Ok("prompted-password".to_string())
+            },
+            || panic!("token prompt should not be used"),
+        )
+        .unwrap();
+
+        assert_eq!(prompts, 1);
+        assert_eq!(resolved.password.as_deref(), Some("prompted-password"));
+        assert!(!resolved.prompt_password);
+        assert!(!resolved.prompt_token);
+    }
 }

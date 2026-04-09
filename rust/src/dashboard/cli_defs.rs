@@ -18,3 +18,4 @@ pub use dashboard_runtime::{
     build_auth_context, build_http_client, build_http_client_for_org, normalize_dashboard_cli_args,
     parse_cli_from, DashboardAuthContext,
 };
+pub(crate) use dashboard_runtime::materialize_dashboard_common_auth;
