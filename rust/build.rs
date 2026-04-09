@@ -32,6 +32,12 @@ fn main() {
     println!("cargo:rerun-if-env-changed=GRAFANA_UTIL_GIT_COMMIT");
     println!("cargo:rerun-if-changed=../.git/HEAD");
     println!("cargo:rerun-if-changed=../.git/packed-refs");
-    println!("cargo:rustc-env=GRAFANA_UTIL_BUILD_TIME={}", build_time_utc());
-    println!("cargo:rustc-env=GRAFANA_UTIL_GIT_COMMIT={}", git_commit_short());
+    println!(
+        "cargo:rustc-env=GRAFANA_UTIL_BUILD_TIME={}",
+        build_time_utc()
+    );
+    println!(
+        "cargo:rustc-env=GRAFANA_UTIL_GIT_COMMIT={}",
+        git_commit_short()
+    );
 }
