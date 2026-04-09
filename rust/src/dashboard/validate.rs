@@ -361,9 +361,7 @@ pub(crate) fn render_validation_result_json(result: &DashboardValidationResult) 
 }
 
 pub(crate) fn run_dashboard_validate_export(args: &ValidateExportArgs) -> Result<()> {
-    let temp_dir = super::inspect::TempInspectDir::new("validate-export")?;
-    let input_dir = super::inspect::resolve_inspect_export_import_dir(
-        &temp_dir.path,
+    let input_dir = super::source_loader::load_dashboard_source(
         &args.input_dir,
         args.input_format,
         None,

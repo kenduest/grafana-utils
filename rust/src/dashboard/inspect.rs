@@ -40,7 +40,6 @@ use super::files::{
 };
 #[cfg(test)]
 pub(crate) use super::inspect_live::prepare_inspect_export_import_dir;
-pub(crate) use super::inspect_live::TempInspectDir;
 #[cfg(test)]
 pub(crate) use super::inspect_query::QueryAnalysis;
 #[allow(unused_imports)]

@@ -10,8 +10,8 @@ use crate::grafana_api::DashboardResourceClient;
 
 use super::delete_support::normalize_folder_path;
 use super::inspect::{resolve_export_folder_inventory_item, resolve_export_folder_path};
-use super::inspect_live::{prepare_inspect_export_import_dir_for_variant, TempInspectDir};
 use super::list::{fetch_current_org_with_request, org_id_value};
+use super::source_loader::{load_dashboard_source, LoadedDashboardSource};
 use super::{
     build_auth_context, build_http_client, build_http_client_for_org,
     collect_folder_inventory_with_request, fetch_dashboard_with_request,
@@ -20,8 +20,7 @@ use super::{
 };
 use crate::dashboard::files::{
     discover_dashboard_files, extract_dashboard_object, load_export_metadata,
-    load_folder_inventory, load_json_file, resolve_dashboard_export_root,
-    resolve_dashboard_import_source,
+    load_folder_inventory, load_json_file,
 };
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -96,14 +95,13 @@ fn load_dashboard_browse_document_from_local_import_dir(
     root_path: Option<&str>,
     strict_workspace: bool,
 ) -> Result<DashboardBrowseDocument> {
-    let temp_dir = TempInspectDir::new("dashboard-browse-local")?;
-    let resolved =
-        resolve_local_browse_source(&temp_dir.path, input_dir, input_format, strict_workspace)?;
-    let metadata = load_export_metadata(&resolved.metadata_dir, None)?;
-    let folder_inventory = load_folder_inventory(&resolved.metadata_dir, metadata.as_ref())?;
-    let dashboard_files = discover_dashboard_files(&resolved.dashboard_dir)?;
+    let resolved = resolve_local_browse_source(input_dir, input_format, strict_workspace)?;
+    let metadata = load_export_metadata(&resolved.resolved.metadata_dir, None)?;
+    let folder_inventory =
+        load_folder_inventory(&resolved.resolved.metadata_dir, metadata.as_ref())?;
+    let dashboard_files = discover_dashboard_files(&resolved.resolved.dashboard_dir)?;
     let summaries = build_local_dashboard_summaries(
-        &resolved.dashboard_dir,
+        &resolved.resolved.dashboard_dir,
         &dashboard_files,
         &folder_inventory,
         metadata.as_ref(),
@@ -128,95 +126,16 @@ fn load_dashboard_browse_document_from_local_import_dir(
         false,
     )?;
     document.summary.scope_label =
-        format!("Local export tree ({})", resolved.dashboard_dir.display());
+        format!("Local export tree ({})", resolved.resolved.dashboard_dir.display());
     Ok(document)
 }
 
 fn resolve_local_browse_source(
-    temp_root: &Path,
     input_dir: &Path,
     input_format: DashboardImportInputFormat,
     strict_workspace: bool,
-) -> Result<super::files::ResolvedDashboardImportSource> {
-    match input_format {
-        DashboardImportInputFormat::Raw => {
-            if resolve_dashboard_export_root(input_dir)?
-                .map(|resolved| resolved.manifest.scope_kind.is_root())
-                .unwrap_or(false)
-            {
-                let dashboard_dir = prepare_inspect_export_import_dir_for_variant(
-                    temp_root,
-                    input_dir,
-                    super::RAW_EXPORT_SUBDIR,
-                )?;
-                return Ok(super::files::ResolvedDashboardImportSource {
-                    source_kind: super::DashboardSourceKind::RawExport,
-                    dashboard_dir: dashboard_dir.clone(),
-                    metadata_dir: dashboard_dir,
-                });
-            }
-            if let Some(workspace_dir) = resolve_dashboard_workspace_variant_dir(input_dir, "raw") {
-                return resolve_dashboard_import_source(&workspace_dir, input_format);
-            }
-            if strict_workspace {
-                return Err(message(format!(
-                    "Workspace path {} does not contain a browsable raw dashboard tree. Point --workspace at a repo root, workspace root, dashboards/ root, or raw export directory.",
-                    input_dir.display()
-                )));
-            }
-            resolve_dashboard_import_source(input_dir, input_format)
-        }
-        DashboardImportInputFormat::Provisioning => {
-            if let Some(workspace_dir) =
-                resolve_dashboard_workspace_variant_dir(input_dir, "provisioning")
-            {
-                return resolve_dashboard_import_source(&workspace_dir, input_format);
-            }
-            if strict_workspace {
-                return Err(message(format!(
-                    "Workspace path {} does not contain a browsable provisioning dashboard tree. Point --workspace at a repo root, workspace root, dashboards/ root, or provisioning export directory.",
-                    input_dir.display()
-                )));
-            }
-            resolve_dashboard_import_source(input_dir, input_format)
-        }
-    }
-}
-
-fn resolve_dashboard_workspace_variant_dir(
-    input_dir: &Path,
-    variant_dir_name: &str,
-) -> Option<PathBuf> {
-    if input_dir.file_name().and_then(|name| name.to_str()) == Some(variant_dir_name)
-        && input_dir.is_dir()
-    {
-        return Some(input_dir.to_path_buf());
-    }
-
-    let direct_candidate = input_dir.join(variant_dir_name);
-    if direct_candidate.is_dir() {
-        return Some(direct_candidate);
-    }
-
-    let dashboards_dir =
-        if input_dir.file_name().and_then(|name| name.to_str()) == Some("dashboards") {
-            input_dir.to_path_buf()
-        } else {
-            input_dir.join("dashboards")
-        };
-    let direct_dashboards_candidate = dashboards_dir.join(variant_dir_name);
-    if direct_dashboards_candidate.is_dir() {
-        return Some(direct_dashboards_candidate);
-    }
-
-    let git_sync_dir =
-        if input_dir.file_name().and_then(|name| name.to_str()) == Some("git-sync") {
-            input_dir.to_path_buf()
-        } else {
-            dashboards_dir.join("git-sync")
-        };
-    let wrapped_candidate = git_sync_dir.join(variant_dir_name);
-    wrapped_candidate.is_dir().then_some(wrapped_candidate)
+) -> Result<LoadedDashboardSource> {
+    load_dashboard_source(input_dir, input_format, None, strict_workspace)
 }
 
 fn build_local_dashboard_summaries(

@@ -16,18 +16,15 @@ use crate::tabular_output::render_yaml;
 
 use super::inspect_render::{render_csv, render_simple_table};
 use super::screenshot::parse_vars_query;
+use super::source_loader::load_dashboard_source;
 use super::{
     build_http_client, build_http_client_for_org, fetch_dashboard, InspectVarsArgs,
     SimpleOutputFormat,
 };
 use crate::dashboard::files::{
     discover_dashboard_files, extract_dashboard_object, load_json_file,
-    resolve_dashboard_export_root, resolve_dashboard_import_source,
 };
-use crate::dashboard::inspect_live::{
-    prepare_inspect_export_import_dir_for_variant, TempInspectDir,
-};
-use crate::dashboard::{DashboardImportInputFormat, RAW_EXPORT_SUBDIR};
+use crate::dashboard::DashboardImportInputFormat;
 
 /// Struct definition for DashboardVariableRow.
 #[derive(Debug, Clone, Serialize, PartialEq, Eq)]
@@ -287,30 +284,8 @@ fn resolve_local_variable_source(
     input_dir: &std::path::Path,
     input_format: DashboardImportInputFormat,
 ) -> Result<super::files::ResolvedDashboardImportSource> {
-    match input_format {
-        DashboardImportInputFormat::Raw => {
-            if resolve_dashboard_export_root(input_dir)?
-                .map(|resolved| resolved.manifest.scope_kind.is_root())
-                .unwrap_or(false)
-            {
-                let temp_dir = TempInspectDir::new("inspect-vars-local")?;
-                let dashboard_dir = prepare_inspect_export_import_dir_for_variant(
-                    &temp_dir.path,
-                    input_dir,
-                    RAW_EXPORT_SUBDIR,
-                )?;
-                return Ok(super::files::ResolvedDashboardImportSource {
-                    source_kind: super::DashboardSourceKind::RawExport,
-                    dashboard_dir: dashboard_dir.clone(),
-                    metadata_dir: dashboard_dir,
-                });
-            }
-            resolve_dashboard_import_source(input_dir, input_format)
-        }
-        DashboardImportInputFormat::Provisioning => {
-            resolve_dashboard_import_source(input_dir, input_format)
-        }
-    }
+    let resolved = load_dashboard_source(input_dir, input_format, None, false)?;
+    Ok(resolved.resolved)
 }
 
 fn select_local_dashboard_file(

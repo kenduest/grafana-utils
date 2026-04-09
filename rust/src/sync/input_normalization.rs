@@ -14,8 +14,8 @@ use super::{
 };
 use crate::common::message;
 use crate::dashboard::{
-    resolve_inspect_export_import_dir, DashboardImportInputFormat, InspectExportInputType,
-    TempInspectDir,
+    load_dashboard_source, DashboardImportInputFormat, InspectExportInputType,
+    LoadedDashboardSource,
 };
 use crate::overview::{OverviewArgs, OverviewOutputFormat};
 use crate::project_status_command::{ProjectStatusOutputFormat, ProjectStatusStagedArgs};
@@ -23,7 +23,7 @@ use serde_json::{Map, Value};
 
 #[derive(Default)]
 pub(crate) struct NormalizedChangeDashboardInputs {
-    pub(crate) _temp_dir: Option<TempInspectDir>,
+    pub(crate) _dashboard_source: Option<LoadedDashboardSource>,
     pub(crate) dashboard_export_dir: Option<PathBuf>,
     pub(crate) dashboard_provisioning_dir: Option<PathBuf>,
 }
@@ -90,36 +90,28 @@ pub(crate) fn normalize_change_dashboard_inputs(
     dashboard_export_dir: Option<&PathBuf>,
     dashboard_provisioning_dir: Option<&PathBuf>,
 ) -> Result<NormalizedChangeDashboardInputs> {
-    let mut temp_dir = None;
+    let mut dashboard_source = None;
     let mut normalized_export_dir = None;
     let mut normalized_provisioning_dir = None;
 
     if let Some(path) = dashboard_export_dir {
-        let holder = TempInspectDir::new("change-dashboard-export-input")?;
-        let resolved = resolve_inspect_export_import_dir(
-            &holder.path,
+        let resolved = load_dashboard_source(
             path,
             DashboardImportInputFormat::Raw,
             Some(InspectExportInputType::Raw),
             false,
         )?;
-        normalized_export_dir = Some(resolved.input_dir);
-        temp_dir = Some(holder);
+        normalized_export_dir = Some(resolved.input_dir.clone());
+        dashboard_source = Some(resolved);
     } else if let Some(path) = dashboard_provisioning_dir {
-        let holder = TempInspectDir::new("change-dashboard-provisioning-input")?;
-        let resolved = resolve_inspect_export_import_dir(
-            &holder.path,
-            path,
-            DashboardImportInputFormat::Provisioning,
-            None,
-            false,
-        )?;
-        normalized_provisioning_dir = Some(resolved.input_dir);
-        temp_dir = Some(holder);
+        let resolved =
+            load_dashboard_source(path, DashboardImportInputFormat::Provisioning, None, false)?;
+        normalized_provisioning_dir = Some(resolved.input_dir.clone());
+        dashboard_source = Some(resolved);
     }
 
     Ok(NormalizedChangeDashboardInputs {
-        _temp_dir: temp_dir,
+        _dashboard_source: dashboard_source,
         dashboard_export_dir: normalized_export_dir,
         dashboard_provisioning_dir: normalized_provisioning_dir,
     })
