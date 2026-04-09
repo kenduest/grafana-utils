@@ -1533,3 +1533,19 @@ fn render_live_mutation_json_summarizes_actions() {
     assert_eq!(value["summary"]["deleteCount"], json!(1));
     assert_eq!(value["summary"]["blockedCount"], json!(1));
 }
+
+#[test]
+fn resolve_delete_preview_type_uses_matching_live_datasource_type() {
+    let live = vec![
+        live_datasource(7, "prom-main", "Prometheus Main", "prometheus"),
+        live_datasource(9, "loki-ops", "Loki Ops", "loki"),
+    ];
+
+    assert_eq!(
+        super::resolve_delete_preview_type(Some(7), &live),
+        "prometheus"
+    );
+    assert_eq!(super::resolve_delete_preview_type(Some(9), &live), "loki");
+    assert_eq!(super::resolve_delete_preview_type(Some(42), &live), "");
+    assert_eq!(super::resolve_delete_preview_type(None, &live), "");
+}

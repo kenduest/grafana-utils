@@ -225,6 +225,16 @@ fn render_diff_identity(entry: &DatasourceDiffEntry) -> String {
     entry.key.clone()
 }
 
+fn resolve_delete_preview_type(target_id: Option<i64>, live: &[Map<String, Value>]) -> String {
+    let Some(target_id) = target_id else {
+        return String::new();
+    };
+    live.iter()
+        .find(|item| item.get("id").and_then(Value::as_i64) == Some(target_id))
+        .map(|item| string_field(item, "type", ""))
+        .unwrap_or_default()
+}
+
 // Render the diff as an operator-summary report rather than a machine contract.
 fn print_datasource_diff_summary_report(report: &DatasourceDiffReport) {
     for entry in &report.entries {
@@ -657,6 +667,7 @@ pub fn run_datasource_cli(command: DatasourceGroupCommand) -> Result<()> {
             let datasource_client = DatasourceResourceClient::new(&client);
             let live = datasource_client.list_datasources()?;
             let matching = resolve_delete_match(args.uid.as_deref(), args.name.as_deref(), &live);
+            let delete_type = resolve_delete_preview_type(matching.target_id, &live);
             let row = vec![
                 "delete".to_string(),
                 args.uid
@@ -672,7 +683,7 @@ pub fn run_datasource_cli(command: DatasourceGroupCommand) -> Result<()> {
                 args.name
                     .clone()
                     .unwrap_or_else(|| matching.target_name.clone()),
-                String::new(),
+                delete_type.clone(),
                 matching.destination.to_string(),
                 matching.action.to_string(),
                 matching
@@ -690,9 +701,10 @@ pub fn run_datasource_cli(command: DatasourceGroupCommand) -> Result<()> {
                     println!("Dry-run checked 1 datasource delete request");
                 } else {
                     println!(
-                        "Dry-run datasource delete uid={} name={} match={} action={}",
+                        "Dry-run datasource delete uid={} name={} type={} match={} action={}",
                         args.uid.clone().unwrap_or_default(),
                         args.name.clone().unwrap_or_default(),
+                        delete_type,
                         matching.destination,
                         matching.action
                     );
@@ -707,9 +719,10 @@ pub fn run_datasource_cli(command: DatasourceGroupCommand) -> Result<()> {
             }
             if matching.action != "would-delete" {
                 return Err(message(format!(
-                    "Datasource delete blocked for uid={} name={}: destination={} action={}.",
+                    "Datasource delete blocked for uid={} name={} type={}: destination={} action={}.",
                     args.uid.clone().unwrap_or_default(),
                     args.name.clone().unwrap_or_default(),
+                    resolve_delete_preview_type(matching.target_id, &live),
                     matching.destination,
                     matching.action
                 )));
@@ -719,7 +732,7 @@ pub fn run_datasource_cli(command: DatasourceGroupCommand) -> Result<()> {
                 .ok_or_else(|| message("Datasource delete requires a live datasource id."))?;
             datasource_client.delete_datasource(&target_id.to_string())?;
             println!(
-                "Deleted datasource uid={} name={} id={}",
+                "Deleted datasource uid={} name={} type={} id={}",
                 if matching.target_uid.is_empty() {
                     args.uid.unwrap_or_default()
                 } else {
@@ -730,6 +743,7 @@ pub fn run_datasource_cli(command: DatasourceGroupCommand) -> Result<()> {
                 } else {
                     matching.target_name
                 },
+                resolve_delete_preview_type(Some(target_id), &live),
                 target_id
             );
             Ok(())
