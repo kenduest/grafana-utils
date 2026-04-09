@@ -34,6 +34,8 @@ pub const ALERT_PLAN_KIND: &str = "grafana-util-alert-plan";
 pub const ALERT_PLAN_SCHEMA_VERSION: i64 = 1;
 pub const ALERT_DELETE_PREVIEW_KIND: &str = "grafana-util-alert-delete-preview";
 pub const ALERT_DELETE_PREVIEW_SCHEMA_VERSION: i64 = 1;
+pub const ALERT_IMPORT_DRY_RUN_KIND: &str = "grafana-util-alert-import-dry-run";
+pub const ALERT_IMPORT_DRY_RUN_SCHEMA_VERSION: i64 = 1;
 pub const ALERT_MANAGED_POLICY_PREVIEW_SCHEMA_VERSION: i64 = 1;
 type AlertDesiredOperation = (PathBuf, String, Map<String, Value>);
 
@@ -409,6 +411,9 @@ pub fn build_alert_import_dry_run_document(rows: &[Value]) -> Value {
         .count();
 
     json!({
+        "kind": ALERT_IMPORT_DRY_RUN_KIND,
+        "schemaVersion": ALERT_IMPORT_DRY_RUN_SCHEMA_VERSION,
+        "toolVersion": tool_version(),
         "reviewRequired": true,
         "reviewed": false,
         "summary": {

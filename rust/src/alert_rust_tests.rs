@@ -801,6 +801,12 @@ fn build_alert_import_dry_run_document_reports_summary_and_rows() {
         }),
     ]);
 
+    assert_eq!(
+        document["kind"],
+        json!(super::alert_runtime_support::ALERT_IMPORT_DRY_RUN_KIND)
+    );
+    assert_eq!(document["schemaVersion"], json!(1));
+    assert_eq!(document["toolVersion"], json!(TOOL_VERSION));
     assert_eq!(document["reviewRequired"], json!(true));
     assert_eq!(document["reviewed"], json!(false));
     assert_eq!(document["summary"]["processed"], json!(3));
@@ -1002,6 +1008,14 @@ fn alert_diff_and_import_documents_align_for_update_and_create_actions() {
         .unwrap()
         .iter()
         .any(|row| row["identity"] == "new-webhook" && row["action"] == "would-create"));
+    assert_eq!(
+        import_document["kind"],
+        json!(super::alert_runtime_support::ALERT_IMPORT_DRY_RUN_KIND)
+    );
+    assert_eq!(import_document["schemaVersion"], json!(1));
+    assert_eq!(import_document["toolVersion"], json!(TOOL_VERSION));
+    assert_eq!(import_document["reviewRequired"], json!(true));
+    assert_eq!(import_document["reviewed"], json!(false));
 }
 
 #[test]
