@@ -431,6 +431,8 @@ fn project_status_live_text_renderer_surfaces_overall_domain_and_action_sections
             "Project status".to_string(),
             "Overall: status=blocked scope=live domains=2 present=2 blocked=1 blockers=3 warnings=1 freshness=current"
                 .to_string(),
+            "Signals: sync sources=sync-summary,bundle-preflight signalKeys=6 blockers=3 warnings=0"
+                .to_string(),
             "Domains:".to_string(),
             "- dashboard status=ready mode=inspect-summary primary=4 blockers=0 warnings=1 freshness=stale next=review dashboard governance warnings before promotion or apply"
                 .to_string(),
@@ -588,6 +590,7 @@ fn project_status_staged_text_renderer_matches_the_shared_contract_fields() {
             "Project status".to_string(),
             "Overall: status=partial scope=staged-only domains=6 present=1 blocked=0 blockers=0 warnings=0 freshness=current"
                 .to_string(),
+            "Signals: sync sources=sync-summary signalKeys=1 blockers=0 warnings=0".to_string(),
             "Domains:".to_string(),
             "- sync status=ready mode=staged-documents primary=4 blockers=0 warnings=0 freshness=current next=re-run sync summary after staged changes"
                 .to_string(),

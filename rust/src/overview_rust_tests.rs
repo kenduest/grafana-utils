@@ -1288,6 +1288,8 @@ fn build_overview_document_and_render_overview_text_for_change_summary_domain_st
             .contains("Summary: resources=4 dashboards=1 datasources=1 folders=1 alerts=1")));
     assert!(lines.iter().any(|line| line
         .contains("- sync status=ready reason=ready primary=4 blockers=0 warnings=0 freshness=")));
+    assert!(lines.iter().any(|line| line
+        .contains("Signals: sync sources=sync-summary signalKeys=1 blockers=0 warnings=0")));
     assert!(lines.iter().any(|line| {
         line.contains("next=re-run sync summary after staged changes")
             && line.contains("- sync status=ready")
@@ -1342,6 +1344,7 @@ fn build_overview_document_preserves_the_shared_project_status_render_contract()
             "Project status".to_string(),
             "Overall: status=partial scope=staged-only domains=6 present=1 blocked=0 blockers=0 warnings=0 freshness=current"
                 .to_string(),
+            "Signals: sync sources=sync-summary signalKeys=1 blockers=0 warnings=0".to_string(),
             "Domains:".to_string(),
             "- sync status=ready mode=staged-documents primary=4 blockers=0 warnings=0 freshness=current next=re-run sync summary after staged changes"
                 .to_string(),

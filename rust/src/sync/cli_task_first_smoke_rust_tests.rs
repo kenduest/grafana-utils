@@ -264,6 +264,10 @@ fn task_first_change_lane_smoke_runs_from_repo_local_workspace() {
         json!("change-task-first-smoke")
     );
     assert_eq!(preview_document["reviewed"], json!(false));
+    assert_eq!(
+        preview_document["discovery"]["workspaceRoot"],
+        json!(workspace.display().to_string())
+    );
 
     let apply_args = task_first_change_cli_args("apply", &workspace, None, Some(&preview_file));
     match apply_args.command {
@@ -451,6 +455,10 @@ fn task_first_change_lane_smoke_runs_from_git_sync_mixed_workspace_root() {
     let preview_document: serde_json::Value =
         serde_json::from_str(&fs::read_to_string(&preview_file).unwrap()).unwrap();
     assert_eq!(preview_document["kind"], json!("grafana-utils-sync-plan"));
+    assert_eq!(
+        preview_document["discovery"]["workspaceRoot"],
+        json!(workspace.display().to_string())
+    );
     assert!(preview_document["operations"].as_array().is_some());
     assert!(preview_document["operations"]
         .as_array()

@@ -7,6 +7,7 @@ use super::{
 };
 use crate::common::{message, tool_version, Result};
 use crate::project_status_staged::build_staged_project_status;
+use crate::project_status::render_project_status_signal_summary;
 use crate::sync::render_discovery_summary_from_value;
 use serde_json::Value;
 
@@ -77,6 +78,9 @@ pub(crate) fn render_overview_text(document: &OverviewDocument) -> Result<Vec<St
         if let Some(summary) = render_discovery_summary_from_value(discovery) {
             lines.push(summary);
         }
+    }
+    if let Some(summary) = render_project_status_signal_summary(&document.project_status) {
+        lines.push(summary);
     }
     if !document.project_status.domains.is_empty() {
         lines.push("Domain status:".to_string());

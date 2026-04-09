@@ -126,6 +126,33 @@ pub(crate) fn status_finding(kind: &str, count: usize, source: &str) -> ProjectS
     }
 }
 
+pub(crate) fn render_project_status_signal_summary(status: &ProjectStatus) -> Option<String> {
+    let mut fragments = Vec::new();
+    for domain in &status.domains {
+        let has_sync_signals = domain
+            .source_kinds
+            .iter()
+            .any(|kind| matches!(kind.as_str(), "sync-summary" | "bundle-preflight" | "promotion-preflight"));
+        let should_render = has_sync_signals || domain.source_kinds.len() > 1;
+        if !should_render || domain.source_kinds.is_empty() {
+            continue;
+        }
+        fragments.push(format!(
+            "{} sources={} signalKeys={} blockers={} warnings={}",
+            domain.id,
+            domain.source_kinds.join(","),
+            domain.signal_keys.len(),
+            domain.blocker_count,
+            domain.warning_count
+        ));
+    }
+    if fragments.is_empty() {
+        None
+    } else {
+        Some(format!("Signals: {}", fragments.join("; ")))
+    }
+}
+
 fn domain_status_rank(status: &str) -> usize {
     match status {
         PROJECT_STATUS_BLOCKED => 0,
