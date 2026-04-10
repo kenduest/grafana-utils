@@ -39,8 +39,7 @@ use super::{
     extract_dashboard_object, import_dashboard_request_with_request, load_export_metadata,
     load_folder_inventory, load_json_file, validate, DiffArgs, FolderInventoryItem,
     FolderInventoryStatus, FolderInventoryStatusKind, ImportArgs, LoadedDashboardSource,
-    DEFAULT_UNKNOWN_UID, FOLDER_INVENTORY_FILENAME, PROVISIONING_EXPORT_SUBDIR,
-    RAW_EXPORT_SUBDIR,
+    DEFAULT_UNKNOWN_UID, FOLDER_INVENTORY_FILENAME, PROVISIONING_EXPORT_SUBDIR, RAW_EXPORT_SUBDIR,
 };
 #[allow(unused_imports)]
 use super::{
@@ -67,9 +66,7 @@ impl LoadedImportSource {
     }
 }
 
-pub(crate) fn resolve_import_source(
-    args: &super::ImportArgs,
-) -> Result<LoadedImportSource> {
+pub(crate) fn resolve_import_source(args: &super::ImportArgs) -> Result<LoadedImportSource> {
     Ok(LoadedImportSource {
         inner: super::load_dashboard_source(&args.input_dir, args.input_format, None, false)?,
     })

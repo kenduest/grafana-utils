@@ -906,7 +906,10 @@ fn run_sync_cli_bundle_accepts_mixed_git_sync_workspace_root() {
     fs::create_dir_all(workspace.join(".git")).unwrap();
     write_dashboard_raw_fixture(&workspace.join("dashboards").join("git-sync").join("raw"));
     write_dashboard_provisioning_fixture(
-        &workspace.join("dashboards").join("git-sync").join("provisioning"),
+        &workspace
+            .join("dashboards")
+            .join("git-sync")
+            .join("provisioning"),
     );
     write_alert_export_fixture(&workspace.join("alerts").join("raw"));
     fs::create_dir_all(workspace.join("datasources").join("provisioning")).unwrap();
@@ -944,11 +947,17 @@ fn run_sync_cli_bundle_accepts_mixed_git_sync_workspace_root() {
     assert_eq!(bundle["discovery"]["inputCount"], json!(3));
     assert_eq!(
         bundle["discovery"]["inputs"]["dashboardExportDir"],
-        json!(workspace.join("dashboards/git-sync/raw").display().to_string())
+        json!(workspace
+            .join("dashboards/git-sync/raw")
+            .display()
+            .to_string())
     );
     assert_eq!(
         bundle["metadata"]["dashboardExportDir"],
-        json!(workspace.join("dashboards/git-sync/raw").display().to_string())
+        json!(workspace
+            .join("dashboards/git-sync/raw")
+            .display()
+            .to_string())
     );
     assert_eq!(
         bundle["metadata"]["alertExportDir"],
@@ -972,7 +981,10 @@ fn run_sync_cli_bundle_accepts_git_sync_provisioning_workspace_root() {
     let workspace = temp.path().join("workspace");
     fs::create_dir_all(workspace.join(".git")).unwrap();
     write_dashboard_provisioning_fixture(
-        &workspace.join("dashboards").join("git-sync").join("provisioning"),
+        &workspace
+            .join("dashboards")
+            .join("git-sync")
+            .join("provisioning"),
     );
     write_alert_export_fixture(&workspace.join("alerts").join("raw"));
     fs::create_dir_all(workspace.join("datasources").join("provisioning")).unwrap();
@@ -1017,7 +1029,10 @@ fn run_sync_cli_bundle_accepts_git_sync_provisioning_workspace_root() {
             .display()
             .to_string())
     );
-    assert_eq!(bundle["metadata"]["dashboardExportDir"], serde_json::Value::Null);
+    assert_eq!(
+        bundle["metadata"]["dashboardExportDir"],
+        serde_json::Value::Null
+    );
     assert_eq!(
         bundle["metadata"]["dashboardExport"]["variant"],
         json!("provisioning")

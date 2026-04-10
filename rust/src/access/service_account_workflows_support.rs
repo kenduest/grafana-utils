@@ -392,7 +392,10 @@ mod service_account_json_tests {
             document.get("resourceKind"),
             Some(&Value::String("service-account".to_string()))
         );
-        assert_eq!(document.get("schemaVersion"), Some(&Value::Number(1.into())));
+        assert_eq!(
+            document.get("schemaVersion"),
+            Some(&Value::Number(1.into()))
+        );
         assert_eq!(document.get("reviewRequired"), Some(&Value::Bool(true)));
         assert_eq!(document.get("reviewed"), Some(&Value::Bool(false)));
         assert!(document.get("toolVersion").is_some());

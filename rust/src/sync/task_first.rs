@@ -282,12 +282,14 @@ pub(crate) fn run_sync_preview(args: ChangePreviewArgs) -> Result<()> {
             OVERVIEW_ARTIFACT_PROMOTION_PREFLIGHT_KIND,
             "Sync promotion preflight",
             build_preview_project_status_inputs(
-                &args.inputs
+                &args
+                    .inputs
                     .source_bundle
                     .clone()
                     .or(discovered.source_bundle.clone())
                     .expect("promotion preview requires source bundle"),
-                &args.target_inventory
+                &args
+                    .target_inventory
                     .clone()
                     .or(discovered.target_inventory.clone())
                     .expect("promotion preview requires target inventory"),
@@ -321,12 +323,14 @@ pub(crate) fn run_sync_preview(args: ChangePreviewArgs) -> Result<()> {
             OVERVIEW_ARTIFACT_BUNDLE_PREFLIGHT_KIND,
             "Sync bundle preflight",
             build_preview_project_status_inputs(
-                &args.inputs
+                &args
+                    .inputs
                     .source_bundle
                     .clone()
                     .or(discovered.source_bundle.clone())
                     .expect("bundle preview requires source bundle"),
-                &args.target_inventory
+                &args
+                    .target_inventory
                     .clone()
                     .or(discovered.target_inventory.clone())
                     .expect("bundle preview requires target inventory"),

@@ -34,11 +34,12 @@ where
     if !io::stdin().is_terminal() || !io::stdout().is_terminal() {
         return Err(message("Dashboard import interactive mode requires a TTY."));
     }
-    let (items, _folders_by_uid) = super::import_interactive_loader::load_interactive_import_context_from_source(
-        args,
-        resolved_import,
-        dashboard_files,
-    )?;
+    let (items, _folders_by_uid) =
+        super::import_interactive_loader::load_interactive_import_context_from_source(
+            args,
+            resolved_import,
+            dashboard_files,
+        )?;
     if items.is_empty() {
         return Err(message(format!(
             "No dashboard JSON files were found under {}.",
@@ -77,11 +78,12 @@ pub(crate) fn select_import_dashboard_files_with_client(
     if !io::stdin().is_terminal() || !io::stdout().is_terminal() {
         return Err(message("Dashboard import interactive mode requires a TTY."));
     }
-    let (items, _folders_by_uid) = super::import_interactive_loader::load_interactive_import_context_from_source(
-        args,
-        resolved_import,
-        dashboard_files,
-    )?;
+    let (items, _folders_by_uid) =
+        super::import_interactive_loader::load_interactive_import_context_from_source(
+            args,
+            resolved_import,
+            dashboard_files,
+        )?;
     if items.is_empty() {
         return Err(message(format!(
             "No dashboard JSON files were found under {}.",

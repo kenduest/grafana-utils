@@ -271,14 +271,13 @@ pub(crate) fn build_access_diff_review_document(
     live_source: &str,
     rows: &[Value],
 ) -> Value {
-    let mut document = build_shared_diff_document(
-        "grafana-utils-access-diff-review",
-        1,
-        summary,
-        rows,
-    );
+    let mut document =
+        build_shared_diff_document("grafana-utils-access-diff-review", 1, summary, rows);
     if let Some(object) = document.as_object_mut() {
-        object.insert("toolVersion".to_string(), Value::String(TOOL_VERSION.to_string()));
+        object.insert(
+            "toolVersion".to_string(),
+            Value::String(TOOL_VERSION.to_string()),
+        );
         object.insert("reviewRequired".to_string(), Value::Bool(true));
         object.insert("reviewed".to_string(), Value::Bool(false));
         object.insert(
@@ -308,10 +307,7 @@ pub(crate) fn build_access_delete_review_document(
             "kind".to_string(),
             Value::String("grafana-utils-access-delete-review".to_string()),
         ),
-        (
-            "schemaVersion".to_string(),
-            Value::Number(1.into()),
-        ),
+        ("schemaVersion".to_string(), Value::Number(1.into())),
         (
             "toolVersion".to_string(),
             Value::String(TOOL_VERSION.to_string()),
@@ -371,9 +367,7 @@ pub(crate) fn access_export_summary_line(
     dry_run: bool,
 ) -> String {
     let action = if dry_run { "Would export" } else { "Exported" };
-    format!(
-        "{action} {exported} {kind}(s) from {source} -> {payload_path} and {metadata_path}"
-    )
+    format!("{action} {exported} {kind}(s) from {source} -> {payload_path} and {metadata_path}")
 }
 
 /// Format a consistent delete summary line for access workflows.
@@ -542,8 +536,8 @@ pub(crate) fn normalize_service_account_row(team: &Map<String, Value>) -> Map<St
 mod tests {
     use super::{
         access_delete_summary_line, access_diff_review_line, access_diff_summary_line,
-        access_export_summary_line, access_import_summary_line, build_access_delete_review_document,
-        build_access_diff_review_document,
+        access_export_summary_line, access_import_summary_line,
+        build_access_delete_review_document, build_access_diff_review_document,
     };
     use crate::common::SharedDiffSummary;
     use crate::common::TOOL_VERSION;
@@ -551,13 +545,7 @@ mod tests {
 
     #[test]
     fn access_diff_summary_line_includes_source_context_for_differences() {
-        let line = access_diff_summary_line(
-            "user",
-            2,
-            1,
-            "./access-users",
-            "Grafana live users",
-        );
+        let line = access_diff_summary_line("user", 2, 1, "./access-users", "Grafana live users");
         assert_eq!(
             line,
             "Diff checked 2 user(s) from ./access-users against Grafana live users; 1 difference(s) found."
@@ -566,13 +554,7 @@ mod tests {
 
     #[test]
     fn access_diff_summary_line_includes_source_context_for_matches() {
-        let line = access_diff_summary_line(
-            "team",
-            3,
-            0,
-            "./access-teams",
-            "Grafana live teams",
-        );
+        let line = access_diff_summary_line("team", 3, 0, "./access-teams", "Grafana live teams");
         assert_eq!(
             line,
             "No team differences across 3 team(s) from ./access-teams against Grafana live teams."
@@ -581,13 +563,7 @@ mod tests {
 
     #[test]
     fn access_diff_review_line_surfaces_review_contract_for_diff() {
-        let line = access_diff_review_line(
-            "team",
-            3,
-            1,
-            "./access-teams",
-            "Grafana live teams",
-        );
+        let line = access_diff_review_line("team", 3, 1, "./access-teams", "Grafana live teams");
         assert_eq!(
             line,
             "Review: required=true reviewed=false kind=team checked=3 same=2 different=1 source=./access-teams live=Grafana live teams"
@@ -709,8 +685,7 @@ mod tests {
             "scope": "global",
             "message": "Deleted."
         })];
-        let document =
-            build_access_delete_review_document("user", "Grafana live users", &rows);
+        let document = build_access_delete_review_document("user", "Grafana live users", &rows);
 
         assert_eq!(
             document.get("kind"),
@@ -721,7 +696,10 @@ mod tests {
         assert_eq!(document.get("reviewRequired"), Some(&json!(true)));
         assert_eq!(document.get("reviewed"), Some(&json!(false)));
         assert_eq!(document.get("resourceKind"), Some(&json!("user")));
-        assert_eq!(document.get("liveSource"), Some(&json!("Grafana live users")));
+        assert_eq!(
+            document.get("liveSource"),
+            Some(&json!("Grafana live users"))
+        );
         assert_eq!(
             document
                 .get("summary")

@@ -379,29 +379,27 @@ where
         .collect::<BTreeMap<String, FolderInventoryItem>>();
     let discovered_dashboard_files =
         super::dashboard_files_for_import(resolved_import.dashboard_dir())?;
-    let dashboard_files = match select_dashboard_files(
-        &resolved_import,
-        discovered_dashboard_files.clone(),
-    )? {
-        Some(selected) => selected,
-        None if args.interactive => {
-            println!(
-                "{} cancelled.",
-                if args.dry_run {
-                    "Interactive dry-run"
-                } else {
-                    "Import"
-                }
-            );
-            return Ok(PreparedImportRun {
-                resolved_import,
-                metadata,
-                folders_by_uid,
-                dashboard_files: Vec::new(),
-            });
-        }
-        None => discovered_dashboard_files,
-    };
+    let dashboard_files =
+        match select_dashboard_files(&resolved_import, discovered_dashboard_files.clone())? {
+            Some(selected) => selected,
+            None if args.interactive => {
+                println!(
+                    "{} cancelled.",
+                    if args.dry_run {
+                        "Interactive dry-run"
+                    } else {
+                        "Import"
+                    }
+                );
+                return Ok(PreparedImportRun {
+                    resolved_import,
+                    metadata,
+                    folders_by_uid,
+                    dashboard_files: Vec::new(),
+                });
+            }
+            None => discovered_dashboard_files,
+        };
     Ok(PreparedImportRun {
         resolved_import,
         metadata,

@@ -192,13 +192,7 @@ pub(crate) fn build_team_import_dry_run_document(
     source: &Path,
 ) -> Value {
     crate::access::build_access_import_dry_run_document(
-        "team",
-        rows,
-        processed,
-        created,
-        updated,
-        skipped,
-        source,
+        "team", rows, processed, created, updated, skipped, source,
     )
 }
 

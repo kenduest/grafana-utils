@@ -25,7 +25,6 @@ mod bundle_inputs;
 pub mod bundle_preflight;
 pub mod cli;
 mod discovery_model;
-mod task_first;
 mod input_normalization;
 mod json;
 pub mod live;
@@ -40,6 +39,7 @@ pub mod promotion_preflight;
 pub mod review_tui;
 mod staged_documents;
 mod summary_builder;
+mod task_first;
 pub mod workbench;
 mod workspace_discovery;
 
@@ -54,13 +54,13 @@ use self::bundle_preflight::{
 pub(crate) use self::discovery_model::{
     render_discovery_summary_from_value, ChangeDiscoveryDocument, DiscoveryInputKind,
 };
-pub(crate) use self::task_first::{run_sync_check, run_sync_inspect, run_sync_preview};
 use self::preflight::{build_sync_preflight_document, render_sync_preflight_text};
 pub(crate) use self::project_status::{build_sync_domain_status, SyncDomainStatusInputs};
 pub(crate) use self::project_status_promotion::build_promotion_domain_status;
 use self::promotion_preflight::{
     build_sync_promotion_preflight_document, render_sync_promotion_preflight_text,
 };
+pub(crate) use self::task_first::{run_sync_check, run_sync_inspect, run_sync_preview};
 use self::workbench::{
     build_sync_apply_intent_document, build_sync_plan_document, build_sync_source_bundle_document,
     build_sync_summary_document, render_sync_source_bundle_text,

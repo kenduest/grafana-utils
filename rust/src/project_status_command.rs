@@ -13,12 +13,12 @@ use std::path::PathBuf;
 use crate::common::{
     render_json_value, set_json_color_choice, CliColorChoice, Result as CommonResult,
 };
+use crate::overview::{self, OverviewArgs, OverviewOutputFormat};
+use crate::project_status::ProjectStatus;
 use crate::project_status::{
     render_domain_finding_summary, render_project_status_decision_order,
     render_project_status_signal_summary,
 };
-use crate::overview::{self, OverviewArgs, OverviewOutputFormat};
-use crate::project_status::ProjectStatus;
 use crate::project_status_live_runtime::build_live_project_status;
 use crate::project_status_staged::build_staged_project_status;
 use crate::sync::render_discovery_summary_from_value;

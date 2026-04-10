@@ -13,7 +13,8 @@ pub(crate) fn load_interactive_import_items(
     args: &super::ImportArgs,
 ) -> Result<Vec<InteractiveImportItem>> {
     let resolved_import = super::import::resolve_import_source(args)?;
-    let dashboard_files = super::import::dashboard_files_for_import(resolved_import.dashboard_dir())?;
+    let dashboard_files =
+        super::import::dashboard_files_for_import(resolved_import.dashboard_dir())?;
     Ok(load_interactive_import_context_from_source(args, &resolved_import, &dashboard_files)?.0)
 }
 

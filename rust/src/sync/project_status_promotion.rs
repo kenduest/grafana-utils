@@ -741,7 +741,9 @@ mod tests {
         assert_eq!(status.reason_code, "ready");
         assert_eq!(status.blocker_count, 0);
         assert_eq!(status.warning_count, 8);
-        assert!(status.signal_keys.contains(&"checkSummary.folderRemapCount".to_string()));
+        assert!(status
+            .signal_keys
+            .contains(&"checkSummary.folderRemapCount".to_string()));
         assert!(status
             .signal_keys
             .contains(&"checkSummary.datasourceUidRemapCount".to_string()));

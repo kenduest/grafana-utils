@@ -72,13 +72,7 @@ pub(crate) fn build_user_import_dry_run_document(
     source: &Path,
 ) -> Value {
     crate::access::build_access_import_dry_run_document(
-        "user",
-        rows,
-        processed,
-        created,
-        updated,
-        skipped,
-        source,
+        "user", rows, processed, created, updated, skipped, source,
     )
 }
 

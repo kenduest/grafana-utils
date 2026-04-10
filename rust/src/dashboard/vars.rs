@@ -21,9 +21,7 @@ use super::{
     build_http_client, build_http_client_for_org, fetch_dashboard, InspectVarsArgs,
     SimpleOutputFormat,
 };
-use crate::dashboard::files::{
-    discover_dashboard_files, extract_dashboard_object, load_json_file,
-};
+use crate::dashboard::files::{discover_dashboard_files, extract_dashboard_object, load_json_file};
 use crate::dashboard::DashboardImportInputFormat;
 
 /// Struct definition for DashboardVariableRow.

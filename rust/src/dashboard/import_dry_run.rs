@@ -78,7 +78,8 @@ where
         .into_iter()
         .map(|item| (item.uid.clone(), item))
         .collect();
-    let discovered_dashboard_files = super::dashboard_files_for_import(resolved_import.dashboard_dir())?;
+    let discovered_dashboard_files =
+        super::dashboard_files_for_import(resolved_import.dashboard_dir())?;
     let dashboard_files = {
         #[cfg(feature = "tui")]
         {
@@ -100,7 +101,7 @@ where
                 resolved_import.dashboard_dir(),
                 discovered_dashboard_files.clone(),
             )?
-                .unwrap_or(discovered_dashboard_files)
+            .unwrap_or(discovered_dashboard_files)
         }
     };
     let effective_replace_existing = args.replace_existing || args.update_existing_only;
@@ -268,7 +269,8 @@ pub(crate) fn collect_import_dry_run_report_with_client(
         .into_iter()
         .map(|item| (item.uid.clone(), item))
         .collect();
-    let discovered_dashboard_files = super::dashboard_files_for_import(resolved_import.dashboard_dir())?;
+    let discovered_dashboard_files =
+        super::dashboard_files_for_import(resolved_import.dashboard_dir())?;
     let dashboard_files = {
         #[cfg(feature = "tui")]
         {
@@ -292,7 +294,7 @@ pub(crate) fn collect_import_dry_run_report_with_client(
                 resolved_import.dashboard_dir(),
                 discovered_dashboard_files.clone(),
             )?
-                .unwrap_or(discovered_dashboard_files)
+            .unwrap_or(discovered_dashboard_files)
         }
     };
     let effective_replace_existing = args.replace_existing || args.update_existing_only;

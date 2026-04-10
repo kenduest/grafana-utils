@@ -125,8 +125,10 @@ fn load_dashboard_browse_document_from_local_import_dir(
         true,
         false,
     )?;
-    document.summary.scope_label =
-        format!("Local export tree ({})", resolved.resolved.dashboard_dir.display());
+    document.summary.scope_label = format!(
+        "Local export tree ({})",
+        resolved.resolved.dashboard_dir.display()
+    );
     Ok(document)
 }
 

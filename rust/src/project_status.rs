@@ -139,9 +139,7 @@ pub(crate) fn render_domain_finding_summary(findings: &[ProjectStatusFinding]) -
     )
 }
 
-pub(crate) fn render_project_status_decision_order(
-    status: &ProjectStatus,
-) -> Option<Vec<String>> {
+pub(crate) fn render_project_status_decision_order(status: &ProjectStatus) -> Option<Vec<String>> {
     let mut ordered_domains = Vec::new();
     for blocker in &status.top_blockers {
         if !ordered_domains.contains(&blocker.domain) {
@@ -186,10 +184,12 @@ pub(crate) fn render_project_status_decision_order(
 pub(crate) fn render_project_status_signal_summary(status: &ProjectStatus) -> Option<String> {
     let mut fragments = Vec::new();
     for domain in &status.domains {
-        let has_sync_signals = domain
-            .source_kinds
-            .iter()
-            .any(|kind| matches!(kind.as_str(), "sync-summary" | "bundle-preflight" | "promotion-preflight"));
+        let has_sync_signals = domain.source_kinds.iter().any(|kind| {
+            matches!(
+                kind.as_str(),
+                "sync-summary" | "bundle-preflight" | "promotion-preflight"
+            )
+        });
         let should_render = has_sync_signals || domain.source_kinds.len() > 1;
         if !should_render || domain.source_kinds.is_empty() {
             continue;

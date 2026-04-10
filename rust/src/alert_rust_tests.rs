@@ -2209,7 +2209,8 @@ fn render_alert_action_text_surfaces_review_contract() {
     assert!(
         lines
             .iter()
-            .any(|line| line == "Summary: delete=1 blocked=0" || line == "Summary: blocked=0 delete=1")
+            .any(|line| line == "Summary: delete=1 blocked=0"
+                || line == "Summary: blocked=0 delete=1")
     );
     assert!(lines.iter().any(|line| line == "Rows:"));
     assert!(lines.iter().any(|line| {
@@ -2231,16 +2232,10 @@ fn build_route_preview_sorts_group_by_and_matchers_stably() {
     });
 
     let preview = super::alert_support::build_route_preview(route.as_object().unwrap());
-    assert_eq!(
-        preview["groupBy"],
-        json!(["alertname", "grafana_folder"])
-    );
+    assert_eq!(preview["groupBy"], json!(["alertname", "grafana_folder"]));
     assert_eq!(
         preview["matchers"],
-        json!([
-            ["severity", "=", "critical"],
-            ["team", "=", "platform"]
-        ])
+        json!([["severity", "=", "critical"], ["team", "=", "platform"]])
     );
 }
 
@@ -2274,10 +2269,7 @@ fn normalize_compare_payload_dedupes_policy_group_by_and_matchers() {
     );
     assert_eq!(
         normalized["routes"][0]["object_matchers"],
-        json!([
-            ["severity", "=", "critical"],
-            ["team", "=", "platform"]
-        ])
+        json!([["severity", "=", "critical"], ["team", "=", "platform"]])
     );
 }
 

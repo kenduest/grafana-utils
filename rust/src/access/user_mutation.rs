@@ -659,7 +659,10 @@ mod user_delete_prompt_tests {
         let user = Map::from_iter(vec![
             ("userId".to_string(), Value::String("9".to_string())),
             ("login".to_string(), Value::String("alice".to_string())),
-            ("email".to_string(), Value::String("alice@example.com".to_string())),
+            (
+                "email".to_string(),
+                Value::String("alice@example.com".to_string()),
+            ),
             ("name".to_string(), Value::String("Alice".to_string())),
             ("role".to_string(), Value::String("Editor".to_string())),
         ]);
@@ -676,7 +679,10 @@ mod user_delete_prompt_tests {
         let row = Map::from_iter(vec![
             ("id".to_string(), Value::String("9".to_string())),
             ("login".to_string(), Value::String("alice".to_string())),
-            ("email".to_string(), Value::String("alice@example.com".to_string())),
+            (
+                "email".to_string(),
+                Value::String("alice@example.com".to_string()),
+            ),
             ("name".to_string(), Value::String("Alice".to_string())),
             ("scope".to_string(), Value::String("global".to_string())),
         ]);

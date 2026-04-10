@@ -9,10 +9,10 @@ use serde_json::{Map, Value};
 
 use crate::common::{message, string_field, value_as_object, Result};
 
+use super::super::render::access_delete_summary_line;
 use super::super::render::{
     build_access_delete_review_document, map_get_text, normalize_service_account_row, scalar_text,
 };
-use super::super::render::access_delete_summary_line;
 use super::super::{request_object, request_object_list_field, DEFAULT_PAGE_SIZE};
 use super::pending_delete_support::{
     format_prompt_row, print_delete_confirmation_summary, prompt_confirm_delete,
@@ -281,7 +281,11 @@ where
             serde_json::to_string_pretty(&build_access_delete_review_document(
                 "service-account",
                 "Grafana live service accounts",
-                &results.iter().cloned().map(Value::Object).collect::<Vec<_>>(),
+                &results
+                    .iter()
+                    .cloned()
+                    .map(Value::Object)
+                    .collect::<Vec<_>>(),
             ))?
         );
     } else {
@@ -434,12 +438,14 @@ fn service_account_token_delete_summary_line(result: &Map<String, Value>) -> Str
             parts.push(format!("{label}={value}"));
         }
     }
-    parts.extend([
-        format!("tokenId={}", map_get_text(result, "tokenId")),
-        format!("tokenName={}", map_get_text(result, "tokenName")),
-        format!("message={}", map_get_text(result, "message")),
-    ]
-    .into_iter());
+    parts.extend(
+        [
+            format!("tokenId={}", map_get_text(result, "tokenId")),
+            format!("tokenName={}", map_get_text(result, "tokenName")),
+            format!("message={}", map_get_text(result, "message")),
+        ]
+        .into_iter(),
+    );
     parts.join(" ")
 }
 
@@ -562,7 +568,11 @@ where
             serde_json::to_string_pretty(&build_access_delete_review_document(
                 "service-account-token",
                 "Grafana live service account tokens",
-                &results.iter().cloned().map(Value::Object).collect::<Vec<_>>(),
+                &results
+                    .iter()
+                    .cloned()
+                    .map(Value::Object)
+                    .collect::<Vec<_>>(),
             ))?
         );
     } else {
@@ -607,14 +617,23 @@ mod pending_delete_service_account_tests {
     #[test]
     fn service_account_token_delete_summary_line_includes_account_context() {
         let result = Map::from_iter(vec![
-            ("serviceAccountId".to_string(), Value::String("4".to_string())),
-            ("serviceAccountName".to_string(), Value::String("svc".to_string())),
+            (
+                "serviceAccountId".to_string(),
+                Value::String("4".to_string()),
+            ),
+            (
+                "serviceAccountName".to_string(),
+                Value::String("svc".to_string()),
+            ),
             ("login".to_string(), Value::String("sa-svc".to_string())),
             ("role".to_string(), Value::String("Viewer".to_string())),
             ("disabled".to_string(), Value::String("false".to_string())),
             ("tokens".to_string(), Value::String("2".to_string())),
             ("tokenId".to_string(), Value::String("9".to_string())),
-            ("tokenName".to_string(), Value::String("automation".to_string())),
+            (
+                "tokenName".to_string(),
+                Value::String("automation".to_string()),
+            ),
             (
                 "message".to_string(),
                 Value::String("Service-account token deleted.".to_string()),
@@ -637,7 +656,10 @@ mod pending_delete_service_account_tests {
     #[test]
     fn service_account_delete_summary_line_includes_identity_and_context() {
         let result = Map::from_iter(vec![
-            ("serviceAccountId".to_string(), Value::String("4".to_string())),
+            (
+                "serviceAccountId".to_string(),
+                Value::String("4".to_string()),
+            ),
             ("name".to_string(), Value::String("svc".to_string())),
             ("login".to_string(), Value::String("sa-svc".to_string())),
             ("role".to_string(), Value::String("Viewer".to_string())),
@@ -680,7 +702,10 @@ mod pending_delete_service_account_tests {
     #[test]
     fn service_account_context_label_prefers_numeric_id_when_present() {
         let service_account = Map::from_iter(vec![
-            ("serviceAccountId".to_string(), Value::String("9".to_string())),
+            (
+                "serviceAccountId".to_string(),
+                Value::String("9".to_string()),
+            ),
             ("name".to_string(), Value::String("svc".to_string())),
             ("login".to_string(), Value::String("sa-svc".to_string())),
         ]);

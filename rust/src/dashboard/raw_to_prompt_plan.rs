@@ -5,8 +5,8 @@ use std::path::{Path, PathBuf};
 use crate::common::{message, Result};
 
 use super::files::resolve_dashboard_export_root;
-use super::source_loader::resolve_dashboard_workspace_variant_dir;
 use super::raw_to_prompt_types::{RawToPromptPlan, RawToPromptPlanItem};
+use super::source_loader::resolve_dashboard_workspace_variant_dir;
 use super::{
     discover_dashboard_files, ExportMetadata, RawToPromptArgs, PROMPT_EXPORT_SUBDIR,
     RAW_EXPORT_SUBDIR,
@@ -71,8 +71,8 @@ fn build_dir_plan(input_dir: &Path, args: &RawToPromptArgs) -> Result<RawToPromp
     }
 
     let export_root = resolve_dashboard_export_root(&input_dir)?;
-    let raw_dir = resolve_dashboard_workspace_variant_dir(&input_dir, RAW_EXPORT_SUBDIR)
-        .or_else(|| {
+    let raw_dir =
+        resolve_dashboard_workspace_variant_dir(&input_dir, RAW_EXPORT_SUBDIR).or_else(|| {
             if input_dir.file_name().and_then(|value| value.to_str()) == Some(RAW_EXPORT_SUBDIR) {
                 Some(input_dir.clone())
             } else {
@@ -86,10 +86,7 @@ fn build_dir_plan(input_dir: &Path, args: &RawToPromptArgs) -> Result<RawToPromp
                 .unwrap_or_else(|| Path::new("."))
                 .join(PROMPT_EXPORT_SUBDIR)
         });
-        let mode = if input_dir
-            .join(RAW_EXPORT_SUBDIR)
-            .is_dir()
-        {
+        let mode = if input_dir.join(RAW_EXPORT_SUBDIR).is_dir() {
             "export-root".to_string()
         } else {
             "raw-dir".to_string()

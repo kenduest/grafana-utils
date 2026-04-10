@@ -173,10 +173,7 @@ fn has_export_org_scopes(input_dir: &Path, variant_dir_name: &str) -> Result<boo
     Ok(false)
 }
 
-fn normalize_export_org_scopes_root(
-    input_dir: &Path,
-    variant_dir_name: &str,
-) -> Result<PathBuf> {
+fn normalize_export_org_scopes_root(input_dir: &Path, variant_dir_name: &str) -> Result<PathBuf> {
     if has_export_org_scopes(input_dir, variant_dir_name)? {
         return Ok(input_dir.to_path_buf());
     }

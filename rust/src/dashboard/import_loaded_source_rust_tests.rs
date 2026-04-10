@@ -70,7 +70,10 @@ fn assert_temp_backed_source_is_owned_until_drop(resolved: LoadedImportSource, v
     let dashboard_dir = resolved.dashboard_dir().to_path_buf();
     let metadata_dir = resolved.metadata_dir().to_path_buf();
 
-    assert_eq!(dashboard_dir.file_name().and_then(|name| name.to_str()), Some(variant));
+    assert_eq!(
+        dashboard_dir.file_name().and_then(|name| name.to_str()),
+        Some(variant)
+    );
     assert_eq!(metadata_dir, dashboard_dir);
     assert!(dashboard_dir.exists());
 
@@ -154,10 +157,14 @@ fn collect_import_dry_run_report_accepts_provisioning_root_variant_metadata() {
     args.dry_run = true;
 
     let report = collect_import_dry_run_report_with_request(
-        with_dashboard_import_live_preflight(json!([]), json!([]), |_method, path, _params, _payload| match path {
-            "/api/dashboards/uid/cpu-main" => Ok(None),
-            _ => Err(crate::common::message(format!("unexpected path {path}"))),
-        }),
+        with_dashboard_import_live_preflight(
+            json!([]),
+            json!([]),
+            |_method, path, _params, _payload| match path {
+                "/api/dashboards/uid/cpu-main" => Ok(None),
+                _ => Err(crate::common::message(format!("unexpected path {path}"))),
+            },
+        ),
         &args,
     )
     .unwrap();

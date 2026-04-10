@@ -423,10 +423,7 @@ fn build_sync_plan_document_skips_default_empty_alert_policy_baseline() {
     assert_eq!(plan["summary"]["would_delete"], json!(0));
     assert_eq!(plan["summary"]["blocked_reasons"], json!([]));
     assert_eq!(plan["alertAssessment"]["summary"]["alertCount"], json!(0));
-    assert_eq!(
-        plan["operations"].as_array().map(Vec::len),
-        Some(0)
-    );
+    assert_eq!(plan["operations"].as_array().map(Vec::len), Some(0));
 }
 
 #[test]

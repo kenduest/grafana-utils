@@ -17,13 +17,16 @@ fn source_loader_contract_resolves_direct_raw_root() {
     let raw_root = temp.path().join("dashboards/raw");
     fs::create_dir_all(&raw_root).unwrap();
 
-    let resolved = load_dashboard_source(&raw_root, DashboardImportInputFormat::Raw, None, true)
-        .unwrap();
+    let resolved =
+        load_dashboard_source(&raw_root, DashboardImportInputFormat::Raw, None, true).unwrap();
 
     assert_eq!(resolved.workspace_root, temp.path());
     assert_eq!(resolved.input_dir, raw_root);
     assert_eq!(resolved.expected_variant, RAW_EXPORT_SUBDIR);
-    assert_eq!(resolved.resolved.source_kind, DashboardSourceKind::RawExport);
+    assert_eq!(
+        resolved.resolved.source_kind,
+        DashboardSourceKind::RawExport
+    );
     assert_eq!(resolved.resolved.dashboard_dir, raw_root);
     assert_eq!(resolved.resolved.metadata_dir, raw_root);
 }
@@ -49,7 +52,10 @@ fn source_loader_contract_resolves_direct_provisioning_root() {
         resolved.resolved.source_kind,
         DashboardSourceKind::ProvisioningExport
     );
-    assert_eq!(resolved.resolved.dashboard_dir, provisioning_root.join("dashboards"));
+    assert_eq!(
+        resolved.resolved.dashboard_dir,
+        provisioning_root.join("dashboards")
+    );
     assert_eq!(resolved.resolved.metadata_dir, provisioning_root);
 }
 
@@ -59,13 +65,16 @@ fn source_loader_contract_resolves_wrapped_git_sync_repo_root() {
     let wrapped_raw_root = temp.path().join("dashboards/git-sync/raw");
     fs::create_dir_all(&wrapped_raw_root).unwrap();
 
-    let resolved = load_dashboard_source(&temp.path(), DashboardImportInputFormat::Raw, None, true)
-        .unwrap();
+    let resolved =
+        load_dashboard_source(&temp.path(), DashboardImportInputFormat::Raw, None, true).unwrap();
 
     assert_eq!(resolved.workspace_root, temp.path());
     assert_eq!(resolved.input_dir, wrapped_raw_root);
     assert_eq!(resolved.expected_variant, RAW_EXPORT_SUBDIR);
-    assert_eq!(resolved.resolved.source_kind, DashboardSourceKind::RawExport);
+    assert_eq!(
+        resolved.resolved.source_kind,
+        DashboardSourceKind::RawExport
+    );
     assert_eq!(resolved.resolved.dashboard_dir, wrapped_raw_root);
     assert_eq!(resolved.resolved.metadata_dir, wrapped_raw_root);
 }

@@ -39,12 +39,12 @@ use super::{
     TeamListArgs, TeamModifyArgs, UserAddArgs, UserCommand, UserDeleteArgs, UserDiffArgs,
     UserExportArgs, UserImportArgs, UserListArgs, UserModifyArgs,
 };
+use crate::common::TOOL_VERSION;
 use clap::{CommandFactory, Parser};
 use reqwest::Method;
 use serde_json::{json, Map, Value};
 use std::fs;
 use tempfile::tempdir;
-use crate::common::TOOL_VERSION;
 
 fn render_access_subcommand_help(path: &[&str]) -> String {
     let mut command = AccessCliRoot::command();
@@ -682,10 +682,7 @@ fn team_import_dry_run_document_reports_summary_and_rows() {
         document.get("kind"),
         Some(&json!("grafana-utils-access-import-dry-run"))
     );
-    assert_eq!(
-        document.get("resourceKind"),
-        Some(&json!("team"))
-    );
+    assert_eq!(document.get("resourceKind"), Some(&json!("team")));
     assert_eq!(document.get("schemaVersion"), Some(&json!(1)));
     assert_eq!(document.get("toolVersion"), Some(&json!(TOOL_VERSION)));
     assert_eq!(document.get("reviewRequired"), Some(&json!(true)));
@@ -757,10 +754,7 @@ fn user_import_dry_run_document_reports_summary_and_rows() {
         document.get("kind"),
         Some(&json!("grafana-utils-access-import-dry-run"))
     );
-    assert_eq!(
-        document.get("resourceKind"),
-        Some(&json!("user"))
-    );
+    assert_eq!(document.get("resourceKind"), Some(&json!("user")));
     assert_eq!(document.get("schemaVersion"), Some(&json!(1)));
     assert_eq!(document.get("toolVersion"), Some(&json!(TOOL_VERSION)));
     assert_eq!(document.get("reviewRequired"), Some(&json!(true)));

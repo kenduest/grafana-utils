@@ -126,8 +126,7 @@ pub(crate) struct ResolvedDashboardImportSource {
     pub metadata_dir: PathBuf,
 }
 
-impl ResolvedDashboardImportSource {
-}
+impl ResolvedDashboardImportSource {}
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct ResolvedDashboardExportRoot {
