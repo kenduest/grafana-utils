@@ -12,7 +12,7 @@ use serde_json::{Map, Value};
 use std::fs;
 use std::path::Path;
 
-use crate::common::{message, render_json_value, Result};
+use crate::common::{message, render_json_value, tool_version, Result};
 use crate::dashboard::{build_api_client, build_http_client_for_org_from_api, DEFAULT_ORG_ID};
 use crate::datasource::{
     render_import_table, resolve_match, DatasourceImportArgs, DatasourceImportInputFormat,
@@ -298,6 +298,17 @@ pub(crate) fn build_datasource_import_dry_run_json_value(
     let secret_visibility =
         build_import_secret_visibility_entries(&report.input_dir, report.input_format);
     Value::Object(Map::from_iter(vec![
+        (
+            "kind".to_string(),
+            Value::String("grafana-util-datasource-import-dry-run".to_string()),
+        ),
+        ("schemaVersion".to_string(), Value::Number(1.into())),
+        (
+            "toolVersion".to_string(),
+            Value::String(tool_version().to_string()),
+        ),
+        ("reviewRequired".to_string(), Value::Bool(true)),
+        ("reviewed".to_string(), Value::Bool(false)),
         ("mode".to_string(), Value::String(report.mode.clone())),
         (
             "sourceOrgId".to_string(),

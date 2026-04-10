@@ -1113,6 +1113,14 @@ fn build_datasource_import_dry_run_json_value_includes_secret_visibility() {
     let value =
         super::datasource_import_export::build_datasource_import_dry_run_json_value(&report);
 
+    assert_eq!(
+        value["kind"],
+        json!("grafana-util-datasource-import-dry-run")
+    );
+    assert_eq!(value["schemaVersion"], json!(1));
+    assert!(value.get("toolVersion").is_some());
+    assert_eq!(value["reviewRequired"], json!(true));
+    assert_eq!(value["reviewed"], json!(false));
     assert_eq!(value["summary"]["secretVisibilityCount"], json!(1));
     assert_eq!(value["secretVisibility"].as_array().unwrap().len(), 1);
     assert_eq!(
