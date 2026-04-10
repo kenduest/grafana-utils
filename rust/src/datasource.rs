@@ -97,9 +97,9 @@ pub(crate) use datasource_import_export::{
     build_import_payload, build_import_payload_with_secret_values,
     classify_datasource_export_root_scope_kind, collect_datasource_import_dry_run_report,
     discover_export_org_import_scopes, format_routed_datasource_scope_summary_fields,
-    format_routed_datasource_target_org_label, render_routed_datasource_import_org_table,
-    resolve_export_org_target_plan, DatasourceExportOrgScope, DatasourceExportOrgTargetPlan,
-    DatasourceImportDryRunReport,
+    format_routed_datasource_import_summary_line, format_routed_datasource_target_org_label,
+    render_routed_datasource_import_org_table, resolve_export_org_target_plan,
+    DatasourceExportOrgScope, DatasourceExportOrgTargetPlan, DatasourceImportDryRunReport,
 };
 #[cfg(any(feature = "tui", test))]
 #[allow(unused_imports)]

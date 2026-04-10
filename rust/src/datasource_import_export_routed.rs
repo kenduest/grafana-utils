@@ -153,6 +153,25 @@ pub(crate) fn render_routed_datasource_import_org_table(
     lines
 }
 
+pub(crate) fn format_routed_datasource_import_summary_line(
+    org_count: usize,
+    existing_org_count: usize,
+    missing_org_count: usize,
+    would_create_org_count: usize,
+    datasource_count: usize,
+    input_dir: &Path,
+) -> String {
+    format!(
+        "Routed datasource import summary: orgs={} existing={} missing={} would-create={} datasources={} from {}",
+        org_count,
+        existing_org_count,
+        missing_org_count,
+        would_create_org_count,
+        datasource_count,
+        input_dir.display()
+    )
+}
+
 pub(crate) fn build_routed_datasource_import_dry_run_json(
     args: &DatasourceImportArgs,
 ) -> Result<String> {

@@ -4,13 +4,14 @@ use super::*;
 use crate::datasource::{
     classify_datasource_export_root_scope_kind, diff_datasources_with_live,
     discover_export_org_import_scopes, format_routed_datasource_scope_summary_fields,
-    format_routed_datasource_target_org_label, load_datasource_export_root_manifest,
-    load_datasource_inspect_export_source, load_datasource_inventory_records_from_export_root,
-    load_import_records, prompt_datasource_inspect_export_input_format,
-    render_datasource_inspect_export_output, render_routed_datasource_import_org_table,
-    resolve_datasource_inspect_export_input_format, run_datasource_cli, DatasourceCliArgs,
-    DatasourceExportRootScopeKind, DatasourceGroupCommand, DatasourceImportArgs,
-    DatasourceImportInputFormat, DatasourceInspectExportRenderFormat,
+    format_routed_datasource_import_summary_line, format_routed_datasource_target_org_label,
+    load_datasource_export_root_manifest, load_datasource_inspect_export_source,
+    load_datasource_inventory_records_from_export_root, load_import_records,
+    prompt_datasource_inspect_export_input_format, render_datasource_inspect_export_output,
+    render_routed_datasource_import_org_table, resolve_datasource_inspect_export_input_format,
+    run_datasource_cli, DatasourceCliArgs, DatasourceExportRootScopeKind,
+    DatasourceGroupCommand, DatasourceImportArgs, DatasourceImportInputFormat,
+    DatasourceInspectExportRenderFormat,
 };
 use std::fs;
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -230,6 +231,23 @@ fn routed_datasource_status_matrix_covers_exists_missing_would_create_and_create
     assert!(would_create_summary.contains("targetOrgId=<new>"));
     assert!(created_summary.contains("orgAction=created"));
     assert!(created_summary.contains("targetOrgId=19"));
+}
+
+#[test]
+fn routed_datasource_import_summary_line_reports_org_and_datasource_totals() {
+    let summary = format_routed_datasource_import_summary_line(
+        3,
+        1,
+        1,
+        1,
+        7,
+        Path::new("/tmp/datasource-export-all-orgs"),
+    );
+
+    assert_eq!(
+        summary,
+        "Routed datasource import summary: orgs=3 existing=1 missing=1 would-create=1 datasources=7 from /tmp/datasource-export-all-orgs"
+    );
 }
 
 #[test]
