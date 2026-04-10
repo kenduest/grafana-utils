@@ -139,6 +139,50 @@ pub(crate) fn render_domain_finding_summary(findings: &[ProjectStatusFinding]) -
     )
 }
 
+pub(crate) fn render_project_status_decision_order(
+    status: &ProjectStatus,
+) -> Option<Vec<String>> {
+    let mut ordered_domains = Vec::new();
+    for blocker in &status.top_blockers {
+        if !ordered_domains.contains(&blocker.domain) {
+            ordered_domains.push(blocker.domain.clone());
+        }
+    }
+    for action in &status.next_actions {
+        if !ordered_domains.contains(&action.domain) {
+            ordered_domains.push(action.domain.clone());
+        }
+    }
+    if ordered_domains.is_empty() {
+        return None;
+    }
+
+    let mut lines = Vec::new();
+    for (index, domain) in ordered_domains.iter().enumerate() {
+        let blockers = status
+            .top_blockers
+            .iter()
+            .filter(|finding| &finding.domain == domain)
+            .map(|finding| format!("{}:{}", finding.kind, finding.count))
+            .collect::<Vec<_>>();
+        let actions = status
+            .next_actions
+            .iter()
+            .filter(|action| &action.domain == domain)
+            .map(|action| action.action.clone())
+            .collect::<Vec<_>>();
+        let mut line = format!("{}. {}", index + 1, domain);
+        if !blockers.is_empty() {
+            line.push_str(&format!(" blockers={}", blockers.join(", ")));
+        }
+        if !actions.is_empty() {
+            line.push_str(&format!(" next={}", actions.join(" / ")));
+        }
+        lines.push(line);
+    }
+    Some(lines)
+}
+
 pub(crate) fn render_project_status_signal_summary(status: &ProjectStatus) -> Option<String> {
     let mut fragments = Vec::new();
     for domain in &status.domains {

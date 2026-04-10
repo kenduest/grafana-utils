@@ -1353,6 +1353,8 @@ fn build_overview_document_preserves_the_shared_project_status_render_contract()
             "Overall: status=partial scope=staged-only domains=6 present=1 blocked=0 blockers=0 warnings=0 freshness=current"
                 .to_string(),
             "Signals: sync sources=sync-summary signalKeys=1 blockers=0 warnings=0".to_string(),
+            "Decision order:".to_string(),
+            "1. sync next=re-run sync summary after staged changes".to_string(),
             "Domains:".to_string(),
             "- sync status=ready mode=staged-documents primary=4 blockers=0 warnings=0 freshness=current next=re-run sync summary after staged changes"
                 .to_string(),

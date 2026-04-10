@@ -433,6 +433,9 @@ fn project_status_live_text_renderer_surfaces_overall_domain_and_action_sections
                 .to_string(),
             "Signals: sync sources=sync-summary,bundle-preflight signalKeys=6 blockers=3 warnings=0"
                 .to_string(),
+            "Decision order:".to_string(),
+            "1. sync blockers=sync-blocking:3 next=resolve sync workflow blockers in the fixed order: sync, provider, secret-placeholder, alert-artifact"
+                .to_string(),
             "Domains:".to_string(),
             "- dashboard status=ready mode=inspect-summary primary=4 blockers=0 warnings=1 freshness=stale next=review dashboard governance warnings before promotion or apply warningKinds=risk-records:1"
                 .to_string(),
@@ -502,9 +505,12 @@ fn project_status_live_text_renderer_limits_top_sections_to_five_items() {
 
     let lines = render_project_status_text(&status);
 
-    assert_eq!(lines[2], "Top blockers:");
+    assert_eq!(lines[2], "Decision order:");
+    assert_eq!(lines[3], "1. domain-0 blockers=kind-0:6 next=action-0");
+    assert_eq!(lines[8], "6. domain-5 blockers=kind-5:1 next=action-5");
+    assert_eq!(lines[9], "Top blockers:");
     assert_eq!(
-        &lines[3..8],
+        &lines[10..15],
         [
             "- domain-0 kind-0 count=6 source=source-0",
             "- domain-1 kind-1 count=5 source=source-1",
@@ -513,10 +519,9 @@ fn project_status_live_text_renderer_limits_top_sections_to_five_items() {
             "- domain-4 kind-4 count=2 source=source-4",
         ]
     );
-    assert!(!lines.iter().any(|line| line.contains("domain-5")));
-    assert_eq!(lines[8], "Next actions:");
+    assert_eq!(lines[15], "Next actions:");
     assert_eq!(
-        &lines[9..14],
+        &lines[16..21],
         [
             "- domain-0 reason=reason-0 action=action-0",
             "- domain-1 reason=reason-1 action=action-1",
@@ -525,7 +530,6 @@ fn project_status_live_text_renderer_limits_top_sections_to_five_items() {
             "- domain-4 reason=reason-4 action=action-4",
         ]
     );
-    assert!(!lines.iter().any(|line| line.contains("action-5")));
 }
 
 #[test]
@@ -591,6 +595,8 @@ fn project_status_staged_text_renderer_matches_the_shared_contract_fields() {
             "Overall: status=partial scope=staged-only domains=6 present=1 blocked=0 blockers=0 warnings=0 freshness=current"
                 .to_string(),
             "Signals: sync sources=sync-summary signalKeys=1 blockers=0 warnings=0".to_string(),
+            "Decision order:".to_string(),
+            "1. sync next=re-run sync summary after staged changes".to_string(),
             "Domains:".to_string(),
             "- sync status=ready mode=staged-documents primary=4 blockers=0 warnings=0 freshness=current next=re-run sync summary after staged changes"
                 .to_string(),

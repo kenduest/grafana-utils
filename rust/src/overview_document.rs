@@ -7,7 +7,8 @@ use super::{
 };
 use crate::common::{message, tool_version, Result};
 use crate::project_status::{
-    render_domain_finding_summary, render_project_status_signal_summary,
+    render_domain_finding_summary, render_project_status_decision_order,
+    render_project_status_signal_summary,
 };
 use crate::project_status_staged::build_staged_project_status;
 use crate::sync::render_discovery_summary_from_value;
@@ -83,6 +84,10 @@ pub(crate) fn render_overview_text(document: &OverviewDocument) -> Result<Vec<St
     }
     if let Some(summary) = render_project_status_signal_summary(&document.project_status) {
         lines.push(summary);
+    }
+    if let Some(order) = render_project_status_decision_order(&document.project_status) {
+        lines.push("Decision order:".to_string());
+        lines.extend(order);
     }
     if !document.project_status.domains.is_empty() {
         lines.push("Domain status:".to_string());
