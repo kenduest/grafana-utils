@@ -71,6 +71,52 @@ impl fmt::Debug for LoadedDashboardSource {
 
 /// Resolve a dashboard workspace root from a local path.
 pub(crate) fn infer_dashboard_workspace_root(input_dir: &Path) -> PathBuf {
+    if let Some(workspace_root) = infer_workspace_root_from_layout_ancestors(input_dir) {
+        return workspace_root;
+    }
+    infer_dashboard_workspace_root_fallback(input_dir)
+}
+
+fn infer_workspace_root_from_layout_ancestors(input_dir: &Path) -> Option<PathBuf> {
+    if input_dir.is_file()
+        && input_dir.file_name().and_then(|name| name.to_str()) == Some("datasources.yaml")
+    {
+        let parent = input_dir.parent();
+        let grandparent = parent.and_then(Path::parent);
+        let great_grandparent = grandparent.and_then(Path::parent);
+        if parent.and_then(Path::file_name).and_then(|v| v.to_str()) == Some("provisioning")
+            && grandparent
+                .and_then(Path::file_name)
+                .and_then(|v| v.to_str())
+                == Some("datasources")
+        {
+            return Some(great_grandparent.unwrap_or(input_dir).to_path_buf());
+        }
+    }
+
+    for ancestor in input_dir.ancestors() {
+        let Some(name) = ancestor.file_name().and_then(|value| value.to_str()) else {
+            continue;
+        };
+        match name {
+            "dashboards" | "alerts" | "datasources" => {
+                return Some(ancestor.parent().unwrap_or(ancestor).to_path_buf());
+            }
+            "git-sync" => {
+                let parent = ancestor.parent();
+                let grandparent = parent.and_then(Path::parent);
+                if parent.and_then(Path::file_name).and_then(|v| v.to_str()) == Some("dashboards") {
+                    return Some(grandparent.unwrap_or(ancestor).to_path_buf());
+                }
+            }
+            _ => {}
+        }
+    }
+
+    None
+}
+
+fn infer_dashboard_workspace_root_fallback(input_dir: &Path) -> PathBuf {
     let Some(name) = input_dir.file_name().and_then(|name| name.to_str()) else {
         return input_dir.to_path_buf();
     };
@@ -213,6 +259,13 @@ fn resolve_worktree_source(
     let source_kind = DashboardSourceKind::from_expected_variant(expected_variant)
         .unwrap_or_else(|| DashboardSourceKind::from_import_input_format(input_format));
 
+    if resolve_dashboard_export_root(input_dir)?
+        .map(|resolved| resolved.manifest.scope_kind.is_root())
+        .unwrap_or(false)
+    {
+        return resolve_root_export_source(input_dir, expected_variant, source_kind);
+    }
+
     if let Some(workspace_dir) =
         resolve_dashboard_workspace_variant_dir(input_dir, expected_variant)
     {
@@ -225,13 +278,6 @@ fn resolve_worktree_source(
             resolved,
             temp_dir: None,
         });
-    }
-
-    if resolve_dashboard_export_root(input_dir)?
-        .map(|resolved| resolved.manifest.scope_kind.is_root())
-        .unwrap_or(false)
-    {
-        return resolve_root_export_source(input_dir, expected_variant, source_kind);
     }
 
     if strict_workspace {
@@ -296,6 +342,28 @@ mod source_loader_tests {
         std::fs::create_dir_all(repo_root.join("dashboards/git-sync/raw")).unwrap();
         assert_eq!(
             infer_dashboard_workspace_root(&repo_root.join("dashboards/git-sync/raw")),
+            repo_root.to_path_buf()
+        );
+    }
+
+    #[test]
+    fn infers_workspace_root_from_org_scoped_git_sync_raw_tree() {
+        let temp = tempdir().unwrap();
+        let repo_root = temp.path();
+        std::fs::create_dir_all(repo_root.join("dashboards/git-sync/raw/org_1/raw")).unwrap();
+        assert_eq!(
+            infer_dashboard_workspace_root(&repo_root.join("dashboards/git-sync/raw/org_1/raw")),
+            repo_root.to_path_buf()
+        );
+    }
+
+    #[test]
+    fn infers_workspace_root_from_org_scoped_raw_tree() {
+        let temp = tempdir().unwrap();
+        let repo_root = temp.path();
+        std::fs::create_dir_all(repo_root.join("dashboards/raw/org_1/raw")).unwrap();
+        assert_eq!(
+            infer_dashboard_workspace_root(&repo_root.join("dashboards/raw/org_1/raw")),
             repo_root.to_path_buf()
         );
     }

@@ -453,10 +453,20 @@ pub(crate) fn execute_sync_bundle(args: &SyncBundleArgs) -> Result<SyncCommandOu
     let mut folders = Vec::new();
     let mut metadata = Map::new();
     if let Some(workspace) = args.workspace.as_ref() {
-        metadata.insert(
-            "workspaceRoot".to_string(),
-            Value::String(workspace.display().to_string()),
-        );
+        if let Some(resolved_workspace_root) = discovered
+            .as_ref()
+            .and_then(|found| found.workspace_root.as_ref())
+        {
+            metadata.insert(
+                "workspaceRoot".to_string(),
+                Value::String(resolved_workspace_root.display().to_string()),
+            );
+        } else {
+            metadata.insert(
+                "workspaceRoot".to_string(),
+                Value::String(workspace.display().to_string()),
+            );
+        }
     }
     if let Some(output_dir) = dashboard_export_dir.as_ref() {
         let (dashboard_items, dashboard_datasources, folder_items, dashboard_metadata) =

@@ -307,6 +307,52 @@ fn run_sync_cli_bundle_writes_source_bundle_artifact() {
 }
 
 #[test]
+fn run_sync_cli_bundle_reports_canonical_workspace_root_for_wrapped_git_sync_tree() {
+    let temp = tempdir().unwrap();
+    let repo_root = temp.path();
+    let raw_root = repo_root.join("dashboards").join("git-sync").join("raw");
+    fs::create_dir_all(&raw_root).unwrap();
+    fs::write(
+        raw_root.join("cpu.json"),
+        serde_json::to_string_pretty(&json!({
+            "dashboard": {
+                "uid": "cpu-main",
+                "title": "CPU Main",
+                "panels": []
+            }
+        }))
+        .unwrap(),
+    )
+    .unwrap();
+    let output_file = temp.path().join("bundle.json");
+
+    let result = run_sync_cli(SyncGroupCommand::Bundle(SyncBundleArgs {
+        workspace: Some(raw_root.clone()),
+        dashboard_export_dir: None,
+        dashboard_provisioning_dir: None,
+        alert_export_dir: None,
+        datasource_export_file: None,
+        datasource_provisioning_file: None,
+        metadata_file: None,
+        output_file: Some(output_file.clone()),
+        also_stdout: false,
+        output_format: SyncOutputFormat::Json,
+    }));
+
+    assert!(result.is_ok(), "{result:?}");
+    let bundle: serde_json::Value =
+        serde_json::from_str(&fs::read_to_string(&output_file).unwrap()).unwrap();
+    assert_eq!(
+        bundle["metadata"]["workspaceRoot"],
+        json!(repo_root.display().to_string())
+    );
+    assert_eq!(
+        bundle["metadata"]["dashboardExportDir"],
+        json!(raw_root.display().to_string())
+    );
+}
+
+#[test]
 fn run_sync_cli_bundle_keeps_plain_file_output_when_also_stdout_is_enabled() {
     let temp = tempdir().unwrap();
     let dashboard_export_dir = temp.path().join("dashboards").join("raw");

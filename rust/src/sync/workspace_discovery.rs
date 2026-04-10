@@ -4,7 +4,7 @@ use std::env;
 use std::path::{Path, PathBuf};
 
 use crate::common::{message, Result};
-use crate::dashboard::DashboardSourceKind;
+use crate::dashboard::{infer_dashboard_workspace_root, DashboardSourceKind};
 use crate::overview::OverviewDocument;
 use crate::project_status::ProjectStatus;
 use serde_json::Value;
@@ -181,52 +181,7 @@ fn discover_from_workspace_root(base_dir: &Path) -> DiscoveredChangeInputs {
 }
 
 fn infer_workspace_root(base_dir: &Path) -> PathBuf {
-    let Some(name) = base_dir.file_name().and_then(|name| name.to_str()) else {
-        return base_dir.to_path_buf();
-    };
-    if base_dir.is_file() {
-        if name == "datasources.yaml" {
-            let parent = base_dir.parent();
-            let grandparent = parent.and_then(Path::parent);
-            let great_grandparent = grandparent.and_then(Path::parent);
-            if parent.and_then(Path::file_name).and_then(|v| v.to_str()) == Some("provisioning")
-                && grandparent
-                    .and_then(Path::file_name)
-                    .and_then(|v| v.to_str())
-                    == Some("datasources")
-            {
-                return great_grandparent.unwrap_or(base_dir).to_path_buf();
-            }
-        }
-        return base_dir.parent().unwrap_or(base_dir).to_path_buf();
-    }
-    let parent = base_dir.parent();
-    let grandparent = parent.and_then(Path::parent);
-    let great_grandparent = grandparent.and_then(Path::parent);
-    match name {
-        "dashboards" | "alerts" | "datasources" => parent.unwrap_or(base_dir).to_path_buf(),
-        "git-sync" => {
-            if parent.and_then(Path::file_name).and_then(|v| v.to_str()) == Some("dashboards") {
-                grandparent.unwrap_or(base_dir).to_path_buf()
-            } else {
-                base_dir.to_path_buf()
-            }
-        }
-        "raw" | "provisioning" => grandparent.unwrap_or(base_dir).to_path_buf(),
-        _ if matches!(
-            parent.and_then(Path::file_name).and_then(|v| v.to_str()),
-            Some("git-sync")
-        ) && matches!(
-            grandparent
-                .and_then(Path::file_name)
-                .and_then(|v| v.to_str()),
-            Some("dashboards")
-        ) =>
-        {
-            great_grandparent.unwrap_or(base_dir).to_path_buf()
-        }
-        _ => base_dir.to_path_buf(),
-    }
+    infer_dashboard_workspace_root(base_dir)
 }
 
 fn overlay_direct_workspace_input(discovered: &mut DiscoveredChangeInputs, base_dir: &Path) {
@@ -597,6 +552,29 @@ mod workspace_discovery_rust_tests {
                 &"Discovery: workspace-root=/tmp/grafana-oac-repo sources=dashboard-export"
                     .to_string()
             )
+        );
+    }
+
+    #[test]
+    fn discover_change_staged_inputs_accepts_org_scoped_git_sync_raw_subtree() {
+        let temp = tempdir().unwrap();
+        let workspace = temp.path();
+        std::fs::create_dir_all(workspace.join("dashboards/git-sync/raw/org_1/raw")).unwrap();
+        std::fs::create_dir_all(workspace.join("dashboards/git-sync/provisioning")).unwrap();
+
+        let discovered = discover_change_staged_inputs(Some(
+            &workspace.join("dashboards/git-sync/raw/org_1/raw"),
+        ))
+        .unwrap();
+
+        assert_eq!(discovered.workspace_root, Some(workspace.to_path_buf()));
+        assert_eq!(
+            discovered.dashboard_export_dir,
+            Some(workspace.join("dashboards/git-sync/raw"))
+        );
+        assert_eq!(
+            discovered.dashboard_provisioning_dir,
+            Some(workspace.join("dashboards/git-sync/provisioning"))
         );
     }
 }

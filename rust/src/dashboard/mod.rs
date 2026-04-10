@@ -158,7 +158,9 @@ pub use live::{
 };
 pub use prompt::build_external_export_document;
 pub(crate) use raw_to_prompt::run_raw_to_prompt;
-pub(crate) use source_loader::{load_dashboard_source, LoadedDashboardSource};
+pub(crate) use source_loader::{
+    infer_dashboard_workspace_root, load_dashboard_source, LoadedDashboardSource,
+};
 
 use browse::browse_dashboards_with_org_client;
 use delete::delete_dashboards_with_org_clients;

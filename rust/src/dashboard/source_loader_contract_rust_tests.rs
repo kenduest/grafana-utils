@@ -11,6 +11,106 @@ fn make_dashboard_repo() -> tempfile::TempDir {
     temp
 }
 
+fn write_all_orgs_root_with_raw_variant(export_root: &std::path::Path) -> std::path::PathBuf {
+    let org_export_dir = export_root.join("org_1_Main_Org/raw");
+    fs::create_dir_all(&org_export_dir).unwrap();
+    fs::write(
+        export_root.join("export-metadata.json"),
+        serde_json::to_string_pretty(&serde_json::json!({
+            "kind": "grafana-utils-dashboard-export-index",
+            "schemaVersion": crate::dashboard::TOOL_SCHEMA_VERSION,
+            "variant": "root",
+            "dashboardCount": 1,
+            "indexFile": "index.json",
+            "orgCount": 1,
+            "orgs": [{
+                "org": "Main Org",
+                "orgId": "1",
+                "dashboardCount": 1,
+                "exportDir": "org_1_Main_Org"
+            }]
+        }))
+        .unwrap(),
+    )
+    .unwrap();
+    fs::write(
+        org_export_dir.join("export-metadata.json"),
+        serde_json::to_string_pretty(&serde_json::json!({
+            "kind": "grafana-utils-dashboard-export-index",
+            "schemaVersion": crate::dashboard::TOOL_SCHEMA_VERSION,
+            "variant": "raw",
+            "dashboardCount": 1,
+            "indexFile": "index.json",
+            "format": "grafana-web-import-preserve-uid",
+            "foldersFile": "folders.json",
+            "datasourcesFile": "datasources.json",
+            "org": "Main Org",
+            "orgId": "1"
+        }))
+        .unwrap(),
+    )
+    .unwrap();
+    fs::write(
+        org_export_dir.join("folders.json"),
+        serde_json::to_string_pretty(&serde_json::json!([{
+            "uid": "general",
+            "title": "General",
+            "path": "General",
+            "org": "Main Org",
+            "orgId": "1"
+        }]))
+        .unwrap(),
+    )
+    .unwrap();
+    fs::write(
+        org_export_dir.join("datasources.json"),
+        serde_json::to_string_pretty(&serde_json::json!([{
+            "uid": "prom-main",
+            "name": "prom-main",
+            "type": "prometheus",
+            "access": "proxy",
+            "url": "http://grafana.example.internal",
+            "isDefault": "true",
+            "org": "Main Org",
+            "orgId": "1"
+        }]))
+        .unwrap(),
+    )
+    .unwrap();
+    fs::write(
+        org_export_dir.join("index.json"),
+        serde_json::to_string_pretty(&serde_json::json!([{
+            "uid": "cpu-main",
+            "title": "CPU Main",
+            "path": "dash.json",
+            "format": "grafana-web-import-preserve-uid",
+            "org": "Main Org",
+            "orgId": "1"
+        }]))
+        .unwrap(),
+    )
+    .unwrap();
+    fs::write(
+        org_export_dir.join("dash.json"),
+        serde_json::to_string_pretty(&serde_json::json!({
+            "dashboard": {
+                "id": null,
+                "uid": "cpu-main",
+                "title": "CPU Main",
+                "schemaVersion": 38,
+                "panels": []
+            },
+            "meta": {
+                "folderUid": "general",
+                "folderTitle": "General"
+            }
+        }))
+        .unwrap(),
+    )
+    .unwrap();
+    export_root.to_path_buf()
+}
+
 #[test]
 fn source_loader_contract_resolves_direct_raw_root() {
     let temp = make_dashboard_repo();
@@ -90,4 +190,31 @@ fn source_loader_contract_resolves_wrapped_git_sync_tree_from_dashboards_root() 
         resolve_dashboard_workspace_variant_dir(&dashboards_root, "provisioning"),
         Some(wrapped_provisioning_root)
     );
+}
+
+#[test]
+fn source_loader_contract_prefers_root_export_over_conflicting_variant_child() {
+    let temp = make_dashboard_repo();
+    let dashboards_root = temp.path().join("dashboards");
+    write_all_orgs_root_with_raw_variant(&dashboards_root);
+
+    let conflicting_raw_root = dashboards_root.join("raw");
+    fs::create_dir_all(&conflicting_raw_root).unwrap();
+    fs::write(conflicting_raw_root.join("export-metadata.json"), "{}\n").unwrap();
+
+    let resolved = load_dashboard_source(
+        &dashboards_root,
+        DashboardImportInputFormat::Raw,
+        None,
+        true,
+    )
+    .unwrap();
+
+    let temp_root = resolved.temp_dir.as_ref().unwrap().path.clone();
+    assert!(resolved.input_dir.starts_with(&temp_root));
+    assert_eq!(resolved.workspace_root, temp.path());
+    assert_ne!(resolved.input_dir, conflicting_raw_root);
+    assert_eq!(resolved.expected_variant, RAW_EXPORT_SUBDIR);
+    drop(resolved);
+    assert!(!temp_root.exists());
 }
