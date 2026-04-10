@@ -12,10 +12,11 @@ use super::super::{
 use super::user_workflows_import_export::load_access_import_records;
 use super::{normalize_access_identity, parse_access_identity_list, DiffPayload, DiffPayloadMap};
 use crate::access::render::{
-    access_diff_summary_line, map_get_text, normalize_org_role, normalize_user_row, scalar_text,
-    value_bool,
+    access_diff_review_line, access_diff_summary_line, build_access_diff_review_document,
+    map_get_text, normalize_org_role, normalize_user_row, scalar_text, value_bool,
 };
-use crate::common::{message, string_field, Result};
+use crate::common::{message, string_field, Result, SharedDiffSummary};
+use serde_json::json;
 
 fn normalize_bool_for_diff(value: Option<&Value>) -> Value {
     match value_bool(value) {
@@ -151,6 +152,15 @@ fn build_record_diff_fields(left: &Map<String, Value>, right: &Map<String, Value
     changed
 }
 
+pub(crate) fn build_user_diff_review_document(
+    summary: SharedDiffSummary,
+    local_source: &str,
+    live_source: &str,
+    rows: &[Value],
+) -> Value {
+    build_access_diff_review_document("user", summary, local_source, live_source, rows)
+}
+
 /// Purpose: implementation note.
 pub(crate) fn diff_users_with_request<F>(mut request_json: F, args: &UserDiffArgs) -> Result<usize>
 where
@@ -175,6 +185,11 @@ where
 
     let mut differences = 0usize;
     let mut checked = 0usize;
+    let mut same = 0usize;
+    let mut different = 0usize;
+    let mut missing_remote = 0usize;
+    let mut extra_remote = 0usize;
+    let mut review_rows = Vec::new();
     for key in local_map.keys() {
         checked += 1;
         let (local_identity, local_payload) = &local_map[key];
@@ -182,18 +197,40 @@ where
             None => {
                 println!("Diff missing-live user {}", local_identity);
                 differences += 1;
+                missing_remote += 1;
+                review_rows.push(json!({
+                    "status": "missing-live",
+                    "identity": local_identity,
+                    "localSource": args.diff_dir.to_string_lossy(),
+                    "liveSource": "Grafana live users",
+                }));
             }
             Some((_live_identity, live_payload)) => {
                 let changed = build_record_diff_fields(local_payload, live_payload);
                 if changed.is_empty() {
                     println!("Diff same user {}", local_identity);
+                    same += 1;
+                    review_rows.push(json!({
+                        "status": "same",
+                        "identity": local_identity,
+                        "localSource": args.diff_dir.to_string_lossy(),
+                        "liveSource": "Grafana live users",
+                    }));
                 } else {
                     differences += 1;
+                    different += 1;
                     println!(
                         "Diff different user {} fields={}",
                         local_identity,
                         changed.join(",")
                     );
+                    review_rows.push(json!({
+                        "status": "different",
+                        "identity": local_identity,
+                        "changedFields": changed,
+                        "localSource": args.diff_dir.to_string_lossy(),
+                        "liveSource": "Grafana live users",
+                    }));
                 }
             }
         }
@@ -205,9 +242,41 @@ where
         }
         differences += 1;
         checked += 1;
+        extra_remote += 1;
         let (live_identity, _) = &live_map[key];
         println!("Diff extra-live user {}", live_identity);
+        review_rows.push(json!({
+            "status": "extra-live",
+            "identity": live_identity,
+            "localSource": args.diff_dir.to_string_lossy(),
+            "liveSource": "Grafana live users",
+        }));
     }
+
+    let _review_document = build_user_diff_review_document(
+        SharedDiffSummary {
+            checked,
+            same,
+            different,
+            missing_remote,
+            extra_remote,
+            ambiguous: 0,
+        },
+        &args.diff_dir.to_string_lossy(),
+        "Grafana live users",
+        &review_rows,
+    );
+
+    println!(
+        "{}",
+        access_diff_review_line(
+            "user",
+            checked,
+            differences,
+            &args.diff_dir.to_string_lossy(),
+            "Grafana live users",
+        )
+    );
 
     println!(
         "{}",

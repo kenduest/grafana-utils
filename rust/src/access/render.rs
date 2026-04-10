@@ -3,7 +3,10 @@
 use serde_json::{Map, Value};
 use std::collections::BTreeSet;
 
-use crate::common::{render_json_value, requested_columns_include_all, string_field};
+use crate::common::{
+    build_shared_diff_document, render_json_value, requested_columns_include_all, string_field,
+    SharedDiffSummary, TOOL_VERSION,
+};
 pub(crate) use crate::tabular_output::render_yaml;
 
 use super::Scope;
@@ -260,6 +263,40 @@ pub(crate) fn access_diff_review_line(
     )
 }
 
+/// Build a shared access diff review document.
+pub(crate) fn build_access_diff_review_document(
+    resource_kind: &str,
+    summary: SharedDiffSummary,
+    local_source: &str,
+    live_source: &str,
+    rows: &[Value],
+) -> Value {
+    let mut document = build_shared_diff_document(
+        "grafana-utils-access-diff-review",
+        1,
+        summary,
+        rows,
+    );
+    if let Some(object) = document.as_object_mut() {
+        object.insert("toolVersion".to_string(), Value::String(TOOL_VERSION.to_string()));
+        object.insert("reviewRequired".to_string(), Value::Bool(true));
+        object.insert("reviewed".to_string(), Value::Bool(false));
+        object.insert(
+            "resourceKind".to_string(),
+            Value::String(resource_kind.to_string()),
+        );
+        object.insert(
+            "localSource".to_string(),
+            Value::String(local_source.to_string()),
+        );
+        object.insert(
+            "liveSource".to_string(),
+            Value::String(live_source.to_string()),
+        );
+    }
+    document
+}
+
 /// Format a consistent import summary line for access workflows.
 pub(crate) fn access_import_summary_line(
     kind: &str,
@@ -456,8 +493,11 @@ pub(crate) fn normalize_service_account_row(team: &Map<String, Value>) -> Map<St
 mod tests {
     use super::{
         access_delete_summary_line, access_diff_review_line, access_diff_summary_line,
-        access_export_summary_line, access_import_summary_line,
+        access_export_summary_line, access_import_summary_line, build_access_diff_review_document,
     };
+    use crate::common::SharedDiffSummary;
+    use crate::common::TOOL_VERSION;
+    use serde_json::{json, Value};
 
     #[test]
     fn access_diff_summary_line_includes_source_context_for_differences() {
@@ -501,6 +541,54 @@ mod tests {
         assert_eq!(
             line,
             "Review: required=true reviewed=false kind=team checked=3 same=2 different=1 source=./access-teams live=Grafana live teams"
+        );
+    }
+
+    #[test]
+    fn access_diff_review_document_surfaces_shared_review_contract() {
+        let rows = vec![json!({
+            "status": "different",
+            "identity": "alice",
+            "changedFields": ["email"]
+        })];
+        let document = build_access_diff_review_document(
+            "user",
+            SharedDiffSummary {
+                checked: 2,
+                same: 1,
+                different: 1,
+                missing_remote: 0,
+                extra_remote: 0,
+                ambiguous: 0,
+            },
+            "./access-users",
+            "Grafana live users",
+            &rows,
+        );
+
+        assert_eq!(
+            document.get("kind"),
+            Some(&json!("grafana-utils-access-diff-review"))
+        );
+        assert_eq!(document.get("schemaVersion"), Some(&json!(1)));
+        assert_eq!(document.get("toolVersion"), Some(&json!(TOOL_VERSION)));
+        assert_eq!(document.get("reviewRequired"), Some(&json!(true)));
+        assert_eq!(document.get("reviewed"), Some(&json!(false)));
+        assert_eq!(document.get("resourceKind"), Some(&json!("user")));
+        assert_eq!(document.get("localSource"), Some(&json!("./access-users")));
+        assert_eq!(
+            document.get("liveSource"),
+            Some(&json!("Grafana live users"))
+        );
+        assert_eq!(
+            document
+                .get("summary")
+                .and_then(|summary| summary.get("checked")),
+            Some(&json!(2))
+        );
+        assert_eq!(
+            document.get("rows").and_then(Value::as_array).map(Vec::len),
+            Some(1)
         );
     }
 

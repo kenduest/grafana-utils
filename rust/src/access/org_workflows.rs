@@ -16,9 +16,9 @@ use super::super::pending_delete::{
     prompt_select_indexes, validate_delete_prompt,
 };
 use super::super::render::{
-    access_delete_summary_line, access_diff_summary_line, access_export_summary_line,
-    access_import_summary_line, format_table, render_csv, render_objects_json, render_yaml,
-    scalar_text,
+    access_delete_summary_line, access_diff_review_line, access_diff_summary_line,
+    access_export_summary_line, access_import_summary_line, format_table, render_csv,
+    render_objects_json, render_yaml, scalar_text,
 };
 use super::super::{
     OrgAddArgs, OrgDeleteArgs, OrgDiffArgs, OrgExportArgs, OrgImportArgs, OrgListArgs,
@@ -336,6 +336,31 @@ mod org_delete_prompt_tests {
         assert_eq!(
             line,
             "Deleted org Main Org id=4 userCount=12 message=Org deleted."
+        );
+    }
+}
+
+fn org_diff_review_line(checked: usize, differences: usize, local_source: &str) -> String {
+    access_diff_review_line(
+        "org",
+        checked,
+        differences,
+        local_source,
+        "Grafana live orgs",
+    )
+}
+
+#[cfg(test)]
+mod org_diff_review_tests {
+    use super::*;
+
+    #[test]
+    fn org_diff_review_line_uses_shared_review_contract() {
+        let line = org_diff_review_line(3, 1, "./access-orgs");
+
+        assert_eq!(
+            line,
+            "Review: required=true reviewed=false kind=org checked=3 same=2 different=1 source=./access-orgs live=Grafana live orgs"
         );
     }
 }
@@ -678,6 +703,10 @@ where
         let (identity, _) = &live_map[key];
         println!("Diff extra-live org {}", identity);
     }
+    println!(
+        "{}",
+        org_diff_review_line(checked, differences, &args.diff_dir.to_string_lossy())
+    );
     println!(
         "{}",
         access_diff_summary_line(
