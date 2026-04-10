@@ -2,7 +2,7 @@
 
 Use this chapter when you already know the workflow and need the exact command behavior, output flags, profile rules, or secret-handling details.
 
-This manual provides the current command surface for `grafana-util`, including profile resolution, output flags, and live/staged status entrypoints.
+This manual provides the current command surface for `grafana-util`, including profile resolution, output flags, and observe entrypoints.
 
 ## Who It Is For
 
@@ -16,7 +16,7 @@ This manual provides the current command surface for `grafana-util`, including p
 - Clarify which output modes exist on which command surfaces.
 - Reduce time spent jumping between individual command pages for shared behavior.
 
-Use this chapter alongside [profile](../../commands/en/profile.md), [status](../../commands/en/status.md), [overview](../../commands/en/overview.md), and [access](../../commands/en/access.md) when you want the command-by-command surface.
+Use this chapter alongside [config profile](../../commands/en/profile.md), [observe](../../commands/en/observe.md), [change](../../commands/en/change.md), and [access](../../commands/en/access.md) when you want the command-by-command surface.
 
 ---
 
@@ -132,9 +132,9 @@ CLI schema lookups:
 - `grafana-util alert diff --help-schema`
 - `grafana-util datasource diff --help-schema`
 
-### `status` JSON documents for CI
+### `observe` JSON documents for CI
 
-`status staged` and `status live` now share one explicit machine-readable contract:
+`observe staged` and `observe live` now share one explicit machine-readable contract:
 
 1. inspect `kind`
 2. confirm `schemaVersion`
@@ -147,20 +147,20 @@ Stable routing:
 
 CLI schema lookups:
 
-- `grafana-util status --help-schema`
-- `grafana-util status staged --help-schema`
-- `grafana-util status live --help-schema`
+- `grafana-util observe --help-schema`
+- `grafana-util observe staged --help-schema`
+- `grafana-util observe live --help-schema`
 
 Practical mapping:
 
-- `status staged --output-format json` -> `grafana-util-project-status`
-- `status live --output-format json` -> `grafana-util-project-status`
+- `observe staged --output-format json` -> `grafana-util-project-status`
+- `observe live --output-format json` -> `grafana-util-project-status`
 
 ---
 
 ## Profile, connection, and secret handling
 
-Profiles are repo-local. `grafana-util profile` reads and writes `grafana-util.yaml` in the current working directory, and `--profile` selects one named profile from that file.
+Profiles are repo-local. `grafana-util config profile` reads and writes `grafana-util.yaml` in the current working directory, and `--profile` selects one named profile from that file.
 
 ### Recommended auth order
 
@@ -216,9 +216,9 @@ Important limits:
 ### 1. Choose the right profile workflow
 | Workflow | Purpose | When to use |
 | :--- | :--- | :--- |
-| `profile init` | Create a minimal starter `grafana-util.yaml`. | When you want a seed file before editing by hand. |
-| `profile add` | Create or update one named profile directly. | When you want a friendly one-step setup path. |
-| `profile example` | Print a fully commented reference config. | When you want a copy-edit template. |
+| `config profile init` | Create a minimal starter `grafana-util.yaml`. | When you want a seed file before editing by hand. |
+| `config profile add` | Create or update one named profile directly. | When you want a friendly one-step setup path. |
+| `config profile example` | Print a fully commented reference config. | When you want a copy-edit template. |
 
 If you set `GRAFANA_UTIL_CONFIG`, the config file moves with that path. The helper files for `encrypted-file` mode follow the same directory:
 
@@ -228,32 +228,32 @@ If you set `GRAFANA_UTIL_CONFIG`, the config file moves with that path. The help
 | `.grafana-util.secrets.yaml` | same directory as `grafana-util.yaml` |
 | `.grafana-util.secrets.key` | same directory as `grafana-util.yaml` |
 
-When `encrypted-file` uses these repo-local helper paths, `profile add` also appends them to the config-directory `.gitignore` if they are not already ignored.
+When `encrypted-file` uses these repo-local helper paths, `config profile add` also appends them to the config-directory `.gitignore` if they are not already ignored.
 
 ### 2. Initialize, add, and list profiles
 ```bash
 # Purpose: 2. Initialize, add, and list profiles.
-grafana-util profile init --overwrite
+grafana-util config profile init --overwrite
 ```
 
 ```bash
 # Purpose: 2. Initialize, add, and list profiles.
-grafana-util profile add dev --url http://127.0.0.1:3000 --basic-user admin --prompt-password
+grafana-util config profile add dev --url http://127.0.0.1:3000 --basic-user admin --prompt-password
 ```
 
 ```bash
 # Purpose: 2. Initialize, add, and list profiles.
-grafana-util profile add ci --url https://grafana.example.com --token-env GRAFANA_CI_TOKEN --store-secret os
+grafana-util config profile add ci --url https://grafana.example.com --token-env GRAFANA_CI_TOKEN --store-secret os
 ```
 
 ```bash
 # Purpose: 2. Initialize, add, and list profiles.
-grafana-util profile list
+grafana-util config profile list
 ```
 
 ```bash
 # Purpose: 2. Initialize, add, and list profiles.
-grafana-util profile example --mode full
+grafana-util config profile example --mode full
 ```
 **Expected Output:**
 ```text
@@ -261,17 +261,17 @@ Wrote grafana-util.yaml.
 dev
 prod
 ```
-`init` creates the local config file, `add` creates a usable profile in one step, and `list` prints one resolved profile name per line. `example` prints a full commented template that you can copy and edit.
+`config profile init` creates the local config file, `config profile add` creates a usable profile in one step, and `config profile list` prints one resolved profile name per line. `config profile example` prints a full commented template that you can copy and edit.
 
 ### 3. Show the resolved profile
 ```bash
 # Purpose: 3. Show the resolved profile.
-grafana-util profile show --profile prod --output-format yaml
+grafana-util config profile show --profile prod --output-format yaml
 ```
 
 ```bash
 # Purpose: 3. Show the resolved profile.
-grafana-util profile show --profile prod --show-secrets --output-format yaml
+grafana-util config profile show --profile prod --show-secrets --output-format yaml
 ```
 **Expected Output:**
 ```text
@@ -283,7 +283,7 @@ profile:
   password_env: GRAFANA_PROD_PASSWORD
   verify_ssl: true
 ```
-Use `show` when you need the final resolved values. `--profile` overrides the default selection rules, and `yaml` is the clearest format when you are checking auth wiring by hand.
+Use `config profile show` when you need the final resolved values. `--profile` overrides the default selection rules, and `yaml` is the clearest format when you are checking auth wiring by hand.
 
 Be careful with `--show-secrets`: it is for local inspection only. It resolves secret-store references and prints plaintext values.
 
@@ -345,17 +345,17 @@ profiles:
 ### 5. Daily-use examples in the common auth styles
 ```bash
 # Purpose: 5. Daily-use examples in the common auth styles.
-grafana-util status live --profile prod --output-format yaml
+grafana-util observe live --profile prod --output-format yaml
 ```
 
 ```bash
 # Purpose: 5. Daily-use examples in the common auth styles.
-grafana-util status live --url http://localhost:3000 --basic-user admin --prompt-password --output-format yaml
+grafana-util observe live --url http://localhost:3000 --basic-user admin --prompt-password --output-format yaml
 ```
 
 ```bash
 # Purpose: 5. Daily-use examples in the common auth styles.
-grafana-util overview live --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-format json
+grafana-util observe overview live --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-format json
 ```
 Use the `--profile` form by default. Keep direct Basic auth for admin-heavy workflows and token auth for scoped automation where you understand the permission envelope.
 
@@ -364,43 +364,43 @@ Use the `--profile` form by default. Keep direct Basic auth for admin-heavy work
 ```bash
 # Environment-backed password for a repeatable local profile.
 export GRAFANA_PROD_PASSWORD='change-me'
-grafana-util profile add prod --url https://grafana.example.com --basic-user admin --password-env GRAFANA_PROD_PASSWORD
+grafana-util config profile add prod --url https://grafana.example.com --basic-user admin --password-env GRAFANA_PROD_PASSWORD
 ```
 
 ```bash
 # Environment-backed password for a repeatable local profile.
-grafana-util status live --profile prod --output-format yaml
+grafana-util observe live --profile prod --output-format yaml
 ```
 
 ```bash
 # OS secret store for a desktop operator workflow on macOS or Linux.
-grafana-util profile add prod-os --url https://grafana.example.com --basic-user admin --prompt-password --store-secret os
+grafana-util config profile add prod-os --url https://grafana.example.com --basic-user admin --prompt-password --store-secret os
 ```
 
 ```bash
 # OS secret store for a desktop operator workflow on macOS or Linux.
-grafana-util overview live --profile prod-os --output-format interactive
+grafana-util observe overview live --profile prod-os --output-format interactive
 ```
 
 ```bash
 # Encrypted file with a prompted passphrase.
-grafana-util profile add prod-encrypted --url https://grafana.example.com --basic-user admin --prompt-password --store-secret encrypted-file --prompt-secret-passphrase
+grafana-util config profile add prod-encrypted --url https://grafana.example.com --basic-user admin --prompt-password --store-secret encrypted-file --prompt-secret-passphrase
 ```
 
 ```bash
 # Encrypted file with a prompted passphrase.
-grafana-util status live --profile prod-encrypted --output-format yaml
+grafana-util observe live --profile prod-encrypted --output-format yaml
 ```
 
 ```bash
 # Scoped token from the environment for automation.
 export GRAFANA_CI_TOKEN='replace-me'
-grafana-util profile add ci --url https://grafana.example.com --token-env GRAFANA_CI_TOKEN
+grafana-util config profile add ci --url https://grafana.example.com --token-env GRAFANA_CI_TOKEN
 ```
 
 ```bash
 # Scoped token from the environment for automation.
-grafana-util overview live --profile ci --output-format json
+grafana-util observe overview live --profile ci --output-format json
 ```
 
 Why these examples matter:
@@ -417,11 +417,11 @@ Why these examples matter:
 
 ### 8. Secret-storage troubleshooting
 
-- `profile add --store-secret os` fails on macOS:
+- `config profile add --store-secret os` fails on macOS:
   verify that the `security` tool is available and that the local login session can access the Keychain.
-- `profile add --store-secret os` fails on Linux:
+- `config profile add --store-secret os` fails on Linux:
   the local environment may not have a working Secret Service session. This is common in headless shells, containers, or minimal servers. Use `password_env`, `token_env`, or `encrypted-file` instead.
-- `profile show --show-secrets` prints an error for a stored secret reference:
+- `config profile show --show-secrets` prints an error for a stored secret reference:
   confirm that the referenced env var exists, the OS secret store entry still exists, or the encrypted secret file and passphrase/local key are still present.
 - `encrypted-file` works on one machine but not another:
   make sure the target checkout has the matching `.grafana-util.secrets.yaml` and either the same passphrase or the matching local key file.
@@ -440,7 +440,7 @@ Why these examples matter:
 | :--- | :--- | :--- | :--- |
 | Direct format selectors | `--text`, `--table`, `--csv`, `--json`, `--yaml` | `text` / `table` / `csv` / `json` / `yaml` | Common on list, review, inspect, and some dry-run mutation surfaces. |
 | Single selector for common formats | `--output-format <FORMAT>` | `text` / `table` / `csv` / `json` / `yaml` | Some commands also define command-specific values such as `governance`, `governance-json`, `queries-json`, `mermaid`, or `dot`. |
-| Live `status` / `overview` entrypoints | `--output-format <FORMAT>` | `table` / `csv` / `text` / `json` / `yaml` / `interactive` | These live entrypoints now use the same standard selector. |
+| Live `observe` entrypoint | `--output-format <FORMAT>` | `table` / `csv` / `text` / `json` / `yaml` / `interactive` | These live entrypoints now use the same standard selector. |
 | Write the rendered result to a file | `--output-file <PATH>` or a command-specific flag | command-specific | Common on topology, governance-gate, screenshot, and similar output-producing commands. |
 
 ### 1. Table or JSON selection
@@ -459,27 +459,27 @@ grafana-util dashboard list -h
 ```
 Use `--json` for automation, `--table` for quick human review, and `--output-format` when you want to switch output with a single flag. The older `--limit` example is no longer current; the command now uses `--page-size` for fetch sizing and `--output-columns` for column selection.
 
-### 2. Live status and overview output selectors
+### 2. Live observe output selectors
 ```bash
-# Purpose: 2. Live status and overview output selectors.
-grafana-util status live -h
+# Purpose: 2. Live observe output selectors.
+grafana-util observe live -h
 ```
 
 ```bash
-# Purpose: 2. Live status and overview output selectors.
-grafana-util overview live -h
+# Purpose: 2. Live observe overview output selectors.
+grafana-util observe overview live -h
 ```
 **Expected Output:**
 ```text
-Render project status from live Grafana read surfaces. Use current Grafana state plus optional staged context files.
+Render live Grafana read surfaces. Use current Grafana state plus optional staged context files.
 ...
 --output-format <OUTPUT_FORMAT>
-    Render project status as table, csv, text, json, yaml, or interactive output.
+    Render live output as table, csv, text, json, yaml, or interactive output.
 
-Render a live overview by delegating to the shared status live path.
+Render a live overview by delegating to the shared observe live path.
 ...
 --output-format <OUTPUT_FORMAT>
-    Render project status as table, csv, text, json, yaml, or interactive output.
+    Render live output as table, csv, text, json, yaml, or interactive output.
 ```
 Both live entrypoints now use `--output-format`.
 
@@ -507,7 +507,7 @@ This is the current JSON path for scripting. If you need fewer or different fiel
 ### 2. Handling Exit Codes
 ```bash
 # Purpose: 2. Handling Exit Codes.
-grafana-util status live --profile prod --output-format json
+grafana-util observe live --profile prod --output-format json
 if [ $? -eq 2 ]; then
   echo "CRITICAL: Grafana connection blocked!"
   exit 1

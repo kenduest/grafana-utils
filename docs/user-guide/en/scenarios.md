@@ -241,4 +241,4 @@ ops-user    Viewer  create   missing
 This workflow is for replaying identity state safely: use import dry-run for users, and use the service-account token commands when you need to rotate automation credentials without guessing at the target account.
 
 ---
-[⬅️ Previous: Change & Status](change-overview-status.md) | [🏠 Home](index.md) | [➡️ Next: Technical Reference](reference.md)
+[⬅️ Previous: Change & Observe](change-overview-status.md) | [🏠 Home](index.md) | [➡️ Next: Technical Reference](reference.md)

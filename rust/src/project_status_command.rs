@@ -1,7 +1,7 @@
 //! Shared status command surface.
 //!
 //! Maintainer note:
-//! - This module owns the top-level `grafana-util status ...` command.
+//! - This module owns the top-level `grafana-util observe staged/live ...` help and schema surface.
 //! - It should stay focused on command args, shared rendering, and high-level
 //!   staged/live aggregation handoff.
 //! - Domain-specific staged/live producer logic belongs in the owning domain
@@ -257,8 +257,8 @@ pub enum ProjectStatusSubcommand {
 
 #[derive(Debug, Clone, Parser)]
 #[command(
-    name = "grafana-util status",
-    about = "Render project-wide staged or live status through the shared status contract. Staged subcommands read exports; live subcommands query Grafana.",
+    name = "grafana-util observe",
+    about = "Render project-wide staged or live status through the shared observe contract. Staged subcommands read exports; live subcommands query Grafana.",
     after_help = PROJECT_STATUS_HELP_TEXT
 )]
 pub struct ProjectStatusCliArgs {

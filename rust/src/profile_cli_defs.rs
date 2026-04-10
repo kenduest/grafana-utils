@@ -27,8 +27,8 @@ pub enum ProfileExampleMode {
 
 #[derive(Debug, Clone, Parser)]
 #[command(
-    name = "grafana-util profile",
-    about = "List, inspect, add, render examples for, and initialize repo-local grafana-util profiles.",
+    name = "grafana-util config profile",
+    about = "List, inspect, add, render examples for, and initialize repo-local Grafana connection profiles.",
     after_help = PROFILE_HELP_TEXT,
     styles = crate::help_styles::CLI_HELP_STYLES
 )]

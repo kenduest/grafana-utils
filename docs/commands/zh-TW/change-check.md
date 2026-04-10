@@ -8,7 +8,7 @@
 
 - 在 `change inspect` 之後，先做一次 readiness gate，再決定是否 preview。
 - 在 CI 中，如果你只需要快速判斷 staged inputs 是否可接受，也適合先跑這一步。
-- 如果你想留在 task-first `change` lane，而不是切去 `status staged`，就用這個。
+- 如果你想留在 task-first `change` lane，而不是切去 `observe staged`，就用這個。
 
 ## 採用前後對照
 
@@ -71,4 +71,4 @@ PREFLIGHT CHECK:
 - [change](./change.md)
 - [change inspect](./change-inspect.md)
 - [change preview](./change-preview.md)
-- [status](./status.md)
+- [observe staged](./observe.md#staged)

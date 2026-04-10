@@ -18,13 +18,13 @@ This domain focuses on the governance gate: the final layer of validation before
 
 ## Before / After
 
-- Before: status, snapshots, and change reviews could feel like separate tools with overlapping names.
+- Before: read-only checks, snapshots, and change reviews could feel like separate tools with overlapping names.
 - After: live checks, staged reviews, and snapshot-style summaries are grouped into one guided path.
 
 ## What success looks like
 
 - You can tell whether the task is about readiness, snapshots, or review before change.
-- You know which command to open when a workflow moves from status into mutation.
+- You know which command to open when a workflow moves from read-only checks into mutation.
 - You can explain what should happen before a change is applied.
 
 ## Failure checks

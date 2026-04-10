@@ -106,11 +106,11 @@ You are in a good operator posture when:
 - you can tell whether the current credential can really see the org or admin scope you need
 - you can separate live reads from staged review from actual apply paths
 - you run preflight or dry-run checks before destructive actions
-- you know which command page to open when the surface shifts from status into dashboard, alert, or access work
+- you know which command page to open when the surface shifts from read-only checks into dashboard, alert, or access work
 
 ## Read next
 
-- [Change & Status](change-overview-status.md)
+- [Change & Observe](change-overview-status.md)
 - [Dashboard Management](dashboard.md)
 - [Data source Management](datasource.md)
 - [Alerting Governance](alert.md)
@@ -144,6 +144,6 @@ You are in a good operator posture when:
 ## Next steps
 
 - [Home](index.md)
-- [Change & Status](change-overview-status.md)
+- [Change & Observe](change-overview-status.md)
 - [Dashboard Management](dashboard.md)
 - [Command Docs](../../commands/en/index.md)

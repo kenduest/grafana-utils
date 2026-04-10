@@ -65,6 +65,8 @@ def render_template(name: str, **values: str) -> str:
 
 HANDBOOK_CONTEXT_BY_COMMAND = {
     "index": "index",
+    "observe": "change-overview-status",
+    "config": "getting-started",
     "dashboard": "dashboard",
     "datasource": "datasource",
     "alert": "alert",
@@ -92,6 +94,14 @@ COMMAND_AUDIENCE_HINTS = {
     "access": {
         "en": "Best for administrators who work with org, user, team, service account, and token lifecycle operations.",
         "zh-TW": "適合要管理 org、使用者、team、service account 與 token 生命週期的管理者。",
+    },
+    "config": {
+        "en": "Best for anyone setting up repo-local connection defaults, secret handling, and repeatable live-command authentication.",
+        "zh-TW": "適合想整理 repo-local 連線預設、secret 處理，以及可重複執行的 live 指令認證方式的人。",
+    },
+    "observe": {
+        "en": "Best for readers who want one safe read-only surface for staged checks, live checks, overview, snapshots, and generic resource reads.",
+        "zh-TW": "適合想用同一個安全的唯讀入口查看 staged 檢查、live 檢查、overview、snapshot 與 generic resource reads 的人。",
     },
     "profile": {
         "en": "Best for anyone setting up repeatable connection defaults, secret handling, and non-interactive runs.",

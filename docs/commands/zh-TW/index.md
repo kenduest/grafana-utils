@@ -17,14 +17,19 @@
 
 現在建議的新手入口是比較小的 task-first surface：
 
-- `observe`：唯讀狀態、overview、snapshot、resource 查詢
+- [observe](./observe.md)：唯讀狀態、overview、snapshot、resource 查詢
 - `export`：常見備份與本地 inventory 擷取
 - `change`：以 review 為先的 staged change workflow
-- `config profile`：repo-local 連線與 secret 管理
+- [config profile](./profile.md)：repo-local 連線與 secret 管理
 - `advanced`：你已經知道是某個 domain 時，再打開進階樹
 
 像 `dashboard`、`alert`、`datasource`、`access` 這些舊根命令仍可使用，但不再是第一層 onboarding 入口。
-較舊的 `status`、`overview`、`profile` 頁面只保留作為相容參考；對外請以 `observe` 與 `config profile` 為主入口。
+
+已移除的 root path：
+
+- `status ...` -> `observe staged ...` 或 `observe live ...`
+- `overview ...` -> `observe overview ...`
+- `profile ...` -> `config profile ...`
 
 ## 常用工作
 
@@ -34,6 +39,7 @@
 - [change preview](./change-preview.md)
 - [change apply](./change-apply.md)
 - [export](./export.md)
+- [observe](./observe.md)
 - `export dashboard`
 - `export alert`
 - `export datasource`

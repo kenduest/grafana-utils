@@ -257,4 +257,4 @@ No service account differences across 2 service account(s).
 Use diff output to decide whether a snapshot is safe to import or whether live Grafana has already drifted.
 
 ---
-[⬅️ Previous: Alerting Governance](alert.md) | [🏠 Home](index.md) | [➡️ Next: Change & Status](change-overview-status.md)
+[⬅️ Previous: Alerting Governance](alert.md) | [🏠 Home](index.md) | [➡️ Next: Change & Observe](change-overview-status.md)

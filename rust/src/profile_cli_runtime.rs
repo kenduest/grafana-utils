@@ -50,7 +50,7 @@ fn load_profile_config_at_resolved_path() -> Result<(std::path::PathBuf, Profile
     let path = resolve_profile_config_path();
     if !path.exists() {
         return Err(validation(format!(
-            "Profile config file {} does not exist. Run `grafana-util profile init` to create one.",
+            "Profile config file {} does not exist. Run `grafana-util config profile init` to create one.",
             path.display()
         )));
     }
@@ -719,7 +719,7 @@ fn run_profile_add(args: ProfileAddArgs) -> Result<()> {
         );
     }
     println!(
-        "Next: grafana-util profile show --profile {} --output-format yaml",
+        "Next: grafana-util config profile show --profile {} --output-format yaml",
         args.name
     );
     Ok(())
@@ -748,7 +748,7 @@ fn run_profile_init(args: ProfileInitArgs) -> Result<()> {
     })?;
     ensure_owner_only_permissions(&path)?;
     println!("Wrote {}.", path.display());
-    println!("Next: grafana-util profile show --profile dev --output-format yaml");
+    println!("Next: grafana-util config profile show --profile dev --output-format yaml");
     Ok(())
 }
 

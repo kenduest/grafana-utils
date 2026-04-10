@@ -131,8 +131,8 @@ CLI 內建快速查詢：
 
 | 指令 | 輸出 kind | 主要 top-level 欄位 |
 | --- | --- | --- |
-| `change inspect --output-format json` | staged summary 或 overview/status 風格的 inspection 輸出 | 依輸入類型輸出 staged 摘要與 discovered-input 資訊 |
-| `change check --output-format json` | project-status staged status | staged readiness/status 輸出，以及 blockers 或 warnings |
+| `change inspect --output-format json` | staged summary 或 observe 風格的 inspection 輸出 | 依輸入類型輸出 staged 摘要與 discovered-input 資訊 |
+| `change check --output-format json` | project-status staged readiness | staged readiness 輸出，以及 blockers 或 warnings |
 | `change preview --output-format json` | `grafana-utils-sync-plan` 或 bundle/promotion preflight kinds | task-first 入口會沿用既有 staged plan/bundle-preflight/promotion-preflight contracts；sync-plan preview 還會帶 `ordering.mode`、`operations[].orderIndex`、`operations[].orderGroup`、`operations[].kindOrder` 與 `summary.blocked_reasons` |
 | `change apply --output-format json` | `grafana-utils-sync-apply-intent` | `kind`、`schemaVersion`、`toolVersion`、`mode`、`reviewed`、`reviewRequired`、`allowPrune`、`approved`、`summary`、`alertAssessment`、`operations`、可選 `preflightSummary`、可選 `bundlePreflightSummary`、`appliedBy`、`appliedAt`、`approvalReason`、`applyNote`、`traceId`、`stage`、`stepIndex`、`parentTraceId`；排序資訊保留在 reviewed preview |
 | `change apply --execute-live --output-format json` | live apply result | `mode`、`appliedCount`、`results` |
@@ -502,7 +502,7 @@ grafana-util change preflight \
 - 如果 live-backed preflight 看起來不對，先核對認證、org 與目標 Grafana
 - 如果 CI 要解析 JSON，請先看 `kind` 與 `schemaVersion`，再讀 `summary` 和 `checks`
 
-相關指令：`change summary`、`change plan`、`status staged`。
+相關指令：`change summary`、`change plan`、`observe staged`。
 
 ## `assess-alerts`
 
@@ -655,7 +655,7 @@ grafana-util change bundle-preflight --source-bundle ./sync-source-bundle.json -
 ```
 當你想先回答「這包東西整體能不能進下一步」時，bundle-preflight 比單純 plan 更貼近 promotion / handoff 場景。
 
-相關指令：`change bundle`、`change promotion-preflight`、`status staged`。
+相關指令：`change bundle`、`change promotion-preflight`、`observe staged`。
 
 ## `promotion-preflight`
 

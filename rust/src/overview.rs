@@ -187,11 +187,11 @@ pub struct OverviewArgs {
     pub output_format: OverviewOutputFormat,
 }
 
-/// CLI shape for `grafana-util overview`.
+/// CLI shape for `grafana-util observe overview`.
 #[derive(Debug, Clone, Parser)]
 #[command(
-    name = "grafana-util overview",
-    about = "Render a project-wide overview from staged artifacts, or use `live` as a thin entrypoint into shared live status.",
+    name = "grafana-util observe overview",
+    about = "Render a project-wide overview from staged artifacts, or use `live` as a thin entrypoint into shared observe live status.",
     args_conflicts_with_subcommands = true,
     after_help = OVERVIEW_HELP_TEXT
 )]
@@ -213,7 +213,7 @@ pub struct OverviewCliArgs {
 #[derive(Debug, Clone, Subcommand)]
 pub enum OverviewCommand {
     #[command(
-        about = "Render a live overview by delegating to the shared status live path.",
+        about = "Render a live overview by delegating to the shared observe live path.",
         after_help = OVERVIEW_LIVE_HELP_TEXT
     )]
     Live(OverviewLiveArgs),

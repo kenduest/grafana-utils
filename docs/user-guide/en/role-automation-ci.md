@@ -102,15 +102,14 @@ Your automation path is in good shape when:
 
 - [Getting Started](getting-started.md)
 - [Technical Reference](reference.md)
-- [Change & Status](change-overview-status.md)
+- [Change & Observe](change-overview-status.md)
 - [Access Management](access.md)
 
 ## Keep open
 
 - [config profile](../../commands/en/profile.md)
-- [observe live](../../commands/en/observe.md)
+- [observe](../../commands/en/observe.md)
 - [change](../../commands/en/change.md)
-- [observe overview](../../commands/en/observe.md)
 - [advanced access service-account](../../commands/en/advanced.md)
 - [advanced access service-account token](../../commands/en/advanced.md)
 - [full command index](../../commands/en/index.md)
@@ -118,7 +117,7 @@ Your automation path is in good shape when:
 ## Common mistakes and limits
 
 - Do not pass raw secrets on the command line if the job can read them from `GRAFANA_CI_TOKEN` or another env-backed profile field.
-- Do not treat `status staged` as `apply`; it is a gate, not the mutating step.
+- Do not treat `observe staged` as `apply`; it is a gate, not the mutating step.
 - Do not expect narrow tokens or service-account tokens to see every org or admin-only surface.
 - Do not rely on interactive output in CI; prefer `json`, `yaml`, `table`, or explicit exit codes.
 - Do not forget that `--show-secrets` is a local inspection aid, not a CI logging mode.
@@ -136,7 +135,7 @@ Your automation path is in good shape when:
 ## When to switch to deeper docs
 
 - Switch to [Technical Reference](reference.md) for output formats, exit codes, and profile-backed secret guidance.
-- Switch to [Change & Status](change-overview-status.md) when the pipeline needs staged gates, preflight, or promotion review.
+- Switch to [Change & Observe](change-overview-status.md) when the pipeline needs staged gates, preflight, or promotion review.
 - Switch to [Access Management](access.md) when automation starts rotating or managing service-account credentials.
 - Switch to the [Command Docs](../../commands/en/index.md) when you need the exact supported flags for one namespace.
 

@@ -102,7 +102,7 @@ Different readers usually need different paths through the handbook:
 *   **New user**
   Start with [What grafana-util is for](what-is-grafana-util.md), then [New User Path](role-new-user.md), then [Getting Started](getting-started.md), then open [Command Docs](../../commands/en/index.md) when you need exact flags.
 *   **SRE / operator**
-  Start with [SRE / Ops Path](role-sre-ops.md), then [Change & Status](change-overview-status.md), [Dashboard Management](dashboard.md), [Data source Management](datasource.md), and [Troubleshooting](troubleshooting.md).
+  Start with [SRE / Ops Path](role-sre-ops.md), then [Change & Observe](change-overview-status.md), [Dashboard Management](dashboard.md), [Data source Management](datasource.md), and [Troubleshooting](troubleshooting.md).
 *   **Identity / access administrator**
   Start with [Access Management](access.md), then [Technical Reference](reference.md), then the [Command Docs](../../commands/en/index.md).
 *   **Automation / CI owner**

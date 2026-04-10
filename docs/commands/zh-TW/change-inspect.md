@@ -81,4 +81,4 @@ grafana-util change inspect --workspace ./dashboards/raw --output-format json
 - [change](./change.md)
 - [change check](./change-check.md)
 - [change preview](./change-preview.md)
-- [overview](./overview.md)
+- [observe overview](./observe.md#overview)
