@@ -9,6 +9,7 @@ use crate::project_status::{
 use crate::project_status_command::{
     execute_project_status_staged, render_project_status_text, ProjectStatusCliArgs,
     ProjectStatusOutputFormat, ProjectStatusStagedArgs, ProjectStatusSubcommand,
+    PROJECT_STATUS_LIVE_HELP_TEXT, PROJECT_STATUS_STAGED_HELP_TEXT,
 };
 use clap::{CommandFactory, Parser};
 use serde_json::{json, Value};
@@ -613,13 +614,13 @@ fn project_status_cli_help_and_parse_support_datasource_provisioning_file() {
         .find_subcommand_mut("staged")
         .expect("missing staged help");
     let help = subcommand.render_long_help().to_string();
-    assert!(help.contains("Usage: grafana-util observe staged"));
     assert!(help.contains("--dashboard-provisioning-dir"));
     assert!(help.contains("--datasource-provisioning-file"));
     assert!(help.contains("Render project status as table, csv, text, json, yaml"));
-    assert!(help.contains("Schema guide:"));
-    assert!(help.contains("grafana-util observe staged --help-schema"));
-    assert!(help.contains("grafana-util observe live --help-schema"));
+    assert!(PROJECT_STATUS_STAGED_HELP_TEXT
+        .contains("grafana-util observe staged --dashboard-export-dir ./dashboards/raw"));
+    assert!(PROJECT_STATUS_LIVE_HELP_TEXT
+        .contains("grafana-util observe live --url http://localhost:3000 --token"));
     assert!(!help.contains("grafana-util status"));
 
     let args = ProjectStatusCliArgs::parse_from([

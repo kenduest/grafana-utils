@@ -443,6 +443,14 @@ fn normalize_policy_route_for_compare(route: &mut Map<String, Value>) {
     {
         sort_matcher_values(matchers);
     }
+    if let Some(routes) = route.get_mut("routes").and_then(Value::as_array_mut) {
+        for nested_route in routes {
+            let Some(route_object) = nested_route.as_object_mut() else {
+                continue;
+            };
+            normalize_policy_route_for_compare(route_object);
+        }
+    }
 }
 
 fn normalize_policy_compare_payload(payload: &mut Map<String, Value>) {
@@ -455,6 +463,24 @@ fn normalize_policy_compare_payload(payload: &mut Map<String, Value>) {
             normalize_policy_route_for_compare(route_object);
         }
     }
+}
+
+fn normalize_template_compare_payload(payload: &mut Map<String, Value>) {
+    let Some(template) = payload
+        .get("template")
+        .and_then(Value::as_str)
+        .map(ToString::to_string)
+    else {
+        return;
+    };
+    let mut normalized = template.replace("\r\n", "\n");
+    while normalized.ends_with('\n') {
+        normalized.pop();
+    }
+    if !normalized.is_empty() {
+        normalized.push('\n');
+    }
+    payload.insert("template".to_string(), Value::String(normalized));
 }
 
 fn parse_duration_seconds(value: &str) -> Option<u64> {
@@ -485,6 +511,7 @@ pub fn normalize_compare_payload(kind: &str, payload: &Map<String, Value>) -> Ma
         RULE_KIND => normalize_rule_compare_payload(&mut normalized),
         CONTACT_POINT_KIND => normalize_contact_point_compare_payload(&mut normalized),
         POLICIES_KIND => normalize_policy_compare_payload(&mut normalized),
+        TEMPLATE_KIND => normalize_template_compare_payload(&mut normalized),
         _ => {}
     }
     normalize_compare_value(Value::Object(normalized))

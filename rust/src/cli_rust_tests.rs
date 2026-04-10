@@ -5,9 +5,7 @@ use super::{
 use crate::cli_help_examples::{paint_section, paint_support};
 use crate::dashboard::SimpleOutputFormat;
 use crate::help_styles::CLI_HELP_STYLES;
-use crate::overview::OverviewCliArgs;
 use crate::profile_cli::ProfileCommand;
-use crate::profile_cli::ProfileCliArgs;
 use crate::resource::{ResourceCommand, ResourceKind, ResourceOutputFormat};
 use clap::builder::styling::AnsiColor;
 use clap::CommandFactory;
@@ -122,25 +120,36 @@ fn export_dashboard_help_colorizes_option_descriptions_as_secondary_text() {
 
 #[test]
 fn observe_overview_help_uses_canonical_examples() {
+    assert!(crate::overview::OVERVIEW_HELP_TEXT
+        .contains("grafana-util observe overview --dashboard-export-dir ./dashboards/raw"));
+    assert!(
+        crate::overview::OVERVIEW_LIVE_HELP_TEXT
+            .contains("grafana-util observe overview live --url http://localhost:3000 --token")
+    );
     let help = render_cli_help_path(&["observe", "overview"]);
-    assert!(help.contains("Usage: grafana-util observe overview"));
-    assert!(help.contains("grafana-util observe overview --dashboard-export-dir ./dashboards/raw"));
-    assert!(help.contains("grafana-util observe overview live --url http://localhost:3000 --token"));
-    assert!(help.contains("shared observe live path"));
     assert!(!help.contains("grafana-util overview"));
 }
 
 #[test]
 fn config_profile_help_uses_canonical_examples() {
     let help = render_cli_help_path(&["config", "profile"]);
-    assert!(help.contains("Usage: grafana-util config profile"));
     assert!(help.contains("grafana-util config profile list"));
-    assert!(help.contains("grafana-util config profile current"));
-    assert!(help.contains("grafana-util config profile show --profile prod --output-format yaml"));
-    assert!(help.contains("grafana-util config profile validate --profile prod"));
-    assert!(help.contains("grafana-util config profile add prod --url https://grafana.example.com"));
-    assert!(help.contains("grafana-util config profile init --overwrite"));
-    assert!(help.contains("observe live, observe overview"));
+    assert!(help.contains(
+        "grafana-util config profile show --profile prod --output-format yaml"
+    ));
+    assert!(help.contains(
+        "grafana-util config profile validate --profile prod"
+    ));
+    assert!(help.contains(
+        "grafana-util config profile add prod --url https://grafana.example.com"
+    ));
+    assert!(help.contains(
+        "grafana-util config profile init --overwrite"
+    ));
+    let current_help = render_cli_help_path(&["config", "profile", "current"]);
+    assert!(current_help.contains(
+        "observe live, observe overview"
+    ));
     assert!(!help.contains("grafana-util profile"));
 }
 

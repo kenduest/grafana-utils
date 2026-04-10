@@ -2274,6 +2274,72 @@ fn normalize_compare_payload_dedupes_policy_group_by_and_matchers() {
 }
 
 #[test]
+fn normalize_compare_payload_recursively_normalizes_nested_policy_routes() {
+    let desired = json!({
+        "receiver": "team-webhook",
+        "routes": [{
+            "receiver": "team-slack",
+            "continue": false,
+            "group_by": ["grafana_folder", "alertname"],
+            "object_matchers": [
+                ["team", "=", "platform"],
+                ["severity", "=", "critical"]
+            ],
+            "routes": [{
+                "receiver": "team-pager",
+                "continue": false,
+                "group_by": ["grafana_folder", "alertname"],
+                "object_matchers": [
+                    ["team", "=", "platform"],
+                    ["severity", "=", "critical"]
+                ]
+            }]
+        }]
+    });
+    let live = json!({
+        "receiver": "team-webhook",
+        "routes": [{
+            "receiver": "team-slack",
+            "group_by": ["alertname", "grafana_folder"],
+            "object_matchers": [
+                ["severity", "=", "critical"],
+                ["team", "=", "platform"]
+            ],
+            "routes": [{
+                "receiver": "team-pager",
+                "group_by": ["alertname", "grafana_folder"],
+                "object_matchers": [
+                    ["severity", "=", "critical"],
+                    ["team", "=", "platform"]
+                ]
+            }]
+        }]
+    });
+
+    assert_eq!(
+        super::normalize_compare_payload(POLICIES_KIND, desired.as_object().unwrap()),
+        super::normalize_compare_payload(POLICIES_KIND, live.as_object().unwrap())
+    );
+}
+
+#[test]
+fn normalize_compare_payload_normalizes_template_line_endings_and_trailing_newline() {
+    let desired = json!({
+        "name": "slack.default",
+        "template": "{{ define \"slack.default\" }}ok{{ end }}"
+    });
+    let live = json!({
+        "name": "slack.default",
+        "template": "{{ define \"slack.default\" }}ok{{ end }}\r\n"
+    });
+
+    assert_eq!(
+        super::normalize_compare_payload(TEMPLATE_KIND, desired.as_object().unwrap()),
+        super::normalize_compare_payload(TEMPLATE_KIND, live.as_object().unwrap())
+    );
+}
+
+#[test]
 fn compare_diff_output_includes_headers_and_local_payload() {
     let remote = json!({
         "kind": RULE_KIND,
@@ -2642,7 +2708,7 @@ fn run_alert_recreate_case(
         serialize_compare_document(&live_compare).unwrap(),
         serialize_compare_document(&super::build_compare_document(
             kind,
-            &super::strip_server_managed_fields(kind, &payload),
+            &super::normalize_compare_payload(kind, &payload),
         ))
         .unwrap(),
         "expected same-state after recreate for {kind}"
