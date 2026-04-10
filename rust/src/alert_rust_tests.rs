@@ -1365,6 +1365,86 @@ fn normalize_compare_payload_erases_authoring_round_trip_drift_defaults() {
         super::normalize_compare_payload(RULE_KIND, rule_desired.as_object().unwrap()),
         super::normalize_compare_payload(RULE_KIND, rule_live.as_object().unwrap())
     );
+
+    let rule_desired_alias = json!({
+        "uid": "cpu-high",
+        "title": "cpu-high",
+        "folderUID": "platform-alerts",
+        "ruleGroup": "cpu",
+        "condition": "A",
+        "for": "5m",
+        "keep_firing_for": "0s",
+        "noDataState": "NoData",
+        "execErrState": "Alerting",
+        "labels": {
+            "grafana_utils_route": "pagerduty-primary",
+            "severity": "critical",
+            "team": "platform"
+        },
+        "annotations": {},
+        "data": [{
+            "refId": "A",
+            "datasourceUid": "__expr__",
+            "relativeTimeRange": {"from": 0, "to": 0},
+            "model": {
+                "refId": "A",
+                "type": "classic_conditions",
+                "datasource": {"type": "__expr__", "uid": "__expr__"},
+                "expression": "A",
+                "conditions": [{
+                    "type": "query",
+                    "query": {"params": ["A"]},
+                    "reducer": {"type": "last", "params": []},
+                    "evaluator": {"type": "gt", "params": [80.0]},
+                    "operator": {"type": "and"}
+                }],
+                "intervalMs": 1000,
+                "maxDataPoints": 43200
+            }
+        }]
+    });
+    let rule_live_alias = json!({
+        "uid": "cpu-high",
+        "title": "cpu-high",
+        "folderUID": "platform-alerts",
+        "ruleGroup": "cpu",
+        "condition": "A",
+        "for": "300s",
+        "keep_firing_for": "0m",
+        "noDataState": "NoData",
+        "execErrState": "Alerting",
+        "labels": {
+            "grafana_utils_route": "pagerduty-primary",
+            "severity": "critical",
+            "team": "platform"
+        },
+        "annotations": {},
+        "data": [{
+            "refId": "A",
+            "queryType": "",
+            "datasourceUid": "__expr__",
+            "relativeTimeRange": {"from": 0, "to": 0},
+            "model": {
+                "refId": "A",
+                "type": "classic_conditions",
+                "datasource": {"type": "__expr__", "uid": "__expr__"},
+                "expression": "A",
+                "conditions": [{
+                    "type": "query",
+                    "query": {"params": ["A"]},
+                    "reducer": {"type": "last", "params": []},
+                    "evaluator": {"type": "gt", "params": [80.0]},
+                    "operator": {"type": "and"}
+                }],
+                "intervalMs": 1000,
+                "maxDataPoints": 43200
+            }
+        }]
+    });
+    assert_eq!(
+        super::normalize_compare_payload(RULE_KIND, rule_desired_alias.as_object().unwrap()),
+        super::normalize_compare_payload(RULE_KIND, rule_live_alias.as_object().unwrap())
+    );
 }
 
 #[test]

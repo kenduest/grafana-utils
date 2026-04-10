@@ -388,7 +388,8 @@ fn normalize_compare_value(value: Value) -> Value {
 fn normalize_rule_compare_payload(payload: &mut Map<String, Value>) {
     payload.remove("orgID");
     remove_bool_field_when(payload, "isPaused", false);
-    remove_string_field_when(payload, "keep_firing_for", "0s");
+    normalize_rule_duration_field(payload, "for");
+    normalize_rule_duration_field(payload, "keep_firing_for");
     remove_null_field(payload, "notification_settings");
     remove_null_field(payload, "record");
     remove_empty_object_field(payload, "annotations");
@@ -401,6 +402,23 @@ fn normalize_rule_compare_payload(payload: &mut Map<String, Value>) {
             remove_string_field_when(item_object, "queryType", "");
         }
     }
+}
+
+fn normalize_rule_duration_field(payload: &mut Map<String, Value>, field: &str) {
+    let Some(raw_value) = payload.get(field).and_then(Value::as_str) else {
+        return;
+    };
+    let Some(duration_seconds) = parse_duration_seconds(raw_value) else {
+        return;
+    };
+    if duration_seconds == 0 {
+        payload.remove(field);
+        return;
+    }
+    payload.insert(
+        field.to_string(),
+        Value::String(format!("{duration_seconds}s")),
+    );
 }
 
 fn normalize_contact_point_compare_payload(payload: &mut Map<String, Value>) {
@@ -426,6 +444,28 @@ fn normalize_policy_compare_payload(payload: &mut Map<String, Value>) {
             normalize_policy_route_for_compare(route_object);
         }
     }
+}
+
+fn parse_duration_seconds(value: &str) -> Option<u64> {
+    let trimmed = value.trim();
+    if trimmed.is_empty() {
+        return None;
+    }
+    let split = trimmed
+        .find(|ch: char| !ch.is_ascii_digit())
+        .unwrap_or(trimmed.len());
+    let (number_part, unit_part) = trimmed.split_at(split);
+    let quantity = number_part.parse::<u64>().ok()?;
+    let unit = unit_part.trim();
+    let multiplier = match unit {
+        "s" | "" => 1,
+        "m" => 60,
+        "h" => 60 * 60,
+        "d" => 60 * 60 * 24,
+        "w" => 60 * 60 * 24 * 7,
+        _ => return None,
+    };
+    quantity.checked_mul(multiplier)
 }
 
 pub fn normalize_compare_payload(kind: &str, payload: &Map<String, Value>) -> Map<String, Value> {
