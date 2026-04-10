@@ -355,6 +355,13 @@ fn remove_bool_field_when(object: &mut Map<String, Value>, key: &str, expected: 
     }
 }
 
+fn sort_string_array_field(object: &mut Map<String, Value>, key: &str) {
+    let Some(values) = object.get_mut(key).and_then(Value::as_array_mut) else {
+        return;
+    };
+    values.sort_by_key(value_to_string);
+}
+
 fn sort_matcher_values(matchers: &mut [Value]) {
     matchers.sort_by_key(value_to_string);
 }
@@ -427,6 +434,7 @@ fn normalize_contact_point_compare_payload(payload: &mut Map<String, Value>) {
 
 fn normalize_policy_route_for_compare(route: &mut Map<String, Value>) {
     remove_bool_field_when(route, "continue", false);
+    sort_string_array_field(route, "group_by");
     if let Some(matchers) = route
         .get_mut("object_matchers")
         .and_then(Value::as_array_mut)
@@ -436,6 +444,7 @@ fn normalize_policy_route_for_compare(route: &mut Map<String, Value>) {
 }
 
 fn normalize_policy_compare_payload(payload: &mut Map<String, Value>) {
+    sort_string_array_field(payload, "group_by");
     if let Some(routes) = payload.get_mut("routes").and_then(Value::as_array_mut) {
         for route in routes {
             let Some(route_object) = route.as_object_mut() else {
@@ -548,10 +557,12 @@ pub fn route_matches_stable_label(route: &Map<String, Value>, route_name: &str) 
 }
 
 pub fn build_route_preview(route: &Map<String, Value>) -> Value {
+    let mut group_by = value_list(route.get("group_by"));
+    group_by.sort_by_key(value_to_string);
     json!({
         "receiver": string_field(route, "receiver", ""),
         "continue": route.get("continue").and_then(Value::as_bool).unwrap_or(false),
-        "groupBy": value_list(route.get("group_by")),
+        "groupBy": group_by,
         "matchers": value_list(route.get("object_matchers")),
         "childRouteCount": route.get("routes").and_then(Value::as_array).map(Vec::len).unwrap_or(0),
     })

@@ -1253,11 +1253,11 @@ fn normalize_compare_payload_erases_authoring_round_trip_drift_defaults() {
 
     let policies_desired = json!({
         "receiver": "pagerduty-primary",
-        "group_by": ["grafana_folder", "alertname"],
+        "group_by": ["alertname", "grafana_folder"],
         "routes": [{
             "receiver": "pagerduty-primary",
             "continue": false,
-            "group_by": ["grafana_folder", "alertname"],
+            "group_by": ["alertname", "grafana_folder"],
             "object_matchers": [
                 ["team", "=", "platform"],
                 ["severity", "=", "critical"],
@@ -1829,7 +1829,7 @@ fn managed_policy_subtree_upsert_is_idempotent_and_leaves_unmanaged_routes_untou
     });
     let desired_route = json!({
         "receiver": "team-webhook",
-        "group_by": ["grafana_folder", "alertname"],
+        "group_by": ["alertname", "grafana_folder"],
         "routes": [{"receiver": "team-slack"}]
     });
 
@@ -1861,6 +1861,10 @@ fn managed_policy_subtree_upsert_is_idempotent_and_leaves_unmanaged_routes_untou
     .unwrap();
     assert_eq!(preview["action"], json!("created"));
     assert_eq!(preview["managedRouteValue"], json!("Team_Alerts"));
+    assert_eq!(
+        preview["nextRoute"]["groupBy"],
+        json!(["alertname", "grafana_folder"])
+    );
 
     let (second_policy, second_action) = super::alert_support::upsert_managed_policy_subtree(
         &first_policy,
@@ -1925,6 +1929,7 @@ fn runtime_managed_policy_helpers_produce_idempotent_documents() {
     });
     let desired_route = json!({
         "receiver": "team-webhook",
+        "group_by": ["alertname", "grafana_folder"],
         "object_matchers": [["grafana_utils_route", "=", "old-value"]],
         "routes": [{"receiver": "team-slack"}]
     });
@@ -1944,6 +1949,10 @@ fn runtime_managed_policy_helpers_produce_idempotent_documents() {
     assert_eq!(preview["reviewRequired"], json!(true));
     assert_eq!(preview["reviewed"], json!(false));
     assert_eq!(preview["preview"]["action"], json!("created"));
+    assert_eq!(
+        preview["preview"]["nextRoute"]["groupBy"],
+        json!(["alertname", "grafana_folder"])
+    );
 
     let first_apply = super::alert_runtime_support::apply_managed_policy_subtree_edit_document(
         &current_policy,
