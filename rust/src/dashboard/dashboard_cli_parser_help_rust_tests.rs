@@ -281,15 +281,15 @@ fn parse_cli_supports_export_provisioning_provider_customization() {
     let args = parse_cli_from([
         "grafana-util",
         "export",
-        "--provisioning-provider-name",
+        "--provider-name",
         "grafana-utils-prod",
-        "--provisioning-provider-org-id",
+        "--provider-org-id",
         "9",
-        "--provisioning-provider-path",
+        "--provider-path",
         "/srv/grafana/dashboards",
-        "--provisioning-provider-disable-deletion",
-        "--provisioning-provider-allow-ui-updates",
-        "--provisioning-provider-update-interval-seconds",
+        "--provider-disable-deletion",
+        "--provider-allow-ui-updates",
+        "--provider-update-interval-seconds",
         "45",
     ]);
 
@@ -307,6 +307,48 @@ fn parse_cli_supports_export_provisioning_provider_customization() {
                 export_args.provisioning_provider_update_interval_seconds,
                 45
             );
+        }
+        _ => panic!("expected export command"),
+    }
+}
+
+#[test]
+fn parse_cli_keeps_export_provisioning_provider_aliases() {
+    let args = parse_cli_from([
+        "grafana-util",
+        "export",
+        "--provisioning-provider-name",
+        "grafana-utils-prod",
+        "--provisioning-provider-org-id",
+        "9",
+        "--provisioning-provider-path",
+        "/srv/grafana/dashboards",
+        "--provisioning-provider-disable-deletion",
+        "--provisioning-provider-allow-ui-updates",
+        "--provisioning-provider-update-interval-seconds",
+        "45",
+        "--without-dashboard-raw",
+        "--without-dashboard-prompt",
+        "--without-dashboard-provisioning",
+    ]);
+
+    match args.command {
+        DashboardCommand::Export(export_args) => {
+            assert_eq!(export_args.provisioning_provider_name, "grafana-utils-prod");
+            assert_eq!(export_args.provisioning_provider_org_id, Some(9));
+            assert_eq!(
+                export_args.provisioning_provider_path,
+                Some(PathBuf::from("/srv/grafana/dashboards"))
+            );
+            assert!(export_args.provisioning_provider_disable_deletion);
+            assert!(export_args.provisioning_provider_allow_ui_updates);
+            assert_eq!(
+                export_args.provisioning_provider_update_interval_seconds,
+                45
+            );
+            assert!(export_args.without_dashboard_raw);
+            assert!(export_args.without_dashboard_prompt);
+            assert!(export_args.without_dashboard_provisioning);
         }
         _ => panic!("expected export command"),
     }
@@ -350,10 +392,10 @@ fn export_help_explains_flat_layout() {
     let help = render_dashboard_subcommand_help("export");
     assert!(help.contains("--all-orgs"));
     assert!(help.contains("--include-history"));
-    assert!(help.contains("Prefer Basic auth when you need cross-org export"));
+    assert!(help.contains("Prefer Basic auth because API tokens are often scoped to one org"));
     assert!(help.contains("Export dashboards across all visible orgs with Basic auth"));
-    assert!(help.contains("Write dashboard files directly into each export variant directory"));
-    assert!(help.contains("folder-based subdirectories on disk"));
+    assert!(help.contains("Write files directly into each export variant directory"));
+    assert!(help.contains("folder-based subdirectories"));
 }
 
 #[test]
@@ -362,6 +404,24 @@ fn export_help_mentions_history_artifacts() {
     assert!(help.contains("history/"));
     assert!(help.contains("revision history"));
     assert!(help.contains("per-dashboard revision history"));
+}
+
+#[test]
+fn export_help_keeps_option_summaries_short() {
+    let help = render_dashboard_subcommand_help("export");
+    assert!(help.contains("Export dashboards from every visible Grafana org."));
+    assert!(help.contains("Skip the raw/ export variant."));
+    assert!(help.contains("Skip the prompt/ export variant."));
+    assert!(help.contains("Skip the provisioning/ export variant."));
+    assert!(help.contains("Also write history/ artifacts for each exported org scope."));
+    assert!(
+        !help.contains("Use this only when you do not need later API import or diff workflows.")
+    );
+    assert!(!help
+        .contains("Use this only when you do not need Grafana UI import with datasource prompts."));
+    assert!(
+        !help.contains("Use this only when you do not need Grafana file provisioning artifacts.")
+    );
 }
 
 #[test]
@@ -377,7 +437,7 @@ fn export_help_describes_progress_and_verbose_modes() {
     assert!(help.contains("--progress"));
     assert!(help.contains("<current>/<total>"));
     assert!(help.contains("-v, --verbose"));
-    assert!(help.contains("Overrides --progress output"));
+    assert!(help.contains("Overrides --progress"));
     assert!(!help.contains("--username"));
     assert!(!help.contains("--password "));
 }
@@ -386,13 +446,13 @@ fn export_help_describes_progress_and_verbose_modes() {
 fn export_help_mentions_provisioning_provider_customization() {
     let help = render_dashboard_subcommand_help("export");
     assert!(help.contains("provisioning/provisioning/dashboards.yaml"));
-    assert!(help.contains("--provisioning-provider-name"));
-    assert!(help.contains("--provisioning-provider-org-id"));
-    assert!(help.contains("--provisioning-provider-path"));
-    assert!(help.contains("--provisioning-provider-disable-deletion"));
-    assert!(help.contains("--provisioning-provider-allow-ui-updates"));
-    assert!(help.contains("--provisioning-provider-update-interval-seconds"));
-    assert!(help.contains("current export tree path"));
+    assert!(help.contains("--provider-name"));
+    assert!(help.contains("--provider-org-id"));
+    assert!(help.contains("--provider-path"));
+    assert!(help.contains("--provider-disable-deletion"));
+    assert!(help.contains("--provider-allow-ui-updates"));
+    assert!(help.contains("--provider-update-interval-seconds"));
+    assert!(help.contains("different on-disk deployment target"));
 }
 
 #[test]
@@ -1099,7 +1159,10 @@ fn parse_cli_supports_browse_workspace_root() {
 
     match args.command {
         DashboardCommand::Browse(browse_args) => {
-            assert_eq!(browse_args.workspace, Some(PathBuf::from("./grafana-oac-repo")));
+            assert_eq!(
+                browse_args.workspace,
+                Some(PathBuf::from("./grafana-oac-repo"))
+            );
             assert_eq!(browse_args.input_dir, None);
             assert_eq!(
                 browse_args.input_format,

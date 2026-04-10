@@ -16,10 +16,10 @@
 - `--all-orgs`：把每個可見 org 匯出到各自的子目錄。建議使用 Basic auth。
 - `--flat`：直接把檔案寫入各個匯出變體目錄。
 - `--overwrite`：取代既有的匯出檔案。
-- `--without-dashboard-raw`、`--without-dashboard-prompt`、`--without-dashboard-provisioning`：略過某個變體。
+- `--without-raw`、`--without-prompt`、`--without-provisioning`：略過某個變體。
 - `--include-history`：把 dashboard 版本歷史成品寫到每個匯出 org 範圍下的 `history/` 子目錄。
-- `--provisioning-provider-name`、`--provisioning-provider-org-id`、`--provisioning-provider-path`：自訂產生的 provisioning provider 檔案。
-- `--provisioning-provider-disable-deletion`、`--provisioning-provider-allow-ui-updates`、`--provisioning-provider-update-interval-seconds`：調整 provisioning 行為。
+- `--provider-name`、`--provider-org-id`、`--provider-path`：自訂產生的 provisioning provider 檔案。
+- `--provider-disable-deletion`、`--provider-allow-ui-updates`、`--provider-update-interval-seconds`：調整 provisioning 行為。
 - `--dry-run`：預覽會寫出哪些內容。
 
 ## 說明

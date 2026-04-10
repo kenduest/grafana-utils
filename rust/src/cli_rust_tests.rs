@@ -5,8 +5,20 @@ use super::{
 use crate::dashboard::SimpleOutputFormat;
 use crate::profile_cli::ProfileCommand;
 use crate::resource::{ResourceCommand, ResourceKind, ResourceOutputFormat};
+use clap::CommandFactory;
 use std::cell::RefCell;
 use std::path::Path;
+
+fn render_cli_help_path(path: &[&str]) -> String {
+    let mut command = CliArgs::command();
+    let mut current = &mut command;
+    for segment in path {
+        current = current
+            .find_subcommand_mut(segment)
+            .unwrap_or_else(|| panic!("missing cli subcommand {segment}"));
+    }
+    current.render_help().to_string()
+}
 
 #[test]
 fn unified_help_mentions_common_and_advanced_surfaces() {
@@ -19,6 +31,52 @@ fn unified_help_mentions_common_and_advanced_surfaces() {
     assert!(help.contains("advanced dashboard sync import"));
     assert!(!help.contains("dashboard capture screenshot"));
     assert!(!help.contains("alert migrate export"));
+}
+
+#[test]
+fn advanced_help_groups_domains_and_examples() {
+    let help = render_cli_help_path(&["advanced"]);
+    assert!(help.contains("dashboard"));
+    assert!(help.contains("alert"));
+    assert!(help.contains("Examples:"));
+    assert!(help.contains("advanced dashboard sync import"));
+}
+
+#[test]
+fn export_dashboard_help_shows_examples_and_grouped_headings() {
+    let help = render_cli_help_path(&["export", "dashboard"]);
+    assert!(help.contains("Connection Options"));
+    assert!(help.contains("Selection Options"));
+    assert!(help.contains("Export Variant Options"));
+    assert!(help.contains("Notes:"));
+    assert!(help.contains("Examples:"));
+    assert!(help.contains("Preview the files and indexes without writing to disk."));
+    assert!(help.contains("grafana-util export dashboard"));
+    assert!(help.contains("--without-raw"));
+    assert!(help.contains("--provider-name <NAME>"));
+    assert!(help.contains("--provider-update-interval-seconds <SECONDS>"));
+    assert!(!help.contains("--without-dashboard-raw"));
+    assert!(!help.contains("--provisioning-provider-name"));
+}
+
+#[test]
+fn advanced_dashboard_sync_import_help_shows_grouped_headings_and_examples() {
+    let help = render_cli_help_path(&["advanced", "dashboard", "sync", "import"]);
+    assert!(help.contains("Connection Options"));
+    assert!(help.contains("Routing Options"));
+    assert!(help.contains("Review Output Options"));
+    assert!(help.contains("Examples:"));
+    assert!(help.contains("grafana-util advanced dashboard sync import"));
+}
+
+#[test]
+fn advanced_dashboard_sync_export_help_uses_short_export_flags() {
+    let help = render_cli_help_path(&["advanced", "dashboard", "sync", "export"]);
+    assert!(help.contains("--without-raw"));
+    assert!(help.contains("--provider-name <NAME>"));
+    assert!(help.contains("--provider-update-interval-seconds <SECONDS>"));
+    assert!(!help.contains("--without-dashboard-raw"));
+    assert!(!help.contains("--provisioning-provider-name"));
 }
 
 #[test]

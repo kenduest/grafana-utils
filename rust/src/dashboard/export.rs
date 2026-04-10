@@ -216,7 +216,7 @@ where
         && args.without_dashboard_provisioning
     {
         return Err(message(
-            "Nothing to export. Remove one of --without-dashboard-raw, --without-dashboard-prompt, or --without-dashboard-provisioning.",
+            "Nothing to export. Remove one of --without-raw, --without-prompt, or --without-provisioning.",
         ));
     }
     let mut scoped_request = |method: Method,

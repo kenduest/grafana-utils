@@ -128,8 +128,8 @@ pub(crate) use authoring::{
     render_dashboard_review_json, render_dashboard_review_table, render_dashboard_review_text,
     render_dashboard_review_yaml, review_dashboard_file as build_dashboard_review,
 };
-pub(crate) use cli_defs::{build_api_client, build_http_client_for_org_from_api};
 pub(crate) use cli_defs::materialize_dashboard_common_auth;
+pub(crate) use cli_defs::{build_api_client, build_http_client_for_org_from_api};
 pub use cli_defs::{
     build_auth_context, build_http_client, build_http_client_for_org, normalize_dashboard_cli_args,
     parse_cli_from, AnalyzeArgs, BrowseArgs, CloneLiveArgs, CommonCliArgs, DashboardAuthContext,
@@ -796,7 +796,7 @@ pub fn run_dashboard_cli(args: DashboardCliArgs) -> Result<()> {
                 && export_args.without_dashboard_provisioning
             {
                 return Err(message(
-                    "At least one export variant must stay enabled. Remove --without-dashboard-raw, --without-dashboard-prompt, or --without-dashboard-provisioning.",
+                    "At least one export variant must stay enabled. Remove --without-raw, --without-prompt, or --without-provisioning.",
                 ));
             }
             let _ = export_dashboards_with_org_clients(&export_args)?;
@@ -976,18 +976,42 @@ pub fn run_dashboard_cli(args: DashboardCliArgs) -> Result<()> {
 
 fn materialize_dashboard_command_auth(args: &mut DashboardCliArgs) -> Result<()> {
     match &mut args.command {
-        DashboardCommand::Browse(inner) => inner.common = materialize_dashboard_common_auth(inner.common.clone())?,
-        DashboardCommand::List(inner) => inner.common = materialize_dashboard_common_auth(inner.common.clone())?,
-        DashboardCommand::Export(inner) => inner.common = materialize_dashboard_common_auth(inner.common.clone())?,
-        DashboardCommand::Get(inner) => inner.common = materialize_dashboard_common_auth(inner.common.clone())?,
-        DashboardCommand::CloneLive(inner) => inner.common = materialize_dashboard_common_auth(inner.common.clone())?,
-        DashboardCommand::EditLive(inner) => inner.common = materialize_dashboard_common_auth(inner.common.clone())?,
-        DashboardCommand::Import(inner) => inner.common = materialize_dashboard_common_auth(inner.common.clone())?,
-        DashboardCommand::InspectLive(inner) => inner.common = materialize_dashboard_common_auth(inner.common.clone())?,
-        DashboardCommand::Diff(inner) => inner.common = materialize_dashboard_common_auth(inner.common.clone())?,
-        DashboardCommand::Screenshot(inner) => inner.common = materialize_dashboard_common_auth(inner.common.clone())?,
-        DashboardCommand::Delete(inner) => inner.common = materialize_dashboard_common_auth(inner.common.clone())?,
-        DashboardCommand::Publish(inner) => inner.common = materialize_dashboard_common_auth(inner.common.clone())?,
+        DashboardCommand::Browse(inner) => {
+            inner.common = materialize_dashboard_common_auth(inner.common.clone())?
+        }
+        DashboardCommand::List(inner) => {
+            inner.common = materialize_dashboard_common_auth(inner.common.clone())?
+        }
+        DashboardCommand::Export(inner) => {
+            inner.common = materialize_dashboard_common_auth(inner.common.clone())?
+        }
+        DashboardCommand::Get(inner) => {
+            inner.common = materialize_dashboard_common_auth(inner.common.clone())?
+        }
+        DashboardCommand::CloneLive(inner) => {
+            inner.common = materialize_dashboard_common_auth(inner.common.clone())?
+        }
+        DashboardCommand::EditLive(inner) => {
+            inner.common = materialize_dashboard_common_auth(inner.common.clone())?
+        }
+        DashboardCommand::Import(inner) => {
+            inner.common = materialize_dashboard_common_auth(inner.common.clone())?
+        }
+        DashboardCommand::InspectLive(inner) => {
+            inner.common = materialize_dashboard_common_auth(inner.common.clone())?
+        }
+        DashboardCommand::Diff(inner) => {
+            inner.common = materialize_dashboard_common_auth(inner.common.clone())?
+        }
+        DashboardCommand::Screenshot(inner) => {
+            inner.common = materialize_dashboard_common_auth(inner.common.clone())?
+        }
+        DashboardCommand::Delete(inner) => {
+            inner.common = materialize_dashboard_common_auth(inner.common.clone())?
+        }
+        DashboardCommand::Publish(inner) => {
+            inner.common = materialize_dashboard_common_auth(inner.common.clone())?
+        }
         DashboardCommand::History(history_args) => match &mut history_args.command {
             DashboardHistorySubcommand::List(inner) => {
                 inner.common = materialize_dashboard_common_auth(inner.common.clone())?

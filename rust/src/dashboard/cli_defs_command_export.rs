@@ -17,111 +17,147 @@ pub struct ExportArgs {
     #[arg(
         long = "output-dir",
         default_value = DEFAULT_EXPORT_DIR,
-        help = "Directory to write exported dashboards into. Export writes raw/, prompt/, and provisioning/ subdirectories by default."
+        help = "Directory to write the export tree into.",
+        help_heading = "Export Output Options"
     )]
     pub output_dir: PathBuf,
-    #[arg(long, default_value_t = DEFAULT_PAGE_SIZE, help = "Dashboard search page size.")]
+    #[arg(
+        long,
+        default_value_t = DEFAULT_PAGE_SIZE,
+        help = "Dashboard search page size.",
+        help_heading = "Selection Options"
+    )]
     pub page_size: usize,
     #[arg(
         long,
         conflicts_with = "all_orgs",
-        help = "Export dashboards from one explicit Grafana org ID instead of the current org. Use this when the same credentials can see multiple orgs."
+        help = "Export dashboards from one explicit Grafana org ID.",
+        help_heading = "Selection Options"
     )]
     pub org_id: Option<i64>,
     #[arg(
         long,
         default_value_t = false,
         conflicts_with = "org_id",
-        help = "Enumerate all visible Grafana orgs and export dashboards from each org into per-org subdirectories under the export root. Prefer Basic auth when you need cross-org export because API tokens are often scoped to one org."
+        help = "Export dashboards from every visible Grafana org.",
+        help_heading = "Selection Options"
     )]
     pub all_orgs: bool,
     #[arg(
         long,
         default_value_t = false,
-        help = "Write dashboard files directly into each export variant directory instead of recreating Grafana folder-based subdirectories on disk."
+        help = "Write files directly into each export variant directory.",
+        help_heading = "Export Layout Options"
     )]
     pub flat: bool,
     #[arg(
         long,
         default_value_t = false,
-        help = "Replace existing local export files in the target directory instead of failing when a file already exists."
+        help = "Replace existing export files in the target directory.",
+        help_heading = "Safety Options"
     )]
     pub overwrite: bool,
     #[arg(
-        long,
+        long = "without-raw",
+        alias = "without-dashboard-raw",
         default_value_t = false,
-        help = "Skip the API-safe raw/ export variant. Use this only when you do not need later API import or diff workflows."
+        help = "Skip the raw/ export variant.",
+        help_heading = "Export Variant Options"
     )]
     pub without_dashboard_raw: bool,
     #[arg(
-        long,
+        long = "without-prompt",
+        alias = "without-dashboard-prompt",
         default_value_t = false,
-        help = "Skip the web-import prompt/ export variant. Use this only when you do not need Grafana UI import with datasource prompts."
+        help = "Skip the prompt/ export variant.",
+        help_heading = "Export Variant Options"
     )]
     pub without_dashboard_prompt: bool,
     #[arg(
-        long,
+        long = "without-provisioning",
+        alias = "without-dashboard-provisioning",
         default_value_t = false,
-        help = "Skip the file-provisioning provisioning/ export variant. Use this only when you do not need Grafana file provisioning artifacts."
+        help = "Skip the provisioning/ export variant.",
+        help_heading = "Export Variant Options"
     )]
     pub without_dashboard_provisioning: bool,
     #[arg(
         long,
         default_value_t = false,
-        help = "Write dashboard revision history artifacts under a history/ subdirectory for each exported org scope."
+        help = "Also write history/ artifacts for each exported org scope.",
+        help_heading = "Export Variant Options"
     )]
     pub include_history: bool,
     #[arg(
-        long,
+        long = "provider-name",
+        value_name = "NAME",
+        alias = "provisioning-provider-name",
         default_value = "grafana-utils-dashboards",
-        help = "Set the Grafana provisioning provider name written into provisioning/provisioning/dashboards.yaml."
+        help = "Set the generated provisioning provider name.",
+        help_heading = "Provisioning Options"
     )]
     pub provisioning_provider_name: String,
     #[arg(
-        long,
-        help = "Override the Grafana org ID written into the provisioning provider config. By default the export uses the current org ID."
+        long = "provider-org-id",
+        value_name = "ORG_ID",
+        alias = "provisioning-provider-org-id",
+        help = "Override the org ID written into the provisioning config.",
+        help_heading = "Provisioning Options"
     )]
     pub provisioning_provider_org_id: Option<i64>,
     #[arg(
-        long,
-        help = "Override the dashboard directory path written into the provisioning provider config. By default the export points at the current export tree path under provisioning/dashboards."
+        long = "provider-path",
+        value_name = "PATH",
+        alias = "provisioning-provider-path",
+        help = "Override the dashboard path written into the provisioning config.",
+        help_heading = "Provisioning Options"
     )]
     pub provisioning_provider_path: Option<PathBuf>,
     #[arg(
-        long,
+        long = "provider-disable-deletion",
+        alias = "provisioning-provider-disable-deletion",
         default_value_t = false,
-        help = "Set disableDeletion in the generated provisioning provider config."
+        help = "Set disableDeletion in the provisioning provider config.",
+        help_heading = "Provisioning Options"
     )]
     pub provisioning_provider_disable_deletion: bool,
     #[arg(
-        long,
+        long = "provider-allow-ui-updates",
+        alias = "provisioning-provider-allow-ui-updates",
         default_value_t = false,
-        help = "Set allowUiUpdates in the generated provisioning provider config."
+        help = "Set allowUiUpdates in the provisioning provider config.",
+        help_heading = "Provisioning Options"
     )]
     pub provisioning_provider_allow_ui_updates: bool,
     #[arg(
-        long,
+        long = "provider-update-interval-seconds",
+        value_name = "SECONDS",
+        alias = "provisioning-provider-update-interval-seconds",
         default_value_t = 30,
-        help = "Set updateIntervalSeconds in the generated provisioning provider config."
+        help = "Set updateIntervalSeconds in the provisioning provider config.",
+        help_heading = "Provisioning Options"
     )]
     pub provisioning_provider_update_interval_seconds: i64,
     #[arg(
         long,
         default_value_t = false,
-        help = "Preview the dashboard files and indexes that would be written without changing disk."
+        help = "Preview the files and indexes without writing to disk.",
+        help_heading = "Output Options"
     )]
     pub dry_run: bool,
     #[arg(
         long,
         default_value_t = false,
-        help = "Show concise per-dashboard export progress in <current>/<total> form while processing files."
+        help = "Show concise <current>/<total> export progress.",
+        help_heading = "Output Options"
     )]
     pub progress: bool,
     #[arg(
         short = 'v',
         long,
         default_value_t = false,
-        help = "Show detailed per-item export output, including variants and output paths. Overrides --progress output."
+        help = "Show detailed per-item export output. Overrides --progress.",
+        help_heading = "Output Options"
     )]
     pub verbose: bool,
 }

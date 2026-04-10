@@ -16,10 +16,10 @@ Use this when you need a local export tree for later import, review, diff, or fi
 - `--all-orgs`: export each visible org into per-org subdirectories. Prefer Basic auth.
 - `--flat`: write files directly into each export variant directory.
 - `--overwrite`: replace existing export files.
-- `--without-dashboard-raw`, `--without-dashboard-prompt`, `--without-dashboard-provisioning`: skip a variant.
+- `--without-raw`, `--without-prompt`, `--without-provisioning`: skip a variant.
 - `--include-history`: write dashboard revision-history artifacts under a `history/` subdirectory for each exported org scope.
-- `--provisioning-provider-name`, `--provisioning-provider-org-id`, `--provisioning-provider-path`: customize the generated provisioning provider file.
-- `--provisioning-provider-disable-deletion`, `--provisioning-provider-allow-ui-updates`, `--provisioning-provider-update-interval-seconds`: tune provisioning behavior.
+- `--provider-name`, `--provider-org-id`, `--provider-path`: customize the generated provisioning provider file.
+- `--provider-disable-deletion`, `--provider-allow-ui-updates`, `--provider-update-interval-seconds`: tune provisioning behavior.
 - `--dry-run`: preview what would be written.
 
 ## Notes
