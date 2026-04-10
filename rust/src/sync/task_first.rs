@@ -20,8 +20,12 @@ use super::{
     SyncCommandOutput, SyncOutputFormat, SyncPlanArgs, SyncPromotionPreflightArgs,
 };
 use crate::common::{emit_plain_output, message};
-use crate::overview::{execute_overview, render_overview_text};
+use crate::overview::{
+    execute_overview, render_overview_text, OverviewArtifact, OverviewInputField,
+    OVERVIEW_ARTIFACT_BUNDLE_PREFLIGHT_KIND, OVERVIEW_ARTIFACT_PROMOTION_PREFLIGHT_KIND,
+};
 use crate::project_status_command::{execute_project_status_staged, render_project_status_text};
+use crate::project_status_staged::build_staged_project_status;
 
 fn ensure_any_discovered(discovered: &DiscoveredChangeInputs) -> Result<()> {
     if discovered == &DiscoveredChangeInputs::default() {
@@ -49,6 +53,59 @@ fn emit_preview_output(
         render_and_emit_sync_command_output(output, format)?;
     }
     Ok(())
+}
+
+fn build_preview_project_status_inputs(
+    source_bundle: &PathBuf,
+    target_inventory: &PathBuf,
+    mapping_file: Option<&PathBuf>,
+    availability_file: Option<&PathBuf>,
+) -> Vec<OverviewInputField> {
+    let mut inputs = vec![
+        OverviewInputField {
+            name: "sourceBundle".to_string(),
+            value: source_bundle.display().to_string(),
+        },
+        OverviewInputField {
+            name: "targetInventory".to_string(),
+            value: target_inventory.display().to_string(),
+        },
+    ];
+    if let Some(path) = mapping_file {
+        inputs.push(OverviewInputField {
+            name: "mappingFile".to_string(),
+            value: path.display().to_string(),
+        });
+    }
+    if let Some(path) = availability_file {
+        inputs.push(OverviewInputField {
+            name: "availabilityFile".to_string(),
+            value: path.display().to_string(),
+        });
+    }
+    inputs
+}
+
+fn attach_preview_project_status(
+    mut output: SyncCommandOutput,
+    artifact_kind: &str,
+    title: &str,
+    inputs: Vec<OverviewInputField>,
+) -> Result<SyncCommandOutput> {
+    let status = build_staged_project_status(&[OverviewArtifact {
+        kind: artifact_kind.to_string(),
+        title: title.to_string(),
+        inputs,
+        document: output.document.clone(),
+    }]);
+    if let Some(object) = output.document.as_object_mut() {
+        object.insert("projectStatus".to_string(), serde_json::to_value(&status)?);
+    }
+    let mut status_lines = render_project_status_text(&status);
+    status_lines.push(String::new());
+    status_lines.extend(output.text_lines);
+    output.text_lines = status_lines;
+    Ok(output)
 }
 
 fn normalize_change_dashboard_args(
@@ -220,6 +277,28 @@ pub(crate) fn run_sync_preview(args: ChangePreviewArgs) -> Result<()> {
             org_id: args.org_id,
             output_format: args.output.output_format,
         })?;
+        let output = attach_preview_project_status(
+            output,
+            OVERVIEW_ARTIFACT_PROMOTION_PREFLIGHT_KIND,
+            "Sync promotion preflight",
+            build_preview_project_status_inputs(
+                &args.inputs
+                    .source_bundle
+                    .clone()
+                    .or(discovered.source_bundle.clone())
+                    .expect("promotion preview requires source bundle"),
+                &args.target_inventory
+                    .clone()
+                    .or(discovered.target_inventory.clone())
+                    .expect("promotion preview requires target inventory"),
+                args.mapping_file
+                    .as_ref()
+                    .or(discovered.mapping_file.as_ref()),
+                args.availability_file
+                    .as_ref()
+                    .or(discovered.availability_file.as_ref()),
+            ),
+        )?;
         return emit_preview_output(
             attach_discovery_to_sync_output(output, &discovered),
             args.output.output_file.as_ref(),
@@ -237,6 +316,26 @@ pub(crate) fn run_sync_preview(args: ChangePreviewArgs) -> Result<()> {
             org_id: args.org_id,
             output_format: args.output.output_format,
         })?;
+        let output = attach_preview_project_status(
+            output,
+            OVERVIEW_ARTIFACT_BUNDLE_PREFLIGHT_KIND,
+            "Sync bundle preflight",
+            build_preview_project_status_inputs(
+                &args.inputs
+                    .source_bundle
+                    .clone()
+                    .or(discovered.source_bundle.clone())
+                    .expect("bundle preview requires source bundle"),
+                &args.target_inventory
+                    .clone()
+                    .or(discovered.target_inventory.clone())
+                    .expect("bundle preview requires target inventory"),
+                None,
+                args.availability_file
+                    .as_ref()
+                    .or(discovered.availability_file.as_ref()),
+            ),
+        )?;
         return emit_preview_output(
             attach_discovery_to_sync_output(output, &discovered),
             args.output.output_file.as_ref(),
@@ -491,5 +590,55 @@ mod task_first_rust_tests {
         assert!(provenance.contains("dashboard-provisioning="));
         assert!(provenance.contains("alert-export="));
         assert!(provenance.contains("datasource-provisioning="));
+    }
+
+    #[test]
+    fn attach_preview_project_status_adds_project_status_document_and_text_block() {
+        let output = SyncCommandOutput {
+            document: serde_json::json!({
+                "kind": "grafana-utils-sync-bundle-preflight",
+                "summary": {
+                    "resourceCount": 2,
+                    "syncBlockingCount": 1,
+                    "providerBlockingCount": 0,
+                    "secretPlaceholderBlockingCount": 0,
+                    "alertArtifactCount": 0,
+                    "alertArtifactPlanOnlyCount": 0,
+                    "alertArtifactBlockingCount": 0
+                }
+            }),
+            text_lines: vec!["Sync bundle preflight".to_string()],
+        };
+
+        let attached = attach_preview_project_status(
+            output,
+            OVERVIEW_ARTIFACT_BUNDLE_PREFLIGHT_KIND,
+            "Sync bundle preflight",
+            build_preview_project_status_inputs(
+                &PathBuf::from("./bundle.json"),
+                &PathBuf::from("./target.json"),
+                None,
+                None,
+            ),
+        )
+        .unwrap();
+
+        assert_eq!(
+            attached.document["projectStatus"]["domains"][0]["id"],
+            serde_json::json!("sync")
+        );
+        assert_eq!(
+            attached.document["projectStatus"]["domains"][0]["sourceKinds"],
+            serde_json::json!(["bundle-preflight"])
+        );
+        assert_eq!(attached.text_lines[0], "Project status");
+        assert!(attached
+            .text_lines
+            .iter()
+            .any(|line| line.contains("Signals: sync sources=bundle-preflight")));
+        assert!(attached
+            .text_lines
+            .iter()
+            .any(|line| line == "Sync bundle preflight"));
     }
 }

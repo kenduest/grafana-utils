@@ -6,8 +6,10 @@ use super::{
     OVERVIEW_KIND, OVERVIEW_SCHEMA_VERSION,
 };
 use crate::common::{message, tool_version, Result};
+use crate::project_status::{
+    render_domain_finding_summary, render_project_status_signal_summary,
+};
 use crate::project_status_staged::build_staged_project_status;
-use crate::project_status::render_project_status_signal_summary;
 use crate::sync::render_discovery_summary_from_value;
 use serde_json::Value;
 
@@ -97,6 +99,12 @@ pub(crate) fn render_overview_text(document: &OverviewDocument) -> Result<Vec<St
             );
             if let Some(action) = domain.next_actions.first() {
                 line.push_str(&format!(" next={action}"));
+            }
+            if let Some(summary) = render_domain_finding_summary(&domain.blockers) {
+                line.push_str(&format!(" blockerKinds={summary}"));
+            }
+            if let Some(summary) = render_domain_finding_summary(&domain.warnings) {
+                line.push_str(&format!(" warningKinds={summary}"));
             }
             lines.push(line);
         }

@@ -126,6 +126,19 @@ pub(crate) fn status_finding(kind: &str, count: usize, source: &str) -> ProjectS
     }
 }
 
+pub(crate) fn render_domain_finding_summary(findings: &[ProjectStatusFinding]) -> Option<String> {
+    if findings.is_empty() {
+        return None;
+    }
+    Some(
+        findings
+            .iter()
+            .map(|finding| format!("{}:{}", finding.kind, finding.count))
+            .collect::<Vec<_>>()
+            .join(","),
+    )
+}
+
 pub(crate) fn render_project_status_signal_summary(status: &ProjectStatus) -> Option<String> {
     let mut fragments = Vec::new();
     for domain in &status.domains {

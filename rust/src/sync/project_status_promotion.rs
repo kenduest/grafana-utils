@@ -47,6 +47,10 @@ const PROMOTION_CHECK_SUMMARY_SIGNAL_KEYS: &[&str] = &[
     "checkSummary.folderRemapCount",
     "checkSummary.datasourceUidRemapCount",
     "checkSummary.datasourceNameRemapCount",
+    "checkSummary.resolvedCount",
+    "checkSummary.directCount",
+    "checkSummary.mappedCount",
+    "checkSummary.missingTargetCount",
 ];
 
 const PROMOTION_BLOCKER_MISSING_MAPPINGS: &str = "missing-mappings";
@@ -744,6 +748,18 @@ mod tests {
         assert!(status
             .signal_keys
             .contains(&"checkSummary.datasourceNameRemapCount".to_string()));
+        assert!(status
+            .signal_keys
+            .contains(&"checkSummary.resolvedCount".to_string()));
+        assert!(status
+            .signal_keys
+            .contains(&"checkSummary.directCount".to_string()));
+        assert!(status
+            .signal_keys
+            .contains(&"checkSummary.mappedCount".to_string()));
+        assert!(status
+            .signal_keys
+            .contains(&"checkSummary.missingTargetCount".to_string()));
         assert!(status.warnings.iter().any(|warning| {
             warning.kind == "folder-remaps"
                 && warning.count == 1

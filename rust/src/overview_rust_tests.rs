@@ -1061,6 +1061,10 @@ fn build_overview_document_and_render_overview_text_for_all_sections() {
         .as_array()
         .unwrap()
         .contains(&json!("checkSummary.datasourceUidRemapCount")));
+    assert!(promotion_domain["signalKeys"]
+        .as_array()
+        .unwrap()
+        .contains(&json!("checkSummary.resolvedCount")));
     assert_eq!(json_document["selectedSectionIndex"], json!(0));
     assert_eq!(json_document["sections"].as_array().unwrap().len(), 4);
     assert_eq!(

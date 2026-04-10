@@ -434,9 +434,9 @@ fn project_status_live_text_renderer_surfaces_overall_domain_and_action_sections
             "Signals: sync sources=sync-summary,bundle-preflight signalKeys=6 blockers=3 warnings=0"
                 .to_string(),
             "Domains:".to_string(),
-            "- dashboard status=ready mode=inspect-summary primary=4 blockers=0 warnings=1 freshness=stale next=review dashboard governance warnings before promotion or apply"
+            "- dashboard status=ready mode=inspect-summary primary=4 blockers=0 warnings=1 freshness=stale next=review dashboard governance warnings before promotion or apply warningKinds=risk-records:1"
                 .to_string(),
-            "- sync status=blocked mode=staged-documents primary=6 blockers=3 warnings=0 freshness=current next=resolve sync workflow blockers in the fixed order: sync, provider, secret-placeholder, alert-artifact"
+            "- sync status=blocked mode=staged-documents primary=6 blockers=3 warnings=0 freshness=current next=resolve sync workflow blockers in the fixed order: sync, provider, secret-placeholder, alert-artifact blockerKinds=sync-blocking:3"
                 .to_string(),
             "Top blockers:".to_string(),
             "- sync sync-blocking count=3 source=summary.syncBlockingCount".to_string(),

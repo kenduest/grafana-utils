@@ -67,6 +67,36 @@ fn build_sync_source_bundle_document_matches_cross_domain_summary_contract() {
 }
 
 #[test]
+fn render_sync_source_bundle_text_includes_discovery_summary_when_present() {
+    let mut source_bundle = build_sync_source_bundle_document(
+        &[],
+        &[],
+        &[],
+        &[],
+        Some(&build_alert_replay_artifact_fixture(true)),
+        Some(&json!({"bundleLabel": "sync-smoke"})),
+    )
+    .unwrap();
+    source_bundle.as_object_mut().unwrap().insert(
+        "discovery".to_string(),
+        json!({
+            "workspaceRoot": "/tmp/grafana-oac-repo",
+            "inputCount": 2,
+            "inputs": {
+                "dashboardExportDir": "/tmp/grafana-oac-repo/dashboards/raw",
+                "alertExportDir": "/tmp/grafana-oac-repo/alerts/raw"
+            }
+        }),
+    );
+
+    let text = render_sync_source_bundle_text(&source_bundle).unwrap();
+    assert_eq!(
+        text[1],
+        "Discovery: workspace-root=/tmp/grafana-oac-repo sources=dashboard-export, alert-export"
+    );
+}
+
+#[test]
 fn build_sync_source_bundle_document_keeps_normalized_alert_specs() {
     let source_bundle = build_sync_source_bundle_document(
         &[],

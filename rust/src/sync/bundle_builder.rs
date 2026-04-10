@@ -4,6 +4,7 @@
 //! only shapes the document; validation and live fetching happen in adjacent layers.
 
 use super::bundle_alert_contracts::build_alert_bundle_contract_document;
+use super::render_discovery_summary_from_value;
 use super::workbench::{SYNC_SOURCE_BUNDLE_KIND, SYNC_SOURCE_BUNDLE_SCHEMA_VERSION};
 use crate::common::{message, tool_version, Result};
 use serde_json::{Map, Value};
@@ -70,8 +71,13 @@ pub fn render_sync_source_bundle_text(document: &Value) -> Result<Vec<String>> {
         .and_then(Value::as_object)
         .cloned()
         .ok_or_else(|| message("Sync source bundle document is missing summary."))?;
-    Ok(vec![
-        "Sync source bundle".to_string(),
+    let mut lines = vec!["Sync source bundle".to_string()];
+    if let Some(discovery) = document.get("discovery").and_then(Value::as_object) {
+        if let Some(summary_line) = render_discovery_summary_from_value(discovery) {
+            lines.push(summary_line);
+        }
+    }
+    lines.extend([
         format!(
             "Dashboards: {}",
             summary
@@ -116,5 +122,6 @@ pub fn render_sync_source_bundle_text(document: &Value) -> Result<Vec<String>> {
                 .and_then(Value::as_i64)
                 .unwrap_or(0),
         ),
-    ])
+    ]);
+    Ok(lines)
 }

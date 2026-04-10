@@ -13,7 +13,7 @@ use std::path::PathBuf;
 use crate::common::{
     render_json_value, set_json_color_choice, CliColorChoice, Result as CommonResult,
 };
-use crate::project_status::render_project_status_signal_summary;
+use crate::project_status::{render_domain_finding_summary, render_project_status_signal_summary};
 use crate::overview::{self, OverviewArgs, OverviewOutputFormat};
 use crate::project_status::ProjectStatus;
 use crate::project_status_live_runtime::build_live_project_status;
@@ -341,6 +341,12 @@ pub(crate) fn render_project_status_text(status: &ProjectStatus) -> Vec<String> 
             );
             if let Some(action) = domain.next_actions.first() {
                 line.push_str(&format!(" next={action}"));
+            }
+            if let Some(summary) = render_domain_finding_summary(&domain.blockers) {
+                line.push_str(&format!(" blockerKinds={summary}"));
+            }
+            if let Some(summary) = render_domain_finding_summary(&domain.warnings) {
+                line.push_str(&format!(" warningKinds={summary}"));
             }
             lines.push(line);
         }
