@@ -63,6 +63,8 @@ const DATASOURCE_REVIEW_IMPORT_ORG_CREATION_ACTIONS: &[&str] =
     &["review datasource org creation before import or sync"];
 const DATASOURCE_REVIEW_IMPORT_ROUTED_SOURCE_ORGS_ACTIONS: &[&str] =
     &["review datasource org routing before import or sync"];
+const DATASOURCE_REVIEW_IMPORT_ROUTING_AND_ORG_CREATION_ACTIONS: &[&str] =
+    &["review datasource org routing and org creation before import or sync"];
 const DATASOURCE_RESOLVE_IMPORT_BLOCKERS_ACTIONS: &[&str] =
     &["resolve datasource import preview blockers before import or sync"];
 
@@ -344,11 +346,6 @@ pub(crate) fn build_datasource_domain_status(
             would_create_org,
             &summary_source_label(would_create_org_source, "wouldCreateOrgCount"),
         );
-        next_actions.extend(
-            DATASOURCE_REVIEW_IMPORT_ORG_CREATION_ACTIONS
-                .iter()
-                .map(|item| (*item).to_string()),
-        );
     }
     if routed_source_orgs > 0 {
         push_warning(
@@ -358,11 +355,28 @@ pub(crate) fn build_datasource_domain_status(
             routed_source_orgs,
             "summary.sourceOrgLabels",
         );
+    }
+    if would_create_org > 0 && routed_source_orgs > 0 {
         next_actions.extend(
-            DATASOURCE_REVIEW_IMPORT_ROUTED_SOURCE_ORGS_ACTIONS
+            DATASOURCE_REVIEW_IMPORT_ROUTING_AND_ORG_CREATION_ACTIONS
                 .iter()
                 .map(|item| (*item).to_string()),
         );
+    } else {
+        if would_create_org > 0 {
+            next_actions.extend(
+                DATASOURCE_REVIEW_IMPORT_ORG_CREATION_ACTIONS
+                    .iter()
+                    .map(|item| (*item).to_string()),
+            );
+        }
+        if routed_source_orgs > 0 {
+            next_actions.extend(
+                DATASOURCE_REVIEW_IMPORT_ROUTED_SOURCE_ORGS_ACTIONS
+                    .iter()
+                    .map(|item| (*item).to_string()),
+            );
+        }
     }
     if would_create > 0 || would_update > 0 || would_block > 0 || would_skip > 0 {
         next_actions.extend(
@@ -769,6 +783,44 @@ mod tests {
                 "summary.wouldCreateOrgCount",
                 "summary.sourceOrgLabels",
             ])
+        );
+    }
+
+    #[test]
+    fn build_datasource_domain_status_combines_routing_and_org_creation_guidance() {
+        let document = json!({
+            "summary": {
+                "datasourceCount": 4,
+                "orgCount": 3,
+                "defaultCount": 1,
+                "typeCount": 2,
+                "wouldCreateOrgCount": 2,
+                "sourceOrgLabels": ["1:Main Org.", "2:Ops Org"],
+            }
+        });
+
+        let domain = build_datasource_domain_status(Some(&document)).unwrap();
+        let domain = serde_json::to_value(domain).unwrap();
+
+        assert_eq!(domain["warningCount"], json!(4));
+        assert_eq!(
+            domain["warnings"],
+            json!([
+                {
+                    "kind": "import-preview-would-create-org",
+                    "count": 2,
+                    "source": "summary.wouldCreateOrgCount",
+                },
+                {
+                    "kind": "import-preview-routed-source-orgs",
+                    "count": 2,
+                    "source": "summary.sourceOrgLabels",
+                }
+            ])
+        );
+        assert_eq!(
+            domain["nextActions"],
+            json!(["review datasource org routing and org creation before import or sync"])
         );
     }
 
