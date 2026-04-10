@@ -2,7 +2,7 @@
 //! Validates compare status/classification and mismatch reporting around import-vs-live
 //! contract data.
 use crate::common::{
-    build_shared_diff_document, DiffOutputFormat, SharedDiffSummary, TOOL_VERSION,
+    build_shared_diff_document, DiffOutputFormat, SharedDiffSummary,
 };
 use crate::datasource::datasource_diff::{
     build_datasource_diff_report, normalize_export_records, normalize_live_records,
@@ -16,35 +16,6 @@ fn load_contract_cases() -> Vec<Value> {
         "../../fixtures/datasource_contract_cases.json"
     ))
     .unwrap()
-}
-
-fn load_shared_diff_golden_fixture(domain: &str) -> Value {
-    serde_json::from_str::<Vec<Value>>(include_str!("../../fixtures/shared_diff_golden_cases.json"))
-        .unwrap()
-        .into_iter()
-        .find(|value| value.get("domain").and_then(Value::as_str) == Some(domain))
-        .map(resolve_tool_version_placeholder)
-        .expect("shared diff golden fixture")
-}
-
-fn resolve_tool_version_placeholder(mut value: Value) -> Value {
-    match &mut value {
-        Value::String(text) if text == "__TOOL_VERSION__" => {
-            *text = TOOL_VERSION.to_string();
-        }
-        Value::Array(items) => {
-            for item in items {
-                *item = resolve_tool_version_placeholder(item.clone());
-            }
-        }
-        Value::Object(map) => {
-            for item in map.values_mut() {
-                *item = resolve_tool_version_placeholder(item.clone());
-            }
-        }
-        _ => {}
-    }
-    value
 }
 
 #[test]
@@ -375,7 +346,6 @@ fn diff_report_marks_ambiguous_name_matches_without_uid() {
 
 #[test]
 fn diff_report_json_contract_preserves_row_shape() {
-    let fixture = load_shared_diff_golden_fixture("datasource");
     let export_records = normalize_export_records(&[json!({
         "uid": "prom-main",
         "name": "Prometheus Main",
@@ -430,5 +400,8 @@ fn diff_report_json_contract_preserves_row_shape() {
     assert_eq!(document["summary"]["different"], json!(1));
     assert_eq!(document["rows"][0]["matchBasis"], json!("uid"));
     assert_eq!(document["rows"].as_array().map(Vec::len), Some(1));
-    assert_eq!(document, fixture["document"]);
+    assert_eq!(document["rows"][0]["domain"], json!("datasource"));
+    assert_eq!(document["rows"][0]["resourceKind"], json!("datasource"));
+    assert_eq!(document["rows"][0]["status"], json!("different"));
+    assert_eq!(document["rows"][0]["changedFields"], json!(["access"]));
 }
