@@ -5,6 +5,18 @@ use clap::{ColorChoice, CommandFactory};
 use super::DashboardCliArgs;
 use crate::cli_help_examples::colorize_dashboard_subcommand_help;
 
+fn ensure_trailing_blank_line(mut text: String) -> String {
+    if text.ends_with("\n\n") {
+        return text;
+    }
+    if text.ends_with('\n') {
+        text.push('\n');
+    } else {
+        text.push_str("\n\n");
+    }
+    text
+}
+
 fn render_dashboard_subcommand_help_text(subcommand_name: &str, colorize: bool) -> String {
     let canonical_name = match subcommand_name {
         "inspect-export" => "analyze-export",
@@ -13,11 +25,13 @@ fn render_dashboard_subcommand_help_text(subcommand_name: &str, colorize: bool) 
         other => other,
     };
     let mut command = DashboardCliArgs::command();
-    let configured = std::mem::take(&mut command).color(if colorize {
-        ColorChoice::Always
-    } else {
-        ColorChoice::Never
-    });
+    let configured = std::mem::take(&mut command)
+        .styles(crate::help_styles::CLI_HELP_STYLES)
+        .color(if colorize {
+            ColorChoice::Always
+        } else {
+            ColorChoice::Never
+        });
     command = configured;
     let subcommand = command
         .find_subcommand_mut(canonical_name)
@@ -32,9 +46,9 @@ fn render_dashboard_subcommand_help_text(subcommand_name: &str, colorize: bool) 
         1,
     );
     if colorize {
-        colorize_dashboard_subcommand_help(&text)
+        ensure_trailing_blank_line(colorize_dashboard_subcommand_help(&text))
     } else {
-        text
+        ensure_trailing_blank_line(text)
     }
 }
 

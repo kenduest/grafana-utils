@@ -24,13 +24,9 @@ macro_rules! help_block {
 }
 
 pub(crate) const HELP_COLOR_RESET: &str = "\x1b[0m";
-pub(crate) const HELP_COLOR_DASHBOARD: &str = "\x1b[1;36m";
+pub(crate) const HELP_COLOR_SECTION: &str = "\x1b[1;97m";
 pub(crate) const HELP_COLOR_COMMAND: &str = "\x1b[1;97m";
-pub(crate) const HELP_COLOR_ALERT: &str = "\x1b[1;31m";
-pub(crate) const HELP_COLOR_DATASOURCE: &str = "\x1b[1;32m";
-pub(crate) const HELP_COLOR_ACCESS: &str = "\x1b[1;33m";
-pub(crate) const HELP_COLOR_SYNC: &str = "\x1b[1;34m";
-pub(crate) const HELP_COLOR_PROFILE: &str = "\x1b[1;35m";
+pub(crate) const HELP_COLOR_SUPPORT: &str = "\x1b[97m";
 
 pub(crate) const HELP_FULL_HINT: &str =
     "Extended Help:\n  --help-full\n          Print help with extended examples\n";
@@ -299,41 +295,79 @@ pub(crate) const SYNC_HELP_FULL_TEXT: &str = help_block!(
     )
 );
 
-pub(crate) const HELP_EXAMPLE_LABELS: [(&str, &str); 30] = [
-    ("[Dashboard Export]", HELP_COLOR_DASHBOARD),
-    ("[Dashboard Capture]", HELP_COLOR_DASHBOARD),
-    ("[Dashboard Analyze]", HELP_COLOR_DASHBOARD),
-    ("[Alert Export]", HELP_COLOR_ALERT),
-    ("[Alert Import]", HELP_COLOR_ALERT),
-    ("[Alert List]", HELP_COLOR_ALERT),
-    ("[Datasource Inventory]", HELP_COLOR_DATASOURCE),
-    ("[Datasource List]", HELP_COLOR_DATASOURCE),
-    ("[Datasource Add]", HELP_COLOR_DATASOURCE),
-    ("[Datasource Import]", HELP_COLOR_DATASOURCE),
-    ("[Datasource Local Inventory]", HELP_COLOR_DATASOURCE),
-    ("[Datasource Diff]", HELP_COLOR_DATASOURCE),
-    ("[Access Local Inventory]", HELP_COLOR_ACCESS),
-    ("[Access User Diff]", HELP_COLOR_ACCESS),
-    ("[Access Team Import]", HELP_COLOR_ACCESS),
-    ("[Access Org Delete]", HELP_COLOR_ACCESS),
-    ("[Access Token Add]", HELP_COLOR_ACCESS),
-    ("[Profile Show]", HELP_COLOR_PROFILE),
-    ("[Profile Init]", HELP_COLOR_PROFILE),
-    ("[Profile Add]", HELP_COLOR_PROFILE),
-    ("[Profile Example]", HELP_COLOR_PROFILE),
-    ("[Change Planning]", HELP_COLOR_SYNC),
-    ("[Change Summary]", HELP_COLOR_SYNC),
-    ("[Change Plan]", HELP_COLOR_SYNC),
-    ("[Change Review]", HELP_COLOR_SYNC),
-    ("[Change Apply]", HELP_COLOR_SYNC),
-    ("[Overview Staged]", HELP_COLOR_SYNC),
-    ("[Overview Bundle]", HELP_COLOR_SYNC),
-    ("[Project Status Staged]", HELP_COLOR_SYNC),
-    ("[Project Status Live]", HELP_COLOR_SYNC),
+pub(crate) const HELP_EXAMPLE_LABELS: [(&str, &str); 39] = [
+    ("[Config]", HELP_COLOR_SECTION),
+    ("[Observe]", HELP_COLOR_SECTION),
+    ("[Export]", HELP_COLOR_SECTION),
+    ("[Change]", HELP_COLOR_SECTION),
+    ("[Advanced]", HELP_COLOR_SECTION),
+    ("[Dashboard import]", HELP_COLOR_SECTION),
+    ("[Alert authoring]", HELP_COLOR_SECTION),
+    ("[Datasource diff]", HELP_COLOR_SECTION),
+    ("[Access administration]", HELP_COLOR_SECTION),
+    ("[Dashboard Export]", HELP_COLOR_SECTION),
+    ("[Dashboard Capture]", HELP_COLOR_SECTION),
+    ("[Dashboard Analyze]", HELP_COLOR_SECTION),
+    ("[Alert Export]", HELP_COLOR_SECTION),
+    ("[Alert Import]", HELP_COLOR_SECTION),
+    ("[Alert List]", HELP_COLOR_SECTION),
+    ("[Datasource Inventory]", HELP_COLOR_SECTION),
+    ("[Datasource List]", HELP_COLOR_SECTION),
+    ("[Datasource Add]", HELP_COLOR_SECTION),
+    ("[Datasource Import]", HELP_COLOR_SECTION),
+    ("[Datasource Local Inventory]", HELP_COLOR_SECTION),
+    ("[Datasource Diff]", HELP_COLOR_SECTION),
+    ("[Access Local Inventory]", HELP_COLOR_SECTION),
+    ("[Access User Diff]", HELP_COLOR_SECTION),
+    ("[Access Team Import]", HELP_COLOR_SECTION),
+    ("[Access Org Delete]", HELP_COLOR_SECTION),
+    ("[Access Token Add]", HELP_COLOR_SECTION),
+    ("[Profile Show]", HELP_COLOR_SECTION),
+    ("[Profile Init]", HELP_COLOR_SECTION),
+    ("[Profile Add]", HELP_COLOR_SECTION),
+    ("[Profile Example]", HELP_COLOR_SECTION),
+    ("[Change Planning]", HELP_COLOR_SECTION),
+    ("[Change Summary]", HELP_COLOR_SECTION),
+    ("[Change Plan]", HELP_COLOR_SECTION),
+    ("[Change Review]", HELP_COLOR_SECTION),
+    ("[Change Apply]", HELP_COLOR_SECTION),
+    ("[Overview Staged]", HELP_COLOR_SECTION),
+    ("[Overview Bundle]", HELP_COLOR_SECTION),
+    ("[Project Status Staged]", HELP_COLOR_SECTION),
+    ("[Project Status Live]", HELP_COLOR_SECTION),
 ];
 
 pub(crate) fn colorize_help_examples(text: &str) -> String {
-    let mut colored = text.to_string();
+    let mut lines = Vec::new();
+    for line in text.lines() {
+        let trimmed = line.trim_start();
+        let indent = &line[..line.len() - trimmed.len()];
+        let colored = match trimmed {
+            "Examples:" | "Extended Examples:" | "Notes:" | "More help:" => {
+                format!("{HELP_COLOR_SECTION}{trimmed}{HELP_COLOR_RESET}")
+            }
+            _ if trimmed.starts_with("grafana-util ") => {
+                format!("{indent}{HELP_COLOR_COMMAND}{trimmed}{HELP_COLOR_RESET}")
+            }
+            _ if trimmed.starts_with("- ") => {
+                format!("{indent}{HELP_COLOR_SUPPORT}{trimmed}{HELP_COLOR_RESET}")
+            }
+            _ if indent == "  " && trimmed.ends_with(':') => {
+                format!("{indent}{HELP_COLOR_SUPPORT}{trimmed}{HELP_COLOR_RESET}")
+            }
+            _ if !trimmed.is_empty()
+                && indent.len() >= 6
+                && !trimmed.starts_with("--")
+                && !trimmed.starts_with('[')
+                && !trimmed.starts_with("grafana-util ") =>
+            {
+                format!("{indent}{HELP_COLOR_SUPPORT}{trimmed}{HELP_COLOR_RESET}")
+            }
+            _ => line.to_string(),
+        };
+        lines.push(colored);
+    }
+    let mut colored = lines.join("\n");
     for (label, color) in HELP_EXAMPLE_LABELS {
         let colored_label = format!("{color}{label}{HELP_COLOR_RESET}");
         colored = colored.replace(label, &colored_label);
@@ -352,7 +386,7 @@ pub(crate) fn colorize_dashboard_short_help(text: &str) -> String {
         "Analyze and review risk:",
         "More help:",
     ] {
-        let colored_heading = format!("{HELP_COLOR_DASHBOARD}{heading}{HELP_COLOR_RESET}");
+        let colored_heading = format!("{HELP_COLOR_SECTION}{heading}{HELP_COLOR_RESET}");
         colored = colored.replace(heading, &colored_heading);
     }
     for lane in [
@@ -361,7 +395,7 @@ pub(crate) fn colorize_dashboard_short_help(text: &str) -> String {
         "move dashboards",
         "analyze and review risk",
     ] {
-        let colored_lane = format!("{HELP_COLOR_DASHBOARD}{lane}{HELP_COLOR_RESET}");
+        let colored_lane = format!("{HELP_COLOR_SECTION}{lane}{HELP_COLOR_RESET}");
         colored = colored.replace(lane, &colored_lane);
     }
     for command in [
@@ -403,14 +437,29 @@ pub(crate) fn colorize_dashboard_subcommand_help(text: &str) -> String {
         let indent = &line[..line.len() - trimmed.len()];
         let colored = match line {
             "Options:" | "What it does:" | "When to use:" | "Related commands:" | "Examples:"
-            | "Arguments:" | "More help:" => {
-                format!("{HELP_COLOR_DASHBOARD}{line}{HELP_COLOR_RESET}")
+            | "Arguments:" | "More help:" | "Notes:" => {
+                format!("{HELP_COLOR_SECTION}{line}{HELP_COLOR_RESET}")
             }
             _ if line.starts_with("Usage: ") => {
                 let rest = line.trim_start_matches("Usage: ");
                 format!(
-                    "{HELP_COLOR_DASHBOARD}Usage:{HELP_COLOR_RESET} {HELP_COLOR_COMMAND}{rest}{HELP_COLOR_RESET}"
+                    "{HELP_COLOR_SECTION}Usage:{HELP_COLOR_RESET} {HELP_COLOR_COMMAND}{rest}{HELP_COLOR_RESET}"
                 )
+            }
+            _ if trimmed.starts_with("- ") => {
+                format!("{indent}{HELP_COLOR_SUPPORT}{trimmed}{HELP_COLOR_RESET}")
+            }
+            _ if indent == "  " && trimmed.ends_with(':') => {
+                format!("{indent}{HELP_COLOR_SUPPORT}{trimmed}{HELP_COLOR_RESET}")
+            }
+            _ if !trimmed.is_empty()
+                && indent.len() >= 6
+                && !trimmed.starts_with("--")
+                && !trimmed.starts_with('[')
+                && !trimmed.starts_with("grafana-util ")
+                && !trimmed.starts_with("- dashboard ") =>
+            {
+                format!("{indent}{HELP_COLOR_SUPPORT}{trimmed}{HELP_COLOR_RESET}")
             }
             _ if trimmed.starts_with("grafana-util ") => {
                 format!("{indent}{HELP_COLOR_COMMAND}{trimmed}{HELP_COLOR_RESET}")

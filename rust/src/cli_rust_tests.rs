@@ -3,8 +3,10 @@ use super::{
     render_unified_help_text, CliArgs, UnifiedCommand,
 };
 use crate::dashboard::SimpleOutputFormat;
+use crate::help_styles::CLI_HELP_STYLES;
 use crate::profile_cli::ProfileCommand;
 use crate::resource::{ResourceCommand, ResourceKind, ResourceOutputFormat};
+use clap::builder::styling::AnsiColor;
 use clap::CommandFactory;
 use std::cell::RefCell;
 use std::path::Path;
@@ -57,6 +59,61 @@ fn export_dashboard_help_shows_examples_and_grouped_headings() {
     assert!(help.contains("--provider-update-interval-seconds <SECONDS>"));
     assert!(!help.contains("--without-dashboard-raw"));
     assert!(!help.contains("--provisioning-provider-name"));
+}
+
+#[test]
+fn export_dashboard_help_colorizes_notes_and_example_commands() {
+    let help = maybe_render_unified_help_from_os_args(
+        ["grafana-util", "export", "dashboard", "--help"],
+        true,
+    )
+    .expect("expected export dashboard help");
+    assert!(help.contains("\u{1b}[1;97mNotes:\u{1b}[0m"));
+    assert!(help.contains("\u{1b}[1;97mExamples:\u{1b}[0m"));
+    assert!(help.contains("\u{1b}[97mExport dashboards from the current org:\u{1b}[0m"));
+    assert!(help.contains("    \u{1b}[1;97mgrafana-util export dashboard"));
+}
+
+#[test]
+fn export_dashboard_help_ends_with_blank_line() {
+    let help = maybe_render_unified_help_from_os_args(
+        ["grafana-util", "export", "dashboard", "--help"],
+        false,
+    )
+    .expect("expected export dashboard help");
+    assert!(help.ends_with("\n\n"));
+}
+
+#[test]
+fn export_dashboard_help_colorizes_default_context_bright_green() {
+    let help = maybe_render_unified_help_from_os_args(
+        ["grafana-util", "export", "dashboard", "--help"],
+        true,
+    )
+    .expect("expected export dashboard help");
+    assert!(help.contains("default:"));
+    assert!(help.contains("500"));
+    assert!(help.contains("grafana-utils-dashboards"));
+    assert!(help.contains("possible values:"));
+}
+
+#[test]
+fn cli_help_styles_use_bright_green_bold_context() {
+    let rendered = format!("{}", CLI_HELP_STYLES.get_context());
+    let expected = format!("{}", AnsiColor::BrightGreen.on_default().bold());
+    assert_eq!(rendered, expected);
+}
+
+#[test]
+fn export_dashboard_help_colorizes_option_descriptions_bright_white() {
+    let help = maybe_render_unified_help_from_os_args(
+        ["grafana-util", "export", "dashboard", "--help"],
+        true,
+    )
+    .expect("expected export dashboard help");
+    assert!(
+        help.contains("          \u{1b}[97mSet the generated provisioning provider name.\u{1b}[0m")
+    );
 }
 
 #[test]

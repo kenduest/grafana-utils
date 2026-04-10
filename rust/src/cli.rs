@@ -45,6 +45,23 @@ use crate::resource::{run_resource_cli, ResourceCliArgs, ResourceCommand};
 use crate::snapshot::{run_snapshot_cli, SnapshotCommand};
 use crate::sync::{run_sync_cli, SyncGroupCommand};
 
+const EXPORT_HELP_TEXT: &str = "Examples:\n\n  [Dashboard backup]\n    grafana-util export dashboard --output-dir ./dashboards --overwrite\n\n  [Alert backup]\n    grafana-util export alert --output-dir ./alerts --overwrite\n\n  [Datasource inventory]\n    grafana-util export datasource --output-dir ./datasources\n\n  [Access inventory]\n    grafana-util export access service-account --output-dir ./access-service-accounts";
+const EXPORT_ACCESS_HELP_TEXT: &str = "Examples:\n\n  Export Grafana users into a local bundle:\n    grafana-util export access user --output-dir ./access-users --overwrite\n\n  Export Grafana teams into a local bundle:\n    grafana-util export access team --output-dir ./access-teams --overwrite\n\n  Export Grafana service accounts into a local bundle:\n    grafana-util export access service-account --output-dir ./access-service-accounts --overwrite";
+const EXPORT_DASHBOARD_HELP_TEXT: &str = "Notes:\n  - Writes raw/, prompt/, and provisioning/ by default.\n  - Use Basic auth with --all-orgs.\n  - Use --flat for files directly under each variant directory.\n  - Use --include-history to add history/ under each exported org scope.\n  - The provider file is provisioning/provisioning/dashboards.yaml.\n  - Keep raw/ for API import or diff, prompt/ for UI import, and provisioning/ for file provisioning.\n\nExamples:\n\n  Export dashboards from the current org:\n    grafana-util export dashboard --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --output-dir ./dashboards --overwrite\n\n  Export dashboards across all visible orgs:\n    grafana-util export dashboard --url http://localhost:3000 --basic-user admin --basic-password admin --all-orgs --output-dir ./dashboards --overwrite";
+const EXPORT_ALERT_HELP_TEXT: &str = "Examples:\n\n  Export alerting resources from Grafana:\n    grafana-util export alert --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --output-dir ./alerts --overwrite";
+const EXPORT_DATASOURCE_HELP_TEXT: &str = "Examples:\n\n  Export datasource inventory into a local artifact tree:\n    grafana-util export datasource --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --output-dir ./datasources --overwrite";
+const ADVANCED_HELP_TEXT: &str = "Examples:\n\n  [Dashboard import]\n    grafana-util advanced dashboard sync import --input-dir ./dashboards/raw --dry-run --table\n\n  [Alert authoring]\n    grafana-util advanced alert author route preview --desired-dir ./alerts/desired --label team=sre --severity critical\n\n  [Datasource diff]\n    grafana-util advanced datasource diff --diff-dir ./datasources --input-format inventory\n\n  [Access administration]\n    grafana-util advanced access user diff --diff-dir ./access-users --scope global";
+const ADVANCED_DASHBOARD_HELP_TEXT: &str = "Examples:\n\n  [Live browse]\n    grafana-util advanced dashboard live browse --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\"\n\n  [Draft review]\n    cat cpu.json | grafana-util advanced dashboard draft review --input - --output-format json\n\n  [Sync import]\n    grafana-util advanced dashboard sync import --input-dir ./dashboards/raw --dry-run --table\n\n  [Analyze]\n    grafana-util advanced dashboard analyze summary --input-dir ./dashboards/raw --input-format raw --output-format tree-table\n\n  [Capture]\n    grafana-util advanced dashboard capture screenshot --dashboard-uid cpu-main --output ./cpu-main.png";
+const ADVANCED_DASHBOARD_SYNC_HELP_TEXT: &str = "Examples:\n\n  Export dashboards into a backup tree:\n    grafana-util advanced dashboard sync export --output-dir ./dashboards --overwrite\n\n  Preview dashboard import before writing live Grafana:\n    grafana-util advanced dashboard sync import --input-dir ./dashboards/raw --dry-run --table\n\n  Compare exported dashboards against Grafana:\n    grafana-util advanced dashboard sync diff --input-dir ./dashboards/raw --output-format json\n\n  Repair a raw export tree into prompt artifacts:\n    grafana-util advanced dashboard sync convert raw-to-prompt --input-dir ./dashboards/raw --output-dir ./dashboards/prompt --overwrite";
+const ADVANCED_DASHBOARD_IMPORT_HELP_TEXT: &str = "Examples:\n\n  Import one raw export directory into the current org:\n    grafana-util advanced dashboard sync import --url http://localhost:3000 --basic-user admin --basic-password admin --input-dir ./dashboards/raw --replace-existing\n\n  Preview import actions without changing Grafana:\n    grafana-util advanced dashboard sync import --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --input-dir ./dashboards/raw --dry-run --table\n\n  Interactively choose exported dashboards to restore/import:\n    grafana-util advanced dashboard sync import --url http://localhost:3000 --basic-user admin --basic-password admin --input-dir ./dashboards/raw --interactive --replace-existing";
+const ADVANCED_DASHBOARD_EXPORT_HELP_TEXT: &str = "Notes:\n  - Writes raw/, prompt/, and provisioning/ by default.\n  - Use Basic auth with --all-orgs.\n  - Use --flat for files directly under each variant directory.\n  - Use --include-history to add history/ under each exported org scope.\n  - The provider file is provisioning/provisioning/dashboards.yaml.\n  - Keep raw/ for API import or diff, prompt/ for UI import, and provisioning/ for file provisioning.\n\nExamples:\n\n  Export dashboards from the current org:\n    grafana-util advanced dashboard sync export --url http://localhost:3000 --basic-user admin --basic-password admin --output-dir ./dashboards --overwrite\n\n  Export dashboards across all visible orgs:\n    grafana-util advanced dashboard sync export --url http://localhost:3000 --basic-user admin --basic-password admin --all-orgs --output-dir ./dashboards --overwrite";
+const ADVANCED_DASHBOARD_DIFF_HELP_TEXT: &str = "Examples:\n\n  Compare one raw export directory against the current org:\n    grafana-util advanced dashboard sync diff --url http://localhost:3000 --basic-user admin --basic-password admin --input-dir ./dashboards/raw\n\n  Compare a provisioning export root against the current org:\n    grafana-util advanced dashboard sync diff --url http://localhost:3000 --basic-user admin --basic-password admin --input-dir ./dashboards/provisioning --input-format provisioning";
+const ADVANCED_ALERT_HELP_TEXT: &str = "Examples:\n\n  [Live inventory]\n    grafana-util advanced alert live list-rules --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --table\n\n  [Migrate import]\n    grafana-util advanced alert migrate import --input-dir ./alerts/raw --replace-existing --dry-run --json\n\n  [Author route]\n    grafana-util advanced alert author route preview --desired-dir ./alerts/desired --label team=sre --severity critical\n\n  [Change plan]\n    grafana-util advanced alert change plan --desired-dir ./alerts/desired --prune";
+const ADVANCED_ALERT_MIGRATE_HELP_TEXT: &str = "Examples:\n\n  Export alerting resources from Grafana:\n    grafana-util advanced alert migrate export --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --output-dir ./alerts --overwrite\n\n  Preview import before execution:\n    grafana-util advanced alert migrate import --url http://localhost:3000 --input-dir ./alerts/raw --replace-existing --dry-run --json\n\n  Compare local alert exports against Grafana:\n    grafana-util advanced alert migrate diff --url http://localhost:3000 --diff-dir ./alerts/raw --output-format json";
+const ADVANCED_ALERT_MIGRATE_EXPORT_HELP_TEXT: &str = "Examples:\n\n  Export alerting resources with overwrite enabled:\n    grafana-util advanced alert migrate export --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --output-dir ./alerts --overwrite";
+const ADVANCED_ALERT_MIGRATE_IMPORT_HELP_TEXT: &str = "Examples:\n\n  Preview a replace-existing import before execution as structured JSON:\n    grafana-util advanced alert migrate import --url http://localhost:3000 --input-dir ./alerts/raw --replace-existing --dry-run --json\n\n  Re-map linked dashboards and panels during import:\n    grafana-util advanced alert migrate import --url http://localhost:3000 --input-dir ./alerts/raw --replace-existing --dashboard-uid-map ./dashboard-map.json --panel-id-map ./panel-map.json";
+const ADVANCED_ALERT_MIGRATE_DIFF_HELP_TEXT: &str = "Examples:\n\n  Compare a local export against Grafana as structured JSON:\n    grafana-util advanced alert migrate diff --url http://localhost:3000 --diff-dir ./alerts/raw --output-format json";
+
 #[derive(Debug, Clone, Subcommand)]
 pub enum ObserveCommand {
     #[command(about = "Render shared project-wide live status.")]
@@ -93,17 +110,25 @@ pub enum ExportAccessCommand {
 
 #[derive(Debug, Clone, Subcommand)]
 pub enum ExportCommand {
-    #[command(about = "Export dashboards into a local artifact tree for review or backup.")]
+    #[command(
+        about = "Export dashboards into a local artifact tree for review or backup.",
+        after_help = EXPORT_DASHBOARD_HELP_TEXT
+    )]
     Dashboard(DashboardExportArgs),
     #[command(
-        about = "Export alerting resources into a local artifact tree for review or backup."
+        about = "Export alerting resources into a local artifact tree for review or backup.",
+        after_help = EXPORT_ALERT_HELP_TEXT
     )]
     Alert(AlertExportArgs),
     #[command(
-        about = "Export datasource inventory into a local artifact tree for review or backup."
+        about = "Export datasource inventory into a local artifact tree for review or backup.",
+        after_help = EXPORT_DATASOURCE_HELP_TEXT
     )]
     Datasource(DatasourceExportArgs),
-    #[command(about = "Export access inventory into a local artifact tree for review or backup.")]
+    #[command(
+        about = "Export access inventory into a local artifact tree for review or backup.",
+        after_help = EXPORT_ACCESS_HELP_TEXT
+    )]
     Access {
         #[command(subcommand)]
         command: ExportAccessCommand,
@@ -188,17 +213,20 @@ pub enum DashboardSyncConvertCommand {
 pub enum DashboardSyncCommand {
     #[command(
         name = "export",
-        about = "Export dashboards to raw/ and prompt/ JSON files."
+        about = "Export dashboards to raw/ and prompt/ JSON files.",
+        after_help = ADVANCED_DASHBOARD_EXPORT_HELP_TEXT
     )]
     Export(DashboardExportArgs),
     #[command(
         name = "import",
-        about = "Import dashboard JSON files through the Grafana API."
+        about = "Import dashboard JSON files through the Grafana API.",
+        after_help = ADVANCED_DASHBOARD_IMPORT_HELP_TEXT
     )]
     Import(ImportArgs),
     #[command(
         name = "diff",
-        about = "Compare local raw dashboard files against live Grafana dashboards."
+        about = "Compare local raw dashboard files against live Grafana dashboards.",
+        after_help = ADVANCED_DASHBOARD_DIFF_HELP_TEXT
     )]
     Diff(DiffArgs),
     #[command(name = "convert", about = "Run dashboard format conversion workflows.")]
@@ -253,7 +281,10 @@ pub enum DashboardGroupCommand {
         #[command(subcommand)]
         command: DashboardDraftCommand,
     },
-    #[command(about = "Move dashboards between local artifacts and Grafana.")]
+    #[command(
+        about = "Move dashboards between local artifacts and Grafana.",
+        after_help = ADVANCED_DASHBOARD_SYNC_HELP_TEXT
+    )]
     Sync {
         #[command(subcommand)]
         command: DashboardSyncCommand,
@@ -297,17 +328,20 @@ pub enum AlertLiveCommand {
 pub enum AlertMigrateCommand {
     #[command(
         name = "export",
-        about = "Export alerting resources into raw/ JSON files."
+        about = "Export alerting resources into raw/ JSON files.",
+        after_help = ADVANCED_ALERT_MIGRATE_EXPORT_HELP_TEXT
     )]
     Export(AlertExportArgs),
     #[command(
         name = "import",
-        about = "Import alerting resource JSON files through the Grafana API."
+        about = "Import alerting resource JSON files through the Grafana API.",
+        after_help = ADVANCED_ALERT_MIGRATE_IMPORT_HELP_TEXT
     )]
     Import(AlertImportArgs),
     #[command(
         name = "diff",
-        about = "Compare local alerting export files against live Grafana resources."
+        about = "Compare local alerting export files against live Grafana resources.",
+        after_help = ADVANCED_ALERT_MIGRATE_DIFF_HELP_TEXT
     )]
     Diff(AlertDiffArgs),
 }
@@ -419,7 +453,10 @@ pub enum AlertCommandSurface {
         #[command(subcommand)]
         command: AlertLiveCommand,
     },
-    #[command(about = "Move alert resources between local artifacts and Grafana.")]
+    #[command(
+        about = "Move alert resources between local artifacts and Grafana.",
+        after_help = ADVANCED_ALERT_MIGRATE_HELP_TEXT
+    )]
     Migrate {
         #[command(subcommand)]
         command: AlertMigrateCommand,
@@ -444,13 +481,17 @@ pub enum AlertCommandSurface {
 #[derive(Debug, Clone, Subcommand)]
 pub enum AdvancedCommand {
     #[command(
-        about = "Run full dashboard browse, authoring, import, analysis, and capture workflows."
+        about = "Run full dashboard browse, authoring, import, analysis, and capture workflows.",
+        after_help = ADVANCED_DASHBOARD_HELP_TEXT
     )]
     Dashboard {
         #[command(subcommand)]
         command: DashboardGroupCommand,
     },
-    #[command(about = "Run grouped alert inventory, migration, authoring, and change workflows.")]
+    #[command(
+        about = "Run grouped alert inventory, migration, authoring, and change workflows.",
+        after_help = ADVANCED_ALERT_HELP_TEXT
+    )]
     Alert(AlertSurfaceArgs),
     #[command(about = "Run datasource list, browse, export, import, and diff workflows.")]
     Datasource {
@@ -478,14 +519,16 @@ pub enum UnifiedCommand {
         command: ObserveCommand,
     },
     #[command(
-        about = "Run common export and backup flows without learning domain-heavy subtrees."
+        about = "Run common export and backup flows without learning domain-heavy subtrees.",
+        after_help = EXPORT_HELP_TEXT
     )]
     Export {
         #[command(subcommand)]
         command: ExportCommand,
     },
     #[command(
-        about = "Open expert and domain-specific workflows once you know which subsystem you need."
+        about = "Open expert and domain-specific workflows once you know which subsystem you need.",
+        after_help = ADVANCED_HELP_TEXT
     )]
     Advanced {
         #[command(subcommand)]

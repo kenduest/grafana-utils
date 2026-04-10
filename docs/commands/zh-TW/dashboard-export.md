@@ -23,9 +23,12 @@
 - `--dry-run`：預覽會寫出哪些內容。
 
 ## 說明
-- 一般單一 org 匯出可優先用 `--profile`。
-- `--all-orgs` 最好搭配管理員憑證支援的 `--profile` 或直接 Basic auth，因為 token 的可見範圍可能不足以涵蓋所有 org。
-- 當 `--all-orgs` 搭配 `--include-history` 時，每個匯出 org 範圍都會各自產生 `org_<id>_<name>/history/` 子樹。
+- 預設會寫出 `raw/`、`prompt/`、`provisioning/`。
+- 搭配 `--all-orgs` 時，優先用 Basic auth。
+- `--flat` 會把檔案直接寫在各變體目錄下。
+- `--include-history` 會在每個匯出 org 範圍下加上 `history/`。
+- provider 檔案會寫到 `provisioning/provisioning/dashboards.yaml`。
+- `raw/` 給 API import 或 diff，`prompt/` 給 UI import，`provisioning/` 給 file provisioning。
 
 ## 成功判準
 - 產生出可供 API replay 與進一步 inspect 的 `raw/` 樹

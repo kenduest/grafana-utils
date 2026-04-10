@@ -9,9 +9,9 @@ use crate::access::root_command as access_root_command;
 use crate::alert::root_command as alert_root_command;
 use crate::cli::CliArgs;
 use crate::cli_help_examples::{
-    colorize_dashboard_short_help, colorize_help_examples, inject_help_full_hint,
-    ACCESS_HELP_FULL_TEXT, ALERT_HELP_FULL_TEXT, DATASOURCE_HELP_FULL_TEXT, SYNC_HELP_FULL_TEXT,
-    UNIFIED_HELP_FULL_TEXT, UNIFIED_HELP_TEXT,
+    colorize_dashboard_short_help, colorize_dashboard_subcommand_help, colorize_help_examples,
+    inject_help_full_hint, ACCESS_HELP_FULL_TEXT, ALERT_HELP_FULL_TEXT, DATASOURCE_HELP_FULL_TEXT,
+    SYNC_HELP_FULL_TEXT, UNIFIED_HELP_FULL_TEXT, UNIFIED_HELP_TEXT,
 };
 use crate::datasource::root_command as datasource_root_command;
 use crate::sync::SyncCliArgs;
@@ -29,12 +29,26 @@ const ALERT_DIFF_SCHEMA_HELP_TEXT: &str = include_str!("../../schemas/help/diff/
 const DATASOURCE_DIFF_SCHEMA_HELP_TEXT: &str =
     include_str!("../../schemas/help/diff/datasource.txt");
 
-fn render_long_help_with_color_choice(command: &mut clap::Command, colorize: bool) -> String {
-    let configured = std::mem::take(command).color(if colorize {
-        ColorChoice::Always
+fn ensure_trailing_blank_line(mut text: String) -> String {
+    if text.ends_with("\n\n") {
+        return text;
+    }
+    if text.ends_with('\n') {
+        text.push('\n');
     } else {
-        ColorChoice::Never
-    });
+        text.push_str("\n\n");
+    }
+    text
+}
+
+fn render_long_help_with_color_choice(command: &mut clap::Command, colorize: bool) -> String {
+    let configured = std::mem::take(command)
+        .styles(crate::help_styles::CLI_HELP_STYLES)
+        .color(if colorize {
+            ColorChoice::Always
+        } else {
+            ColorChoice::Never
+        });
     *command = configured;
     let rendered = command.render_long_help();
     if colorize {
@@ -45,7 +59,10 @@ fn render_long_help_with_color_choice(command: &mut clap::Command, colorize: boo
 }
 
 fn render_domain_help_text(mut command: clap::Command, colorize: bool) -> String {
-    inject_help_full_hint(render_long_help_with_color_choice(&mut command, colorize))
+    ensure_trailing_blank_line(inject_help_full_hint(render_long_help_with_color_choice(
+        &mut command,
+        colorize,
+    )))
 }
 
 fn render_domain_help_full_text(
@@ -59,19 +76,43 @@ fn render_domain_help_full_text(
     } else {
         help.push_str(extended_examples);
     }
-    help
+    ensure_trailing_blank_line(help)
+}
+
+fn render_unified_subcommand_help(path: &[String], colorize: bool) -> Option<String> {
+    let mut command = CliArgs::command();
+    let mut current = &mut command;
+    for segment in path {
+        current = current.find_subcommand_mut(segment)?;
+    }
+    let help = render_long_help_with_color_choice(current, colorize);
+    let usage_prefix = format!("Usage: {}", path.last()?);
+    let help = help.replacen(
+        &usage_prefix,
+        &format!("Usage: grafana-util {}", path.join(" ")),
+        1,
+    );
+    if !colorize {
+        return Some(ensure_trailing_blank_line(help));
+    }
+    let help = if path.iter().any(|segment| segment == "dashboard") {
+        colorize_dashboard_subcommand_help(&help)
+    } else {
+        colorize_help_examples(&help)
+    };
+    Some(ensure_trailing_blank_line(help))
 }
 
 pub fn render_unified_help_text(colorize: bool) -> String {
     let mut command = CliArgs::command();
     let help = inject_help_full_hint(render_long_help_with_color_choice(&mut command, colorize));
     if colorize {
-        help.replace(
+        ensure_trailing_blank_line(help.replace(
             UNIFIED_HELP_TEXT,
             &colorize_help_examples(UNIFIED_HELP_TEXT),
-        )
+        ))
     } else {
-        help
+        ensure_trailing_blank_line(help)
     }
 }
 
@@ -82,7 +123,7 @@ pub fn render_unified_help_full_text(colorize: bool) -> String {
     } else {
         help.push_str(UNIFIED_HELP_FULL_TEXT);
     }
-    help
+    ensure_trailing_blank_line(help)
 }
 
 pub fn render_unified_version_text() -> String {
@@ -291,6 +332,20 @@ where
             .filter(|value| !value.starts_with('-'))
             .map(String::as_str);
         return render_status_schema_help(target);
+    }
+    if let Some(help_index) = args
+        .iter()
+        .position(|value| value == "--help" || value == "-h")
+    {
+        if help_index >= 2 {
+            let path = args[1..help_index].to_vec();
+            if matches!(
+                path.first().map(String::as_str),
+                Some("advanced") | Some("export")
+            ) {
+                return render_unified_subcommand_help(&path, colorize);
+            }
+        }
     }
     match args.as_slice() {
         [_binary] => Some(render_unified_help_text(colorize)),

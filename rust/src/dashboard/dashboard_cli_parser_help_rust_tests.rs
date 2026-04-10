@@ -392,18 +392,18 @@ fn export_help_explains_flat_layout() {
     let help = render_dashboard_subcommand_help("export");
     assert!(help.contains("--all-orgs"));
     assert!(help.contains("--include-history"));
-    assert!(help.contains("Prefer Basic auth because API tokens are often scoped to one org"));
+    assert!(help.contains("Use Basic auth with --all-orgs."));
     assert!(help.contains("Export dashboards across all visible orgs with Basic auth"));
     assert!(help.contains("Write files directly into each export variant directory"));
-    assert!(help.contains("folder-based subdirectories"));
+    assert!(help.contains("files directly under each variant directory"));
 }
 
 #[test]
 fn export_help_mentions_history_artifacts() {
     let help = render_dashboard_subcommand_help("export");
     assert!(help.contains("history/"));
-    assert!(help.contains("revision history"));
-    assert!(help.contains("per-dashboard revision history"));
+    assert!(help.contains("Use --include-history to add history/"));
+    assert!(!help.contains("per-dashboard revision history"));
 }
 
 #[test]
@@ -452,7 +452,7 @@ fn export_help_mentions_provisioning_provider_customization() {
     assert!(help.contains("--provider-disable-deletion"));
     assert!(help.contains("--provider-allow-ui-updates"));
     assert!(help.contains("--provider-update-interval-seconds"));
-    assert!(help.contains("different on-disk deployment target"));
+    assert!(help.contains("The provider file is"));
 }
 
 #[test]
@@ -1619,8 +1619,8 @@ fn dashboard_fetch_live_help_colorizes_section_headings_and_example_commands() {
         true,
     )
     .expect("expected dashboard subcommand help");
-    assert!(help.contains("\u{1b}[1;36mWhat it does:\u{1b}[0m"));
-    assert!(help.contains("\u{1b}[1;36mExamples:\u{1b}[0m"));
+    assert!(help.contains("\u{1b}[1;97mWhat it does:\u{1b}[0m"));
+    assert!(help.contains("\u{1b}[1;97mExamples:\u{1b}[0m"));
     assert!(help.contains("    \u{1b}[1;97mgrafana-util dashboard fetch-live"));
 }
 

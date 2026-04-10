@@ -23,9 +23,12 @@ Use this when you need a local export tree for later import, review, diff, or fi
 - `--dry-run`: preview what would be written.
 
 ## Notes
-- Use `--profile` for normal single-org export flows.
-- For `--all-orgs`, prefer admin-backed `--profile` or direct Basic auth because token visibility may not cover every org you expect.
-- When you combine `--all-orgs` with `--include-history`, each exported org scope gets its own `org_<id>_<name>/history/` subtree.
+- Writes `raw/`, `prompt/`, and `provisioning/` by default.
+- Use Basic auth with `--all-orgs`.
+- Use `--flat` for files directly under each variant directory.
+- Use `--include-history` to add `history/` under each exported org scope.
+- The provider file is `provisioning/provisioning/dashboards.yaml`.
+- Keep `raw/` for API import or diff, `prompt/` for UI import, and `provisioning/` for file provisioning.
 
 ## What success looks like
 - a `raw/` tree exists for API replay and deeper inspection
