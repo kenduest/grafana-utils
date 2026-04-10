@@ -3,190 +3,497 @@
 //! Purpose:
 //! - Own only command topology and domain dispatch.
 //! - Keep `grafana-util` command surface in one place.
-//! - Route to domain runners (`dashboard`, `alert`, `access`, `datasource`, `snapshot`, `overview`, `status`) without
-//!   carrying transport/request behavior.
-//!
-//! Flow:
-//! - Parse into `CliArgs` via Clap.
-//! - Normalize namespaced command forms into one domain command enum.
-//! - Delegate execution to the selected domain runner function.
-//!
-//! Caveats:
-//! - Do not add domain logic or HTTP transport details here.
-//! - Keep help output canonical-first so users discover formal commands.
+//! - Route to domain runners without carrying transport logic.
+
 use clap::{Args, Parser, Subcommand};
 
-use crate::access::{run_access_cli, AccessCliArgs};
+use crate::access::{
+    run_access_cli, AccessCliArgs, AccessCommand, OrgCommand, OrgExportArgs, ServiceAccountCommand,
+    ServiceAccountExportArgs, TeamCommand, TeamExportArgs, UserCommand, UserExportArgs,
+};
 use crate::alert::{
-    normalize_alert_namespace_args, run_alert_cli, AlertCliArgs, AlertNamespaceArgs,
+    normalize_alert_group_command, run_alert_cli, AlertAddContactPointArgs, AlertAddRuleArgs,
+    AlertApplyArgs, AlertCliArgs, AlertCloneRuleArgs, AlertDeleteArgs, AlertDiffArgs,
+    AlertExportArgs, AlertImportArgs, AlertInitArgs, AlertListArgs, AlertNewResourceArgs,
+    AlertPlanArgs, AlertPreviewRouteArgs, AlertSetRouteArgs,
 };
 pub use crate::cli_help::{
     maybe_render_unified_help_from_os_args, render_unified_help_full_text,
     render_unified_help_text, render_unified_version_text,
 };
 use crate::cli_help::{
-    DASHBOARD_ANALYZE_HELP_TEXT, DASHBOARD_BROWSE_HELP_TEXT, DASHBOARD_CLONE_LIVE_HELP_TEXT,
-    DASHBOARD_DELETE_HELP_TEXT, DASHBOARD_DIFF_HELP_TEXT, DASHBOARD_EXPORT_HELP_TEXT,
-    DASHBOARD_GET_HELP_TEXT, DASHBOARD_GOVERNANCE_GATE_HELP_TEXT, DASHBOARD_IMPORT_HELP_TEXT,
-    DASHBOARD_INSPECT_EXPORT_HELP_TEXT, DASHBOARD_INSPECT_LIVE_HELP_TEXT,
-    DASHBOARD_INSPECT_VARS_HELP_TEXT, DASHBOARD_LIST_HELP_TEXT, DASHBOARD_PATCH_FILE_HELP_TEXT,
-    DASHBOARD_PUBLISH_HELP_TEXT, DASHBOARD_REVIEW_HELP_TEXT, DASHBOARD_SCREENSHOT_HELP_TEXT,
-    DASHBOARD_TOPOLOGY_HELP_TEXT, SNAPSHOT_HELP_TEXT, UNIFIED_ACCESS_HELP_TEXT,
-    UNIFIED_ALERT_HELP_TEXT, UNIFIED_DASHBOARD_HELP_TEXT, UNIFIED_DATASOURCE_HELP_TEXT,
-    UNIFIED_MIGRATE_HELP_TEXT, UNIFIED_PROFILE_HELP_TEXT, UNIFIED_SYNC_HELP_TEXT,
+    UNIFIED_ACCESS_HELP_TEXT, UNIFIED_ALERT_HELP_TEXT, UNIFIED_DASHBOARD_HELP_TEXT,
+    UNIFIED_DATASOURCE_HELP_TEXT, UNIFIED_SYNC_HELP_TEXT,
 };
 use crate::cli_help_examples::UNIFIED_HELP_TEXT;
 use crate::common::{json_color_choice, set_json_color_choice, CliColorChoice, Result};
 use crate::dashboard::{
     run_dashboard_cli, AnalyzeArgs, BrowseArgs, CloneLiveArgs, DashboardCliArgs, DashboardCommand,
-    DashboardHistoryArgs, DeleteArgs, DiffArgs, EditLiveArgs, ExportArgs, GetArgs,
-    GovernanceGateArgs, ImpactArgs, ImportArgs, InspectExportArgs, InspectLiveArgs,
-    InspectVarsArgs, ListArgs, PatchFileArgs, PublishArgs, ReviewArgs, ScreenshotArgs, ServeArgs,
-    TopologyArgs, ValidateExportArgs,
+    DashboardHistoryArgs, DeleteArgs, DiffArgs, EditLiveArgs, ExportArgs as DashboardExportArgs,
+    GetArgs, GovernanceGateArgs, ImpactArgs, ImportArgs, InspectVarsArgs, ListArgs, PatchFileArgs,
+    PublishArgs, RawToPromptArgs, ReviewArgs, ScreenshotArgs, ServeArgs, TopologyArgs,
 };
-use crate::datasource::{run_datasource_cli, DatasourceGroupCommand};
-use crate::migrate::{run_migrate_cli, MigrateCliArgs};
-use crate::overview::{run_overview_cli, OverviewCliArgs};
+use crate::datasource::{run_datasource_cli, DatasourceExportArgs, DatasourceGroupCommand};
+use crate::migrate::{run_migrate_cli, MigrateCliArgs, MigrateCommand, MigrateDashboardCommand};
+use crate::overview::{run_overview_cli, OverviewArgs, OverviewCliArgs, OverviewCommand};
 use crate::profile_cli::{run_profile_cli, ProfileCliArgs};
-use crate::project_status_command::{run_project_status_cli, ProjectStatusCliArgs};
-use crate::resource::{run_resource_cli, ResourceCliArgs};
+use crate::project_status_command::{
+    run_project_status_cli, ProjectStatusCliArgs, ProjectStatusLiveArgs, ProjectStatusStagedArgs,
+    ProjectStatusSubcommand,
+};
+use crate::resource::{run_resource_cli, ResourceCliArgs, ResourceCommand};
 use crate::snapshot::{run_snapshot_cli, SnapshotCommand};
 use crate::sync::{run_sync_cli, SyncGroupCommand};
 
-/// Dashboard subcommands exposed through the unified root CLI.
 #[derive(Debug, Clone, Subcommand)]
-pub enum DashboardGroupCommand {
+pub enum ObserveCommand {
+    #[command(about = "Render shared project-wide live status.")]
+    Live(ProjectStatusLiveArgs),
+    #[command(about = "Render shared project-wide staged status.")]
+    Staged(ProjectStatusStagedArgs),
+    #[command(about = "Render project-wide staged or live overview.")]
+    Overview {
+        #[command(flatten)]
+        staged: OverviewArgs,
+        #[command(subcommand)]
+        command: Option<OverviewCommand>,
+    },
+    #[command(about = "Export or review live dashboard snapshots.")]
+    Snapshot {
+        #[command(subcommand)]
+        command: SnapshotCommand,
+    },
+    #[command(about = "Run generic read-only Grafana resource queries.")]
+    Resource {
+        #[command(subcommand)]
+        command: ResourceCommand,
+    },
+}
+
+#[derive(Debug, Clone, Subcommand)]
+pub enum ConfigCommand {
+    #[command(about = "Manage repo-local Grafana connection profiles.")]
+    Profile(ProfileCliArgs),
+}
+
+#[derive(Debug, Clone, Subcommand)]
+pub enum ExportAccessCommand {
+    #[command(about = "Export Grafana users into a local reviewable bundle.")]
+    User(UserExportArgs),
+    #[command(about = "Export Grafana org inventory into a local reviewable bundle.")]
+    Org(OrgExportArgs),
+    #[command(about = "Export Grafana teams into a local reviewable bundle.")]
+    Team(TeamExportArgs),
     #[command(
-        about = "Browse the live dashboard tree in an interactive terminal UI.",
-        after_help = DASHBOARD_BROWSE_HELP_TEXT
+        name = "service-account",
+        about = "Export Grafana service accounts into a local reviewable bundle."
     )]
+    ServiceAccount(ServiceAccountExportArgs),
+}
+
+#[derive(Debug, Clone, Subcommand)]
+pub enum ExportCommand {
+    #[command(about = "Export dashboards into a local artifact tree for review or backup.")]
+    Dashboard(DashboardExportArgs),
+    #[command(
+        about = "Export alerting resources into a local artifact tree for review or backup."
+    )]
+    Alert(AlertExportArgs),
+    #[command(
+        about = "Export datasource inventory into a local artifact tree for review or backup."
+    )]
+    Datasource(DatasourceExportArgs),
+    #[command(about = "Export access inventory into a local artifact tree for review or backup.")]
+    Access {
+        #[command(subcommand)]
+        command: ExportAccessCommand,
+    },
+}
+
+#[derive(Debug, Clone, Subcommand)]
+pub enum DashboardLiveCommand {
+    #[command(about = "Browse the live dashboard tree in an interactive terminal UI.")]
     Browse(BrowseArgs),
     #[command(
-        name = "fetch-live",
-        about = "Fetch one live dashboard into an API-safe local JSON draft.",
-        after_help = DASHBOARD_GET_HELP_TEXT
-    )]
-    Get(GetArgs),
-    #[command(
-        about = "Clone one live dashboard into a local draft with optional overrides.",
-        after_help = DASHBOARD_CLONE_LIVE_HELP_TEXT
-    )]
-    CloneLive(CloneLiveArgs),
-    #[command(about = "Serve dashboard drafts through a local preview server.")]
-    Serve(ServeArgs),
-    #[command(about = "Edit one live dashboard through an external editor.")]
-    EditLive(EditLiveArgs),
-    #[command(
-        about = "List dashboard summaries without writing export files.",
-        after_help = DASHBOARD_LIST_HELP_TEXT
+        name = "list",
+        about = "List dashboard summaries without writing export files."
     )]
     List(ListArgs),
     #[command(
-        about = "Export dashboards to raw/ and prompt/ JSON files.",
-        after_help = DASHBOARD_EXPORT_HELP_TEXT
+        name = "vars",
+        about = "List dashboard templating variables from live Grafana or local artifacts."
     )]
-    Export(ExportArgs),
+    Vars(InspectVarsArgs),
     #[command(
-        about = "Import dashboard JSON files through the Grafana API.",
-        after_help = DASHBOARD_IMPORT_HELP_TEXT
+        name = "fetch",
+        about = "Fetch one live dashboard into an API-safe local JSON draft."
     )]
-    Import(ImportArgs),
+    Fetch(GetArgs),
     #[command(
-        about = "Delete live dashboards by UID or folder path.",
-        after_help = DASHBOARD_DELETE_HELP_TEXT
+        name = "clone",
+        about = "Clone one live dashboard into a local draft with optional overrides."
+    )]
+    Clone(CloneLiveArgs),
+    #[command(
+        name = "edit",
+        about = "Edit one live dashboard through an external editor."
+    )]
+    Edit(EditLiveArgs),
+    #[command(
+        name = "delete",
+        about = "Delete live dashboards by UID or folder path."
     )]
     Delete(DeleteArgs),
     #[command(
-        about = "Compare local raw dashboard files against live Grafana dashboards.",
-        after_help = DASHBOARD_DIFF_HELP_TEXT
+        name = "history",
+        about = "List, restore, diff, or export live dashboard revision history."
     )]
-    Diff(DiffArgs),
-    #[command(
-        name = "patch-file",
-        about = "Patch one local dashboard JSON file in place or to a new path.",
-        after_help = DASHBOARD_PATCH_FILE_HELP_TEXT
-    )]
-    PatchFile(PatchFileArgs),
+    History(DashboardHistoryArgs),
+}
+
+#[derive(Debug, Clone, Subcommand)]
+pub enum DashboardDraftCommand {
     #[command(
         name = "review",
-        about = "Review one local dashboard JSON file without touching Grafana.",
-        after_help = DASHBOARD_REVIEW_HELP_TEXT
+        about = "Review one local dashboard JSON file without touching Grafana."
     )]
     Review(ReviewArgs),
     #[command(
-        about = "Publish one local dashboard JSON file through the existing dashboard import pipeline.",
-        after_help = DASHBOARD_PUBLISH_HELP_TEXT
+        name = "patch",
+        about = "Patch one local dashboard JSON file in place or to a new path."
+    )]
+    Patch(PatchFileArgs),
+    #[command(
+        name = "serve",
+        about = "Serve dashboard drafts through a local preview server."
+    )]
+    Serve(ServeArgs),
+    #[command(
+        name = "publish",
+        about = "Publish one local dashboard JSON file through the existing dashboard import pipeline."
     )]
     Publish(PublishArgs),
+}
+
+#[derive(Debug, Clone, Subcommand)]
+pub enum DashboardSyncConvertCommand {
     #[command(
-        about = "Analyze dashboards from live Grafana or a local export tree and build summary or governance artifacts."
-        ,
-        after_help = DASHBOARD_ANALYZE_HELP_TEXT
+        name = "raw-to-prompt",
+        about = "Convert raw dashboard exports into prompt lane artifacts."
     )]
-    Analyze(AnalyzeArgs),
+    RawToPrompt(RawToPromptArgs),
+}
+
+#[derive(Debug, Clone, Subcommand)]
+pub enum DashboardSyncCommand {
     #[command(
-        name = "analyze-export",
-        alias = "inspect-export",
-        hide = true,
-        about = "Analyze a raw dashboard export directory and summarize its structure.",
-        after_help = DASHBOARD_INSPECT_EXPORT_HELP_TEXT
+        name = "export",
+        about = "Export dashboards to raw/ and prompt/ JSON files."
     )]
-    InspectExport(InspectExportArgs),
+    Export(DashboardExportArgs),
     #[command(
-        name = "analyze-live",
-        alias = "inspect-live",
-        hide = true,
-        about = "Analyze live Grafana dashboards without writing a persistent export.",
-        after_help = DASHBOARD_INSPECT_LIVE_HELP_TEXT
+        name = "import",
+        about = "Import dashboard JSON files through the Grafana API."
     )]
-    InspectLive(InspectLiveArgs),
+    Import(ImportArgs),
     #[command(
-        name = "list-vars",
-        alias = "inspect-vars",
-        about = "List dashboard templating variables from live Grafana.",
-        after_help = DASHBOARD_INSPECT_VARS_HELP_TEXT
+        name = "diff",
+        about = "Compare local raw dashboard files against live Grafana dashboards."
     )]
-    InspectVars(InspectVarsArgs),
+    Diff(DiffArgs),
+    #[command(name = "convert", about = "Run dashboard format conversion workflows.")]
+    Convert {
+        #[command(subcommand)]
+        command: DashboardSyncConvertCommand,
+    },
+}
+
+#[derive(Debug, Clone, Subcommand)]
+pub enum DashboardAnalyzeCommand {
     #[command(
-        about = "Evaluate governance policy against dashboard inspect JSON artifacts.",
-        after_help = DASHBOARD_GOVERNANCE_GATE_HELP_TEXT
+        name = "summary",
+        about = "Analyze dashboards from live Grafana or a local export tree."
     )]
-    GovernanceGate(GovernanceGateArgs),
+    Summary(AnalyzeArgs),
     #[command(
         name = "topology",
-        visible_alias = "graph",
-        about = "Show which dashboards, variables, data sources, and alerts depend on each other.",
-        after_help = DASHBOARD_TOPOLOGY_HELP_TEXT
+        about = "Show which dashboards, variables, data sources, and alerts depend on each other."
     )]
     Topology(TopologyArgs),
     #[command(
-        about = "Show which dashboards and alert resources would be affected by one data source from live Grafana, an export tree, or saved artifacts."
+        name = "impact",
+        about = "Show which dashboards and alert resources would be affected by one data source."
     )]
     Impact(ImpactArgs),
     #[command(
-        name = "validate-export",
-        about = "Run strict schema validation against dashboard raw export files before GitOps sync."
+        name = "governance",
+        about = "Evaluate governance policy against dashboard inspect JSON artifacts."
     )]
-    ValidateExport(ValidateExportArgs),
+    Governance(GovernanceGateArgs),
+}
+
+#[derive(Debug, Clone, Subcommand)]
+pub enum DashboardCaptureCommand {
     #[command(
-        about = "List, restore, diff, or export live dashboard revision history.",
-        after_help = "Examples:\n\n  List recent revisions from live Grafana for one dashboard:\n    grafana-util dashboard history list --url http://localhost:3000 --basic-user admin --basic-password admin --dashboard-uid cpu-main --output-format table\n\n  Review one local history artifact without calling Grafana:\n    grafana-util dashboard history list --input ./cpu-main.history.json --output-format yaml\n\n  Compare two live or local historical revisions:\n    grafana-util dashboard history diff --base-input ./cpu-main.history.json --base-version 17 --new-input ./cpu-main.history.json --new-version 21 --output-format json\n\n  Restore one historical revision as a new latest Grafana version:\n    grafana-util dashboard history restore --url http://localhost:3000 --basic-user admin --basic-password admin --dashboard-uid cpu-main --version 17 --dry-run\n\n  Export recent revision history into a reusable JSON artifact:\n    grafana-util dashboard history export --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --dashboard-uid cpu-main --output ./cpu-main.history.json"
-    )]
-    History(DashboardHistoryArgs),
-    #[command(
-        about = "Open one dashboard in a headless browser and capture image or PDF output.",
-        after_help = DASHBOARD_SCREENSHOT_HELP_TEXT
+        name = "screenshot",
+        about = "Open one dashboard in a headless browser and capture image or PDF output."
     )]
     Screenshot(ScreenshotArgs),
 }
 
-/// Namespaced root commands handled by the Rust `grafana-util` binary.
+#[derive(Debug, Clone, Subcommand)]
+pub enum DashboardGroupCommand {
+    #[command(about = "Work with live dashboards and history.")]
+    Live {
+        #[command(subcommand)]
+        command: DashboardLiveCommand,
+    },
+    #[command(about = "Work with local dashboard drafts before publish.")]
+    Draft {
+        #[command(subcommand)]
+        command: DashboardDraftCommand,
+    },
+    #[command(about = "Move dashboards between local artifacts and Grafana.")]
+    Sync {
+        #[command(subcommand)]
+        command: DashboardSyncCommand,
+    },
+    #[command(about = "Analyze dashboard structure, dependencies, and governance.")]
+    Analyze {
+        #[command(subcommand)]
+        command: DashboardAnalyzeCommand,
+    },
+    #[command(about = "Capture browser-rendered dashboard artifacts.")]
+    Capture {
+        #[command(subcommand)]
+        command: DashboardCaptureCommand,
+    },
+}
+
+#[derive(Debug, Clone, Subcommand)]
+pub enum AlertLiveCommand {
+    #[command(name = "list-rules", about = "List live Grafana alert rules.")]
+    ListRules(AlertListArgs),
+    #[command(
+        name = "list-contact-points",
+        about = "List live Grafana alert contact points."
+    )]
+    ListContactPoints(AlertListArgs),
+    #[command(name = "list-mute-timings", about = "List live Grafana mute timings.")]
+    ListMuteTimings(AlertListArgs),
+    #[command(
+        name = "list-templates",
+        about = "List live Grafana notification templates."
+    )]
+    ListTemplates(AlertListArgs),
+    #[command(
+        name = "delete",
+        about = "Delete one explicit alert resource identity."
+    )]
+    Delete(AlertDeleteArgs),
+}
+
+#[derive(Debug, Clone, Subcommand)]
+pub enum AlertMigrateCommand {
+    #[command(
+        name = "export",
+        about = "Export alerting resources into raw/ JSON files."
+    )]
+    Export(AlertExportArgs),
+    #[command(
+        name = "import",
+        about = "Import alerting resource JSON files through the Grafana API."
+    )]
+    Import(AlertImportArgs),
+    #[command(
+        name = "diff",
+        about = "Compare local alerting export files against live Grafana resources."
+    )]
+    Diff(AlertDiffArgs),
+}
+
+#[derive(Debug, Clone, Subcommand)]
+pub enum AlertAuthorRuleCommand {
+    #[command(
+        name = "add",
+        about = "Add a managed alert rule into the staged desired tree."
+    )]
+    Add(AlertAddRuleArgs),
+    #[command(
+        name = "clone",
+        about = "Clone an existing staged alert rule into a new authoring target."
+    )]
+    Clone(AlertCloneRuleArgs),
+}
+
+#[derive(Debug, Clone, Subcommand)]
+pub enum AlertAuthorContactPointCommand {
+    #[command(
+        name = "add",
+        about = "Add a managed contact point into the staged desired tree."
+    )]
+    Add(AlertAddContactPointArgs),
+}
+
+#[derive(Debug, Clone, Subcommand)]
+pub enum AlertAuthorRouteCommand {
+    #[command(
+        name = "set",
+        about = "Set the tool-owned managed route inside the desired tree."
+    )]
+    Set(AlertSetRouteArgs),
+    #[command(
+        name = "preview",
+        about = "Preview how the staged managed route would match labels and severity."
+    )]
+    Preview(AlertPreviewRouteArgs),
+}
+
+#[derive(Debug, Clone, Subcommand)]
+pub enum AlertAuthorCommand {
+    #[command(name = "init", about = "Initialize a staged desired-state alert tree.")]
+    Init(AlertInitArgs),
+    #[command(name = "rule", about = "Author or clone managed alert rules.")]
+    Rule {
+        #[command(subcommand)]
+        command: AlertAuthorRuleCommand,
+    },
+    #[command(name = "contact-point", about = "Author managed alert contact points.")]
+    ContactPoint {
+        #[command(subcommand)]
+        command: AlertAuthorContactPointCommand,
+    },
+    #[command(
+        name = "route",
+        about = "Author or preview the managed alert routing subtree."
+    )]
+    Route {
+        #[command(subcommand)]
+        command: AlertAuthorRouteCommand,
+    },
+}
+
+#[derive(Debug, Clone, Subcommand)]
+pub enum AlertScaffoldCommand {
+    #[command(
+        name = "rule",
+        about = "Seed a low-level rule scaffold into the desired tree."
+    )]
+    Rule(AlertNewResourceArgs),
+    #[command(
+        name = "contact-point",
+        about = "Seed a low-level contact-point scaffold into the desired tree."
+    )]
+    ContactPoint(AlertNewResourceArgs),
+    #[command(
+        name = "template",
+        about = "Seed a low-level template scaffold into the desired tree."
+    )]
+    Template(AlertNewResourceArgs),
+}
+
+#[derive(Debug, Clone, Subcommand)]
+pub enum AlertChangeCommand {
+    #[command(
+        name = "plan",
+        about = "Build a staged alert change plan from desired files."
+    )]
+    Plan(AlertPlanArgs),
+    #[command(
+        name = "apply",
+        about = "Apply a reviewed alert plan after explicit approval."
+    )]
+    Apply(AlertApplyArgs),
+}
+
+#[derive(Debug, Clone, Args)]
+pub struct AlertSurfaceArgs {
+    #[command(subcommand)]
+    pub command: AlertCommandSurface,
+}
+
+#[derive(Debug, Clone, Subcommand)]
+pub enum AlertCommandSurface {
+    #[command(about = "Read live alert inventory or delete one live alert resource.")]
+    Live {
+        #[command(subcommand)]
+        command: AlertLiveCommand,
+    },
+    #[command(about = "Move alert resources between local artifacts and Grafana.")]
+    Migrate {
+        #[command(subcommand)]
+        command: AlertMigrateCommand,
+    },
+    #[command(about = "Author managed alert desired-state resources.")]
+    Author {
+        #[command(subcommand)]
+        command: AlertAuthorCommand,
+    },
+    #[command(about = "Seed low-level alert resource scaffolds.")]
+    Scaffold {
+        #[command(subcommand)]
+        command: AlertScaffoldCommand,
+    },
+    #[command(about = "Plan or apply staged alert changes.")]
+    Change {
+        #[command(subcommand)]
+        command: AlertChangeCommand,
+    },
+}
+
+#[derive(Debug, Clone, Subcommand)]
+pub enum AdvancedCommand {
+    #[command(
+        about = "Run full dashboard browse, authoring, import, analysis, and capture workflows."
+    )]
+    Dashboard {
+        #[command(subcommand)]
+        command: DashboardGroupCommand,
+    },
+    #[command(about = "Run grouped alert inventory, migration, authoring, and change workflows.")]
+    Alert(AlertSurfaceArgs),
+    #[command(about = "Run datasource list, browse, export, import, and diff workflows.")]
+    Datasource {
+        #[arg(
+            long,
+            global = true,
+            value_enum,
+            help = "Override JSON/YAML/table color for the datasource namespace."
+        )]
+        color: Option<CliColorChoice>,
+        #[command(subcommand)]
+        command: DatasourceGroupCommand,
+    },
+    #[command(about = "List and manage Grafana users, teams, and service accounts.")]
+    Access(AccessCliArgs),
+}
+
 #[derive(Debug, Clone, Subcommand)]
 pub enum UnifiedCommand {
     #[command(about = "Print the current grafana-util version.")]
     Version(VersionArgs),
+    #[command(about = "Read live and staged Grafana state through a shared observe surface.")]
+    Observe {
+        #[command(subcommand)]
+        command: ObserveCommand,
+    },
     #[command(
-        about = "Run dashboard browse, authoring, export, import, diff, patch-file, review, publish, and migration workflows.",
+        about = "Run common export and backup flows without learning domain-heavy subtrees."
+    )]
+    Export {
+        #[command(subcommand)]
+        command: ExportCommand,
+    },
+    #[command(
+        about = "Open expert and domain-specific workflows once you know which subsystem you need."
+    )]
+    Advanced {
+        #[command(subcommand)]
+        command: AdvancedCommand,
+    },
+    #[command(
+        hide = true,
+        about = "Compatibility path for full dashboard browse, authoring, export, import, analysis, and capture workflows.",
         visible_alias = "db",
         after_help = UNIFIED_DASHBOARD_HELP_TEXT
     )]
@@ -195,7 +502,8 @@ pub enum UnifiedCommand {
         command: DashboardGroupCommand,
     },
     #[command(
-        about = "Run datasource list, browse-live, export, import, and diff workflows.",
+        hide = true,
+        about = "Compatibility path for datasource list, browse, export, import, and diff workflows.",
         visible_alias = "ds",
         after_help = UNIFIED_DATASOURCE_HELP_TEXT
     )]
@@ -204,12 +512,24 @@ pub enum UnifiedCommand {
             long,
             global = true,
             value_enum,
-            help = "Override JSON/YAML/table color for the datasource namespace. Use auto, always, never, none, or off."
+            help = "Override JSON/YAML/table color for the datasource namespace."
         )]
         color: Option<CliColorChoice>,
         #[command(subcommand)]
         command: DatasourceGroupCommand,
     },
+    #[command(
+        hide = true,
+        about = "Compatibility path for grouped alert inventory, migration, authoring, and change workflows.",
+        after_help = UNIFIED_ALERT_HELP_TEXT
+    )]
+    Alert(AlertSurfaceArgs),
+    #[command(
+        hide = true,
+        about = "Compatibility path for Grafana users, teams, and service accounts.",
+        after_help = UNIFIED_ACCESS_HELP_TEXT
+    )]
+    Access(AccessCliArgs),
     #[command(
         name = "change",
         about = "Run review-first change workflows with optional live Grafana fetch/apply paths.",
@@ -219,47 +539,19 @@ pub enum UnifiedCommand {
         #[command(subcommand)]
         command: SyncGroupCommand,
     },
-    #[command(
-        about = "Export, import, or diff Grafana alerting resources.",
-        after_help = UNIFIED_ALERT_HELP_TEXT
-    )]
-    Alert(AlertNamespaceArgs),
-    #[command(
-        about = "List and manage Grafana users, teams, and service accounts.",
-        after_help = UNIFIED_ACCESS_HELP_TEXT
-    )]
-    Access(AccessCliArgs),
-    #[command(
-        about = "Run profile list, show, add, example, and init workflows.",
-        after_help = UNIFIED_PROFILE_HELP_TEXT
-    )]
-    Profile(ProfileCliArgs),
-    #[command(
-        about = "Run resource describe, kinds, list, and get workflows through a generic read-only query surface."
-    )]
-    Resource(ResourceCliArgs),
-    #[command(
-        about = "Run migration and repair transforms across Grafana artifact formats.",
-        after_help = UNIFIED_MIGRATE_HELP_TEXT
-    )]
-    Migrate(MigrateCliArgs),
-    #[command(
-        about = "Export and review live dashboard snapshots.",
-        after_help = SNAPSHOT_HELP_TEXT
-    )]
-    Snapshot {
+    #[command(about = "Run repo-local Grafana configuration and profile workflows.")]
+    Config {
         #[command(subcommand)]
-        command: SnapshotCommand,
+        command: ConfigCommand,
     },
     #[command(
-        about = "Summarize project artifacts into a project-wide overview. Staged exports are the default; use `overview live` to route into shared live status."
+        hide = true,
+        about = "Compatibility path for migration and artifact repair workflows."
     )]
-    Overview(OverviewCliArgs),
-    #[command(
-        name = "status",
-        about = "Render shared project-wide staged or live status. Staged subcommands use exported artifacts; live subcommands query Grafana."
-    )]
-    Status(ProjectStatusCliArgs),
+    Migrate {
+        #[command(subcommand)]
+        command: MigrateCommand,
+    },
 }
 
 #[derive(Debug, Clone, Args)]
@@ -272,11 +564,10 @@ pub struct VersionArgs {
 #[command(
     name = "grafana-util",
     version = crate::common::TOOL_VERSION_DETAILS,
-    about = "Unified Grafana dashboard, alerting, access, and profile utility.",
+    about = "Task-first Grafana CLI for observe, export, change review, config, and advanced workflows.",
     after_help = UNIFIED_HELP_TEXT,
     styles = crate::help_styles::CLI_HELP_STYLES
 )]
-/// Parsed root CLI arguments for the Rust unified binary.
 pub struct CliArgs {
     #[arg(
         long,
@@ -289,16 +580,11 @@ pub struct CliArgs {
     pub command: UnifiedCommand,
 }
 
-/// Parse raw argv into the unified command tree.
-///
-/// This is intentionally side-effect-free and should only validate CLI shape.
 pub fn parse_cli_from<I, T>(iter: I) -> CliArgs
 where
     I: IntoIterator<Item = T>,
     T: Into<std::ffi::OsString> + Clone,
 {
-    // Keep parser invocation in one place so runtime entrypoints all share identical
-    // argument normalization and Clap error handling.
     CliArgs::parse_from(iter)
 }
 
@@ -311,63 +597,166 @@ fn wrap_dashboard(command: DashboardCommand) -> DashboardCliArgs {
 
 fn wrap_dashboard_group(command: DashboardGroupCommand) -> DashboardCliArgs {
     match command {
-        DashboardGroupCommand::Browse(inner) => wrap_dashboard(DashboardCommand::Browse(inner)),
-        DashboardGroupCommand::Get(inner) => wrap_dashboard(DashboardCommand::Get(inner)),
-        DashboardGroupCommand::CloneLive(inner) => {
-            wrap_dashboard(DashboardCommand::CloneLive(inner))
-        }
-        DashboardGroupCommand::Serve(inner) => wrap_dashboard(DashboardCommand::Serve(inner)),
-        DashboardGroupCommand::EditLive(inner) => wrap_dashboard(DashboardCommand::EditLive(inner)),
-        DashboardGroupCommand::List(inner) => wrap_dashboard(DashboardCommand::List(inner)),
-        DashboardGroupCommand::Export(inner) => wrap_dashboard(DashboardCommand::Export(inner)),
-        DashboardGroupCommand::Import(inner) => wrap_dashboard(DashboardCommand::Import(inner)),
-        DashboardGroupCommand::Delete(inner) => wrap_dashboard(DashboardCommand::Delete(inner)),
-        DashboardGroupCommand::Diff(inner) => wrap_dashboard(DashboardCommand::Diff(inner)),
-        DashboardGroupCommand::PatchFile(inner) => {
-            wrap_dashboard(DashboardCommand::PatchFile(inner))
-        }
-        DashboardGroupCommand::Review(inner) => wrap_dashboard(DashboardCommand::Review(inner)),
-        DashboardGroupCommand::Publish(inner) => wrap_dashboard(DashboardCommand::Publish(inner)),
-        DashboardGroupCommand::Analyze(inner) => wrap_dashboard(DashboardCommand::Analyze(inner)),
-        DashboardGroupCommand::InspectExport(inner) => {
-            wrap_dashboard(DashboardCommand::InspectExport(inner))
-        }
-        DashboardGroupCommand::InspectLive(inner) => {
-            wrap_dashboard(DashboardCommand::InspectLive(inner))
-        }
-        DashboardGroupCommand::InspectVars(inner) => {
-            wrap_dashboard(DashboardCommand::InspectVars(inner))
-        }
-        DashboardGroupCommand::GovernanceGate(inner) => {
-            wrap_dashboard(DashboardCommand::GovernanceGate(inner))
-        }
-        DashboardGroupCommand::Topology(inner) => wrap_dashboard(DashboardCommand::Topology(inner)),
-        DashboardGroupCommand::Impact(inner) => wrap_dashboard(DashboardCommand::Impact(inner)),
-        DashboardGroupCommand::ValidateExport(inner) => {
-            wrap_dashboard(DashboardCommand::ValidateExport(inner))
-        }
-        DashboardGroupCommand::History(inner) => wrap_dashboard(DashboardCommand::History(inner)),
-        DashboardGroupCommand::Screenshot(inner) => {
-            wrap_dashboard(DashboardCommand::Screenshot(inner))
-        }
+        DashboardGroupCommand::Live { command } => match command {
+            DashboardLiveCommand::Browse(inner) => wrap_dashboard(DashboardCommand::Browse(inner)),
+            DashboardLiveCommand::List(inner) => wrap_dashboard(DashboardCommand::List(inner)),
+            DashboardLiveCommand::Vars(inner) => {
+                wrap_dashboard(DashboardCommand::InspectVars(inner))
+            }
+            DashboardLiveCommand::Fetch(inner) => wrap_dashboard(DashboardCommand::Get(inner)),
+            DashboardLiveCommand::Clone(inner) => {
+                wrap_dashboard(DashboardCommand::CloneLive(inner))
+            }
+            DashboardLiveCommand::Edit(inner) => wrap_dashboard(DashboardCommand::EditLive(inner)),
+            DashboardLiveCommand::Delete(inner) => wrap_dashboard(DashboardCommand::Delete(inner)),
+            DashboardLiveCommand::History(inner) => {
+                wrap_dashboard(DashboardCommand::History(inner))
+            }
+        },
+        DashboardGroupCommand::Draft { command } => match command {
+            DashboardDraftCommand::Review(inner) => wrap_dashboard(DashboardCommand::Review(inner)),
+            DashboardDraftCommand::Patch(inner) => {
+                wrap_dashboard(DashboardCommand::PatchFile(inner))
+            }
+            DashboardDraftCommand::Serve(inner) => wrap_dashboard(DashboardCommand::Serve(inner)),
+            DashboardDraftCommand::Publish(inner) => {
+                wrap_dashboard(DashboardCommand::Publish(inner))
+            }
+        },
+        DashboardGroupCommand::Sync { command } => match command {
+            DashboardSyncCommand::Export(inner) => wrap_dashboard(DashboardCommand::Export(inner)),
+            DashboardSyncCommand::Import(inner) => wrap_dashboard(DashboardCommand::Import(inner)),
+            DashboardSyncCommand::Diff(inner) => wrap_dashboard(DashboardCommand::Diff(inner)),
+            DashboardSyncCommand::Convert { .. } => {
+                unreachable!("convert is handled before dashboard dispatch")
+            }
+        },
+        DashboardGroupCommand::Analyze { command } => match command {
+            DashboardAnalyzeCommand::Summary(inner) => {
+                wrap_dashboard(DashboardCommand::Analyze(inner))
+            }
+            DashboardAnalyzeCommand::Topology(inner) => {
+                wrap_dashboard(DashboardCommand::Topology(inner))
+            }
+            DashboardAnalyzeCommand::Impact(inner) => {
+                wrap_dashboard(DashboardCommand::Impact(inner))
+            }
+            DashboardAnalyzeCommand::Governance(inner) => {
+                wrap_dashboard(DashboardCommand::GovernanceGate(inner))
+            }
+        },
+        DashboardGroupCommand::Capture { command } => match command {
+            DashboardCaptureCommand::Screenshot(inner) => {
+                wrap_dashboard(DashboardCommand::Screenshot(inner))
+            }
+        },
     }
 }
 
-// Centralized command fan-out before invoking domain runners.
-// Every unified CLI variant is normalized into one of dashboard/alert/datasource/access/snapshot/overview/status runners here.
-/// Dispatch the normalized root command into exactly one domain handler.
-///
-/// Handlers are injected as callables so tests can assert routing without
-/// triggering network-heavy domain execution.
+fn wrap_alert_surface(command: AlertCommandSurface) -> AlertCliArgs {
+    use crate::alert::AlertGroupCommand;
+
+    let legacy = match command {
+        AlertCommandSurface::Live { command } => match command {
+            AlertLiveCommand::ListRules(inner) => AlertGroupCommand::ListRules(inner),
+            AlertLiveCommand::ListContactPoints(inner) => {
+                AlertGroupCommand::ListContactPoints(inner)
+            }
+            AlertLiveCommand::ListMuteTimings(inner) => AlertGroupCommand::ListMuteTimings(inner),
+            AlertLiveCommand::ListTemplates(inner) => AlertGroupCommand::ListTemplates(inner),
+            AlertLiveCommand::Delete(inner) => AlertGroupCommand::Delete(inner),
+        },
+        AlertCommandSurface::Migrate { command } => match command {
+            AlertMigrateCommand::Export(inner) => AlertGroupCommand::Export(inner),
+            AlertMigrateCommand::Import(inner) => AlertGroupCommand::Import(inner),
+            AlertMigrateCommand::Diff(inner) => AlertGroupCommand::Diff(inner),
+        },
+        AlertCommandSurface::Author { command } => match command {
+            AlertAuthorCommand::Init(inner) => AlertGroupCommand::Init(inner),
+            AlertAuthorCommand::Rule { command } => match command {
+                AlertAuthorRuleCommand::Add(inner) => AlertGroupCommand::AddRule(inner),
+                AlertAuthorRuleCommand::Clone(inner) => AlertGroupCommand::CloneRule(inner),
+            },
+            AlertAuthorCommand::ContactPoint { command } => match command {
+                AlertAuthorContactPointCommand::Add(inner) => {
+                    AlertGroupCommand::AddContactPoint(inner)
+                }
+            },
+            AlertAuthorCommand::Route { command } => match command {
+                AlertAuthorRouteCommand::Set(inner) => AlertGroupCommand::SetRoute(inner),
+                AlertAuthorRouteCommand::Preview(inner) => AlertGroupCommand::PreviewRoute(inner),
+            },
+        },
+        AlertCommandSurface::Scaffold { command } => match command {
+            AlertScaffoldCommand::Rule(inner) => AlertGroupCommand::NewRule(inner),
+            AlertScaffoldCommand::ContactPoint(inner) => AlertGroupCommand::NewContactPoint(inner),
+            AlertScaffoldCommand::Template(inner) => AlertGroupCommand::NewTemplate(inner),
+        },
+        AlertCommandSurface::Change { command } => match command {
+            AlertChangeCommand::Plan(inner) => AlertGroupCommand::Plan(inner),
+            AlertChangeCommand::Apply(inner) => AlertGroupCommand::Apply(inner),
+        },
+    };
+
+    normalize_alert_group_command(legacy)
+}
+
+fn wrap_overview(staged: OverviewArgs, command: Option<OverviewCommand>) -> OverviewCliArgs {
+    OverviewCliArgs {
+        color: json_color_choice(),
+        staged,
+        command,
+    }
+}
+
+fn run_dashboard_sync_convert(args: RawToPromptArgs) -> Result<()> {
+    run_migrate_cli(MigrateCliArgs {
+        command: MigrateCommand::Dashboard {
+            command: MigrateDashboardCommand::RawToPrompt(args),
+        },
+    })
+}
+
+fn wrap_export_access(command: ExportAccessCommand) -> AccessCliArgs {
+    let command = match command {
+        ExportAccessCommand::User(inner) => AccessCommand::User {
+            command: UserCommand::Export(inner),
+        },
+        ExportAccessCommand::Org(inner) => AccessCommand::Org {
+            command: OrgCommand::Export(inner),
+        },
+        ExportAccessCommand::Team(inner) => AccessCommand::Team {
+            command: TeamCommand::Export(inner),
+        },
+        ExportAccessCommand::ServiceAccount(inner) => AccessCommand::ServiceAccount {
+            command: ServiceAccountCommand::Export(inner),
+        },
+    };
+    AccessCliArgs { command }
+}
+
+fn wrap_project_status(command: ObserveCommand) -> Option<ProjectStatusCliArgs> {
+    match command {
+        ObserveCommand::Live(inner) => Some(ProjectStatusCliArgs {
+            color: json_color_choice(),
+            command: ProjectStatusSubcommand::Live(inner),
+        }),
+        ObserveCommand::Staged(inner) => Some(ProjectStatusCliArgs {
+            color: json_color_choice(),
+            command: ProjectStatusSubcommand::Staged(inner),
+        }),
+        _ => None,
+    }
+}
+
 #[allow(clippy::too_many_arguments)]
-fn dispatch_with_handlers<FD, FS, FY, FA, FX, FM, FP, FR, FO, FQ>(
+fn dispatch_with_handlers<FD, FS, FY, FA, FX, FP, FR, FO, FQ>(
     args: CliArgs,
     mut run_dashboard: FD,
     mut run_datasource: FS,
     mut run_sync: FY,
     mut run_alert: FA,
     mut run_access: FX,
-    mut run_migrate: FM,
     mut run_profile: FP,
     mut run_snapshot: FR,
     mut run_overview: FO,
@@ -379,7 +768,6 @@ where
     FY: FnMut(SyncGroupCommand) -> Result<()>,
     FA: FnMut(AlertCliArgs) -> Result<()>,
     FX: FnMut(AccessCliArgs) -> Result<()>,
-    FM: FnMut(MigrateCliArgs) -> Result<()>,
     FP: FnMut(ProfileCliArgs) -> Result<()>,
     FR: FnMut(SnapshotCommand) -> Result<()>,
     FO: FnMut(OverviewCliArgs) -> Result<()>,
@@ -405,29 +793,72 @@ where
             }
             Ok(())
         }
-        UnifiedCommand::Dashboard { command } => run_dashboard(wrap_dashboard_group(command)),
+        UnifiedCommand::Observe { command } => match command {
+            ObserveCommand::Overview { staged, command } => {
+                run_overview(wrap_overview(staged, command))
+            }
+            ObserveCommand::Snapshot { command } => run_snapshot(command),
+            ObserveCommand::Resource { command } => run_resource_cli(ResourceCliArgs {
+                color: json_color_choice(),
+                command,
+            }),
+            other => run_project_status(wrap_project_status(other).expect("observe status path")),
+        },
+        UnifiedCommand::Export { command } => match command {
+            ExportCommand::Dashboard(inner) => {
+                run_dashboard(wrap_dashboard(DashboardCommand::Export(inner)))
+            }
+            ExportCommand::Alert(inner) => {
+                run_alert(wrap_alert_surface(AlertCommandSurface::Migrate {
+                    command: AlertMigrateCommand::Export(inner),
+                }))
+            }
+            ExportCommand::Datasource(inner) => {
+                run_datasource(DatasourceGroupCommand::Export(inner))
+            }
+            ExportCommand::Access { command } => run_access(wrap_export_access(command)),
+        },
+        UnifiedCommand::Advanced { command } => match command {
+            AdvancedCommand::Dashboard { command } => match command {
+                DashboardGroupCommand::Sync {
+                    command:
+                        DashboardSyncCommand::Convert {
+                            command: DashboardSyncConvertCommand::RawToPrompt(inner),
+                        },
+                } => run_dashboard_sync_convert(inner),
+                other => run_dashboard(wrap_dashboard_group(other)),
+            },
+            AdvancedCommand::Alert(inner) => run_alert(wrap_alert_surface(inner.command)),
+            AdvancedCommand::Datasource { color, command } => {
+                set_json_color_choice(color.unwrap_or(default_color));
+                run_datasource(command)
+            }
+            AdvancedCommand::Access(inner) => run_access(inner),
+        },
+        UnifiedCommand::Dashboard { command } => match command {
+            DashboardGroupCommand::Sync {
+                command:
+                    DashboardSyncCommand::Convert {
+                        command: DashboardSyncConvertCommand::RawToPrompt(inner),
+                    },
+            } => run_dashboard_sync_convert(inner),
+            other => run_dashboard(wrap_dashboard_group(other)),
+        },
         UnifiedCommand::Datasource { color, command } => {
             set_json_color_choice(color.unwrap_or(default_color));
             run_datasource(command)
         }
-        UnifiedCommand::Change { command } => run_sync(command),
-        UnifiedCommand::Alert(inner) => run_alert(normalize_alert_namespace_args(inner)),
+        UnifiedCommand::Alert(inner) => run_alert(wrap_alert_surface(inner.command)),
         UnifiedCommand::Access(inner) => run_access(inner),
-        UnifiedCommand::Migrate(inner) => run_migrate(inner),
-        UnifiedCommand::Profile(inner) => run_profile(inner),
-        UnifiedCommand::Resource(inner) => run_resource_cli(inner),
-        UnifiedCommand::Snapshot { command } => run_snapshot(command),
-        UnifiedCommand::Overview(inner) => run_overview(inner),
-        UnifiedCommand::Status(inner) => run_project_status(inner),
+        UnifiedCommand::Change { command } => run_sync(command),
+        UnifiedCommand::Config { command } => match command {
+            ConfigCommand::Profile(inner) => run_profile(inner),
+        },
+        UnifiedCommand::Migrate { command } => run_migrate_cli(MigrateCliArgs { command }),
     }
 }
 
-/// Runtime entrypoint for unified execution.
-///
-/// Keeping handler execution injectable via `dispatch_with_handlers` allows tests to
-/// validate dispatch logic without touching network transport.
 pub fn run_cli(args: CliArgs) -> Result<()> {
-    // Keep one executable boundary: parse-independent dispatch + injected runners.
     set_json_color_choice(args.color);
     dispatch_with_handlers(
         args,
@@ -436,7 +867,6 @@ pub fn run_cli(args: CliArgs) -> Result<()> {
         run_sync_cli,
         run_alert_cli,
         run_access_cli,
-        run_migrate_cli,
         run_profile_cli,
         run_snapshot_cli,
         run_overview_cli,

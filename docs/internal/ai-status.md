@@ -8,12 +8,26 @@ Current AI-maintained status only.
 - Keep this file short and current. Additive historical detail belongs in `docs/internal/archive/`.
 - Detailed 2026-03-29 through 2026-03-31 entries moved to [`archive/ai-status-archive-2026-03-31.md`](/Users/kendlee/work/grafana-utils/docs/internal/archive/ai-status-archive-2026-03-31.md).
 
+## 2026-04-10 - Regroup the root CLI around observe/config and task-first dashboard/alert lanes
+- State: In Progress
+- Scope: `rust/src/{cli.rs,cli_help.rs,cli_help_examples.rs,cli_rust_tests.rs,alert.rs}`, `rust/src/access/{cli_defs.rs,access_user_cli.rs,access_service_account_cli.rs}`, `docs/commands/{en,zh-TW}/{index,dashboard,alert}.md`, `docs/internal/{ai-status.md,ai-changes.md}`
+- Baseline: the root Rust CLI mixed resource-first and workflow-first entrypoints (`status`, `overview`, `snapshot`, `resource`, `profile`) with domain namespaces, while `dashboard` and `alert` still exposed many flat subcommands. That made discovery hard because operators had to guess both the right root surface and the right verb family before help output offered much guidance.
+- Current Update: added canonical `observe` and `config profile` root surfaces, grouped dashboard commands into `live`, `draft`, `sync`, `analyze`, and `capture`, grouped alert commands into `live`, `migrate`, `author`, `scaffold`, and `change`, and removed the old root/flat public entrypoints from the unified CLI. Also rewrote short help/examples to point at the new grouped surfaces and fixed access help `about` text so `access --help` no longer leaks Clap's enum placeholder wording.
+- Result: parser, dispatch, and source docs now expose only the regrouped task-first surfaces for the unified CLI, so discovery no longer depends on legacy root or flat command knowledge.
+
 ## 2026-04-09 - Add discoverable column selectors across access and existing output-column surfaces
 - State: Done
 - Scope: `rust/src/access/{access_user_cli.rs,access_service_account_cli.rs,cli_defs.rs,render.rs,user_read.rs,team_list.rs,service_account_workflows_mutation.rs,mod.rs,*tests.rs}`, `rust/src/dashboard/{cli_defs_command_list.rs,cli_defs_command_local.rs,dashboard_runtime.rs,list_render.rs,import_render.rs,mod.rs,*tests.rs}`, `rust/src/{datasource.rs,datasource_cli_defs.rs,datasource_export_support.rs,datasource_inspect_export.rs,datasource_mutation_render.rs,datasource_rust_tests.rs}`, `docs/commands/{en,zh-TW}/*`, `docs/internal/ai-status.md`, `docs/internal/ai-changes.md`
 - Baseline: some commands already had `--output-columns`, but discoverability was weak and support was inconsistent. Access list commands had no column selector at all, and existing dashboard/datasource selectors did not offer one obvious “show me everything” contract or a zero-guess way to list supported columns.
 - Current Update: added `--output-columns` plus `--list-columns` to access user/team/service-account list, taught those human-readable outputs to honor selected columns without changing JSON/YAML contracts, and added `all` as the canonical full-column selector. Then aligned the pre-existing dashboard list, dashboard import dry-run, datasource import dry-run, and datasource list selectors so `all` expands the full human-readable column set and `--list-columns` prints the supported ids without requiring live auth. A follow-up pass also added `--list-columns` to dashboard analyze/inspect `--report-columns`.
 - Result: column discovery and full-column expansion now follow one consistent operator model: `--list-columns` shows the canonical ids, `--output-columns all` expands the full human-readable set, and JSON/YAML machine contracts stay full and unchanged.
+
+## 2026-04-09 - Widen datasource list onto full datasource records with selectable fields
+- State: Done
+- Scope: `rust/src/{datasource.rs,datasource_cli_defs.rs,datasource_export_support.rs,datasource_rust_tests.rs,datasource_cli_mutation_tail_rust_tests.rs}`, `docs/commands/{en,zh-TW}/datasource-list.md`, `docs/internal/{ai-status.md,ai-changes.md}`
+- Baseline: `datasource list` fetches live datasource rows but rebuilds them into a small inventory projection for table/csv/json/yaml output. That drops datasource-specific fields like `database`, Influx bucket or organization values in `jsonData`, Elasticsearch index patterns, and other plugin-specific settings even when operators ask for JSON.
+- Current Update: changed the live datasource list path so JSON and YAML preserve the full datasource records returned by Grafana, while table/text/csv still default to the compact summary columns. `--output-columns` now accepts datasource-specific fields and nested paths such as `jsonData.organization`, and `all` expands every discovered field in human-readable output instead of only the old fixed summary set.
+- Result: `datasource list` now keeps the full live datasource shape available for automation and review, and operators can selectively surface datasource-specific fields for plugins like PostgreSQL, MySQL, InfluxDB, Elasticsearch, and Loki without adding a separate `--verbose` mode.
 
 ## 2026-04-09 - Add structured origin and last-active metadata to access user machine output
 - State: Done

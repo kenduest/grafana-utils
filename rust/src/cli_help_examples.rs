@@ -35,229 +35,81 @@ pub(crate) const HELP_COLOR_PROFILE: &str = "\x1b[1;35m";
 pub(crate) const HELP_FULL_HINT: &str =
     "Extended Help:\n  --help-full\n          Print help with extended examples\n";
 
-pub(crate) const OVERVIEW_HELP_FULL_TEXT: &str = help_block!(
-    "Extended Examples:",
-    (
-        "[Overview Staged]",
-        "Summarize staged dashboard, alert, and sync exports into one overview:",
-        "grafana-util overview --dashboard-export-dir ./dashboards/raw --alert-export-dir ./alerts/raw --desired-file ./desired.json --output-format json"
-    ),
-    (
-        "[Overview Live]",
-        "Open the live project-home overview through the shared status live path:",
-        "grafana-util overview live --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --output-format interactive"
-    ),
-    (
-        "[Overview Bundle]",
-        "Build an overview from staged bundle and promotion inputs:",
-        "grafana-util overview --source-bundle ./sync-source-bundle.json --target-inventory ./target-inventory.json --availability-file ./availability.json --mapping-file ./mapping.json --output-format text"
-    )
-);
-
-pub(crate) const PROJECT_STATUS_HELP_FULL_TEXT: &str = help_block!(
-    "Extended Examples:",
-    (
-        "[Status Staged]",
-        "Inspect staged artifacts with a machine-readable summary:",
-        "grafana-util status staged --dashboard-export-dir ./dashboards/raw --desired-file ./desired.json --output-format json"
-    ),
-    (
-        "[Status Live]",
-        "Check live Grafana status while layering staged sync context:",
-        "grafana-util status live --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --sync-summary-file ./sync-summary.json --bundle-preflight-file ./bundle-preflight.json --output-format json"
-    )
-);
-
 pub(crate) const UNIFIED_HELP_TEXT: &str = help_block!(
     "Examples:",
     (
-        "[Dashboard Export]",
-        "Export dashboards with Basic auth:",
-        "grafana-util dashboard export --url http://localhost:3000 --basic-user admin --basic-password admin --output-dir ./dashboards --overwrite"
+        "[Config]",
+        "Create one repo-local profile so later commands stay short:",
+        "grafana-util config profile add prod --url https://grafana.example.com --basic-user admin --prompt-password --store-secret encrypted-file"
     ),
     (
-        "[Migrate Raw To Prompt]",
-        "Convert one raw dashboard file into its sibling .prompt.json target:",
-        "grafana-util migrate dashboard raw-to-prompt --input-file ./dashboards/raw/cpu-main.json"
+        "[Observe]",
+        "Start with a read-only overview of staged or live state:",
+        "grafana-util observe overview --dashboard-export-dir ./dashboards/raw --alert-export-dir ./alerts/raw --output-format text"
     ),
     (
-        "[Dashboard Export]",
-        "Export dashboards across all visible orgs:",
-        "grafana-util dashboard export --url http://localhost:3000 --basic-user admin --basic-password admin --all-orgs --output-dir ./dashboards --overwrite"
+        "[Export]",
+        "Export dashboards through the new task-first backup surface:",
+        "grafana-util export dashboard --url http://localhost:3000 --basic-user admin --basic-password admin --output-dir ./dashboards --overwrite"
     ),
     (
-        "[Dashboard Capture]",
-        "Capture a dashboard screenshot from browser-like state:",
-        r#"grafana-util dashboard screenshot --dashboard-url 'https://grafana.example.com/d/cpu-main/cpu-overview?var-cluster=prod-a' --token "$GRAFANA_API_TOKEN" --output ./cpu-main.png --full-page"#
+        "[Export]",
+        "Export alerting resources without opening the advanced alert tree first:",
+        r#"grafana-util export alert --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-dir ./alerts --overwrite"#
     ),
     (
-        "[Dashboard Capture]",
-        "Inspect dashboard variables before capture:",
-        r#"grafana-util dashboard list-vars --dashboard-url 'https://grafana.example.com/d/cpu-main/cpu-overview?var-cluster=prod-a' --token "$GRAFANA_API_TOKEN""#
+        "[Change]",
+        "Review a staged change before touching Grafana:",
+        r#"grafana-util change preview --workspace ./grafana-oac-repo --fetch-live --url http://localhost:3000 --token "$GRAFANA_API_TOKEN""#
     ),
     (
-        "[Dashboard Capture]",
-        "Inspect dashboard variables from a local dashboard file:",
-        "grafana-util dashboard list-vars --input ./dashboards/raw/cpu-main.json --output-format yaml"
-    ),
-    (
-        "[Dashboard Browse]",
-        "Browse a local export tree from disk:",
-        "grafana-util dashboard browse --input-dir ./dashboards/raw --path 'Platform / Infra'"
-    ),
-    (
-        "[Dashboard Analyze]",
-        "Analyze live Grafana before topology or governance checks:",
-        r#"grafana-util dashboard analyze --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-format governance-json"#
-    ),
-    (
-        "[Dashboard Review]",
-        "Review a local dashboard file before publish:",
-        "grafana-util dashboard review --input ./drafts/cpu-main.json --output-format yaml"
-    ),
-    (
-        "[Snapshot Export]",
-        "Capture a live snapshot into a local export root:",
-        r#"grafana-util snapshot export --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-dir ./snapshot"#
-    ),
-    (
-        "[Alert Export]",
-        "Export alerting resources through the unified binary:",
-        r#"grafana-util alert export --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-dir ./alerts --overwrite"#
-    ),
-    (
-        "[Datasource Inventory]",
-        "List datasource inventory through the unified binary:",
-        r#"grafana-util datasource list --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --json"#
-    ),
-    (
-        "[Datasource Local Inventory]",
-        "Inspect a local datasource export root without Grafana access:",
-        r#"grafana-util datasource list --input-dir ./datasources --json"#
-    ),
-    (
-        "[Access Local Inventory]",
-        "Inspect exported access users without calling Grafana:",
-        r#"grafana-util access user list --input-dir ./access-users --json"#
-    ),
-    (
-        "[Profile Show]",
-        "Inspect a selected profile from the repo-local config file:",
-        "grafana-util profile show --profile prod --output-format yaml"
-    ),
-    (
-        "[Profile Add]",
-        "Create or replace one repo-local profile entry:",
-        "grafana-util profile add prod --url https://grafana.example.com --basic-user admin --prompt-password --store-secret encrypted-file"
-    ),
-    (
-        "[Profile Example]",
-        "Render a full annotated config example for reference editing:",
-        "grafana-util profile example --mode full"
-    ),
-    (
-        "[Snapshot Review]",
-        "Review a local snapshot inventory as JSON:",
-        "grafana-util snapshot review --input-dir ./snapshot --output-format json"
-    ),
-    (
-        "[Change Planning]",
-        "Preview a staged change directly against live Grafana:",
-        r#"grafana-util change preview --fetch-live --url http://localhost:3000 --token "$GRAFANA_API_TOKEN"#
-    ),
-    (
-        "[Change Apply]",
-        "Apply a reviewed change preview back to Grafana:",
-        r#"grafana-util change apply --preview-file ./change-preview.json --approve --execute-live --url http://localhost:3000 --token "$GRAFANA_API_TOKEN"#
+        "[Advanced]",
+        "Open the advanced dashboard tree when the job is domain-specific:",
+        "grafana-util advanced dashboard sync import --url http://localhost:3000 --basic-user admin --basic-password admin --input-dir ./dashboards/raw --dry-run --table"
     )
 );
 
 pub(crate) const UNIFIED_HELP_FULL_TEXT: &str = help_block!(
     "Extended Examples:",
     (
-        "[Dashboard Analyze]",
-        "Render a grouped dashboard dependency table from raw exports:",
-        "grafana-util dashboard analyze --input-dir ./dashboards/raw --input-format raw --output-format tree-table --report-columns dashboard_uid,panel_title,datasource_uid,query"
+        "[Observe]",
+        "Query generic Grafana resources through the canonical observe surface:",
+        "grafana-util observe resource describe dashboards --output-format json"
     ),
     (
-        "[Migrate Raw To Prompt]",
-        "Generate a prompt/ lane from a raw export root:",
-        "grafana-util migrate dashboard raw-to-prompt --input-dir ./dashboards/raw --output-dir ./dashboards/prompt --overwrite"
+        "[Export]",
+        "Export datasource inventory from a repo workspace or local bundle:",
+        "grafana-util export datasource --output-dir ./datasources"
     ),
     (
-        "[Dashboard Analyze]",
-        "Inspect a provisioning tree from the file-provisioning root:",
-        "grafana-util dashboard analyze --input-dir ./dashboards/provisioning --input-format provisioning --output-format tree-table"
+        "[Export]",
+        "Export access service accounts through the task-first export surface:",
+        "grafana-util export access service-account --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --output-dir ./access-service-accounts"
     ),
     (
-        "[Dashboard Analyze]",
-        "Render datasource governance JSON directly from live Grafana:",
-        r#"grafana-util dashboard analyze --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-format governance-json"#
+        "[Advanced Dashboard]",
+        "Analyze dashboards from a raw export tree after you know you need dashboard-specific tooling:",
+        "grafana-util advanced dashboard analyze summary --input-dir ./dashboards/raw --input-format raw --output-format tree-table --report-columns dashboard_uid,panel_title,datasource_uid,query"
     ),
     (
-        "[Datasource Import]",
-        "Dry-run a datasource import and keep the result machine-readable:",
-        r#"grafana-util datasource import --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --input-dir ./datasources --dry-run --json"#
+        "[Advanced Dashboard]",
+        "Convert a raw dashboard export root into a prompt lane through the advanced dashboard tree:",
+        "grafana-util advanced dashboard sync convert raw-to-prompt --input-dir ./dashboards/raw --output-dir ./dashboards/prompt --overwrite"
     ),
     (
-        "[Datasource Diff]",
-        "Compare a provisioning datasource tree against live Grafana:",
-        r#"grafana-util datasource diff --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --diff-dir ./datasources/provisioning --input-format provisioning"#
+        "[Advanced Datasource]",
+        "Dry-run datasource import with machine-readable output:",
+        r#"grafana-util advanced datasource import --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --input-dir ./datasources --dry-run --json"#
     ),
     (
-        "[Access Local Inventory]",
-        "Inspect exported access users without calling Grafana:",
-        "grafana-util access user list --input-dir ./access-users --json"
+        "[Advanced Access]",
+        "Inspect exported access users through the advanced access tree:",
+        "grafana-util advanced access user list --input-dir ./access-users --json"
     ),
     (
-        "[Profile Show]",
-        "Inspect a selected profile from the repo-local config file:",
-        "grafana-util profile show --profile prod --output-format yaml"
-    ),
-    (
-        "[Profile Init]",
-        "Seed grafana-util.yaml in the current directory from the built-in template:",
-        "grafana-util profile init --overwrite"
-    ),
-    (
-        "[Profile Add]",
-        "Create or replace one repo-local profile entry:",
-        "grafana-util profile add prod --url https://grafana.example.com --basic-user admin --prompt-password --store-secret encrypted-file"
-    ),
-    (
-        "[Profile Example]",
-        "Render a full annotated config example for reference editing:",
-        "grafana-util profile example --mode full"
-    ),
-    (
-        "[Snapshot Export]",
-        "Capture a live snapshot into a local export root:",
-        r#"grafana-util snapshot export --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-dir ./snapshot"#
-    ),
-    (
-        "[Alert Import]",
-        "Re-map linked alert dashboards during import:",
-        "grafana-util alert import --url http://localhost:3000 --input-dir ./alerts/raw --replace-existing --dashboard-uid-map ./dashboard-map.json --panel-id-map ./panel-map.json"
-    ),
-    (
-        "[Change Review]",
-        "Stamp a plan as reviewed before apply:",
-        "grafana-util change advanced review --plan-file ./sync-plan.json --review-note 'peer-reviewed' --output-format json"
-    ),
-    (
-        "[Overview Staged]",
-        "Summarize staged dashboard, alert, and sync exports into one overview:",
-        "grafana-util overview --dashboard-export-dir ./dashboards/raw --alert-export-dir ./alerts/raw --desired-file ./desired.json --output-format json"
-    ),
-    (
-        "[Status Staged]",
-        "Inspect staged artifacts with a machine-readable summary:",
-        "grafana-util status staged --dashboard-export-dir ./dashboards/raw --desired-file ./desired.json --output-format json"
-    ),
-    (
-        "[Snapshot Review]",
-        "Open a local snapshot inventory in the interactive browser with `--interactive`:",
-        "grafana-util snapshot review --input-dir ./snapshot --interactive"
+        "[Advanced Alert]",
+        "Preview alert routing through the advanced alert tree:",
+        "grafana-util advanced alert author route preview --desired-dir ./alerts/desired --label team=platform --severity critical"
     )
 );
 

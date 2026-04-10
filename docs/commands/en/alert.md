@@ -19,9 +19,11 @@ This is the right entrypoint for SREs, platform operators, and anyone who wants 
 
 ## Workflow lanes
 
-- **Inspect**: list-rules, list-contact-points, list-mute-timings, and list-templates.
-- **Move**: export, import, add-rule, clone-rule, add-contact-point, set-route, new-rule, new-contact-point, and new-template.
-- **Review Before Mutate**: diff, plan, apply, and preview-route.
+- **`alert live ...`**: list-rules, list-contact-points, list-mute-timings, list-templates, and delete.
+- **`alert migrate ...`**: export, import, and diff.
+- **`alert author ...`**: init, `rule add|clone`, `contact-point add`, and `route set|preview`.
+- **`alert scaffold ...`**: rule, contact-point, and template.
+- **`alert change ...`**: plan and apply.
 
 Choose this page when alert work spans rules, routes, contact points, or templates and you want the workflow before the flags.
 
@@ -46,7 +48,7 @@ Choose this page when alert work spans rules, routes, contact points, or templat
 
 - `--profile`, `--url`, `--token`, `--basic-user`, `--basic-password`
 - `--prompt-password`, `--prompt-token`, `--timeout`, `--verify-ssl`
-- Use the nested subcommands for `export`, `import`, `diff`, `plan`, `apply`, `delete`, `add-rule`, `clone-rule`, `add-contact-point`, `set-route`, `preview-route`, `new-rule`, `new-contact-point`, `new-template`, `list-rules`, `list-contact-points`, `list-mute-timings`, and `list-templates`.
+- Use the nested subcommands for `migrate`, `change`, `live`, `author`, and `scaffold`.
 
 ## Auth notes
 
@@ -58,22 +60,22 @@ Choose this page when alert work spans rules, routes, contact points, or templat
 
 ```bash
 # Purpose: Inspect alert inventory before choosing a lane.
-grafana-util alert list-rules --profile prod --json
+grafana-util alert live list-rules --profile prod --json
 ```
 
 ```bash
 # Purpose: Export alert resources for review or migration.
-grafana-util alert export --url http://localhost:3000 --basic-user admin --basic-password admin --output-dir ./alerts --overwrite
+grafana-util alert migrate export --url http://localhost:3000 --basic-user admin --basic-password admin --output-dir ./alerts --overwrite
 ```
 
 ```bash
 # Purpose: Preview the route shape before mutating live alert routing.
-grafana-util alert preview-route --url http://localhost:3000 --profile prod --output-format json
+grafana-util alert author route preview --desired-dir ./alerts/desired --label team=platform --severity critical --output-format json
 ```
 
 ```bash
 # Purpose: Export alert resources for review or migration with token auth.
-grafana-util alert export --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-dir ./alerts --flat
+grafana-util alert migrate export --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-dir ./alerts --flat
 ```
 
 ## Related commands

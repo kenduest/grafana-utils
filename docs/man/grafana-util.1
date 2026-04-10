@@ -9,6 +9,8 @@ grafana\-util \- unified CLI for Grafana dashboards, alerts, datasources, access
 .PP
 .B grafana-util dashboard [\fISUBCOMMAND\fR] [\fIOPTIONS\fR]
 .PP
+.B grafana-util migrate [\fISUBCOMMAND\fR] [\fIOPTIONS\fR]
+.PP
 .B grafana-util alert [\fISUBCOMMAND\fR] [\fIOPTIONS\fR]
 .PP
 .B grafana-util datasource [\fISUBCOMMAND\fR] [\fIOPTIONS\fR]
@@ -31,7 +33,10 @@ The checked-in English command reference pages under docs/commands/en/ are the h
 .SH TOP-LEVEL COMMANDS
 .TP
 .B dashboard
-grafana\-util dashboard is the namespace for live dashboard workflows, local draft handling, export/import review, inspection, topology, and screenshots. The same namespace is also available as grafana\-util db. Use when: You need to browse live dashboards, fetch or clone a live dashboard into a local JSON draft, compare local files with Grafana, inspect export or live metadata, convert raw dashboards into prompt JSON, or publish a prepared dashboard back to Grafana.
+grafana\-util dashboard is the namespace for live dashboard workflows, local draft handling, export/import review, inspection, topology, and screenshots. The same namespace is also available as grafana\-util db. Use when: You need to browse live dashboards, fetch or clone a live dashboard into a local JSON draft, compare local files with Grafana, inspect export or live metadata, or publish a prepared dashboard back to Grafana. Use dashboard sync convert raw\-to\-prompt when the job is artifact repair rather than dashboard operations.
+.TP
+.B migrate
+grafana\-util migrate is the namespace for repair and normalization workflows that turn one Grafana artifact shape into another safer migration artifact. Use when: The job is not day\-to\-day live dashboard operations, but preparing exported artifacts for reuse, remapping, or safer re\-import into another environment.
 .TP
 .B alert
 Run the alerting command surface for exporting, importing, diffing, planning, applying, deleting, authoring, and listing Grafana alert resources. Use when: Export local alert bundles from Grafana.; Import or diff alert bundles against live Grafana state.; Build and apply a reviewed alert management plan.; Author staged rules, contact points, routes, and templates.; List live alert rules, contact points, mute timings, and templates.
@@ -72,7 +77,7 @@ Clone one live dashboard into a local draft with optional overrides. Use when: Y
 List dashboard summaries without writing export files. Use when: You want a non\-interactive inventory view of live dashboards, optionally with resolved sources or structured output.
 .TP
 .B grafana\-util\-dashboard\-export(1)
-Export dashboards to raw/, prompt/, and provisioning/ files, with optional history/ artifacts. Use when: You need a local export tree for later import, review, diff, or file\-provisioning workflows. Add \-\-include\-history when you also need dashboard revision\-history artifacts under each exported org scope. The prompt/ lane is for Grafana UI import, not dashboard API import; use dashboard raw\-to\-prompt when you need to convert ordinary or raw dashboard JSON into prompt JSON.
+Export dashboards to raw/, prompt/, and provisioning/ files, with optional history/ artifacts. Use when: You need a local export tree for later import, review, diff, or file\-provisioning workflows. Add \-\-include\-history when you also need dashboard revision\-history artifacts under each exported org scope. The prompt/ lane is for Grafana UI import, not dashboard API import; use migrate dashboard raw\-to\-prompt when you need to convert ordinary or raw dashboard JSON into prompt JSON.
 .TP
 .B grafana\-util\-dashboard\-import(1)
 Import dashboard JSON files through the Grafana API. Use when: You have a local export tree or provisioning tree and need to push dashboards back into Grafana, either live or as a dry run. This command consumes raw/ or provisioning/ inputs; it does not consume the Grafana UI prompt/ lane.
@@ -109,6 +114,10 @@ Build a deterministic dashboard topology graph directly from live Grafana or a l
 .TP
 .B grafana\-util\-dashboard\-screenshot(1)
 Open one dashboard in a headless browser and capture image or PDF output. Use when: You need a reproducible dashboard or panel screenshot, especially for docs, incident notes, or visual debugging.
+.SS migrate
+.TP
+.B grafana\-util\-migrate\-dashboard\-raw\-to\-prompt(1)
+Convert ordinary dashboard JSON or raw/ lane files into Grafana UI prompt JSON with __inputs. Use when: Someone gives you a normal Grafana dashboard export, legacy raw JSON, or a raw/ lane file and you need a prompt\-safe file for the Grafana UI Upload JSON flow.
 .SS alert
 .TP
 .B grafana\-util\-alert\-export(1)
@@ -170,7 +179,7 @@ List live Grafana notification templates. Use when: Inspect template inventory f
 Show the built\-in supported datasource type catalog. Use when: You need to see the canonical datasource type ids that the CLI normalizes and supports for create flows.
 .TP
 .B grafana\-util\-datasource\-list(1)
-List datasource inventory from live Grafana or a local export bundle. Use when: You need a non\-interactive inventory of datasources, either from live Grafana for the current org, one explicit org, or across all visible orgs, or from a local export bundle on disk.
+List datasource inventory from live Grafana or a local export bundle. Use when: You need a non\-interactive datasource read path. Live JSON and YAML output now keep the full datasource records returned by Grafana, while text, table, and CSV stay compact by default unless you ask for more fields.
 .TP
 .B grafana\-util\-datasource\-browse(1)
 Open a live datasource browser against Grafana with in\-place modify and delete actions. Use when: You want an interactive inventory view for inspecting, editing, or deleting live datasources.
@@ -279,6 +288,10 @@ export dashboard, datasource, and access inventory into a local snapshot bundle.
 .TP
 .B grafana\-util\-snapshot\-review(1)
 review a local snapshot inventory without touching Grafana. Use when: Want to inspect an exported snapshot root as table, csv, text, json, yaml, or interactive output.
+.SS advanced
+.TP
+.B grafana\-util\-advanced(1)
+grafana\-util advanced is the expert\-facing namespace for domain\-specific workflows. Use when: Use this namespace once you already know the subsystem you need, such as dashboard import, alert authoring, datasource diff, or access administration.
 .SS change
 .TP
 .B grafana\-util\-change\-apply(1)
@@ -309,12 +322,12 @@ List, restore, diff, or export dashboard revision history for one dashboard UID,
 Estimate the blast radius of one datasource directly from live Grafana, a local export tree, or reusable dashboard governance artifacts. Use when: You are about to change, migrate, or troubleshoot one datasource and need to know which dashboards and alert resources depend on it before you touch the live system. Prefer direct live or local inputs for the common path; keep governance artifacts for reuse.
 .SS dashboard
 .TP
-.B grafana\-util\-dashboard\-raw\-to\-prompt(1)
-Convert ordinary dashboard JSON or raw/ lane files into Grafana UI prompt JSON with __inputs. Use when: Someone gives you a normal Grafana dashboard export, legacy raw JSON, or a raw/ lane file and you need a prompt\-safe file for the Grafana UI Upload JSON flow.
-.SS dashboard
-.TP
 .B grafana\-util\-dashboard\-serve(1)
 Serve one or more dashboard drafts through a lightweight local preview server. Use when: You are iterating on one dashboard draft, one draft directory, or one generator command and want a local browser surface without publishing back to Grafana after every change.
+.SS export
+.TP
+.B grafana\-util\-export(1)
+grafana\-util export is the task\-first surface for common backup and local inventory capture jobs. Use when: The job is straightforward export or backup and you do not want to start from a domain\-heavy tree.
 .SS resource
 .TP
 .B grafana\-util\-resource\-describe(1)
@@ -433,6 +446,7 @@ grafana-util datasource export --url http://localhost:3000 --export-dir ./dataso
 .EE
 .SH SEE ALSO
 \fBgrafana-util-dashboard\fR(1),
+\fBgrafana-util-migrate\fR(1),
 \fBgrafana-util-alert\fR(1),
 \fBgrafana-util-datasource\fR(1),
 \fBgrafana-util-access\fR(1),

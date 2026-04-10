@@ -13,7 +13,65 @@ These pages track the current Rust CLI help for the command tree exposed by `gra
 
 Use these pages when you want one stable page per command or subcommand instead of a handbook chapter. The handbook explains workflow and intent; the command pages explain the concrete CLI surface.
 
-## Output selector conventions
+## Start Here
+
+The public first-run CLI is organized around a small task-first surface:
+
+- `observe`: read-only status, overview, snapshot, and resource queries
+- `export`: common backup and local-inventory capture
+- `change`: review-first staged change workflows
+- `config profile`: repo-local connection and secret management
+- `advanced`: domain-heavy workflows once you already know the subsystem
+
+Compatibility roots such as `dashboard`, `alert`, `datasource`, and `access` still exist, but they are no longer the primary onboarding path.
+
+## Common Tasks
+
+- [change](./change.md)
+- [change inspect](./change-inspect.md)
+- [change check](./change-check.md)
+- [change preview](./change-preview.md)
+- [change apply](./change-apply.md)
+- [export](./export.md)
+- `export dashboard`
+- `export alert`
+- `export datasource`
+- `export access user|org|team|service-account`
+- `observe live`
+- `observe staged`
+- `observe overview`
+- `observe snapshot`
+- `observe resource describe|kinds|list|get`
+- `config profile`
+
+## Advanced Tasks
+
+- [advanced](./advanced.md)
+- `advanced dashboard live|draft|sync|analyze|capture`
+- `advanced alert live|migrate|author|scaffold|change`
+- `advanced datasource types|list|browse|add|modify|delete|export|import|diff`
+- `advanced access user|org|team|service-account`
+- [migrate](./migrate.md)
+
+## Domain Reference
+
+- [dashboard](./dashboard.md)
+- [dashboard export](./dashboard-export.md)
+- [dashboard import](./dashboard-import.md)
+- [datasource](./datasource.md)
+- [datasource export](./datasource-export.md)
+- [datasource import](./datasource-import.md)
+- [alert](./alert.md)
+- [alert export](./alert-export.md)
+- [alert import](./alert-import.md)
+- [access](./access.md)
+- [access user](./access-user.md)
+- [access org](./access-org.md)
+- [access team](./access-team.md)
+- [access service-account](./access-service-account.md)
+- [access service-account token](./access-service-account-token.md)
+
+## Output Selector Conventions
 
 Many list, review, and dry-run commands support both a long output selector and one or more direct shorthand flags.
 
@@ -38,114 +96,3 @@ If you are unsure, treat the per-command page as authoritative for that exact co
 If you prefer `man` format, render [grafana-util(1)](../../man/grafana-util.1) locally with `man ./docs/man/grafana-util.1` on macOS or `man -l docs/man/grafana-util.1` on GNU/Linux.
 The checked-in `docs/man/*.1` files are generated from these English command pages via `python3 scripts/generate_manpages.py`.
 The checked-in `docs/html/commands/en/*.html` files are generated from the same source via `python3 scripts/generate_command_html.py`.
-
-## Dashboard
-- [dashboard](./dashboard.md)
-- [dashboard browse](./dashboard-browse.md)
-- [dashboard fetch-live](./dashboard-fetch-live.md)
-- [dashboard clone-live](./dashboard-clone-live.md)
-- [dashboard list](./dashboard-list.md)
-- [dashboard export](./dashboard-export.md)
-- [dashboard import](./dashboard-import.md)
-- [dashboard patch-file](./dashboard-patch-file.md)
-- [dashboard serve](./dashboard-serve.md)
-- [dashboard edit-live](./dashboard-edit-live.md)
-- [dashboard review](./dashboard-review.md)
-- [dashboard publish](./dashboard-publish.md)
-- [dashboard delete](./dashboard-delete.md)
-- [dashboard diff](./dashboard-diff.md)
-- [dashboard list-vars](./dashboard-list-vars.md)
-- [dashboard governance-gate](./dashboard-governance-gate.md)
-- [dashboard topology](./dashboard-topology.md)
-- [dashboard impact](./dashboard-impact.md)
-- [dashboard history](./dashboard-history.md)
-- [dashboard screenshot](./dashboard-screenshot.md)
-
-### Compatibility Pages
-
-These pages document compatibility aliases for `dashboard analyze`. Prefer the canonical `dashboard analyze ...` form in new docs and scripts.
-
-- [dashboard analyze (local alias)](./dashboard-analyze-export.md)
-- [dashboard analyze (live alias)](./dashboard-analyze-live.md)
-
-## Datasource
-- [datasource](./datasource.md)
-- [datasource types](./datasource-types.md)
-- [datasource list](./datasource-list.md)
-- [datasource browse](./datasource-browse.md)
-- [datasource export](./datasource-export.md)
-- [datasource import](./datasource-import.md)
-- [datasource diff](./datasource-diff.md)
-- [datasource add](./datasource-add.md)
-- [datasource modify](./datasource-modify.md)
-- [datasource delete](./datasource-delete.md)
-
-## Alert
-
-- [alert](./alert.md)
-- [alert export](./alert-export.md)
-- [alert import](./alert-import.md)
-- [alert diff](./alert-diff.md)
-- [alert plan](./alert-plan.md)
-- [alert apply](./alert-apply.md)
-- [alert delete](./alert-delete.md)
-- [alert add-rule](./alert-add-rule.md)
-- [alert clone-rule](./alert-clone-rule.md)
-- [alert add-contact-point](./alert-add-contact-point.md)
-- [alert set-route](./alert-set-route.md)
-- [alert preview-route](./alert-preview-route.md)
-- [alert new-rule](./alert-new-rule.md)
-- [alert new-contact-point](./alert-new-contact-point.md)
-- [alert new-template](./alert-new-template.md)
-- [alert list-rules](./alert-list-rules.md)
-- [alert list-contact-points](./alert-list-contact-points.md)
-- [alert list-mute-timings](./alert-list-mute-timings.md)
-- [alert list-templates](./alert-list-templates.md)
-
-## Access
-
-- [access](./access.md)
-- [access user](./access-user.md)
-- [access org](./access-org.md)
-- [access team](./access-team.md)
-- [access service-account](./access-service-account.md)
-- [access service-account token](./access-service-account-token.md)
-
-## Shared Surfaces
-
-- [change](./change.md)
-- [change inspect](./change-inspect.md)
-- [change check](./change-check.md)
-- [change preview](./change-preview.md)
-- [change apply](./change-apply.md)
-- [change advanced](./change.md#advanced)
-- [change advanced subcommands (summary, plan, review, audit, bundle, promotion handoff)](./change.md#advanced)
-- [overview](./overview.md)
-- [overview live](./overview.md#live)
-- [status](./status.md)
-- [status staged](./status.md#staged)
-- [status live](./status.md#live)
-- [profile](./profile.md)
-- [profile list](./profile.md#list)
-- [profile show](./profile.md#show)
-- [profile add](./profile.md#add)
-- [profile example](./profile.md#example)
-- [profile init](./profile.md#init)
-- [snapshot](./snapshot.md)
-- [snapshot export](./snapshot.md#export)
-- [snapshot review](./snapshot.md#review)
-
-## Migration
-
-- [migrate](./migrate.md)
-- [migrate dashboard raw-to-prompt](./migrate-dashboard-raw-to-prompt.md)
-
-## Generic Resource Query
-
-- [resource](./resource.md)
-- [resource describe](./resource-describe.md)
-- [resource kinds](./resource-kinds.md)
-- [resource list](./resource-list.md)
-- [resource get](./resource-get.md)
-
-The matching manpages live under `docs/man/grafana-util-*.1`.

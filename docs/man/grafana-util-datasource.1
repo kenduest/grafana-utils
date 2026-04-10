@@ -30,7 +30,7 @@ After: the same lifecycle is grouped into one namespace, so browse, export, diff
 Show the built\-in supported datasource type catalog. Use when: You need to see the canonical datasource type ids that the CLI normalizes and supports for create flows.
 .TP
 .B list
-List datasource inventory from live Grafana or a local export bundle. Use when: You need a non\-interactive inventory of datasources, either from live Grafana for the current org, one explicit org, or across all visible orgs, or from a local export bundle on disk.
+List datasource inventory from live Grafana or a local export bundle. Use when: You need a non\-interactive datasource read path. Live JSON and YAML output now keep the full datasource records returned by Grafana, while text, table, and CSV stay compact by default unless you ask for more fields.
 .TP
 .B browse
 Open a live datasource browser against Grafana with in\-place modify and delete actions. Use when: You want an interactive inventory view for inspecting, editing, or deleting live datasources.

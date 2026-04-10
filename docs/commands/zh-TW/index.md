@@ -1,117 +1,69 @@
-# 指令詳細說明
+# 指令文件
 
-## 語言切換
+## 語言
 
-- 繁體中文指令詳細說明：[目前頁面](./index.md)
-- English command reference: [英文指令總索引](../en/index.md)
-- 繁體中文手冊：[維運手冊](../../user-guide/zh-TW/index.md)
-- English handbook: [Operator Handbook](../../user-guide/en/index.md)
+- 英文指令說明：[目前頁面](./index.md)
+- 繁體中文指令說明：[目前頁面](./index.md)
+- 英文手冊：[Operator Handbook](../../user-guide/en/index.md)
+- 繁體中文手冊：[繁體中文手冊](../../user-guide/zh-TW/index.md)
 
 ---
 
-這個目錄收錄 `grafana-util` 各個 command 與 subcommand 的獨立頁面。  
-如果手冊章節是幫你理解整體工作流程，這裡就是用來查實際語法、常用旗標，以及相近命令差在哪裡的地方。
+這些頁面對應 `grafana-util` 目前 Rust CLI 的指令樹。
 
-## 輸出旗標慣例
+如果你要的是每個指令或子指令一頁的穩定說明，請看這裡；如果你想先理解操作流程與場景，請先看手冊。
 
-很多 list、review、dry-run 類指令，同時支援完整寫法與較短的快捷旗標。
+## 先從這裡開始
 
-常見對應關係：
+現在建議的新手入口是比較小的 task-first surface：
 
-- `--output-format table` 通常等於 `--table`
-- `--output-format json` 通常等於 `--json`
-- `--output-format csv` 通常等於 `--csv`
-- `--output-format yaml` 通常等於 `--yaml`
-- `--output-format text` 通常等於 `--text`
+- `observe`：唯讀狀態、overview、snapshot、resource 查詢
+- `export`：常見備份與本地 inventory 擷取
+- `change`：以 review 為先的 staged change workflow
+- `config profile`：repo-local 連線與 secret 管理
+- `advanced`：你已經知道是某個 domain 時，再打開進階樹
 
-如果你是在腳本、CI 或範本裡統一帶參數，建議優先用完整寫法。  
-如果你是在終端直接操作，快捷旗標會比較省事。
+像 `dashboard`、`alert`、`datasource`、`access` 這些舊根命令仍可使用，但不再是第一層 onboarding 入口。
 
-但也有幾個重要例外：
+## 常用工作
 
-- 有些指令只支援部分快捷旗標，不一定每種格式都有短寫
-- `dashboard topology` 是特例：它支援 `text`、`json`、`mermaid`、`dot`，但沒有 `--table` 這類快捷旗標
-- `--output-file`，或某些匯出 / draft 指令裡的 `--output`，代表的是輸出檔案路徑，不是輸出格式
+- [change](./change.md)
+- [change inspect](./change-inspect.md)
+- [change check](./change-check.md)
+- [change preview](./change-preview.md)
+- [change apply](./change-apply.md)
+- [export](./export.md)
+- `export dashboard`
+- `export alert`
+- `export datasource`
+- `export access user|org|team|service-account`
+- `observe live`
+- `observe staged`
+- `observe overview`
+- `observe snapshot`
+- `observe resource describe|kinds|list|get`
+- `config profile`
 
-所以如果你要確認某一條指令到底支援哪些格式，還是以該指令頁面為準。
+## 進階工作
 
-如果你是從繁體中文手冊進來，建議這樣使用：
+- [advanced](./advanced.md)
+- `advanced dashboard live|draft|sync|analyze|capture`
+- `advanced alert live|migrate|author|scaffold|change`
+- `advanced datasource types|list|browse|add|modify|delete|export|import|diff`
+- `advanced access user|org|team|service-account`
+- [migrate](./migrate.md)
 
-| 你要查什麼 | 建議閱讀順序 |
-| :--- | :--- |
-| 先理解功能目的和操作流程 | 先讀 `docs/user-guide/zh-TW/` 對應章節 |
-| 需要查某個 command 或 subcommand 怎麼用 | 直接進這裡的繁中指令頁 |
-| 想核對目前 Rust CLI help 的實際語法 | 以這裡的指令頁為主，必要時再對照英文頁 |
-
-如果你習慣用 `man` 格式閱讀頂層命令，macOS 可執行 `man ./docs/man/grafana-util.1`，GNU/Linux 可執行 `man -l docs/man/grafana-util.1`。
-
-## Dashboard
+## Domain 參考頁
 
 - [dashboard](./dashboard.md)
-- [dashboard browse](./dashboard-browse.md)
-- [dashboard fetch-live](./dashboard-fetch-live.md)
-- [dashboard clone-live](./dashboard-clone-live.md)
-- [dashboard list](./dashboard-list.md)
 - [dashboard export](./dashboard-export.md)
 - [dashboard import](./dashboard-import.md)
-- [dashboard patch-file](./dashboard-patch-file.md)
-- [dashboard serve](./dashboard-serve.md)
-- [dashboard edit-live](./dashboard-edit-live.md)
-- [dashboard review](./dashboard-review.md)
-- [dashboard publish](./dashboard-publish.md)
-- [dashboard delete](./dashboard-delete.md)
-- [dashboard diff](./dashboard-diff.md)
-- [dashboard list-vars](./dashboard-list-vars.md)
-- [dashboard governance-gate](./dashboard-governance-gate.md)
-- [dashboard topology](./dashboard-topology.md)
-- [dashboard impact](./dashboard-impact.md)
-- [dashboard history](./dashboard-history.md)
-- [dashboard screenshot](./dashboard-screenshot.md)
-
-### 相容頁面
-
-這些頁面是 `dashboard analyze` 的相容別名說明。新文件與腳本請優先使用 canonical 的 `dashboard analyze ...` 形式。
-
-- [dashboard analyze（本地別名）](./dashboard-analyze-export.md)
-- [dashboard analyze（即時別名）](./dashboard-analyze-live.md)
-
-## Datasource
-
 - [datasource](./datasource.md)
-- [datasource types](./datasource-types.md)
-- [datasource list](./datasource-list.md)
-- [datasource browse](./datasource-browse.md)
 - [datasource export](./datasource-export.md)
 - [datasource import](./datasource-import.md)
-- [datasource diff](./datasource-diff.md)
-- [datasource add](./datasource-add.md)
-- [datasource modify](./datasource-modify.md)
-- [datasource delete](./datasource-delete.md)
-
-## Alert
-
 - [alert](./alert.md)
 - [alert export](./alert-export.md)
 - [alert import](./alert-import.md)
-- [alert diff](./alert-diff.md)
-- [alert plan](./alert-plan.md)
-- [alert apply](./alert-apply.md)
-- [alert delete](./alert-delete.md)
-- [alert add-rule](./alert-add-rule.md)
-- [alert clone-rule](./alert-clone-rule.md)
-- [alert add-contact-point](./alert-add-contact-point.md)
-- [alert set-route](./alert-set-route.md)
-- [alert preview-route](./alert-preview-route.md)
-- [alert new-rule](./alert-new-rule.md)
-- [alert new-contact-point](./alert-new-contact-point.md)
-- [alert new-template](./alert-new-template.md)
-- [alert list-rules](./alert-list-rules.md)
-- [alert list-contact-points](./alert-list-contact-points.md)
-- [alert list-mute-timings](./alert-list-mute-timings.md)
-- [alert list-templates](./alert-list-templates.md)
-
-## Access
-
 - [access](./access.md)
 - [access user](./access-user.md)
 - [access org](./access-org.md)
@@ -119,39 +71,28 @@
 - [access service-account](./access-service-account.md)
 - [access service-account token](./access-service-account-token.md)
 
-## 共用介面
+## 輸出格式旗標慣例
 
-- [change](./change.md)
-- [change inspect](./change-inspect.md)
-- [change check](./change-check.md)
-- [change preview](./change-preview.md)
-- [change apply](./change-apply.md)
-- [change advanced](./change.md#advanced)
-- [change advanced 子指令（summary、plan、review、audit、bundle、promotion handoff）](./change.md#advanced)
-- [overview](./overview.md)
-- [overview live](./overview.md#live)
-- [status](./status.md)
-- [status staged](./status.md#staged)
-- [status live](./status.md#live)
-- [profile](./profile.md)
-- [profile list](./profile.md#list)
-- [profile show](./profile.md#show)
-- [profile add](./profile.md#add)
-- [profile example](./profile.md#example)
-- [profile init](./profile.md#init)
-- [snapshot](./snapshot.md)
-- [snapshot export](./snapshot.md#export)
-- [snapshot review](./snapshot.md#review)
+許多 list、review、dry-run 指令同時支援長格式輸出選擇器與較短的快捷旗標。
 
-## Migration
+常見對應如下：
 
-- [migrate](./migrate.md)
-- [migrate dashboard raw-to-prompt](./migrate-dashboard-raw-to-prompt.md)
+- `--output-format table` 通常等同 `--table`
+- `--output-format json` 通常等同 `--json`
+- `--output-format csv` 通常等同 `--csv`
+- `--output-format yaml` 通常等同 `--yaml`
+- `--output-format text` 通常等同 `--text`
 
-## 通用資源查詢
+如果你要讓 script 或 template 更清楚，優先用長格式；如果你只是互動式操作，短旗標通常更快。
 
-- [resource](./resource.md)
-- [resource describe](./resource-describe.md)
-- [resource kinds](./resource-kinds.md)
-- [resource list](./resource-list.md)
-- [resource get](./resource-get.md)
+注意例外：
+
+- 有些指令只支援其中一部分快捷旗標
+- `dashboard topology` 是特例：它支援 `text`、`json`、`mermaid`、`dot`，但沒有 `--table`
+- 像 `--output-file`、`--output` 這種輸出檔路徑旗標不是 render format selector
+
+如果不確定，請以該指令自己的頁面為準。
+
+如果你偏好 `man` 形式，可以在本地用 `man ./docs/man/grafana-util.1`（macOS）或 `man -l docs/man/grafana-util.1`（GNU/Linux）查看 [grafana-util(1)](../../man/grafana-util.1)。
+版本庫中的 `docs/man/*.1` 是由這些英文 command source page 經 `python3 scripts/generate_manpages.py` 產生。
+版本庫中的 `docs/html/commands/zh-TW/*.html` 則來自同一份 source，再經 `python3 scripts/generate_command_html.py` 產生。

@@ -770,7 +770,7 @@ code[class*="language-"],pre[class*="language-"]{color:#ccc;background:none;font
 </div>
 <div class="command-intro-block">
   <p class="command-intro-label">When to open this page</p>
-  <ul class="command-intro-list"><li>Use this namespace when you need to browse live dashboards, fetch or clone a live dashboard into a local JSON draft, compare local files with Grafana, inspect export or live metadata, or publish a prepared dashboard back to Grafana. Use migrate dashboard raw-to-prompt when the job is artifact repair rather than dashboard operations.</li></ul>
+  <ul class="command-intro-list"><li>Use this namespace when you need to browse live dashboards, fetch or clone a live dashboard into a local JSON draft, compare local files with Grafana, inspect export or live metadata, or publish a prepared dashboard back to Grafana. Use dashboard sync convert raw-to-prompt when the job is artifact repair rather than dashboard operations.</li></ul>
 </div>
 <div class="command-intro-block">
   <p class="command-intro-label">Who this page is for</p>
@@ -781,14 +781,14 @@ code[class*="language-"],pre[class*="language-"]{color:#ccc;background:none;font
 <h2 id="purpose">Purpose</h2>
 <p><code>grafana-util dashboard</code> is the namespace for live dashboard workflows, local draft handling, export/import review, inspection, topology, and screenshots. The same namespace is also available as <code>grafana-util db</code>.</p>
 <h2 id="when-to-use">When to use</h2>
-<p>Use this namespace when you need to browse live dashboards, fetch or clone a live dashboard into a local JSON draft, compare local files with Grafana, inspect export or live metadata, or publish a prepared dashboard back to Grafana. Use <code>migrate dashboard raw-to-prompt</code> when the job is artifact repair rather than dashboard operations.</p>
+<p>Use this namespace when you need to browse live dashboards, fetch or clone a live dashboard into a local JSON draft, compare local files with Grafana, inspect export or live metadata, or publish a prepared dashboard back to Grafana. Use <code>dashboard sync convert raw-to-prompt</code> when the job is artifact repair rather than dashboard operations.</p>
 <h2 id="description">Description</h2>
 <p>Open this page first when the work is about the full dashboard workflow rather than one isolated flag. The <code>dashboard</code> namespace brings together the tasks that usually travel together in real operator work: inventory reads, export and backup, migration between environments, staged review before apply, live inspection, topology checks, and reproducible screenshots.</p>
 <p>If you are an SRE, Grafana operator, or responder, this page should help you decide which dashboard path to open next. If you already know the exact action, jump from here into the matching subcommand page for the concrete flags and examples.</p>
 <h2 id="workflow-lanes">Workflow lanes</h2>
-<ul><li><strong>Browse and inventory</strong>: browse, list, and fetch-live.</li><li><strong>Analyze dashboards and build reports</strong>: analyze, list-vars, and topology checks.</li><li><strong>Move</strong>: export, import, clone-live, diff, and publish paths.</li><li><strong>Author</strong>: fetch-live, clone-live, serve, patch-file, edit-live, review, and publish around one dashboard draft.</li><li><strong>Review Before Mutate</strong>: review, governance-gate, and impact analysis.</li><li><strong>History</strong>: list, restore, and export revision history before you recover or promote a dashboard.</li><li><strong>Capture</strong>: screenshot flows for reproducible visual proof.</li></ul>
+<ul><li><strong><code>dashboard live ...</code></strong>: browse, list, vars, fetch, clone, edit, delete, and history.</li><li><strong><code>dashboard draft ...</code></strong>: review, patch, serve, and publish around one local draft.</li><li><strong><code>dashboard sync ...</code></strong>: export, import, diff, and <code>convert raw-to-prompt</code>.</li><li><strong><code>dashboard analyze ...</code></strong>: summary, topology, impact, and governance checks.</li><li><strong><code>dashboard capture ...</code></strong>: screenshot flows for reproducible visual proof.</li></ul>
 <p>For single-dashboard authoring, the local draft path is:</p>
-<ul><li><code>fetch-live</code> or <code>clone-live</code> to start from one live dashboard</li><li><code>serve</code> to keep one or more drafts open in a local preview browser while you edit, optionally opening the browser for you</li><li><code>review</code> to verify one draft</li><li><code>patch-file</code> to rewrite local metadata</li><li><code>edit-live</code> to fetch one live dashboard into an editor with a safe local-draft default and a review-aware apply gate</li><li><code>publish</code> to replay that draft back through the import pipeline</li></ul>
+<ul><li><code>dashboard live fetch</code> or <code>dashboard live clone</code> to start from one live dashboard</li><li><code>dashboard draft serve</code> to keep one or more drafts open in a local preview browser while you edit</li><li><code>dashboard draft review</code> to verify one draft</li><li><code>dashboard draft patch</code> to rewrite local metadata</li><li><code>dashboard live edit</code> to fetch one live dashboard into an editor with a safe local-draft default and a review-aware apply gate</li><li><code>dashboard draft publish</code> to replay that draft back through the import pipeline</li></ul>
 <p><code>review</code>, <code>patch-file</code>, and <code>publish</code> also accept <code>--input -</code> for one wrapped or bare dashboard JSON document from standard input. Use that when an external generator already writes the dashboard JSON to stdout. <code>patch-file --input -</code> requires <code>--output</code>, and <code>publish --watch</code> is the local-file variant for repeated save-and-preview loops and does not support <code>--input -</code>.</p>
 <p>Choose this page when the task is dashboard work but you are still deciding whether the next step is to inspect, move, review, or capture.</p>
 <h2 id="before-after">Before / After</h2>
@@ -800,28 +800,28 @@ code[class*="language-"],pre[class*="language-"]{color:#ccc;background:none;font
 <h2 id="key-flags">Key flags</h2>
 <ul><li><code>--url</code>: Grafana base URL.</li><li><code>--token</code>, <code>--basic-user</code>, <code>--basic-password</code>: shared live Grafana credentials.</li><li><code>--profile</code>: load repo-local defaults from <code>grafana-util.yaml</code>.</li><li><code>--color</code>: control JSON color output for the namespace.</li></ul>
 <h2 id="auth-notes">Auth notes</h2>
-<ul><li>Prefer <code>--profile</code> for repeatable daily work and CI.</li><li>Use direct Basic auth for bootstrap or admin-heavy flows.</li><li>Token auth can be enough for scoped reads, but cross-org workflows such as <code>--all-orgs</code> are safer with admin-backed <code>--profile</code> or Basic auth.</li><li><code>migrate dashboard raw-to-prompt</code> is usually offline, but it can optionally use <code>--profile</code> or live auth flags to look up datasource inventory while repairing prompt files.</li></ul>
+<ul><li>Prefer <code>--profile</code> for repeatable daily work and CI.</li><li>Use direct Basic auth for bootstrap or admin-heavy flows.</li><li>Token auth can be enough for scoped reads, but cross-org workflows such as <code>--all-orgs</code> are safer with admin-backed <code>--profile</code> or Basic auth.</li><li><code>dashboard sync convert raw-to-prompt</code> is usually offline, but it can optionally use <code>--profile</code> or live auth flags to look up datasource inventory while repairing prompt files.</li></ul>
 <h2 id="examples">Examples</h2>
 <pre><code># Purpose: Inspect the dashboard namespace before choosing a lane.
 grafana-util dashboard --help</code></pre>
 <pre><code># Purpose: Browse live dashboards from a saved profile.
-grafana-util dashboard browse --profile prod</code></pre>
+grafana-util dashboard live browse --profile prod</code></pre>
 <pre><code># Purpose: Browse a local Grafana instance with explicit credentials.
-grafana-util dashboard browse --url http://localhost:3000 --basic-user admin --basic-password admin</code></pre>
+grafana-util dashboard live browse --url http://localhost:3000 --basic-user admin --basic-password admin</code></pre>
 <pre><code># Purpose: Convert a legacy dashboard export into prompt-friendly JSON.
-grafana-util migrate dashboard raw-to-prompt --input-file ./legacy/cpu-main.json --profile prod --org-id 2</code></pre>
+grafana-util dashboard sync convert raw-to-prompt --input-file ./legacy/cpu-main.json --profile prod --org-id 2</code></pre>
 <pre><code># Purpose: Review one generated dashboard from standard input before mutation.
-jsonnet dashboards/cpu.jsonnet | grafana-util dashboard review --input - --output-format json</code></pre>
+jsonnet dashboards/cpu.jsonnet | grafana-util dashboard draft review --input - --output-format json</code></pre>
 <pre><code># Purpose: Watch one local draft file and rerun publish dry-run after each save.
-grafana-util dashboard publish --url http://localhost:3000 --basic-user admin --basic-password admin --input ./drafts/cpu-main.json --dry-run --watch</code></pre>
+grafana-util dashboard draft publish --url http://localhost:3000 --basic-user admin --basic-password admin --input ./drafts/cpu-main.json --dry-run --watch</code></pre>
 <pre><code># Purpose: Open one local dashboard draft in the local preview server.
-grafana-util dashboard serve --input ./drafts/cpu-main.json --port 18080 --open-browser</code></pre>
+grafana-util dashboard draft serve --input ./drafts/cpu-main.json --port 18080 --open-browser</code></pre>
 <pre><code># Purpose: Pull one live dashboard into an external editor and keep the result as a local draft by default.
-grafana-util dashboard edit-live --profile prod --dashboard-uid cpu-main --output ./drafts/cpu-main.edited.json</code></pre>
+grafana-util dashboard live edit --profile prod --dashboard-uid cpu-main --output ./drafts/cpu-main.edited.json</code></pre>
 <pre><code># Purpose: Analyze live dashboard governance data for downstream review.
-grafana-util dashboard analyze --url http://localhost:3000 --token &quot;$GRAFANA_API_TOKEN&quot; --output-format governance</code></pre>
+grafana-util dashboard analyze summary --url http://localhost:3000 --token &quot;$GRAFANA_API_TOKEN&quot; --output-format governance</code></pre>
 <pre><code># Purpose: Open the interactive analysis workbench for a live dashboard.
-grafana-util dashboard analyze --url http://localhost:3000 --basic-user admin --basic-password admin --interactive</code></pre>
+grafana-util dashboard analyze summary --url http://localhost:3000 --basic-user admin --basic-password admin --interactive</code></pre>
 <h2 id="related-commands">Related commands</h2>
 <h3 id="browse-and-inventory">Browse and Inventory</h3>
 <ul><li><a href="dashboard-browse.html">dashboard browse</a></li><li><a href="dashboard-list.html">dashboard list</a></li><li><a href="dashboard-fetch-live.html">dashboard fetch-live</a></li><li><a href="dashboard-analyze-live.html">dashboard analyze (live)</a></li><li><a href="dashboard-analyze-export.html">dashboard analyze (local)</a></li><li><a href="dashboard-list-vars.html">dashboard list-vars</a></li></ul>

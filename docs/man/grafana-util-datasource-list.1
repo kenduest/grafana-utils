@@ -7,12 +7,12 @@ grafana\-util\-datasource\-list \- List datasource inventory from live Grafana o
 .SH DESCRIPTION
 List datasource inventory from live Grafana or a local export bundle.
 .PP
-Use this when you need a non\-interactive inventory of datasources, either from live Grafana for the current org, one explicit org, or across all visible orgs, or from a local export bundle on disk.
+Use this when you need a non\-interactive datasource read path. Live JSON and YAML output now keep the full datasource records returned by Grafana, while text, table, and CSV stay compact by default unless you ask for more fields.
 .SH BEFORE / AFTER
 .IP \(bu 2
 Before: datasource inventory was easy to read only after jumping between Grafana UI, export bundles, or ad hoc API calls.
 .IP \(bu 2
-After: one inventory command can give you a reviewable snapshot in text, table, CSV, JSON, or YAML from live Grafana or a local bundle.
+After: one inventory command can give you a reviewable snapshot in text, table, CSV, JSON, or YAML from live Grafana or a local bundle, and live JSON/YAML no longer drop datasource\-specific fields.
 .SH COMMON OPTIONS
 .TP
 .B \-\-input\-dir
@@ -31,10 +31,10 @@ aggregate datasource inventory across visible orgs. Requires Basic auth.
 output mode controls.
 .TP
 .B \-\-output\-columns
-choose the displayed columns. Use all to expand the full human\-readable column set.
+choose which datasource fields to display. Use all to expand every discovered field in human\-readable output. Common ids include uid, name, type, access, url, is_default, database, org, org_id, and nested paths such as jsonData.organization, jsonData.defaultBucket, or secureJsonFields.basicAuthPassword.
 .TP
 .B \-\-list\-columns
-print the supported \-\-output\-columns values and exit.
+print the common \-\-output\-columns ids and path patterns, then exit.
 .TP
 .B \-\-no\-header
 suppress table headers.
@@ -42,7 +42,9 @@ suppress table headers.
 .IP \(bu 2
 you can point the command at the org you care about or at a local bundle and get the inventory you expected
 .IP \(bu 2
-table and CSV output are easy to hand to a script or review in a pull request
+live JSON/YAML output preserves datasource\-specific fields like SQL database names, Influx bucket/org settings, Loki options, or Elasticsearch index settings when Grafana returns them
+.IP \(bu 2
+table and CSV output are easy to hand to a script or review in a pull request, and \-\-output\-columns lets you surface only the fields you care about
 .IP \(bu 2
 all\-org inventory only happens when you really want a cross\-org read
 .SH FAILURE CHECKS

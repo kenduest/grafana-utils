@@ -55,10 +55,13 @@ pub(crate) use crate::grafana_api::alert_live::{
 pub(crate) use crate::grafana_api::{expect_object_list, parse_template_list_response};
 pub use alert_cli_defs::{
     build_auth_context, cli_args_from_common, normalize_alert_group_command,
-    normalize_alert_namespace_args, parse_cli_from, root_command, AlertAuthContext,
-    AlertAuthoringCommandKind, AlertCliArgs, AlertCommandKind, AlertCommandOutputFormat,
-    AlertCommonArgs, AlertDiffArgs, AlertExportArgs, AlertGroupCommand, AlertImportArgs,
-    AlertLegacyArgs, AlertListArgs, AlertListKind, AlertNamespaceArgs, AlertResourceKind,
+    normalize_alert_namespace_args, parse_cli_from, root_command, AlertAddContactPointArgs,
+    AlertAddRuleArgs, AlertApplyArgs, AlertAuthContext, AlertAuthoringCommandKind, AlertCliArgs,
+    AlertCloneRuleArgs, AlertCommandKind, AlertCommandOutputFormat, AlertCommonArgs,
+    AlertDeleteArgs, AlertDiffArgs, AlertExportArgs, AlertGroupCommand, AlertImportArgs,
+    AlertInitArgs, AlertLegacyArgs, AlertListArgs, AlertListKind, AlertNamespaceArgs,
+    AlertNewResourceArgs, AlertPlanArgs, AlertPreviewRouteArgs, AlertResourceKind,
+    AlertSetRouteArgs,
 };
 pub(crate) use alert_client::GrafanaAlertClient;
 #[allow(unused_imports)]
@@ -156,7 +159,10 @@ fn build_alert_http_client(args: &AlertCliArgs) -> Result<JsonHttpClient> {
 
 pub(crate) fn render_alert_action_text(title: &str, document: &Value) -> Vec<String> {
     let mut lines = vec![title.to_string()];
-    if document.get("reviewRequired").and_then(Value::as_bool).is_some()
+    if document
+        .get("reviewRequired")
+        .and_then(Value::as_bool)
+        .is_some()
         || document.get("reviewed").and_then(Value::as_bool).is_some()
     {
         let review_required = document

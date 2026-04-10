@@ -55,7 +55,7 @@ pub(crate) struct LoadedDashboardSource {
     pub(crate) input_dir: PathBuf,
     pub(crate) expected_variant: &'static str,
     pub(crate) resolved: ResolvedDashboardImportSource,
-    _temp_dir: Option<TempInspectDir>,
+    pub(crate) temp_dir: Option<TempInspectDir>,
 }
 
 impl fmt::Debug for LoadedDashboardSource {
@@ -198,7 +198,7 @@ fn resolve_root_export_source(
         input_dir: dashboard_dir.clone(),
         expected_variant,
         resolved,
-        _temp_dir: Some(temp_dir),
+        temp_dir: Some(temp_dir),
     })
 }
 
@@ -213,7 +213,9 @@ fn resolve_worktree_source(
     let source_kind = DashboardSourceKind::from_expected_variant(expected_variant)
         .unwrap_or_else(|| DashboardSourceKind::from_import_input_format(input_format));
 
-    if let Some(workspace_dir) = resolve_dashboard_workspace_variant_dir(input_dir, expected_variant) {
+    if let Some(workspace_dir) =
+        resolve_dashboard_workspace_variant_dir(input_dir, expected_variant)
+    {
         let resolved = resolve_dashboard_import_source(&workspace_dir, input_format)?;
         let input_dir = resolved.dashboard_dir.clone();
         return Ok(LoadedDashboardSource {
@@ -221,7 +223,7 @@ fn resolve_worktree_source(
             input_dir,
             expected_variant,
             resolved,
-            _temp_dir: None,
+            temp_dir: None,
         });
     }
 
@@ -246,7 +248,7 @@ fn resolve_worktree_source(
         input_dir,
         expected_variant,
         resolved,
-        _temp_dir: None,
+        temp_dir: None,
     })
 }
 

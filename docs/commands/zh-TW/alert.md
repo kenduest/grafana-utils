@@ -21,6 +21,14 @@
 
 `grafana-util alert` 把告警工作流收在同一個入口：從盤點、匯出、比對，到路由設計、草稿撰寫，再到 plan / apply。這頁適合先搞懂規則、通知路由與 contact point 的關係，再決定要往哪個子命令深入。
 
+新的 canonical 分組方式是：
+
+- `alert live ...`
+- `alert migrate ...`
+- `alert author ...`
+- `alert scaffold ...`
+- `alert change ...`
+
 ## 採用前後對照
 
 - **採用前**：告警工作常分散在 UI、臨時 export，或不容易重跑的 shell 指令裡。
@@ -42,23 +50,23 @@
 
 - `--profile`、`--url`、`--token`、`--basic-user`、`--basic-password`
 - `--prompt-password`、`--prompt-token`、`--timeout`、`--verify-ssl`
-- 巢狀子命令涵蓋 `export`、`import`、`diff`、`plan`、`apply`、`delete`、`add-rule`、`clone-rule`、`add-contact-point`、`set-route`、`preview-route`、`new-rule`、`new-contact-point`、`new-template`、`list-rules`、`list-contact-points`、`list-mute-timings`、`list-templates`
+- 巢狀子命令主要分成 `live`、`migrate`、`author`、`scaffold`、`change`
 
 ## 範例
 
 ```bash
 # 先盤點目前有哪些 alert 規則。
-grafana-util alert list-rules --profile prod --json
+grafana-util alert live list-rules --profile prod --json
 ```
 
 ```bash
 # 先把現況匯出，再拿去做 diff 或 review。
-grafana-util alert export --url http://localhost:3000 --basic-user admin --basic-password admin --output-dir ./alerts --overwrite
+grafana-util alert migrate export --url http://localhost:3000 --basic-user admin --basic-password admin --output-dir ./alerts --overwrite
 ```
 
 ```bash
 # 先試跑規劃，不要直接套用。
-grafana-util alert plan --url http://localhost:3000 --basic-user admin --basic-password admin --output-format json
+grafana-util alert change plan --desired-dir ./alerts/desired --output-format json
 ```
 
 ## 相關命令

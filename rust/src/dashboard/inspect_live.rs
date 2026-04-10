@@ -608,14 +608,18 @@ pub(crate) fn prepare_inspect_export_import_dir_for_variant(
         .map(|resolved| resolved.manifest.scope_kind.is_root())
         .unwrap_or(false)
     {
+        let export_root = root_manifest
+            .as_ref()
+            .map(|resolved| resolved.metadata_dir.as_path())
+            .unwrap_or(input_dir);
         let inspect_variant_dir = temp_root
             .join("inspect-export-all-orgs")
             .join(expected_variant);
-        let org_variant_dirs = discover_org_variant_export_dirs(input_dir, expected_variant)?;
+        let org_variant_dirs = discover_org_variant_export_dirs(export_root, expected_variant)?;
         merge_org_variant_exports_into_dir(
             &org_variant_dirs,
             &inspect_variant_dir,
-            Some(input_dir),
+            Some(export_root),
             expected_variant,
         )?;
         return Ok(inspect_variant_dir);

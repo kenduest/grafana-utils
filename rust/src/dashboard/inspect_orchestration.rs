@@ -26,11 +26,11 @@ use super::super::inspect_report::{
     refresh_filtered_query_report_summary, report_format_supports_columns,
     resolve_report_column_ids_for_format, ExportInspectionQueryReport,
 };
-use super::super::source_loader::{load_dashboard_source, resolve_dashboard_workspace_variant_dir};
 #[cfg(feature = "tui")]
 use super::super::inspect_workbench::run_inspect_workbench;
 #[cfg(feature = "tui")]
 use super::super::inspect_workbench_support::build_inspect_workbench_document;
+use super::super::source_loader::{load_dashboard_source, resolve_dashboard_workspace_variant_dir};
 use super::super::{PROMPT_EXPORT_SUBDIR, RAW_EXPORT_SUBDIR};
 use super::inspect_output::{
     render_export_inspection_report_output, render_export_inspection_summary_output,
@@ -53,6 +53,7 @@ pub(crate) struct ResolvedInspectExportInput {
     pub(crate) input_dir: PathBuf,
     pub(crate) expected_variant: &'static str,
     pub(crate) source_kind: Option<DashboardSourceKind>,
+    _temp_dir: Option<TempInspectDir>,
 }
 
 fn map_output_format_to_report(
@@ -110,12 +111,17 @@ pub(crate) fn resolve_inspect_export_import_dir(
             resolve_raw_inspect_input(temp_root, input_dir, input_type, interactive)
         }
         DashboardImportInputFormat::Provisioning => {
-            let resolved =
-                load_dashboard_source(input_dir, DashboardImportInputFormat::Provisioning, None, false)?;
+            let resolved = load_dashboard_source(
+                input_dir,
+                DashboardImportInputFormat::Provisioning,
+                None,
+                false,
+            )?;
             Ok(ResolvedInspectExportInput {
                 input_dir: resolved.input_dir,
                 expected_variant: RAW_EXPORT_SUBDIR,
                 source_kind: Some(DashboardSourceKind::ProvisioningExport),
+                _temp_dir: resolved.temp_dir,
             })
         }
     }
@@ -158,7 +164,8 @@ fn resolve_raw_inspect_input(
     let metadata = load_export_metadata(&input_dir, None)?;
     let raw_dirs = discover_org_variant_export_dirs(&input_dir, RAW_EXPORT_SUBDIR)?;
     let source_dirs = discover_org_variant_export_dirs(&input_dir, PROMPT_EXPORT_SUBDIR)?;
-    let raw_workspace_variant = resolve_dashboard_workspace_variant_dir(&input_dir, RAW_EXPORT_SUBDIR);
+    let raw_workspace_variant =
+        resolve_dashboard_workspace_variant_dir(&input_dir, RAW_EXPORT_SUBDIR);
     let source_workspace_variant =
         resolve_dashboard_workspace_variant_dir(&input_dir, PROMPT_EXPORT_SUBDIR);
     let selected_input_type = match input_type {
@@ -171,7 +178,10 @@ fn resolve_raw_inspect_input(
         None if matches!(
             metadata.as_ref().map(|item| item.variant.as_str()),
             Some(PROMPT_EXPORT_SUBDIR)
-        ) => InspectExportInputType::Source,
+        ) =>
+        {
+            InspectExportInputType::Source
+        }
         None => InspectExportInputType::Raw,
     };
 
@@ -186,6 +196,7 @@ fn resolve_raw_inspect_input(
         input_dir: resolved.input_dir,
         expected_variant: resolved.expected_variant,
         source_kind: DashboardSourceKind::from_expected_variant(resolved.expected_variant),
+        _temp_dir: resolved.temp_dir,
     })
 }
 

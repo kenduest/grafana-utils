@@ -30,6 +30,9 @@ import safety and reconciliation controls.
 .B \-\-secret\-values
 resolve placeholder secrets during import.
 .TP
+.B \-\-secret\-values\-file
+resolve placeholder secrets from a JSON file during import.
+.TP
 .B \-\-dry\-run, \-\-table, \-\-json, \-\-output\-format, \-\-no\-header, \-\-output\-columns, \-\-list\-columns, \-\-progress, \-\-verbose
 preview and reporting controls. Use \-\-output\-columns all for the full dry\-run table.
 .SH SUCCESS CRITERIA
@@ -45,7 +48,7 @@ if the import touches the wrong org, verify the routing flags before trying agai
 .IP \(bu 2
 if the plan is incomplete, confirm the \-\-input\-format and whether the bundle is inventory or provisioning
 .IP \(bu 2
-if secrets stay unresolved, check the placeholder map and the provided secret values
+if secrets stay unresolved, check the placeholder names in secureJsonDataPlaceholders and the keys provided through \-\-secret\-values or \-\-secret\-values\-file
 .SH EXAMPLES
 .PP
 Import datasource inventory through the Grafana API.

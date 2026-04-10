@@ -46,6 +46,8 @@ if the export tree is missing org data, confirm the org scope and whether the cr
 if \-\-all\-orgs fails, use Basic auth and verify that the account can see each target org
 .IP \(bu 2
 if the bundle looks stale, verify the export directory and whether \-\-overwrite was used intentionally
+.IP \(bu 2
+if you expected secret plaintext in the export, remember that Grafana live datasource APIs do not return it; export only captures config and secureJsonDataPlaceholders
 .SH EXAMPLES
 .PP
 Export live Grafana datasource inventory as normalized JSON plus provisioning files.

@@ -15,26 +15,33 @@
 
 ## 從這裡開始
 
-- 先看現況：`dashboard browse` 或 `dashboard list`
-- 先做草稿：`dashboard fetch-live`、`dashboard clone-live`、`dashboard export`
-- 先做比對：`dashboard diff`、`dashboard review`
-- 先做分析：`dashboard analyze --input-dir ...`、`dashboard analyze --url ...`、`dashboard list-vars`
+- 先看現況：`dashboard live browse` 或 `dashboard live list`
+- 先做草稿：`dashboard live fetch`、`dashboard live clone`、`dashboard sync export`
+- 先做比對：`dashboard sync diff`、`dashboard draft review`
+- 先做分析：`dashboard analyze summary --input-dir ...`、`dashboard analyze summary --url ...`、`dashboard live vars`
 - 先做上線前檢查：`dashboard governance-gate`
 - 先看影響面：`dashboard topology`、`dashboard impact`
-- 先處理歷史版本：`dashboard history list`、`dashboard history restore`、`dashboard history export`
-- 先拿素材：`dashboard screenshot`
+- 先處理歷史版本：`dashboard live history list`、`dashboard live history restore`、`dashboard live history export`
+- 先拿素材：`dashboard capture screenshot`
 
 ## 說明
 
 `grafana-util dashboard` 把 dashboard 相關工作收在同一個入口：從瀏覽、草稿、匯出、匯入、比對，到拓樸、影響面和截圖。它也可用 `grafana-util db` 呼叫。
 
+新的 canonical 分組方式是：
+- `dashboard live ...`
+- `dashboard draft ...`
+- `dashboard sync ...`
+- `dashboard analyze ...`
+- `dashboard capture ...`
+
 如果是單一 dashboard 的 authoring 路徑，建議把它想成：
-- `get` 或 `clone-live`：先做草稿
-- `serve`：用本地 preview server 持續檢視草稿內容，必要時也能自動打開瀏覽器
-- `review`：先驗證草稿內容
-- `patch-file`：改寫本地中繼資料
-- `edit-live`：從 live 拉一份進 editor，預設仍先落回本地草稿，而且會依 review 結果決定能不能回寫 live
-- `publish`：沿用 import pipeline 發回 Grafana
+- `dashboard live fetch` 或 `dashboard live clone`：先做草稿
+- `dashboard draft serve`：用本地 preview server 持續檢視草稿內容，必要時也能自動打開瀏覽器
+- `dashboard draft review`：先驗證草稿內容
+- `dashboard draft patch`：改寫本地中繼資料
+- `dashboard live edit`：從 live 拉一份進 editor，預設仍先落回本地草稿，而且會依 review 結果決定能不能回寫 live
+- `dashboard draft publish`：沿用 import pipeline 發回 Grafana
 
 `review`、`patch-file`、`publish` 也都支援 `--input -`，可以直接吃標準輸入的一份 wrapped 或 bare dashboard JSON。這適合外部 generator 已經把 JSON 寫到 stdout 的情況。`patch-file --input -` 必須搭配 `--output`，若你是在本地反覆編修同一份檔案，則改用 `publish --watch`；它只支援本地檔案路徑，不支援 `--input -`。
 
@@ -77,37 +84,37 @@
 
 ```bash
 # 先看 live dashboard 長什麼樣，再決定下一步要走哪條工作流。
-grafana-util dashboard browse --profile prod
+grafana-util dashboard live browse --profile prod
 ```
 
 ```bash
 # 先盤點現況，再決定要走 browse 或 export。
-grafana-util dashboard list --profile prod
+grafana-util dashboard live list --profile prod
 ```
 
 ```bash
 # 先做 live 分析，再決定要不要匯出或截圖。
-grafana-util dashboard analyze --url http://localhost:3000 --basic-user admin --basic-password admin --interactive
+grafana-util dashboard analyze summary --url http://localhost:3000 --basic-user admin --basic-password admin --interactive
 ```
 
 ```bash
 # 先產生治理輸出，留給 topology 或 governance-gate 接著用。
-grafana-util dashboard analyze --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-format governance
+grafana-util dashboard analyze summary --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-format governance
 ```
 
 ```bash
 # 先從標準輸入 review 一份生成儀表板，再決定要不要 publish。
-jsonnet dashboards/cpu.jsonnet | grafana-util dashboard review --input - --output-format json
+jsonnet dashboards/cpu.jsonnet | grafana-util dashboard draft review --input - --output-format json
 ```
 
 ```bash
 # 編修本地草稿時，每次儲存後自動重跑 publish dry-run。
-grafana-util dashboard publish --url http://localhost:3000 --basic-user admin --basic-password admin --input ./drafts/cpu-main.json --dry-run --watch
+grafana-util dashboard draft publish --url http://localhost:3000 --basic-user admin --basic-password admin --input ./drafts/cpu-main.json --dry-run --watch
 ```
 
 ```bash
 # 開一個本地 preview server，持續檢視單一 dashboard 草稿。
-grafana-util dashboard serve --input ./drafts/cpu-main.json --port 18080 --open-browser
+grafana-util dashboard draft serve --input ./drafts/cpu-main.json --port 18080 --open-browser
 ```
 
 ```bash
