@@ -5,6 +5,10 @@ use clap::{Args, Subcommand};
 use std::path::PathBuf;
 
 use super::super::cli_defs_shared::{CommonCliArgs, HistoryOutputFormat};
+use super::super::{
+    DASHBOARD_HISTORY_DIFF_AFTER_HELP, DASHBOARD_HISTORY_EXPORT_AFTER_HELP,
+    DASHBOARD_HISTORY_LIST_AFTER_HELP, DASHBOARD_HISTORY_RESTORE_AFTER_HELP,
+};
 
 /// Arguments for dashboard history list.
 #[derive(Debug, Clone, Args)]
@@ -190,25 +194,25 @@ pub enum DashboardHistorySubcommand {
     #[command(
         name = "list",
         about = "List live dashboard revision history or review local history artifacts.",
-        after_help = "Examples:\n\n  List the last 20 live versions as a table:\n    grafana-util dashboard history list --url http://localhost:3000 --basic-user admin --basic-password admin --dashboard-uid cpu-main --limit 20 --output-format table\n\n  Review one saved history artifact without calling Grafana:\n    grafana-util dashboard history list --input ./cpu-main.history.json --output-format yaml\n\n  Scan one export tree created with --include-history:\n    grafana-util dashboard history list --input-dir ./dashboards --dashboard-uid cpu-main --output-format json"
+        after_help = DASHBOARD_HISTORY_LIST_AFTER_HELP
     )]
     List(HistoryListArgs),
     #[command(
         name = "restore",
         about = "Restore a previous live dashboard revision from Grafana history.",
-        after_help = "Examples:\n\n  Preview a restore without changing Grafana:\n    grafana-util dashboard history restore --url http://localhost:3000 --basic-user admin --basic-password admin --dashboard-uid cpu-main --version 17 --dry-run --output-format table\n\n  Prompt for one recent version, preview it, and confirm the restore:\n    grafana-util dashboard history restore --url http://localhost:3000 --basic-user admin --basic-password admin --dashboard-uid cpu-main --prompt\n\n  Restore a historical version and record a new revision message:\n    grafana-util dashboard history restore --url http://localhost:3000 --basic-user admin --basic-password admin --dashboard-uid cpu-main --version 17 --message 'Restore known good CPU dashboard after regression' --yes"
+        after_help = DASHBOARD_HISTORY_RESTORE_AFTER_HELP
     )]
     Restore(HistoryRestoreArgs),
     #[command(
         name = "diff",
         about = "Compare two historical dashboard revisions from live Grafana or local history artifacts.",
-        after_help = "Examples:\n\n  Compare two live revisions from Grafana:\n    grafana-util dashboard history diff --url http://localhost:3000 --basic-user admin --basic-password admin --base-dashboard-uid cpu-main --base-version 17 --new-dashboard-uid cpu-main --new-version 21\n\n  Compare two versions from one local history artifact:\n    grafana-util dashboard history diff --base-input ./cpu-main.history.json --base-version 17 --new-input ./cpu-main.history.json --new-version 21 --output-format json\n\n  Compare two dated export roots for the same dashboard UID:\n    grafana-util dashboard history diff --base-input-dir ./exports-2026-04-01 --base-dashboard-uid cpu-main --base-version 17 --new-input-dir ./exports-2026-04-07 --new-dashboard-uid cpu-main --new-version 21 --output-format json"
+        after_help = DASHBOARD_HISTORY_DIFF_AFTER_HELP
     )]
     Diff(HistoryDiffArgs),
     #[command(
         name = "export",
         about = "Export dashboard revision history into a reusable JSON artifact.",
-        after_help = "Examples:\n\n  Export the last 20 revisions to a JSON artifact:\n    grafana-util dashboard history export --url http://localhost:3000 --basic-user admin --basic-password admin --dashboard-uid cpu-main --output ./cpu-main.history.json\n\n  Overwrite an existing history artifact and raise the export limit:\n    grafana-util dashboard history export --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --dashboard-uid cpu-main --limit 50 --output ./cpu-main.history.json --overwrite"
+        after_help = DASHBOARD_HISTORY_EXPORT_AFTER_HELP
     )]
     Export(HistoryExportArgs),
 }
