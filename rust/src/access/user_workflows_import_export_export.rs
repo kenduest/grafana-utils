@@ -4,7 +4,9 @@ use reqwest::Method;
 use serde_json::{Map, Value};
 use std::path::Path;
 
-use crate::access::render::{map_get_text, normalize_org_role, normalize_user_row, scalar_text};
+use crate::access::render::{
+    access_export_summary_line, map_get_text, normalize_org_role, normalize_user_row, scalar_text,
+};
 use crate::common::{message, string_field, write_json_file, Result};
 use crate::export_metadata::{
     build_export_metadata_common, export_metadata_common_map, EXPORT_BUNDLE_KIND_ROOT,
@@ -171,18 +173,16 @@ where
         )?;
     }
 
-    let action = if args.dry_run {
-        "Would export"
-    } else {
-        "Exported"
-    };
     println!(
-        "{} {} user(s) from {} -> {} and {}",
-        action,
-        records.len(),
-        args.common.url,
-        users_path.display(),
-        metadata_path.display()
+        "{}",
+        access_export_summary_line(
+            "user",
+            records.len(),
+            &args.common.url,
+            &users_path.to_string_lossy(),
+            &metadata_path.to_string_lossy(),
+            args.dry_run,
+        )
     );
 
     Ok(records.len())

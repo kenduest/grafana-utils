@@ -16,8 +16,8 @@ use super::super::pending_delete::{
     prompt_select_indexes, validate_delete_prompt,
 };
 use super::super::render::{
-    access_diff_summary_line, access_import_summary_line, format_table, render_csv,
-    render_objects_json, render_yaml, scalar_text,
+    access_diff_summary_line, access_export_summary_line, access_import_summary_line,
+    format_table, render_csv, render_objects_json, render_yaml, scalar_text,
 };
 use super::super::{
     OrgAddArgs, OrgDeleteArgs, OrgDiffArgs, OrgExportArgs, OrgImportArgs, OrgListArgs,
@@ -397,17 +397,16 @@ where
             args.overwrite,
         )?;
     }
-    let action = if args.dry_run {
-        "Would export"
-    } else {
-        "Exported"
-    };
     println!(
-        "{action} {} org(s) from {} -> {} and {}",
-        records.len(),
-        args.common.url,
-        payload_path.display(),
-        metadata_path.display()
+        "{}",
+        access_export_summary_line(
+            "org",
+            records.len(),
+            &args.common.url,
+            &payload_path.to_string_lossy(),
+            &metadata_path.to_string_lossy(),
+            args.dry_run,
+        )
     );
     Ok(records.len())
 }

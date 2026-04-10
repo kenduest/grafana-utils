@@ -261,6 +261,21 @@ pub(crate) fn access_import_summary_line(
     )
 }
 
+/// Format a consistent export summary line for access workflows.
+pub(crate) fn access_export_summary_line(
+    kind: &str,
+    exported: usize,
+    source: &str,
+    payload_path: &str,
+    metadata_path: &str,
+    dry_run: bool,
+) -> String {
+    let action = if dry_run { "Would export" } else { "Exported" };
+    format!(
+        "{action} {exported} {kind}(s) from {source} -> {payload_path} and {metadata_path}"
+    )
+}
+
 // Build a normalized user row shape expected by access list renderers.
 /// Purpose: implementation note.
 pub(crate) fn normalize_user_row(user: &Map<String, Value>, scope: &Scope) -> Map<String, Value> {
@@ -410,7 +425,9 @@ pub(crate) fn normalize_service_account_row(team: &Map<String, Value>) -> Map<St
 
 #[cfg(test)]
 mod tests {
-    use super::{access_diff_summary_line, access_import_summary_line};
+    use super::{
+        access_diff_summary_line, access_export_summary_line, access_import_summary_line,
+    };
 
     #[test]
     fn access_diff_summary_line_includes_source_context_for_differences() {
@@ -448,6 +465,35 @@ mod tests {
         assert_eq!(
             line,
             "Import summary for user: processed=3 created=1 updated=1 skipped=1 source=/tmp/access-users"
+        );
+    }
+
+    #[test]
+    fn access_export_summary_line_is_consistent_across_resources() {
+        let dry_run = access_export_summary_line(
+            "team",
+            2,
+            "/tmp/access-teams",
+            "/tmp/access-teams/teams.json",
+            "/tmp/access-teams/metadata.json",
+            true,
+        );
+        assert_eq!(
+            dry_run,
+            "Would export 2 team(s) from /tmp/access-teams -> /tmp/access-teams/teams.json and /tmp/access-teams/metadata.json"
+        );
+
+        let live = access_export_summary_line(
+            "service-account",
+            1,
+            "/tmp/access-service-accounts",
+            "/tmp/access-service-accounts/service-accounts.json",
+            "/tmp/access-service-accounts/metadata.json",
+            false,
+        );
+        assert_eq!(
+            live,
+            "Exported 1 service-account(s) from /tmp/access-service-accounts -> /tmp/access-service-accounts/service-accounts.json and /tmp/access-service-accounts/metadata.json"
         );
     }
 }

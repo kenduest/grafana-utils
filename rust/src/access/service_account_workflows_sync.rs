@@ -10,8 +10,9 @@ use serde_json::{Map, Value};
 use crate::common::{message, render_json_value, string_field, write_json_file, Result};
 
 use super::super::super::render::{
-    access_diff_summary_line, access_import_summary_line, format_table,
-    normalize_service_account_row, scalar_text, service_account_role_to_api, value_bool,
+    access_diff_summary_line, access_export_summary_line, access_import_summary_line,
+    format_table, normalize_service_account_row, scalar_text, service_account_role_to_api,
+    value_bool,
 };
 use super::super::super::{
     ServiceAccountDiffArgs, ServiceAccountExportArgs, ServiceAccountImportArgs,
@@ -73,18 +74,16 @@ where
             args.overwrite,
         )?;
     }
-    let action = if args.dry_run {
-        "Would export"
-    } else {
-        "Exported"
-    };
     println!(
-        "{} {} service-account(s) from {} -> {} and {}",
-        action,
-        records.len(),
-        args.common.url,
-        bundle_path.display(),
-        metadata_path.display()
+        "{}",
+        access_export_summary_line(
+            "service-account",
+            records.len(),
+            &args.common.url,
+            &bundle_path.to_string_lossy(),
+            &metadata_path.to_string_lossy(),
+            args.dry_run,
+        )
     );
     Ok(records.len())
 }

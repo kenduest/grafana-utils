@@ -12,7 +12,8 @@ use std::collections::{BTreeMap, BTreeSet};
 use crate::common::{message, render_json_value, string_field, write_json_file, Result};
 
 use crate::access::render::{
-    access_import_summary_line, format_table, map_get_text, normalize_team_row, scalar_text,
+    access_export_summary_line, access_import_summary_line, format_table, map_get_text,
+    normalize_team_row, scalar_text,
 };
 use crate::access::team_import_export_diff::{
     assert_not_overwrite, build_membership_payloads, build_team_access_export_metadata,
@@ -117,18 +118,16 @@ where
         )?;
     }
 
-    let action = if args.dry_run {
-        "Would export"
-    } else {
-        "Exported"
-    };
     println!(
-        "{} {} team(s) from {} -> {} and {}",
-        action,
-        records.len(),
-        args.common.url,
-        teams_path.display(),
-        metadata_path.display()
+        "{}",
+        access_export_summary_line(
+            "team",
+            records.len(),
+            &args.common.url,
+            &teams_path.to_string_lossy(),
+            &metadata_path.to_string_lossy(),
+            args.dry_run,
+        )
     );
 
     Ok(records.len())
