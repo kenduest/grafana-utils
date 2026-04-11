@@ -102,6 +102,40 @@ Expected companion updates:
 - maintainer-routing change:
   - the owning internal maintainer docs, not just one local note
 
+### Architecture Consistency Pass
+
+Before editing architecture, facade, or large-file organization, do a short
+consistency pass against the current guardrails and owning docs.
+
+Read in this order when relevant:
+
+1. `docs/internal/overview-architecture.md`
+2. the current contract or policy doc for the touched surface
+3. `docs/internal/generated-docs-architecture.md` if generated output is part
+   of the change
+4. `docs/internal/profile-secret-storage-architecture.md` for profile or secret
+   work
+5. `docs/internal/task-brief-template.md` to confirm the brief carries the
+   right ownership and validation fields
+6. `docs/internal/docs-architecture-guardrails.md` for handbook/manual,
+   command-doc, generated-doc, internal-doc, and trace-doc boundaries
+
+Use this pass to answer:
+
+- is the change preserving the current layer boundary, or is it mixing two
+  responsibilities into one file
+- does a large file need to be split by responsibility before more behavior is
+  added
+- does the task brief already identify the owned layer, source of truth,
+  contract impact, test strategy, and generated-doc impact
+- will the docs update stay in the right layer, or is the manual drifting into
+  command-reference detail
+- does the command reference need the exact syntax first, with the manual only
+  updating the stable user journey or decision table
+
+If the answer is unclear, stop and resolve it against the owning docs before
+editing code or docs.
+
 ### 2. Query
 
 An agent should query the repo through the maintainer routing first.
@@ -203,9 +237,17 @@ For agent-friendly work, prefer a short brief with these fields:
 - goal
 - touched surface
 - constraints
+- owned layer
 - source-of-truth files
+- contract impact
 - expected companion updates
+- test strategy
+- generated docs impact
 - validation commands
+
+When the task crosses architecture or large-file boundaries, include the
+architecture consistency pass in the brief instead of relying on ad hoc
+judgment.
 
 Example:
 

@@ -44,6 +44,8 @@ Then branch by task:
 - docs-generator change: open `docs/internal/generated-docs-architecture.md`
 - zh-TW doc copy review: open `docs/internal/zh-tw-style-guide.md`
 - secret/profile change: open `docs/internal/profile-secret-storage-architecture.md`
+- architecture boundary or large-module refactor: open `docs/internal/rust-architecture-guardrails.md`
+- handbook/manual boundary or docs split change: open `docs/internal/docs-architecture-guardrails.md`
 - AI-assisted workflow or agent task shaping: open `docs/internal/ai-workflow-note.md`
 - task brief drafting for agent work: open `docs/internal/task-brief-template.md`
 - GitHub collaboration templates: open `.github/ISSUE_TEMPLATE/ai-task-brief.md` and `.github/PULL_REQUEST_TEMPLATE.md`
@@ -167,6 +169,10 @@ Use these pages for the matching concern:
   - maintainer routing by role
 - `docs/internal/contract-doc-map.md`
   - current contract/policy entrypoint
+- `docs/internal/rust-architecture-guardrails.md`
+  - Rust layer boundaries, split thresholds, hotspot order, and lint usage
+- `docs/internal/docs-architecture-guardrails.md`
+  - handbook/manual, command docs, generated docs, internal docs, and trace docs boundaries
 - `docs/internal/generated-docs-architecture.md`
   - generated-doc system design
 - `docs/internal/generated-docs-playbook.md`
@@ -196,6 +202,9 @@ Use these pages for the matching concern:
   second production main path.
 - Handbook content and command-reference content are separate source layers.
   Do not merge them into one doc family just because they cross-link.
+- Handbook/manual content should keep stable workflow and intent; command docs
+  should keep flags and exact syntax.
+- Generated docs should stay derived artifacts, not a second source layer.
 - Generated artifacts should not become the only place a change is made.
 - When a command writes a persisted artifact, keep the on-disk output plain text and only duplicate stdout when `--also-stdout` is explicitly set.
 - `docs/internal/ai-status.md` and `docs/internal/ai-changes.md` are trace

@@ -25,6 +25,10 @@ backlogs, market analysis, and progress snapshots have been moved into
   - first-entry route for new maintainers and AI agents
 - `profile-secret-storage-architecture.md`
   - profile secret backend model, platform support, and maintainer rules
+- `rust-architecture-guardrails.md`
+  - Rust layer boundaries, split thresholds, hotspot order, and architecture-lint usage
+- `docs-architecture-guardrails.md`
+  - handbook/manual, command docs, generated docs, internal docs, and trace docs boundaries
 - `maintainer-role-map.md`
   - maintainer routing by concern: runtime, docs, contracts, and release flow
 - `overview-architecture.md`
@@ -52,6 +56,8 @@ backlogs, market analysis, and progress snapshots have been moved into
 - `zh-tw-style-guide.md` -> review rules for Taiwan-facing Traditional Chinese docs and product-object naming
 - `maintainer-quickstart.md` -> first-entry reading order, source-of-truth map, task routing, and safe validation commands
 - `profile-secret-storage-architecture.md` -> profile secret modes, macOS/Linux backend behavior, and secret-resolution design rules
+- `rust-architecture-guardrails.md` -> Rust layer boundaries, split thresholds, hotspot order, and lint expectations
+- `docs-architecture-guardrails.md` -> handbook/manual, command docs, generated docs, internal docs, and trace docs boundaries
 - `maintainer-role-map.md` -> maintainer persona entrypoint and validation map by concern
 - `overview-architecture.md` -> `grafana-util overview` map and extension rules
 - `project-status-architecture.md` -> cross-domain status model behind the public `status` surface

@@ -15,6 +15,8 @@ If you are working on:
   start with `rust/src/cli.rs`, the domain runtime modules under `rust/src/`, and the architecture walkthroughs in `docs/overview-rust.md` and `docs/internal/overview-architecture.md`
 - command or handbook docs:
   start with `README.md`, `README.zh-TW.md`, `docs/user-guide/`, `docs/commands/`, and the generated-docs notes listed below
+- docs architecture or handbook/manual boundary changes:
+  start with `docs/internal/docs-architecture-guardrails.md`
 - generated `man` or HTML docs:
   start with `docs/internal/generated-docs-architecture.md` and `docs/internal/generated-docs-playbook.md`
 - contract or schema changes:
@@ -27,6 +29,9 @@ If you are working on:
   start with `docs/internal/ai-workflow-note.md`
 
 If you prefer to route by maintainer persona instead of by subsystem, open `docs/internal/maintainer-role-map.md`.
+
+For Rust layering, split thresholds, hotspot order, and architecture-lint usage,
+see `docs/internal/rust-architecture-guardrails.md`.
 
 ## Repo Priorities
 
@@ -205,6 +210,8 @@ Dashboard watch implementation policy:
 - Prefer updating Rust behavior and help text first; treat Python as legacy reference unless the task explicitly requires parity work there.
 - Keep public usage guidance in `README.md`, `README.zh-TW.md`, and the user guides.
 - Keep command-reference detail in `docs/commands/`.
+- Keep handbook/manual workflow and intent in `README.md`, `README.zh-TW.md`,
+  and `docs/user-guide/`; do not make them a second command reference.
 - Keep generated docs logic narrow and documented through the generated-docs architecture and playbook.
 - Keep typed contracts in the dedicated internal policy/spec docs.
 - Treat the shared diff JSON contract as one family: bump `schemaVersion` only for breaking changes to the envelope or required field semantics, keep it stable for additive backward-compatible fields, and update `dashboard diff`, `alert diff`, and `datasource diff` together.
@@ -213,6 +220,11 @@ Dashboard watch implementation policy:
 - Treat golden payload fixtures such as `fixtures/shared_diff_golden_cases.json` and `fixtures/machine_schema_golden_cases.json` as validation artifacts, not as the canonical field inventory.
 - Prefer repo-owned typed envelopes over ad hoc maps when a workflow already owns the shape.
 - Keep facades thin: `cli.rs` and domain `mod.rs` files should route, normalize, and re-export, not absorb downstream contract logic.
+- Keep Rust layer boundaries explicit: CLI topology, dispatch spine, domain runtime, workflow/service, contract/model, render, and fixtures each own one job. Use `docs/internal/rust-architecture-guardrails.md` when a change starts crossing those lines.
+- Keep docs layer boundaries explicit: manual, command docs, generated docs,
+  internal docs, and trace docs each own one job. Use
+  `docs/internal/docs-architecture-guardrails.md` when a change starts crossing
+  those lines.
 - Keep comments high-signal: explain ownership, invariants, and non-obvious behavior; do not narrate obvious control flow.
 - Keep trace/history notes in `docs/internal/ai-status.md` and `docs/internal/ai-changes.md`.
 - For new live workflow code, prefer adding one workflow-level helper under `rust/src/grafana_api/` and keep raw `"/api/..."` contract ownership there instead of reintroducing those paths inside command runtimes. Keep `with_request` style seams for tests and adapters, not as a second production main path.
