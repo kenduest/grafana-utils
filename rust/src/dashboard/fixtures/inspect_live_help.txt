@@ -1,6 +1,6 @@
-Analyze live Grafana dashboards via a temporary raw-export snapshot.
+Summarize live Grafana dashboards through one local analysis pass.
 
-Usage: analyze-live [OPTIONS]
+Usage: summary [OPTIONS]
 
 Options:
       --color <COLOR>
@@ -26,23 +26,23 @@ Options:
       --page-size <PAGE_SIZE>
           Dashboard search page size. [default: 500]
       --concurrency <CONCURRENCY>
-          Maximum parallel dashboard fetch workers used for live inspect when supported. [default: 8]
+          Maximum parallel dashboard fetch workers used for live summary when supported. [default: 8]
       --org-id <ORG_ID>
-          Inspect dashboards from this Grafana org ID.
+          Summarize dashboards from this Grafana org ID.
       --all-orgs
-          Enumerate all visible Grafana orgs and inspect dashboards across them.
+          Enumerate all visible Grafana orgs and summarize dashboards across them.
       --text
-          Render the live inspection analysis as plain text.
+          Render the live summary analysis as plain text.
       --table
-          Render the live inspection analysis as a table-oriented summary.
+          Render the live summary analysis as a table-oriented summary.
       --csv
-          Render the live inspection analysis as CSV.
+          Render the live summary analysis as CSV.
       --json
-          Render the live inspection analysis as JSON.
+          Render the live summary analysis as JSON.
       --yaml
-          Render the live inspection analysis as YAML.
+          Render the live summary analysis as YAML.
       --output-format <OUTPUT_FORMAT>
-          Select inspect output directly. Use text, table, csv, json, yaml, tree, tree-table, dependency, dependency-json, governance, governance-json, or queries-json. [possible values: text, table, csv, json, yaml, tree, tree-table, dependency, dependency-json, governance, governance-json, queries-json]
+          Select summary output directly. Use text, table, csv, json, yaml, tree, tree-table, dependency, dependency-json, governance, governance-json, or queries-json. [possible values: text, table, csv, json, yaml, tree, tree-table, dependency, dependency-json, governance, governance-json, queries-json]
       --report-columns <REPORT_COLUMNS>
           For table, csv, or tree-table output, limit the query report to the selected columns. Use all to expand every supported column. Supported values: org, org_id, dashboard_uid, dashboard_title, dashboard_tags, folder_path, folder_full_path, folder_level, folder_uid, parent_folder_uid, panel_id, panel_title, panel_type, panel_target_count, panel_query_count, panel_datasource_count, panel_variables, ref_id, datasource, datasource_name, datasource_uid, datasource_org, datasource_org_id, datasource_database, datasource_bucket, datasource_organization, datasource_index_pattern, datasource_type, datasource_family, query_field, target_hidden, target_disabled, query_variables, metrics, functions, measurements, buckets, query, file. JSON-style aliases like orgId, dashboardUid, dashboardTags, folderFullPath, folderLevel, folderUid, parentFolderUid, panelTargetCount, panelQueryCount, panelDatasourceCount, panelVariables, datasourceName, datasourceUid, datasourceOrg, datasourceOrgId, datasourceDatabase, datasourceBucket, datasourceOrganization, datasourceIndexPattern, datasourceType, datasourceFamily, targetHidden, targetDisabled, and queryVariables are also accepted.
       --report-filter-datasource <REPORT_FILTER_DATASOURCE>
@@ -50,24 +50,24 @@ Options:
       --report-filter-panel-id <REPORT_FILTER_PANEL_ID>
           For structured analysis output, include only rows whose panel id exactly matches this value.
       --progress
-          Show a progress bar while live dashboards are fetched for inspection.
+          Show a progress bar while live dashboards are fetched for summary.
       --help-full
-          Show extended help with report examples for analyze-live.
+          Show extended help with report examples for summary.
       --no-header
-          Do not print headers when rendering table, csv, or tree-table inspection output, including compatible --output-format values.
+          Do not print headers when rendering table, csv, or tree-table summary output, including compatible --output-format values.
       --output-file <OUTPUT_FILE>
-          Write inspect output to this file.
+          Write summary output to this file.
       --also-stdout
-          When --output-file is set, also print inspect output to stdout.
+          When --output-file is set, also print summary output to stdout.
       --interactive
-          Open the shared interactive inspect workbench over the live inspection artifacts.
+          Open the shared interactive summary workbench over the live summary artifacts.
   -h, --help
           Print help
 
 Examples:
 
   Render governance JSON from live Grafana:
-    grafana-util dashboard analyze-live --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-format governance-json
+    grafana-util dashboard summary --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-format governance-json
 
-  Open the interactive inspect workbench over live Grafana:
-    grafana-util dashboard analyze-live --url http://localhost:3000 --basic-user admin --basic-password admin --interactive
+  Open the interactive summary workbench over live Grafana:
+    grafana-util dashboard summary --url http://localhost:3000 --basic-user admin --basic-password admin --interactive

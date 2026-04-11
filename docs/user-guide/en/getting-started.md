@@ -290,7 +290,7 @@ Token auth can be enough for single-org read flows, but multi-org or admin-scope
 
 ## 🖥️ Interactive Mode (TUI)
 
-`grafana-util advanced dashboard live browse` opens the live dashboard tree in a terminal UI. `observe overview live --output-format interactive` opens the interactive overview mode.
+`grafana-util dashboard browse` opens the live dashboard tree in a terminal UI. `observe overview live --output-format interactive` opens the interactive overview mode.
 
 ---
 [🏠 Home](index.md) | [➡️ Next: Architecture & Design](architecture.md)

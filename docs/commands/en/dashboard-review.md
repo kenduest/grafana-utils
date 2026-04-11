@@ -28,6 +28,6 @@ jsonnet dashboards/cpu.jsonnet | grafana-util dashboard review --input - --outpu
 ```
 
 ## Related commands
-- [dashboard patch-file](./dashboard-patch-file.md)
+- [dashboard patch](./dashboard-patch.md)
 - [dashboard publish](./dashboard-publish.md)
-- [dashboard analyze (local)](./dashboard-analyze-export.md)
+- [dashboard dependencies](./dashboard-dependencies.md)

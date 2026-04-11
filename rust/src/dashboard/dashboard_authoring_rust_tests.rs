@@ -229,7 +229,7 @@ fn patch_dashboard_file_rejects_stdin_without_output() {
 
     assert!(error
         .to_string()
-        .contains("patch-file --input - requires --output"));
+        .contains("patch --input - requires --output"));
 }
 
 #[test]

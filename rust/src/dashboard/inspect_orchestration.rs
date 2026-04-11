@@ -690,12 +690,12 @@ fn run_interactive_export_workbench(
     _expected_variant: &str,
     _source_kind: Option<DashboardSourceKind>,
 ) -> Result<usize> {
-    super::super::tui_not_built("analyze-export --interactive")
+    super::super::tui_not_built("summary-export --interactive")
 }
 
 pub(crate) fn analyze_export_dir(args: &InspectExportArgs) -> Result<usize> {
     validate_inspect_export_report_args(args)?;
-    let temp_dir = TempInspectDir::new("inspect-export")?;
+    let temp_dir = TempInspectDir::new("summary-export")?;
     let resolved = resolve_inspect_export_import_dir(
         &temp_dir.path,
         &args.input_dir,

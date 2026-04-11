@@ -37,16 +37,16 @@ This guide is for operators who need to inventory Grafana data sources from live
 
 Need the command-by-command surface instead of the workflow guide?
 
-- [advanced datasource command overview](../../commands/en/advanced.md)
-- [advanced datasource types](../../commands/en/advanced.md)
-- [advanced datasource browse](../../commands/en/advanced.md)
-- [advanced datasource list](../../commands/en/advanced.md)
+- [datasource command overview](../../commands/en/datasource.md)
+- [datasource types](../../commands/en/datasource.md)
+- [datasource browse](../../commands/en/datasource.md)
+- [datasource list](../../commands/en/datasource.md)
 - [export datasource](../../commands/en/export.md)
-- [advanced datasource import](../../commands/en/advanced.md)
-- [advanced datasource diff](../../commands/en/advanced.md)
-- [advanced datasource add](../../commands/en/advanced.md)
-- [advanced datasource modify](../../commands/en/advanced.md)
-- [advanced datasource delete](../../commands/en/advanced.md)
+- [datasource import](../../commands/en/datasource.md)
+- [datasource diff](../../commands/en/datasource.md)
+- [datasource add](../../commands/en/datasource.md)
+- [datasource modify](../../commands/en/datasource.md)
+- [datasource delete](../../commands/en/datasource.md)
 - [full command index](../../commands/en/index.md)
 
 ---
@@ -81,7 +81,7 @@ Use `datasource list` to verify the current state of your Grafana plugins and ta
 
 ```bash
 # Purpose: Use datasource list to verify the current state of your Grafana plugins and targets.
-grafana-util advanced datasource list \
+grafana-util datasource list \
   --url http://localhost:3000 \
   --basic-user admin \
   --basic-password admin \
@@ -132,7 +132,7 @@ Datasource export completed: 3 item(s)
 ### 2. Dry-Run Import Preview
 ```bash
 # Purpose: 2. Dry-Run Import Preview.
-grafana-util advanced datasource import --input-dir ./datasources --replace-existing --dry-run --table
+grafana-util datasource import --input-dir ./datasources --replace-existing --dry-run --table
 ```
 **Output Excerpt:**
 ```text
@@ -148,7 +148,7 @@ loki-prod   loki-prod          loki         create   missing
 ### 3. Direct Live Add (Dry-Run)
 ```bash
 # Purpose: 3. Direct Live Add (Dry-Run).
-grafana-util advanced datasource add \
+grafana-util datasource add \
   --uid prom-main --name prom-new --type prometheus \
   --datasource-url http://prometheus:9090 --dry-run --table
 ```
@@ -161,7 +161,7 @@ INDEX  NAME       TYPE         ACTION  DETAIL
 ### 4. Local Inventory Review
 ```bash
 # Purpose: 4. Local Inventory Review.
-grafana-util advanced datasource list --input-dir ./datasources --table
+grafana-util datasource list --input-dir ./datasources --table
 ```
 **Output Excerpt:**
 ```text

@@ -75,7 +75,7 @@ pub(crate) const UNIFIED_HELP_TEXT: &str = help_block!(
     ),
     (
         "[Export]",
-        "Export alerting resources without opening the advanced alert tree first:",
+        "Export alerting resources without opening a deeper tree first:",
         r#"grafana-util export alert --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-dir ./alerts --overwrite"#
     ),
     (
@@ -84,9 +84,29 @@ pub(crate) const UNIFIED_HELP_TEXT: &str = help_block!(
         r#"grafana-util change preview --workspace ./grafana-oac-repo --fetch-live --url http://localhost:3000 --token "$GRAFANA_API_TOKEN""#
     ),
     (
-        "[Advanced]",
-        "Open the advanced dashboard tree when the job is domain-specific:",
-        "grafana-util advanced dashboard sync import --url http://localhost:3000 --basic-user admin --basic-password admin --input-dir ./dashboards/raw --dry-run --table"
+        "[Dashboard]",
+        "Work with dashboards through the flat dashboard surface:",
+        "grafana-util dashboard export --url http://localhost:3000 --basic-user admin --basic-password admin --output-dir ./dashboards --overwrite"
+    ),
+    (
+        "[Dashboard]",
+        "Summarize dashboard dependencies and governance inputs before review:",
+        "grafana-util dashboard summary --input-dir ./dashboards/raw --input-format raw --output-format governance"
+    ),
+    (
+        "[Alert]",
+        "Export alerting resources through the flat alert surface:",
+        r#"grafana-util alert export --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-dir ./alerts --overwrite"#
+    ),
+    (
+        "[Datasource]",
+        "Import datasource inventory from a local bundle or export tree:",
+        r#"grafana-util datasource import --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --input-dir ./datasources --dry-run --json"#
+    ),
+    (
+        "[Access]",
+        "Inspect access users without leaving the unified root:",
+        r#"grafana-util access user list --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --json"#
     )
 );
 
@@ -108,29 +128,34 @@ pub(crate) const UNIFIED_HELP_FULL_TEXT: &str = help_block!(
         "grafana-util export access service-account --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --output-dir ./access-service-accounts"
     ),
     (
-        "[Advanced Dashboard]",
-        "Analyze dashboards from a raw export tree after you know you need dashboard-specific tooling:",
-        "grafana-util advanced dashboard analyze summary --input-dir ./dashboards/raw --input-format raw --output-format tree-table --report-columns dashboard_uid,panel_title,datasource_uid,query"
+        "[Change]",
+        "Review a staged change before touching Grafana:",
+        r#"grafana-util change preview --workspace ./grafana-oac-repo --fetch-live --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-format json"#
     ),
     (
-        "[Advanced Dashboard]",
-        "Convert a raw dashboard export root into a prompt lane through the advanced dashboard tree:",
-        "grafana-util advanced dashboard sync convert raw-to-prompt --input-dir ./dashboards/raw --output-dir ./dashboards/prompt --overwrite"
+        "[Dashboard]",
+        "Analyze dashboards from a raw export tree through the flat dashboard surface:",
+        "grafana-util dashboard summary --input-dir ./dashboards/raw --input-format raw --output-format tree-table --report-columns dashboard_uid,panel_title,datasource_uid,query"
     ),
     (
-        "[Advanced Datasource]",
+        "[Dashboard]",
+        "Export dashboards into a backup tree through the flat dashboard surface:",
+        "grafana-util dashboard export --url http://localhost:3000 --basic-user admin --basic-password admin --output-dir ./dashboards --overwrite --include-history"
+    ),
+    (
+        "[Alert]",
+        "Preview alert routing through the flat alert surface:",
+        "grafana-util alert preview-route --desired-dir ./alerts/desired --label team=platform --severity critical"
+    ),
+    (
+        "[Datasource]",
         "Dry-run datasource import with machine-readable output:",
-        r#"grafana-util advanced datasource import --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --input-dir ./datasources --dry-run --json"#
+        r#"grafana-util datasource import --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --input-dir ./datasources --dry-run --json"#
     ),
     (
-        "[Advanced Access]",
-        "Inspect exported access users through the advanced access tree:",
-        "grafana-util advanced access user list --input-dir ./access-users --json"
-    ),
-    (
-        "[Advanced Alert]",
-        "Preview alert routing through the advanced alert tree:",
-        "grafana-util advanced alert author route preview --desired-dir ./alerts/desired --label team=platform --severity critical"
+        "[Access]",
+        "Inspect exported access users through the flat access surface:",
+        "grafana-util access user list --input-dir ./access-users --json"
     )
 );
 
@@ -311,7 +336,7 @@ pub(crate) const SYNC_HELP_FULL_TEXT: &str = help_block!(
     (
         "[Change Review]",
         "Stamp a reviewed plan with reviewer metadata:",
-        "grafana-util change advanced review --plan-file ./sync-plan.json --review-note 'peer-reviewed' --reviewed-by ops-user --output-format json"
+        "grafana-util change review --plan-file ./sync-plan.json --review-note 'peer-reviewed' --reviewed-by ops-user --output-format json"
     ),
     (
         "[Change Apply]",
@@ -320,12 +345,15 @@ pub(crate) const SYNC_HELP_FULL_TEXT: &str = help_block!(
     )
 );
 
-pub(crate) const HELP_EXAMPLE_LABELS: [(&str, &str); 39] = [
+pub(crate) const HELP_EXAMPLE_LABELS: [(&str, &str); 42] = [
     ("[Config]", HELP_PALETTE.section),
     ("[Observe]", HELP_PALETTE.section),
     ("[Export]", HELP_PALETTE.section),
     ("[Change]", HELP_PALETTE.section),
-    ("[Advanced]", HELP_PALETTE.section),
+    ("[Dashboard]", HELP_PALETTE.section),
+    ("[Alert]", HELP_PALETTE.section),
+    ("[Datasource]", HELP_PALETTE.section),
+    ("[Access]", HELP_PALETTE.section),
     ("[Dashboard import]", HELP_PALETTE.section),
     ("[Alert authoring]", HELP_PALETTE.section),
     ("[Datasource diff]", HELP_PALETTE.section),
@@ -400,51 +428,33 @@ pub(crate) fn colorize_help_examples(text: &str) -> String {
 
 pub(crate) fn colorize_dashboard_short_help(text: &str) -> String {
     let mut colored = text.to_string();
-    for heading in [
-        "Usage:",
-        "Choose the task first:",
-        "Work with live Grafana:",
-        "Work with local drafts:",
-        "Move dashboards:",
-        "Analyze and review risk:",
-        "More help:",
-    ] {
+    for heading in ["Usage:", "Common tasks:", "More help:"] {
         let colored_heading = paint_section(heading);
         colored = colored.replace(heading, &colored_heading);
-    }
-    for lane in [
-        "work with live Grafana",
-        "work with local drafts",
-        "move dashboards",
-        "analyze and review risk",
-    ] {
-        let colored_lane = paint_section(lane);
-        colored = colored.replace(lane, &colored_lane);
     }
     for command in [
         "browse",
         "list",
-        "fetch-live",
-        "analyze",
+        "get",
+        "clone",
+        "variables",
+        "edit-live",
+        "delete",
+        "history",
         "export",
         "import",
         "diff",
-        "delete",
-        "clone-live",
-        "serve",
-        "edit-live",
         "review",
-        "patch-file",
-        "raw-to-prompt",
+        "patch",
+        "serve",
         "publish",
-        "analyze-live",
-        "analyze-export",
-        "list-vars",
-        "topology",
-        "history",
+        "summary",
+        "dependencies",
+        "impact",
+        "policy",
         "screenshot",
-        "governance-gate",
-        "migrate",
+        "convert",
+        "raw-to-prompt",
     ] {
         let needle = format!("\n  {command}");
         let replacement = format!("\n  {}", paint_command(command));

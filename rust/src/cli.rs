@@ -14,27 +14,27 @@ use crate::access::{
 use crate::alert::{
     normalize_alert_group_command, run_alert_cli, AlertAddContactPointArgs, AlertAddRuleArgs,
     AlertApplyArgs, AlertCliArgs, AlertCloneRuleArgs, AlertDeleteArgs, AlertDiffArgs,
-    AlertExportArgs, AlertImportArgs, AlertInitArgs, AlertListArgs, AlertNewResourceArgs,
-    AlertPlanArgs, AlertPreviewRouteArgs, AlertSetRouteArgs,
+    AlertExportArgs, AlertGroupCommand, AlertImportArgs, AlertInitArgs, AlertListArgs,
+    AlertNewResourceArgs, AlertPlanArgs, AlertPreviewRouteArgs, AlertSetRouteArgs,
 };
 pub use crate::cli_help::{
     maybe_render_unified_help_from_os_args, render_unified_help_full_text,
     render_unified_help_text, render_unified_version_text,
 };
 use crate::cli_help::{
-    UNIFIED_ACCESS_HELP_TEXT, UNIFIED_ALERT_HELP_TEXT, UNIFIED_DASHBOARD_HELP_TEXT,
-    UNIFIED_DATASOURCE_HELP_TEXT, UNIFIED_SYNC_HELP_TEXT,
+    UNIFIED_ACCESS_HELP_TEXT, UNIFIED_ALERT_HELP_TEXT, UNIFIED_DATASOURCE_HELP_TEXT,
+    UNIFIED_SYNC_HELP_TEXT,
 };
 use crate::cli_help_examples::UNIFIED_HELP_TEXT;
 use crate::common::{json_color_choice, set_json_color_choice, CliColorChoice, Result};
 use crate::dashboard::{
-    run_dashboard_cli, AnalyzeArgs, BrowseArgs, CloneLiveArgs, DashboardCliArgs, DashboardCommand,
-    DashboardHistoryArgs, DeleteArgs, DiffArgs, EditLiveArgs, ExportArgs as DashboardExportArgs,
-    GetArgs, GovernanceGateArgs, ImpactArgs, ImportArgs, InspectVarsArgs, ListArgs, PatchFileArgs,
-    PublishArgs, RawToPromptArgs, ReviewArgs, ScreenshotArgs, ServeArgs, TopologyArgs,
+    run_dashboard_cli, run_raw_to_prompt, AnalyzeArgs, BrowseArgs, CloneLiveArgs, DashboardCliArgs,
+    DashboardCommand, DashboardHistoryArgs, DeleteArgs, DiffArgs, EditLiveArgs,
+    ExportArgs as DashboardExportArgs, GetArgs, GovernanceGateArgs, ImpactArgs, ImportArgs,
+    InspectVarsArgs, ListArgs, PatchFileArgs, PublishArgs, RawToPromptArgs, ReviewArgs,
+    ScreenshotArgs, ServeArgs, TopologyArgs,
 };
 use crate::datasource::{run_datasource_cli, DatasourceExportArgs, DatasourceGroupCommand};
-use crate::migrate::{run_migrate_cli, MigrateCliArgs, MigrateCommand, MigrateDashboardCommand};
 use crate::overview::{run_overview_cli, OverviewArgs, OverviewCliArgs, OverviewCommand};
 use crate::profile_cli::{run_profile_cli, ProfileCliArgs};
 use crate::project_status_command::{
@@ -50,18 +50,10 @@ const EXPORT_ACCESS_HELP_TEXT: &str = "Examples:\n\n  Export Grafana users into 
 const EXPORT_DASHBOARD_HELP_TEXT: &str = "Notes:\n  - Writes raw/, prompt/, and provisioning/ by default.\n  - Use Basic auth with --all-orgs.\n  - Use --flat for files directly under each variant directory.\n  - Use --include-history to add history/ under each exported org scope.\n  - The provider file is provisioning/provisioning/dashboards.yaml.\n  - Keep raw/ for API import or diff, prompt/ for UI import, and provisioning/ for file provisioning.\n\nExamples:\n\n  Export dashboards from the current org:\n    grafana-util export dashboard --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --output-dir ./dashboards --overwrite\n\n  Export dashboards across all visible orgs:\n    grafana-util export dashboard --url http://localhost:3000 --basic-user admin --basic-password admin --all-orgs --output-dir ./dashboards --overwrite";
 const EXPORT_ALERT_HELP_TEXT: &str = "Examples:\n\n  Export alerting resources from Grafana:\n    grafana-util export alert --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --output-dir ./alerts --overwrite";
 const EXPORT_DATASOURCE_HELP_TEXT: &str = "Examples:\n\n  Export datasource inventory into a local artifact tree:\n    grafana-util export datasource --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --output-dir ./datasources --overwrite";
-const ADVANCED_HELP_TEXT: &str = "Examples:\n\n  [Dashboard import]\n    grafana-util advanced dashboard sync import --input-dir ./dashboards/raw --dry-run --table\n\n  [Alert authoring]\n    grafana-util advanced alert author route preview --desired-dir ./alerts/desired --label team=sre --severity critical\n\n  [Datasource diff]\n    grafana-util advanced datasource diff --diff-dir ./datasources --input-format inventory\n\n  [Access administration]\n    grafana-util advanced access user diff --diff-dir ./access-users --scope global";
-const ADVANCED_DASHBOARD_HELP_TEXT: &str = "Examples:\n\n  [Live browse]\n    grafana-util advanced dashboard live browse --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\"\n\n  [Draft review]\n    cat cpu.json | grafana-util advanced dashboard draft review --input - --output-format json\n\n  [Sync import]\n    grafana-util advanced dashboard sync import --input-dir ./dashboards/raw --dry-run --table\n\n  [Analyze]\n    grafana-util advanced dashboard analyze summary --input-dir ./dashboards/raw --input-format raw --output-format tree-table\n\n  [Capture]\n    grafana-util advanced dashboard capture screenshot --dashboard-uid cpu-main --output ./cpu-main.png";
-const ADVANCED_DASHBOARD_SYNC_HELP_TEXT: &str = "Examples:\n\n  Export dashboards into a backup tree:\n    grafana-util advanced dashboard sync export --output-dir ./dashboards --overwrite\n\n  Preview dashboard import before writing live Grafana:\n    grafana-util advanced dashboard sync import --input-dir ./dashboards/raw --dry-run --table\n\n  Compare exported dashboards against Grafana:\n    grafana-util advanced dashboard sync diff --input-dir ./dashboards/raw --output-format json\n\n  Repair a raw export tree into prompt artifacts:\n    grafana-util advanced dashboard sync convert raw-to-prompt --input-dir ./dashboards/raw --output-dir ./dashboards/prompt --overwrite";
-const ADVANCED_DASHBOARD_IMPORT_HELP_TEXT: &str = "Examples:\n\n  Import one raw export directory into the current org:\n    grafana-util advanced dashboard sync import --url http://localhost:3000 --basic-user admin --basic-password admin --input-dir ./dashboards/raw --replace-existing\n\n  Preview import actions without changing Grafana:\n    grafana-util advanced dashboard sync import --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --input-dir ./dashboards/raw --dry-run --table\n\n  Interactively choose exported dashboards to restore/import:\n    grafana-util advanced dashboard sync import --url http://localhost:3000 --basic-user admin --basic-password admin --input-dir ./dashboards/raw --interactive --replace-existing";
-const ADVANCED_DASHBOARD_EXPORT_HELP_TEXT: &str = "Notes:\n  - Writes raw/, prompt/, and provisioning/ by default.\n  - Use Basic auth with --all-orgs.\n  - Use --flat for files directly under each variant directory.\n  - Use --include-history to add history/ under each exported org scope.\n  - The provider file is provisioning/provisioning/dashboards.yaml.\n  - Keep raw/ for API import or diff, prompt/ for UI import, and provisioning/ for file provisioning.\n\nExamples:\n\n  Export dashboards from the current org:\n    grafana-util advanced dashboard sync export --url http://localhost:3000 --basic-user admin --basic-password admin --output-dir ./dashboards --overwrite\n\n  Export dashboards across all visible orgs:\n    grafana-util advanced dashboard sync export --url http://localhost:3000 --basic-user admin --basic-password admin --all-orgs --output-dir ./dashboards --overwrite";
-const ADVANCED_DASHBOARD_DIFF_HELP_TEXT: &str = "Examples:\n\n  Compare one raw export directory against the current org:\n    grafana-util advanced dashboard sync diff --url http://localhost:3000 --basic-user admin --basic-password admin --input-dir ./dashboards/raw\n\n  Compare a provisioning export root against the current org:\n    grafana-util advanced dashboard sync diff --url http://localhost:3000 --basic-user admin --basic-password admin --input-dir ./dashboards/provisioning --input-format provisioning";
-const ADVANCED_ALERT_HELP_TEXT: &str = "Examples:\n\n  [Live inventory]\n    grafana-util advanced alert live list-rules --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --table\n\n  [Migrate import]\n    grafana-util advanced alert migrate import --input-dir ./alerts/raw --replace-existing --dry-run --json\n\n  [Author route]\n    grafana-util advanced alert author route preview --desired-dir ./alerts/desired --label team=sre --severity critical\n\n  [Change plan]\n    grafana-util advanced alert change plan --desired-dir ./alerts/desired --prune";
-const ADVANCED_ALERT_MIGRATE_HELP_TEXT: &str = "Examples:\n\n  Export alerting resources from Grafana:\n    grafana-util advanced alert migrate export --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --output-dir ./alerts --overwrite\n\n  Preview import before execution:\n    grafana-util advanced alert migrate import --url http://localhost:3000 --input-dir ./alerts/raw --replace-existing --dry-run --json\n\n  Compare local alert exports against Grafana:\n    grafana-util advanced alert migrate diff --url http://localhost:3000 --diff-dir ./alerts/raw --output-format json";
-const ADVANCED_ALERT_MIGRATE_EXPORT_HELP_TEXT: &str = "Examples:\n\n  Export alerting resources with overwrite enabled:\n    grafana-util advanced alert migrate export --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --output-dir ./alerts --overwrite";
-const ADVANCED_ALERT_MIGRATE_IMPORT_HELP_TEXT: &str = "Examples:\n\n  Preview a replace-existing import before execution as structured JSON:\n    grafana-util advanced alert migrate import --url http://localhost:3000 --input-dir ./alerts/raw --replace-existing --dry-run --json\n\n  Re-map linked dashboards and panels during import:\n    grafana-util advanced alert migrate import --url http://localhost:3000 --input-dir ./alerts/raw --replace-existing --dashboard-uid-map ./dashboard-map.json --panel-id-map ./panel-map.json";
-const ADVANCED_ALERT_MIGRATE_DIFF_HELP_TEXT: &str = "Examples:\n\n  Compare a local export against Grafana as structured JSON:\n    grafana-util advanced alert migrate diff --url http://localhost:3000 --diff-dir ./alerts/raw --output-format json";
-
+const ALERT_MIGRATE_HELP_TEXT: &str = "Examples:\n\n  [Import]\n    grafana-util alert migrate import --input-dir ./alerts/raw --replace-existing --dry-run --json\n\n  [Export]\n    grafana-util alert migrate export --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --output-dir ./alerts --overwrite\n\n  [Diff]\n    grafana-util alert migrate diff --url http://localhost:3000 --diff-dir ./alerts/raw --output-format json";
+const ALERT_MIGRATE_EXPORT_HELP_TEXT: &str = "Examples:\n\n  Export alerting resources with overwrite enabled:\n    grafana-util alert migrate export --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --output-dir ./alerts --overwrite";
+const ALERT_MIGRATE_IMPORT_HELP_TEXT: &str = "Examples:\n\n  Preview a replace-existing import before execution as structured JSON:\n    grafana-util alert migrate import --url http://localhost:3000 --input-dir ./alerts/raw --replace-existing --dry-run --json\n\n  Re-map linked dashboards and panels during import:\n    grafana-util alert migrate import --url http://localhost:3000 --input-dir ./alerts/raw --replace-existing --dashboard-uid-map ./dashboard-map.json --panel-id-map ./panel-map.json";
+const ALERT_MIGRATE_DIFF_HELP_TEXT: &str = "Examples:\n\n  Compare a local export against Grafana as structured JSON:\n    grafana-util alert migrate diff --url http://localhost:3000 --diff-dir ./alerts/raw --output-format json";
 #[derive(Debug, Clone, Subcommand)]
 pub enum ObserveCommand {
     #[command(about = "Render shared project-wide live status.")]
@@ -136,8 +128,20 @@ pub enum ExportCommand {
 }
 
 #[derive(Debug, Clone, Subcommand)]
-pub enum DashboardLiveCommand {
-    #[command(about = "Browse the live dashboard tree in an interactive terminal UI.")]
+pub enum DashboardConvertCommand {
+    #[command(
+        name = "raw-to-prompt",
+        about = "Convert raw dashboard exports into prompt lane artifacts."
+    )]
+    RawToPrompt(RawToPromptArgs),
+}
+
+#[derive(Debug, Clone, Subcommand)]
+pub enum DashboardRootCommand {
+    #[command(
+        name = "browse",
+        about = "Browse the live dashboard tree in an interactive terminal UI."
+    )]
     Browse(BrowseArgs),
     #[command(
         name = "list",
@@ -145,39 +149,56 @@ pub enum DashboardLiveCommand {
     )]
     List(ListArgs),
     #[command(
-        name = "vars",
+        name = "variables",
+        alias = "vars",
         about = "List dashboard templating variables from live Grafana or local artifacts."
     )]
-    Vars(InspectVarsArgs),
+    Variables(InspectVarsArgs),
     #[command(
-        name = "fetch",
+        name = "get",
         about = "Fetch one live dashboard into an API-safe local JSON draft."
     )]
-    Fetch(GetArgs),
+    Get(GetArgs),
+    #[command(
+        name = "history",
+        about = "List, restore, diff, or export live dashboard revision history."
+    )]
+    History(DashboardHistoryArgs),
     #[command(
         name = "clone",
         about = "Clone one live dashboard into a local draft with optional overrides."
     )]
     Clone(CloneLiveArgs),
     #[command(
-        name = "edit",
+        name = "edit-live",
         about = "Edit one live dashboard through an external editor."
     )]
-    Edit(EditLiveArgs),
+    EditLive(EditLiveArgs),
     #[command(
         name = "delete",
         about = "Delete live dashboards by UID or folder path."
     )]
     Delete(DeleteArgs),
     #[command(
-        name = "history",
-        about = "List, restore, diff, or export live dashboard revision history."
+        name = "export",
+        about = "Export dashboards to raw/ and prompt/ JSON files."
     )]
-    History(DashboardHistoryArgs),
-}
-
-#[derive(Debug, Clone, Subcommand)]
-pub enum DashboardDraftCommand {
+    Export(DashboardExportArgs),
+    #[command(
+        name = "import",
+        about = "Import dashboard JSON files through the Grafana API."
+    )]
+    Import(ImportArgs),
+    #[command(
+        name = "diff",
+        about = "Compare local raw dashboard files against live Grafana dashboards."
+    )]
+    Diff(DiffArgs),
+    #[command(name = "convert", about = "Run dashboard format conversion workflows.")]
+    Convert {
+        #[command(subcommand)]
+        command: DashboardConvertCommand,
+    },
     #[command(
         name = "review",
         about = "Review one local dashboard JSON file without touching Grafana."
@@ -198,107 +219,31 @@ pub enum DashboardDraftCommand {
         about = "Publish one local dashboard JSON file through the existing dashboard import pipeline."
     )]
     Publish(PublishArgs),
-}
-
-#[derive(Debug, Clone, Subcommand)]
-pub enum DashboardSyncConvertCommand {
-    #[command(
-        name = "raw-to-prompt",
-        about = "Convert raw dashboard exports into prompt lane artifacts."
-    )]
-    RawToPrompt(RawToPromptArgs),
-}
-
-#[derive(Debug, Clone, Subcommand)]
-pub enum DashboardSyncCommand {
-    #[command(
-        name = "export",
-        about = "Export dashboards to raw/ and prompt/ JSON files.",
-        after_help = ADVANCED_DASHBOARD_EXPORT_HELP_TEXT
-    )]
-    Export(DashboardExportArgs),
-    #[command(
-        name = "import",
-        about = "Import dashboard JSON files through the Grafana API.",
-        after_help = ADVANCED_DASHBOARD_IMPORT_HELP_TEXT
-    )]
-    Import(ImportArgs),
-    #[command(
-        name = "diff",
-        about = "Compare local raw dashboard files against live Grafana dashboards.",
-        after_help = ADVANCED_DASHBOARD_DIFF_HELP_TEXT
-    )]
-    Diff(DiffArgs),
-    #[command(name = "convert", about = "Run dashboard format conversion workflows.")]
-    Convert {
-        #[command(subcommand)]
-        command: DashboardSyncConvertCommand,
-    },
-}
-
-#[derive(Debug, Clone, Subcommand)]
-pub enum DashboardAnalyzeCommand {
     #[command(
         name = "summary",
         about = "Analyze dashboards from live Grafana or a local export tree."
     )]
     Summary(AnalyzeArgs),
     #[command(
-        name = "topology",
+        name = "dependencies",
         about = "Show which dashboards, variables, data sources, and alerts depend on each other."
     )]
-    Topology(TopologyArgs),
+    Dependencies(TopologyArgs),
     #[command(
         name = "impact",
         about = "Show which dashboards and alert resources would be affected by one data source."
     )]
     Impact(ImpactArgs),
     #[command(
-        name = "governance",
+        name = "policy",
         about = "Evaluate governance policy against dashboard inspect JSON artifacts."
     )]
-    Governance(GovernanceGateArgs),
-}
-
-#[derive(Debug, Clone, Subcommand)]
-pub enum DashboardCaptureCommand {
+    Policy(GovernanceGateArgs),
     #[command(
         name = "screenshot",
         about = "Open one dashboard in a headless browser and capture image or PDF output."
     )]
     Screenshot(ScreenshotArgs),
-}
-
-#[derive(Debug, Clone, Subcommand)]
-pub enum DashboardGroupCommand {
-    #[command(about = "Work with live dashboards and history.")]
-    Live {
-        #[command(subcommand)]
-        command: DashboardLiveCommand,
-    },
-    #[command(about = "Work with local dashboard drafts before publish.")]
-    Draft {
-        #[command(subcommand)]
-        command: DashboardDraftCommand,
-    },
-    #[command(
-        about = "Move dashboards between local artifacts and Grafana.",
-        after_help = ADVANCED_DASHBOARD_SYNC_HELP_TEXT
-    )]
-    Sync {
-        #[command(subcommand)]
-        command: DashboardSyncCommand,
-    },
-    #[command(about = "Analyze dashboard structure, dependencies, and governance.")]
-    Analyze {
-        #[command(subcommand)]
-        command: DashboardAnalyzeCommand,
-    },
-    #[command(about = "Capture browser-rendered dashboard artifacts.")]
-    Capture {
-        #[command(subcommand)]
-        command: DashboardCaptureCommand,
-    },
 }
 
 #[derive(Debug, Clone, Subcommand)]
@@ -329,19 +274,19 @@ pub enum AlertMigrateCommand {
     #[command(
         name = "export",
         about = "Export alerting resources into raw/ JSON files.",
-        after_help = ADVANCED_ALERT_MIGRATE_EXPORT_HELP_TEXT
+        after_help = ALERT_MIGRATE_EXPORT_HELP_TEXT
     )]
     Export(AlertExportArgs),
     #[command(
         name = "import",
         about = "Import alerting resource JSON files through the Grafana API.",
-        after_help = ADVANCED_ALERT_MIGRATE_IMPORT_HELP_TEXT
+        after_help = ALERT_MIGRATE_IMPORT_HELP_TEXT
     )]
     Import(AlertImportArgs),
     #[command(
         name = "diff",
         about = "Compare local alerting export files against live Grafana resources.",
-        after_help = ADVANCED_ALERT_MIGRATE_DIFF_HELP_TEXT
+        after_help = ALERT_MIGRATE_DIFF_HELP_TEXT
     )]
     Diff(AlertDiffArgs),
 }
@@ -455,7 +400,7 @@ pub enum AlertCommandSurface {
     },
     #[command(
         about = "Move alert resources between local artifacts and Grafana.",
-        after_help = ADVANCED_ALERT_MIGRATE_HELP_TEXT
+        after_help = ALERT_MIGRATE_HELP_TEXT
     )]
     Migrate {
         #[command(subcommand)]
@@ -479,37 +424,6 @@ pub enum AlertCommandSurface {
 }
 
 #[derive(Debug, Clone, Subcommand)]
-pub enum AdvancedCommand {
-    #[command(
-        about = "Run full dashboard browse, authoring, import, analysis, and capture workflows.",
-        after_help = ADVANCED_DASHBOARD_HELP_TEXT
-    )]
-    Dashboard {
-        #[command(subcommand)]
-        command: DashboardGroupCommand,
-    },
-    #[command(
-        about = "Run grouped alert inventory, migration, authoring, and change workflows.",
-        after_help = ADVANCED_ALERT_HELP_TEXT
-    )]
-    Alert(AlertSurfaceArgs),
-    #[command(about = "Run datasource list, browse, export, import, and diff workflows.")]
-    Datasource {
-        #[arg(
-            long,
-            global = true,
-            value_enum,
-            help = "Override JSON/YAML/table color for the datasource namespace."
-        )]
-        color: Option<CliColorChoice>,
-        #[command(subcommand)]
-        command: DatasourceGroupCommand,
-    },
-    #[command(about = "List and manage Grafana users, teams, and service accounts.")]
-    Access(AccessCliArgs),
-}
-
-#[derive(Debug, Clone, Subcommand)]
 pub enum UnifiedCommand {
     #[command(about = "Print the current grafana-util version.")]
     Version(VersionArgs),
@@ -527,26 +441,14 @@ pub enum UnifiedCommand {
         command: ExportCommand,
     },
     #[command(
-        about = "Open expert and domain-specific workflows once you know which subsystem you need.",
-        after_help = ADVANCED_HELP_TEXT
-    )]
-    Advanced {
-        #[command(subcommand)]
-        command: AdvancedCommand,
-    },
-    #[command(
-        hide = true,
-        about = "Compatibility path for full dashboard browse, authoring, export, import, analysis, and capture workflows.",
-        visible_alias = "db",
-        after_help = UNIFIED_DASHBOARD_HELP_TEXT
+        about = "Canonical dashboard root for browse, list, authoring, export, import, analysis, and capture workflows."
     )]
     Dashboard {
         #[command(subcommand)]
-        command: DashboardGroupCommand,
+        command: DashboardRootCommand,
     },
     #[command(
-        hide = true,
-        about = "Compatibility path for datasource list, browse, export, import, and diff workflows.",
+        about = "Manage datasource list, browse, export, import, and diff workflows.",
         visible_alias = "ds",
         after_help = UNIFIED_DATASOURCE_HELP_TEXT
     )]
@@ -562,14 +464,22 @@ pub enum UnifiedCommand {
         command: DatasourceGroupCommand,
     },
     #[command(
-        hide = true,
-        about = "Compatibility path for grouped alert inventory, migration, authoring, and change workflows.",
+        about = "Manage alert inventory, migration, authoring, and change workflows.",
         after_help = UNIFIED_ALERT_HELP_TEXT
     )]
-    Alert(AlertSurfaceArgs),
+    Alert {
+        #[arg(
+            long,
+            global = true,
+            value_enum,
+            help = "Override JSON/YAML/table color for the alert namespace."
+        )]
+        color: Option<CliColorChoice>,
+        #[command(subcommand)]
+        command: AlertGroupCommand,
+    },
     #[command(
-        hide = true,
-        about = "Compatibility path for Grafana users, teams, and service accounts.",
+        about = "Manage Grafana users, teams, and service accounts.",
         after_help = UNIFIED_ACCESS_HELP_TEXT
     )]
     Access(AccessCliArgs),
@@ -587,14 +497,6 @@ pub enum UnifiedCommand {
         #[command(subcommand)]
         command: ConfigCommand,
     },
-    #[command(
-        hide = true,
-        about = "Compatibility path for migration and artifact repair workflows."
-    )]
-    Migrate {
-        #[command(subcommand)]
-        command: MigrateCommand,
-    },
 }
 
 #[derive(Debug, Clone, Args)]
@@ -607,7 +509,7 @@ pub struct VersionArgs {
 #[command(
     name = "grafana-util",
     version = crate::common::TOOL_VERSION_DETAILS,
-    about = "Task-first Grafana CLI for observe, export, change review, config, and advanced workflows.",
+    about = "Task-first Grafana CLI for observe, export, dashboard, change review, config, and sync workflows.",
     after_help = UNIFIED_HELP_TEXT,
     styles = crate::help_styles::CLI_HELP_STYLES
 )]
@@ -638,110 +540,40 @@ fn wrap_dashboard(command: DashboardCommand) -> DashboardCliArgs {
     }
 }
 
-fn wrap_dashboard_group(command: DashboardGroupCommand) -> DashboardCliArgs {
+fn wrap_dashboard_root(command: DashboardRootCommand) -> DashboardCliArgs {
     match command {
-        DashboardGroupCommand::Live { command } => match command {
-            DashboardLiveCommand::Browse(inner) => wrap_dashboard(DashboardCommand::Browse(inner)),
-            DashboardLiveCommand::List(inner) => wrap_dashboard(DashboardCommand::List(inner)),
-            DashboardLiveCommand::Vars(inner) => {
-                wrap_dashboard(DashboardCommand::InspectVars(inner))
-            }
-            DashboardLiveCommand::Fetch(inner) => wrap_dashboard(DashboardCommand::Get(inner)),
-            DashboardLiveCommand::Clone(inner) => {
-                wrap_dashboard(DashboardCommand::CloneLive(inner))
-            }
-            DashboardLiveCommand::Edit(inner) => wrap_dashboard(DashboardCommand::EditLive(inner)),
-            DashboardLiveCommand::Delete(inner) => wrap_dashboard(DashboardCommand::Delete(inner)),
-            DashboardLiveCommand::History(inner) => {
-                wrap_dashboard(DashboardCommand::History(inner))
-            }
-        },
-        DashboardGroupCommand::Draft { command } => match command {
-            DashboardDraftCommand::Review(inner) => wrap_dashboard(DashboardCommand::Review(inner)),
-            DashboardDraftCommand::Patch(inner) => {
-                wrap_dashboard(DashboardCommand::PatchFile(inner))
-            }
-            DashboardDraftCommand::Serve(inner) => wrap_dashboard(DashboardCommand::Serve(inner)),
-            DashboardDraftCommand::Publish(inner) => {
-                wrap_dashboard(DashboardCommand::Publish(inner))
-            }
-        },
-        DashboardGroupCommand::Sync { command } => match command {
-            DashboardSyncCommand::Export(inner) => wrap_dashboard(DashboardCommand::Export(inner)),
-            DashboardSyncCommand::Import(inner) => wrap_dashboard(DashboardCommand::Import(inner)),
-            DashboardSyncCommand::Diff(inner) => wrap_dashboard(DashboardCommand::Diff(inner)),
-            DashboardSyncCommand::Convert { .. } => {
-                unreachable!("convert is handled before dashboard dispatch")
-            }
-        },
-        DashboardGroupCommand::Analyze { command } => match command {
-            DashboardAnalyzeCommand::Summary(inner) => {
-                wrap_dashboard(DashboardCommand::Analyze(inner))
-            }
-            DashboardAnalyzeCommand::Topology(inner) => {
-                wrap_dashboard(DashboardCommand::Topology(inner))
-            }
-            DashboardAnalyzeCommand::Impact(inner) => {
-                wrap_dashboard(DashboardCommand::Impact(inner))
-            }
-            DashboardAnalyzeCommand::Governance(inner) => {
-                wrap_dashboard(DashboardCommand::GovernanceGate(inner))
-            }
-        },
-        DashboardGroupCommand::Capture { command } => match command {
-            DashboardCaptureCommand::Screenshot(inner) => {
-                wrap_dashboard(DashboardCommand::Screenshot(inner))
-            }
-        },
+        DashboardRootCommand::Browse(inner) => wrap_dashboard(DashboardCommand::Browse(inner)),
+        DashboardRootCommand::List(inner) => wrap_dashboard(DashboardCommand::List(inner)),
+        DashboardRootCommand::Variables(inner) => {
+            wrap_dashboard(DashboardCommand::InspectVars(inner))
+        }
+        DashboardRootCommand::Get(inner) => wrap_dashboard(DashboardCommand::Get(inner)),
+        DashboardRootCommand::History(inner) => wrap_dashboard(DashboardCommand::History(inner)),
+        DashboardRootCommand::Clone(inner) => wrap_dashboard(DashboardCommand::CloneLive(inner)),
+        DashboardRootCommand::EditLive(inner) => wrap_dashboard(DashboardCommand::EditLive(inner)),
+        DashboardRootCommand::Delete(inner) => wrap_dashboard(DashboardCommand::Delete(inner)),
+        DashboardRootCommand::Export(inner) => wrap_dashboard(DashboardCommand::Export(inner)),
+        DashboardRootCommand::Import(inner) => wrap_dashboard(DashboardCommand::Import(inner)),
+        DashboardRootCommand::Diff(inner) => wrap_dashboard(DashboardCommand::Diff(inner)),
+        DashboardRootCommand::Convert { .. } => {
+            unreachable!("convert is handled before dashboard dispatch")
+        }
+        DashboardRootCommand::Review(inner) => wrap_dashboard(DashboardCommand::Review(inner)),
+        DashboardRootCommand::Patch(inner) => wrap_dashboard(DashboardCommand::PatchFile(inner)),
+        DashboardRootCommand::Serve(inner) => wrap_dashboard(DashboardCommand::Serve(inner)),
+        DashboardRootCommand::Publish(inner) => wrap_dashboard(DashboardCommand::Publish(inner)),
+        DashboardRootCommand::Summary(inner) => wrap_dashboard(DashboardCommand::Analyze(inner)),
+        DashboardRootCommand::Dependencies(inner) => {
+            wrap_dashboard(DashboardCommand::Topology(inner))
+        }
+        DashboardRootCommand::Impact(inner) => wrap_dashboard(DashboardCommand::Impact(inner)),
+        DashboardRootCommand::Policy(inner) => {
+            wrap_dashboard(DashboardCommand::GovernanceGate(inner))
+        }
+        DashboardRootCommand::Screenshot(inner) => {
+            wrap_dashboard(DashboardCommand::Screenshot(inner))
+        }
     }
-}
-
-fn wrap_alert_surface(command: AlertCommandSurface) -> AlertCliArgs {
-    use crate::alert::AlertGroupCommand;
-
-    let legacy = match command {
-        AlertCommandSurface::Live { command } => match command {
-            AlertLiveCommand::ListRules(inner) => AlertGroupCommand::ListRules(inner),
-            AlertLiveCommand::ListContactPoints(inner) => {
-                AlertGroupCommand::ListContactPoints(inner)
-            }
-            AlertLiveCommand::ListMuteTimings(inner) => AlertGroupCommand::ListMuteTimings(inner),
-            AlertLiveCommand::ListTemplates(inner) => AlertGroupCommand::ListTemplates(inner),
-            AlertLiveCommand::Delete(inner) => AlertGroupCommand::Delete(inner),
-        },
-        AlertCommandSurface::Migrate { command } => match command {
-            AlertMigrateCommand::Export(inner) => AlertGroupCommand::Export(inner),
-            AlertMigrateCommand::Import(inner) => AlertGroupCommand::Import(inner),
-            AlertMigrateCommand::Diff(inner) => AlertGroupCommand::Diff(inner),
-        },
-        AlertCommandSurface::Author { command } => match command {
-            AlertAuthorCommand::Init(inner) => AlertGroupCommand::Init(inner),
-            AlertAuthorCommand::Rule { command } => match command {
-                AlertAuthorRuleCommand::Add(inner) => AlertGroupCommand::AddRule(inner),
-                AlertAuthorRuleCommand::Clone(inner) => AlertGroupCommand::CloneRule(inner),
-            },
-            AlertAuthorCommand::ContactPoint { command } => match command {
-                AlertAuthorContactPointCommand::Add(inner) => {
-                    AlertGroupCommand::AddContactPoint(inner)
-                }
-            },
-            AlertAuthorCommand::Route { command } => match command {
-                AlertAuthorRouteCommand::Set(inner) => AlertGroupCommand::SetRoute(inner),
-                AlertAuthorRouteCommand::Preview(inner) => AlertGroupCommand::PreviewRoute(inner),
-            },
-        },
-        AlertCommandSurface::Scaffold { command } => match command {
-            AlertScaffoldCommand::Rule(inner) => AlertGroupCommand::NewRule(inner),
-            AlertScaffoldCommand::ContactPoint(inner) => AlertGroupCommand::NewContactPoint(inner),
-            AlertScaffoldCommand::Template(inner) => AlertGroupCommand::NewTemplate(inner),
-        },
-        AlertCommandSurface::Change { command } => match command {
-            AlertChangeCommand::Plan(inner) => AlertGroupCommand::Plan(inner),
-            AlertChangeCommand::Apply(inner) => AlertGroupCommand::Apply(inner),
-        },
-    };
-
-    normalize_alert_group_command(legacy)
 }
 
 fn wrap_overview(staged: OverviewArgs, command: Option<OverviewCommand>) -> OverviewCliArgs {
@@ -753,11 +585,8 @@ fn wrap_overview(staged: OverviewArgs, command: Option<OverviewCommand>) -> Over
 }
 
 fn run_dashboard_sync_convert(args: RawToPromptArgs) -> Result<()> {
-    run_migrate_cli(MigrateCliArgs {
-        command: MigrateCommand::Dashboard {
-            command: MigrateDashboardCommand::RawToPrompt(args),
-        },
-    })
+    set_json_color_choice(args.color);
+    run_raw_to_prompt(&args)
 }
 
 fn wrap_export_access(command: ExportAccessCommand) -> AccessCliArgs {
@@ -851,53 +680,33 @@ where
             ExportCommand::Dashboard(inner) => {
                 run_dashboard(wrap_dashboard(DashboardCommand::Export(inner)))
             }
-            ExportCommand::Alert(inner) => {
-                run_alert(wrap_alert_surface(AlertCommandSurface::Migrate {
-                    command: AlertMigrateCommand::Export(inner),
-                }))
-            }
+            ExportCommand::Alert(inner) => run_alert(normalize_alert_group_command(
+                AlertGroupCommand::Export(inner),
+            )),
             ExportCommand::Datasource(inner) => {
                 run_datasource(DatasourceGroupCommand::Export(inner))
             }
             ExportCommand::Access { command } => run_access(wrap_export_access(command)),
         },
-        UnifiedCommand::Advanced { command } => match command {
-            AdvancedCommand::Dashboard { command } => match command {
-                DashboardGroupCommand::Sync {
-                    command:
-                        DashboardSyncCommand::Convert {
-                            command: DashboardSyncConvertCommand::RawToPrompt(inner),
-                        },
-                } => run_dashboard_sync_convert(inner),
-                other => run_dashboard(wrap_dashboard_group(other)),
-            },
-            AdvancedCommand::Alert(inner) => run_alert(wrap_alert_surface(inner.command)),
-            AdvancedCommand::Datasource { color, command } => {
-                set_json_color_choice(color.unwrap_or(default_color));
-                run_datasource(command)
-            }
-            AdvancedCommand::Access(inner) => run_access(inner),
-        },
         UnifiedCommand::Dashboard { command } => match command {
-            DashboardGroupCommand::Sync {
-                command:
-                    DashboardSyncCommand::Convert {
-                        command: DashboardSyncConvertCommand::RawToPrompt(inner),
-                    },
+            DashboardRootCommand::Convert {
+                command: DashboardConvertCommand::RawToPrompt(inner),
             } => run_dashboard_sync_convert(inner),
-            other => run_dashboard(wrap_dashboard_group(other)),
+            other => run_dashboard(wrap_dashboard_root(other)),
         },
         UnifiedCommand::Datasource { color, command } => {
             set_json_color_choice(color.unwrap_or(default_color));
             run_datasource(command)
         }
-        UnifiedCommand::Alert(inner) => run_alert(wrap_alert_surface(inner.command)),
+        UnifiedCommand::Alert { color, command } => {
+            set_json_color_choice(color.unwrap_or(default_color));
+            run_alert(normalize_alert_group_command(command))
+        }
         UnifiedCommand::Access(inner) => run_access(inner),
         UnifiedCommand::Change { command } => run_sync(command),
         UnifiedCommand::Config { command } => match command {
             ConfigCommand::Profile(inner) => run_profile(inner),
         },
-        UnifiedCommand::Migrate { command } => run_migrate_cli(MigrateCliArgs { command }),
     }
 }
 

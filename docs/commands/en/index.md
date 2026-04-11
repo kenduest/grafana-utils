@@ -19,12 +19,12 @@ The public first-run CLI is organized around a small task-first surface:
 
 - [observe](./observe.md): read-only status, overview, snapshot, and resource queries
 - [config](./config.md): repo-local configuration workflows and profile management
-- `export`: common backup and local-inventory capture
-- `change`: review-first staged change workflows
-- [config profile](./profile.md): repo-local connection and secret management
-- `advanced`: domain-heavy workflows once you already know the subsystem
-
-Compatibility roots such as `dashboard`, `alert`, `datasource`, and `access` still exist for expert workflows, but they are no longer the primary onboarding path.
+- [export](./export.md): common backup and local-inventory capture
+- [change](./change.md): review-first staged change workflows
+- [dashboard](./dashboard.md): browse, get, clone, export/import, summary, dependencies, policy, and screenshot workflows
+- [alert](./alert.md): alert inventory, authoring, and change workflows
+- [datasource](./datasource.md): datasource inventory and lifecycle workflows
+- [access](./access.md): user, team, org, and service-account workflows
 
 Removed root paths as migration notes only:
 
@@ -41,6 +41,7 @@ Removed root paths as migration notes only:
 - [change apply](./change-apply.md)
 - [export](./export.md)
 - [observe](./observe.md)
+- [dashboard convert raw-to-prompt](./dashboard-convert-raw-to-prompt.md)
 - `export dashboard`
 - `export alert`
 - `export datasource`
@@ -51,15 +52,6 @@ Removed root paths as migration notes only:
 - `observe snapshot`
 - `observe resource describe|kinds|list|get`
 - `config profile`
-
-## Advanced Tasks
-
-- [advanced](./advanced.md)
-- `advanced dashboard live|draft|sync|analyze|capture`
-- `advanced alert live|migrate|author|scaffold|change`
-- `advanced datasource types|list|browse|add|modify|delete|export|import|diff`
-- `advanced access user|org|team|service-account`
-- [migrate](./migrate.md)
 
 ## Domain Reference
 
@@ -96,7 +88,7 @@ Use the long form when you want one explicit flag that is easy to templatize in 
 Important exceptions:
 
 - some commands only expose a subset of shortcuts
-- `dashboard topology` is different: it supports `text`, `json`, `mermaid`, and `dot`, but it does not have shortcut flags such as `--table`
+- `dashboard dependencies` is different: it supports `text`, `json`, `mermaid`, and `dot`, but it does not have shortcut flags such as `--table`
 - destination-path flags such as `--output-file` or `--output` on draft/export commands are not render-format selectors
 
 If you are unsure, treat the per-command page as authoritative for that exact command surface.

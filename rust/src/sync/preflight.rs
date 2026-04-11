@@ -171,9 +171,9 @@ fn build_dashboard_checks(
                 identity: format!("{}->{}", spec.identity, datasource_uid),
                 status: if available { "ok" } else { "missing" }.to_string(),
                 detail: if available {
-                    "Referenced datasource is available for dashboard sync."
+                    "Referenced datasource is available for dashboard change validation."
                 } else {
-                    "Referenced datasource is missing for dashboard sync."
+                    "Referenced datasource is missing for dashboard change validation."
                 }
                 .to_string(),
                 blocking: !available,
@@ -187,9 +187,9 @@ fn build_dashboard_checks(
             identity: format!("{}->{}", spec.identity, datasource_name),
             status: if available { "ok" } else { "missing" }.to_string(),
             detail: if available {
-                "Referenced datasource name is available for dashboard sync."
+                "Referenced datasource name is available for dashboard change validation."
             } else {
-                "Referenced datasource name is missing for dashboard sync."
+                "Referenced datasource name is missing for dashboard change validation."
             }
             .to_string(),
             blocking: !available,

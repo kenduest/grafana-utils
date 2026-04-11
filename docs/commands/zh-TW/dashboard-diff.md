@@ -27,7 +27,7 @@ grafana-util dashboard diff --url http://localhost:3000 --basic-user admin --bas
 ## 相關指令
 - [dashboard export](./dashboard-export.md)
 - [dashboard import](./dashboard-import.md)
-- [dashboard analyze（本地）](./dashboard-analyze-export.md)
+- [dashboard dependencies](./dashboard-dependencies.md)
 - [共用 diff JSON contract](../../user-guide/zh-TW/diff-json-contract.md)
 
 CLI schema 快速查詢：

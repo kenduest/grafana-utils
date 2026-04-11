@@ -26,7 +26,7 @@ fn render_dashboard_subcommand_help(name: &str) -> String {
 fn parse_cli_supports_dashboard_governance_gate_command() {
     let args = parse_cli_from([
         "grafana-util",
-        "governance-gate",
+        "policy",
         "--policy-source",
         "file",
         "--policy",
@@ -57,13 +57,13 @@ fn parse_cli_supports_dashboard_governance_gate_command() {
                 Some(PathBuf::from("./governance-check.json"))
             );
         }
-        _ => panic!("expected governance-gate command"),
+        _ => panic!("expected policy command"),
     }
 }
 
 #[test]
 fn governance_gate_help_mentions_policy_and_queries_inputs() {
-    let help = render_dashboard_subcommand_help("governance-gate");
+    let help = render_dashboard_subcommand_help("policy");
 
     assert!(help.contains(
         "Check dashboard findings against a policy from live Grafana or a local export tree."
@@ -78,7 +78,7 @@ fn governance_gate_help_mentions_policy_and_queries_inputs() {
     assert!(help.contains("--queries"));
     assert!(help.contains("--json-output"));
     assert!(help.contains("--output-format"));
-    assert!(help.contains("governance-gate"));
+    assert!(help.contains("policy"));
     assert!(help.contains("Check live Grafana directly"));
     assert!(help.contains("Advanced reuse: recheck saved analysis artifacts"));
 }
@@ -87,7 +87,7 @@ fn governance_gate_help_mentions_policy_and_queries_inputs() {
 fn parse_cli_supports_dashboard_governance_gate_git_sync_input_dir() {
     let args = parse_cli_from([
         "grafana-util",
-        "governance-gate",
+        "policy",
         "--policy-source",
         "builtin",
         "--builtin-policy",
@@ -109,7 +109,7 @@ fn parse_cli_supports_dashboard_governance_gate_git_sync_input_dir() {
                 crate::dashboard::DashboardImportInputFormat::Raw
             );
         }
-        _ => panic!("expected governance-gate command"),
+        _ => panic!("expected policy command"),
     }
 }
 
@@ -117,7 +117,7 @@ fn parse_cli_supports_dashboard_governance_gate_git_sync_input_dir() {
 fn parse_cli_supports_dashboard_governance_gate_builtin_policy_command() {
     let args = parse_cli_from([
         "grafana-util",
-        "governance-gate",
+        "policy",
         "--policy-source",
         "builtin",
         "--builtin-policy",
@@ -140,13 +140,13 @@ fn parse_cli_supports_dashboard_governance_gate_builtin_policy_command() {
             assert_eq!(gate_args.queries, Some(PathBuf::from("./queries.json")));
             assert_eq!(gate_args.output_format, GovernanceGateOutputFormat::Text);
         }
-        _ => panic!("expected governance-gate command"),
+        _ => panic!("expected policy command"),
     }
 }
 
 #[test]
 fn governance_gate_help_mentions_interactive_browser() {
-    let help = render_dashboard_subcommand_help("governance-gate");
+    let help = render_dashboard_subcommand_help("policy");
     assert!(help.contains("--interactive"));
 }
 
@@ -154,7 +154,7 @@ fn governance_gate_help_mentions_interactive_browser() {
 fn parse_cli_supports_dashboard_topology_command() {
     let args = parse_cli_from([
         "grafana-util",
-        "topology",
+        "dependencies",
         "--governance",
         "./governance.json",
         "--alert-contract",
@@ -184,7 +184,7 @@ fn parse_cli_supports_dashboard_topology_command() {
             assert!(!topology_args.also_stdout);
             assert!(topology_args.interactive);
         }
-        _ => panic!("expected topology command"),
+        _ => panic!("expected dependencies command"),
     }
 }
 
@@ -192,7 +192,7 @@ fn parse_cli_supports_dashboard_topology_command() {
 fn parse_cli_supports_dashboard_topology_also_stdout() {
     let args = parse_cli_from([
         "grafana-util",
-        "topology",
+        "dependencies",
         "--governance",
         "./governance.json",
         "--output-file",
@@ -208,7 +208,7 @@ fn parse_cli_supports_dashboard_topology_also_stdout() {
             );
             assert!(topology_args.also_stdout);
         }
-        _ => panic!("expected topology command"),
+        _ => panic!("expected dependencies command"),
     }
 }
 
@@ -216,7 +216,7 @@ fn parse_cli_supports_dashboard_topology_also_stdout() {
 fn parse_cli_supports_dashboard_topology_live_source_flags() {
     let args = parse_cli_from([
         "grafana-util",
-        "topology",
+        "dependencies",
         "--url",
         "http://localhost:3000",
         "--basic-user",
@@ -239,13 +239,13 @@ fn parse_cli_supports_dashboard_topology_live_source_flags() {
             assert!(topology_args.input_dir.is_none());
             assert!(topology_args.governance.is_none());
         }
-        _ => panic!("expected topology command"),
+        _ => panic!("expected dependencies command"),
     }
 }
 
 #[test]
 fn topology_help_mentions_alert_contract_and_visual_formats() {
-    let help = render_dashboard_subcommand_help("topology");
+    let help = render_dashboard_subcommand_help("dependencies");
 
     assert!(help.contains(
         "Show dashboard dependencies directly from live Grafana or a local export tree."
@@ -262,9 +262,9 @@ fn topology_help_mentions_alert_contract_and_visual_formats() {
     assert!(help.contains("governance.json"));
     assert!(help.contains("mermaid"));
     assert!(help.contains("dot"));
-    assert!(help.contains("graph"));
+    assert!(help.contains("dependencies"));
     assert!(help.contains("dashboard dependencies directly"));
-    assert!(help.contains("topology"));
+    assert!(help.contains("dependencies"));
     assert!(help.contains("Advanced reuse: render Graphviz DOT"));
 }
 
@@ -272,7 +272,7 @@ fn topology_help_mentions_alert_contract_and_visual_formats() {
 fn parse_cli_supports_dashboard_topology_git_sync_input_dir() {
     let args = parse_cli_from([
         "grafana-util",
-        "topology",
+        "dependencies",
         "--input-dir",
         "./grafana-oac-repo",
         "--input-format",
@@ -293,7 +293,7 @@ fn parse_cli_supports_dashboard_topology_git_sync_input_dir() {
             );
             assert_eq!(topology_args.output_format, TopologyOutputFormat::Json);
         }
-        _ => panic!("expected topology command"),
+        _ => panic!("expected dependencies command"),
     }
 }
 
@@ -301,7 +301,7 @@ fn parse_cli_supports_dashboard_topology_git_sync_input_dir() {
 fn parse_cli_supports_dashboard_governance_gate_import_dir() {
     let args = parse_cli_from([
         "grafana-util",
-        "governance-gate",
+        "policy",
         "--policy-source",
         "builtin",
         "--builtin-policy",
@@ -322,7 +322,7 @@ fn parse_cli_supports_dashboard_governance_gate_import_dir() {
             assert!(gate_args.governance.is_none());
             assert!(gate_args.queries.is_none());
         }
-        _ => panic!("expected governance-gate command"),
+        _ => panic!("expected policy command"),
     }
 }
 

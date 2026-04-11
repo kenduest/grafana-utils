@@ -36,29 +36,29 @@ Inventory reads can come from live Grafana or from a local export bundle; the wo
 
 Need the command-by-command surface instead of the workflow guide?
 
-- [advanced access command overview](../../commands/en/advanced.md)
-- [advanced access user](../../commands/en/advanced.md)
-- [advanced access org](../../commands/en/advanced.md)
-- [advanced access team](../../commands/en/advanced.md)
-- [advanced access service-account](../../commands/en/advanced.md)
-- [advanced access service-account token](../../commands/en/advanced.md)
+- [access command overview](../../commands/en/access.md)
+- [access user](../../commands/en/access.md)
+- [access org](../../commands/en/access.md)
+- [access team](../../commands/en/access.md)
+- [access service-account](../../commands/en/access.md)
+- [access service-account token](../../commands/en/access.md)
 - [full command index](../../commands/en/index.md)
 
 ---
 
 ## org Management
 
-Use `advanced access org` when you need Basic-auth-backed inventory, export, or replay for orgs, especially when you need to verify which orgs exist before a cross-org change. The same `list` command can also read a saved bundle with `--input-dir`.
+Use `access org` when you need Basic-auth-backed inventory, export, or replay for orgs, especially when you need to verify which orgs exist before a cross-org change. The same `list` command can also read a saved bundle with `--input-dir`.
 
 ### 1. List, Export, and Replay orgs
 ```bash
 # Purpose: 1. List, Export, and Replay orgs.
-grafana-util advanced access org list --table
+grafana-util access org list --table
 ```
 
 ```bash
 # Purpose: 1. List, Export, and Replay orgs.
-grafana-util advanced access org list --input-dir ./access-orgs --table
+grafana-util access org list --input-dir ./access-orgs --table
 ```
 
 ```bash
@@ -68,7 +68,7 @@ grafana-util export access org --output-dir ./access-orgs
 
 ```bash
 # Purpose: 1. List, Export, and Replay orgs.
-grafana-util advanced access org import --input-dir ./access-orgs --dry-run
+grafana-util access org import --input-dir ./access-orgs --dry-run
 ```
 **Expected Output:**
 ```text
@@ -89,25 +89,25 @@ Use the list output to confirm the main org, then export/import when you need a 
 
 ## User and team management
 
-Use `advanced access user` and `advanced access team` for membership changes, snapshots, and drift checks when you need to reconcile who can see or edit what. Their `list` and `browse` commands both read local bundles through `--input-dir`.
+Use `access user` and `access team` for membership changes, snapshots, and drift checks when you need to reconcile who can see or edit what. Their `list` and `browse` commands both read local bundles through `--input-dir`.
 
 ### 1. Add, Modify, and Diff Users
 ```bash
 # Add a new user with global admin role
-grafana-util advanced access user add --login dev-user --role Admin --prompt-password
+grafana-util access user add --login dev-user --role Admin --prompt-password
 
 # Update an existing user's organization role
-grafana-util advanced access user modify --login dev-user --org-id 5 --role Editor
+grafana-util access user modify --login dev-user --org-id 5 --role Editor
 
 # Compare a saved user snapshot against live Grafana
-grafana-util advanced access user diff --diff-dir ./access-users --scope global
+grafana-util access user diff --diff-dir ./access-users --scope global
 ```
 
 If you want the same user inventory from a saved bundle, use:
 
 ```bash
 # Inspect the same user inventory from a local bundle
-grafana-util advanced access user list --input-dir ./access-users
+grafana-util access user list --input-dir ./access-users
 ```
 **Expected Output:**
 ```text
@@ -120,12 +120,12 @@ Use `--prompt-password` when you do not want a password in shell history. `--sco
 ### 2. Discover and Sync Teams
 ```bash
 # Purpose: 2. Discover and Sync Teams.
-grafana-util advanced access team list --org-id 1 --table
+grafana-util access team list --org-id 1 --table
 ```
 
 ```bash
 # Purpose: 2. Discover and Sync Teams.
-grafana-util advanced access team list --input-dir ./access-teams --table
+grafana-util access team list --input-dir ./access-teams --table
 ```
 
 ```bash
@@ -135,7 +135,7 @@ grafana-util export access team --output-dir ./access-teams --with-members
 
 ```bash
 # Purpose: 2. Discover and Sync Teams.
-grafana-util advanced access team import --input-dir ./access-teams --replace-existing --dry-run --table
+grafana-util access team import --input-dir ./access-teams --replace-existing --dry-run --table
 ```
 **Expected Output:**
 ```text
@@ -161,12 +161,12 @@ Their inventory can be reviewed from live Grafana or from a local export bundle 
 ### 1. List and Export Service Accounts
 ```bash
 # Purpose: 1. List and Export Service Accounts.
-grafana-util advanced access service-account list --json
+grafana-util access service-account list --json
 ```
 
 ```bash
 # Purpose: 1. List and Export Service Accounts.
-grafana-util advanced access service-account list --input-dir ./access-sa --output-format text
+grafana-util access service-account list --input-dir ./access-sa --output-format text
 ```
 
 ```bash
@@ -196,13 +196,13 @@ Exported service account tokens    -> access-sa/tokens.json
 ### 2. Create and Delete Tokens
 ```bash
 # Add a new token to a service account by name
-grafana-util advanced access service-account token add --name deploy-bot --token-name nightly --seconds-to-live 3600
+grafana-util access service-account token add --name deploy-bot --token-name nightly --seconds-to-live 3600
 
 # Add a new token by numeric id and capture the one-time secret
-grafana-util advanced access service-account token add --service-account-id 15 --token-name ci-deployment-token --json
+grafana-util access service-account token add --service-account-id 15 --token-name ci-deployment-token --json
 
 # Delete an old token after verification
-grafana-util advanced access service-account token delete --service-account-id 15 --token-name nightly --yes --json
+grafana-util access service-account token delete --service-account-id 15 --token-name nightly --yes --json
 ```
 **Expected Output:**
 ```text
@@ -232,17 +232,17 @@ Compare your local identity snapshots against the live Grafana server.
 
 ```bash
 # Purpose: Compare your local identity snapshots against the live Grafana server.
-grafana-util advanced access user diff --input-dir ./access-users
+grafana-util access user diff --input-dir ./access-users
 ```
 
 ```bash
 # Purpose: Compare your local identity snapshots against the live Grafana server.
-grafana-util advanced access team diff --diff-dir ./access-teams
+grafana-util access team diff --diff-dir ./access-teams
 ```
 
 ```bash
 # Purpose: Compare your local identity snapshots against the live Grafana server.
-grafana-util advanced access service-account diff --diff-dir ./access-sa
+grafana-util access service-account diff --diff-dir ./access-sa
 ```
 **Expected Output:**
 ```text

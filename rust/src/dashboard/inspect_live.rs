@@ -121,7 +121,7 @@ pub(crate) fn prepare_live_analysis_import_dir(
     }
 
     let inspect_raw_dir = temp_root
-        .join("inspect-live-all-orgs")
+        .join("summary-live-all-orgs")
         .join(RAW_EXPORT_SUBDIR);
     let org_raw_dirs = discover_org_variant_export_dirs(temp_root, RAW_EXPORT_SUBDIR)?;
     merge_org_variant_exports_into_dir(&org_raw_dirs, &inspect_raw_dir, None, RAW_EXPORT_SUBDIR)?;
@@ -164,7 +164,7 @@ where
             }
             Err(error) => {
                 return Err(error.with_context(format!(
-                    "Failed to fetch live dashboard uid={uid} during analyze-live"
+                    "Failed to fetch live dashboard uid={uid} during summary-live"
                 )))
             }
         }
@@ -322,22 +322,22 @@ pub(crate) fn load_variant_index_entries(
 #[cfg(feature = "tui")]
 fn run_interactive_inspect_live_tui_from_dir(input_dir: &Path) -> Result<usize> {
     eprintln!(
-        "[analyze-live --interactive] building summary: {}",
+        "[summary-live --interactive] building summary: {}",
         input_dir.display()
     );
     let summary = build_export_inspection_summary(input_dir)?;
     eprintln!(
-        "[analyze-live --interactive] building query report: {}",
+        "[summary-live --interactive] building query report: {}",
         input_dir.display()
     );
     let report = build_export_inspection_query_report(input_dir)?;
     eprintln!(
-        "[analyze-live --interactive] building governance review: {}",
+        "[summary-live --interactive] building governance review: {}",
         input_dir.display()
     );
     let governance = build_export_inspection_governance_document(&summary, &report);
     eprintln!(
-        "[analyze-live --interactive] launching analysis workbench: {}",
+        "[summary-live --interactive] launching analysis workbench: {}",
         input_dir.display()
     );
     run_inspect_live_tui(&summary, &governance, &report)?;
@@ -346,7 +346,7 @@ fn run_interactive_inspect_live_tui_from_dir(input_dir: &Path) -> Result<usize> 
 
 #[cfg(not(feature = "tui"))]
 fn run_interactive_inspect_live_tui_from_dir(_import_dir: &Path) -> Result<usize> {
-    super::tui_not_built("analyze-live --interactive")
+    super::tui_not_built("summary-live --interactive")
 }
 
 pub(crate) fn inspect_live_dashboards_with_client(
@@ -362,7 +362,7 @@ pub(crate) fn inspect_live_dashboards_with_client(
         );
     }
 
-    let temp_dir = TempInspectDir::new("inspect-live")?;
+    let temp_dir = TempInspectDir::new("summary-live")?;
     let raw_dir = temp_dir.path.join(RAW_EXPORT_SUBDIR);
     let dashboard = DashboardResourceClient::new(client);
     let datasource = DatasourceResourceClient::new(client);
@@ -613,7 +613,7 @@ pub(crate) fn prepare_inspect_export_import_dir_for_variant(
             .map(|resolved| resolved.metadata_dir.as_path())
             .unwrap_or(input_dir);
         let inspect_variant_dir = temp_root
-            .join("inspect-export-all-orgs")
+            .join("summary-export-all-orgs")
             .join(expected_variant);
         let org_variant_dirs = discover_org_variant_export_dirs(export_root, expected_variant)?;
         merge_org_variant_exports_into_dir(
@@ -636,7 +636,7 @@ where
 {
     // Live inspect first stages a raw export tree, then reuses the offline analyzer so the
     // live and export code paths stay behaviorally aligned.
-    let temp_dir = TempInspectDir::new("inspect-live")?;
+    let temp_dir = TempInspectDir::new("summary-live")?;
     let export_args = build_live_export_args(args, temp_dir.path.clone());
     let _ = export_dashboards_with_request(&mut request_json, &export_args)?;
     let inspect_import_dir = prepare_inspect_live_import_dir(&temp_dir.path, args)?;

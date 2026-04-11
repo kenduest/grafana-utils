@@ -18,12 +18,13 @@
 現在建議的新手入口是比較小的 task-first surface：
 
 - [observe](./observe.md)：唯讀狀態、overview、snapshot、resource 查詢
-- `export`：常見備份與本地 inventory 擷取
-- `change`：以 review 為先的 staged change workflow
 - [config](./config.md)：repo-local 連線與 secret 管理，主要是 `config profile`
-- `advanced`：你已經知道是某個 domain 時，再打開進階樹
-
-像 `dashboard`、`alert`、`datasource`、`access` 這些舊根命令仍可使用，但不再是第一層 onboarding 入口。
+- [export](./export.md)：常見備份與本地 inventory 擷取
+- [change](./change.md)：以 review 為先的 staged change workflow
+- [dashboard](./dashboard.md)：瀏覽、get、clone、export/import、summary、dependencies、policy 與 screenshot workflow
+- [alert](./alert.md)：alert inventory、authoring、change workflow
+- [datasource](./datasource.md)：datasource inventory 與生命週期 workflow
+- [access](./access.md)：user、team、org、service-account workflow
 
 已移除的 root path：
 
@@ -40,6 +41,7 @@
 - [change apply](./change-apply.md)
 - [export](./export.md)
 - [observe](./observe.md)
+- [dashboard convert raw-to-prompt](./dashboard-convert-raw-to-prompt.md)
 - `export dashboard`
 - `export alert`
 - `export datasource`
@@ -50,15 +52,6 @@
 - `observe snapshot`
 - `observe resource describe|kinds|list|get`
 - `config profile`
-
-## 進階工作
-
-- [advanced](./advanced.md)
-- `advanced dashboard live|draft|sync|analyze|capture`
-- `advanced alert live|migrate|author|scaffold|change`
-- `advanced datasource types|list|browse|add|modify|delete|export|import|diff`
-- `advanced access user|org|team|service-account`
-- [migrate](./migrate.md)
 
 ## Domain 參考頁
 
@@ -95,7 +88,7 @@
 注意例外：
 
 - 有些指令只支援其中一部分快捷旗標
-- `dashboard topology` 是特例：它支援 `text`、`json`、`mermaid`、`dot`，但沒有 `--table`
+- `dashboard dependencies` 是特例：它支援 `text`、`json`、`mermaid`、`dot`，但沒有 `--table`
 - 像 `--output-file`、`--output` 這種輸出檔路徑旗標不是 render format selector
 
 如果不確定，請以該指令自己的頁面為準。

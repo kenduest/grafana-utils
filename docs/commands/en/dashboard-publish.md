@@ -39,4 +39,4 @@ grafana-util dashboard publish --url http://localhost:3000 --basic-user admin --
 ## Related commands
 - [dashboard import](./dashboard-import.md)
 - [dashboard review](./dashboard-review.md)
-- [dashboard patch-file](./dashboard-patch-file.md)
+- [dashboard patch](./dashboard-patch.md)

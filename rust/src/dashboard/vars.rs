@@ -262,7 +262,7 @@ fn execute_dashboard_variable_inspection_local(
         );
     }
     let Some(input_dir) = args.input_dir.as_deref() else {
-        return Err(message("Local list-vars requires --input or --input-dir."));
+        return Err(message("Local variables requires --input or --input-dir."));
     };
     let resolved = resolve_local_variable_source(input_dir, args.input_format)?;
     let mut dashboard_files = discover_dashboard_files(&resolved.dashboard_dir)?;
@@ -582,7 +582,7 @@ mod tests {
     #[test]
     fn write_inspect_vars_output_strips_ansi_and_trailing_newlines() {
         let temp = tempdir().unwrap();
-        let output_file = temp.path().join("inspect-vars.txt");
+        let output_file = temp.path().join("variables.txt");
 
         write_inspect_vars_output(
             "Dashboard variables: CPU Main (cpu-main)\n\u{1b}[1;36mVariable count: 1\u{1b}[0m\n\n",

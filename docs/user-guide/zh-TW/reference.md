@@ -41,7 +41,7 @@
 
 - 不是每個 command 都會把所有短旗標都做齊
 - 有些指令只支援一兩種輸出形態
-- `dashboard topology` 是特例：它支援 `text`、`json`、`mermaid`、`dot`，但沒有 `--table` 這類快捷旗標
+- `dashboard dependencies` 是特例：它支援 `text`、`json`、`mermaid`、`dot`，但沒有 `--table` 這類快捷旗標
 - `--output-file`，或某些匯出 / draft 指令裡的 `--output`，代表的是輸出檔案路徑，不是輸出格式
 
 如果你不確定某個 command 到底支援哪些格式，最準的還是該 command 的獨立說明頁。
@@ -440,7 +440,7 @@ grafana-util observe overview live --profile ci --output-format json
 | 直接切換常見格式 | `--text`、`--table`、`--csv`、`--json`、`--yaml` | `text` / `table` / `csv` / `json` / `yaml` | 適合 list、review、inspect、部分 import / delete dry-run 這類輸出面。 |
 | 用單一旗標切換格式 | `--output-format <FORMAT>` | `text` / `table` / `csv` / `json` / `yaml` | 也可能出現 command 專用值，例如 `governance`、`governance-json`、`queries-json`、`mermaid`、`dot`。 |
 | observe live / overview 類入口 | `--output-format <FORMAT>` | `table` / `csv` / `text` / `json` / `yaml` / `interactive` | 這條路徑現在也統一使用 `--output-format`。 |
-| 將結果另外寫入檔案 | `--output-file <PATH>` 或 command 專用旗標 | 視指令而定 | 常見於 topology、governance gate、screenshot 這類輸出型指令。 |
+| 將結果另外寫入檔案 | `--output-file <PATH>` 或 command 專用旗標 | 視指令而定 | 常見於 dependencies、policy、screenshot 這類輸出型指令。 |
 
 ### 1. 表格或 JSON 的選擇
 ```bash
@@ -489,7 +489,7 @@ Render a live overview by delegating to the shared observe live path.
 - `raw/` 是給 API replay/import 使用的路徑。
 - `prompt/` 是給 Grafana UI 匯入使用的路徑。
 - `dashboard export` 會直接產生 prompt 路徑。
-- `migrate dashboard raw-to-prompt` 可以把一般或 raw 的 dashboard JSON 轉成 prompt JSON，方便修補或遷移成 Grafana UI 匯入格式。
+- `dashboard convert raw-to-prompt` 可以把一般或 raw 的 dashboard JSON 轉成 prompt JSON，方便修補或遷移成 Grafana UI 匯入格式。
 - `dashboard import` 只吃 `raw/` 或 `provisioning/` 輸入，不吃 `prompt/`。
 
 ---

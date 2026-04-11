@@ -81,12 +81,12 @@ Live status: ready
 
 ```bash
 # 用途：盤點跨 org 的資產。
-grafana-util advanced dashboard live list --profile prod --all-orgs --with-sources --table
+grafana-util dashboard list --profile prod --all-orgs --with-sources --table
 ```
 
 ```bash
 # 用途：盤點跨 org 的資產。
-grafana-util advanced access org list --basic-user admin --basic-password admin --with-users --output-format yaml
+grafana-util access org list --basic-user admin --basic-password admin --with-users --output-format yaml
 ```
 **預期輸出：**
 ```text
@@ -149,12 +149,12 @@ Exported service account inventory -> access-service-accounts/service-accounts.j
 
 ```bash
 # 用途：把備份回放到 live Grafana 實例。
-grafana-util advanced dashboard sync import --input-dir ./backups/raw --replace-existing --dry-run --table
+grafana-util dashboard import --input-dir ./backups/raw --replace-existing --dry-run --table
 ```
 
 ```bash
 # 用途：把備份回放到 live Grafana 實例。
-grafana-util advanced access team import --input-dir ./access-teams --replace-existing --dry-run --table
+grafana-util access team import --input-dir ./access-teams --replace-existing --dry-run --table
 ```
 **預期輸出：**
 ```text
@@ -186,7 +186,7 @@ grafana-util change check --desired-file ./desired.json --fetch-live --output-fo
 
 ```bash
 # 用途：告警變更應遵循受審查的生命週期。
-grafana-util advanced alert change plan --profile prod --desired-dir ./alerts/desired --output-format json
+grafana-util alert change plan --profile prod --desired-dir ./alerts/desired --output-format json
 ```
 **預期輸出 (摘要片段)：**
 ```text
@@ -213,17 +213,17 @@ PREFLIGHT CHECK:
 
 ```bash
 # 用途：透過快照管理使用者、team 與 service account。
-grafana-util advanced access user import --input-dir ./access-users --dry-run --table
+grafana-util access user import --input-dir ./access-users --dry-run --table
 ```
 
 ```bash
 # 用途：透過快照管理使用者、team 與 service account。
-grafana-util advanced access service-account token add --service-account-id 15 --token-name nightly --seconds-to-live 3600 --json
+grafana-util access service-account token add --service-account-id 15 --token-name nightly --seconds-to-live 3600 --json
 ```
 
 ```bash
 # 用途：透過快照管理使用者、team 與 service account。
-grafana-util advanced access service-account token delete --service-account-id 15 --token-name nightly --yes --json
+grafana-util access service-account token delete --service-account-id 15 --token-name nightly --yes --json
 ```
 **預期輸出：**
 ```text

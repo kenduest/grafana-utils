@@ -314,7 +314,7 @@ compare_normalized_report_json() {
   normalize_inspection_report_projection "${right}" >"${right_normalized}"
   if ! diff -u "${left_normalized}" "${right_normalized}" >/dev/null; then
     diff -u "${left_normalized}" "${right_normalized}" >&2 || true
-    fail "${label} parity mismatch between inspect-export and inspect-live"
+    fail "${label} parity mismatch between summary local and summary live"
   fi
 }
 
@@ -329,7 +329,7 @@ compare_normalized_governance_json() {
   normalize_inspection_governance_projection "${right}" >"${right_normalized}"
   if ! diff -u "${left_normalized}" "${right_normalized}" >/dev/null; then
     diff -u "${left_normalized}" "${right_normalized}" >&2 || true
-    fail "${label} parity mismatch between inspect-export and inspect-live"
+    fail "${label} parity mismatch between summary local and summary live"
   fi
 }
 
@@ -1002,7 +1002,7 @@ run_access_smoke() {
     --basic-user "${GRAFANA_USER}" \
     --basic-password "${GRAFANA_PASSWORD}" \
     --scope global \
-    --import-dir "${ACCESS_USER_REPLAY_EXPORT_DIR}" \
+    --input-dir "${ACCESS_USER_REPLAY_EXPORT_DIR}" \
     --replace-existing \
     --dry-run \
     --json >"${user_import_dry_run_json}"
@@ -1020,7 +1020,7 @@ run_access_smoke() {
     --basic-user "${GRAFANA_USER}" \
     --basic-password "${GRAFANA_PASSWORD}" \
     --scope global \
-    --import-dir "${ACCESS_USER_REPLAY_EXPORT_DIR}" \
+    --input-dir "${ACCESS_USER_REPLAY_EXPORT_DIR}" \
     --replace-existing >/dev/null
 
   user_json="$(
@@ -1060,7 +1060,7 @@ run_access_smoke() {
     --basic-user "${GRAFANA_USER}" \
     --basic-password "${GRAFANA_PASSWORD}" \
     --scope global \
-    --import-dir "${ACCESS_USER_REPLAY_EXPORT_DIR}" \
+    --input-dir "${ACCESS_USER_REPLAY_EXPORT_DIR}" \
     --replace-existing >/dev/null
 
   user_json="$(
@@ -1154,7 +1154,7 @@ run_access_smoke() {
     --basic-user "${GRAFANA_USER}" \
     --basic-password "${GRAFANA_PASSWORD}" \
     --scope org \
-    --import-dir "${ACCESS_USER_ORG_REPLAY_EXPORT_DIR}" \
+    --input-dir "${ACCESS_USER_ORG_REPLAY_EXPORT_DIR}" \
     --replace-existing \
     --yes \
     --dry-run \
@@ -1174,7 +1174,7 @@ run_access_smoke() {
     --basic-user "${GRAFANA_USER}" \
     --basic-password "${GRAFANA_PASSWORD}" \
     --scope org \
-    --import-dir "${ACCESS_USER_ORG_REPLAY_EXPORT_DIR}" \
+    --input-dir "${ACCESS_USER_ORG_REPLAY_EXPORT_DIR}" \
     --replace-existing \
     --yes >/dev/null
 
@@ -1313,7 +1313,7 @@ run_access_smoke() {
     --url "${GRAFANA_URL}" \
     --basic-user "${GRAFANA_USER}" \
     --basic-password "${GRAFANA_PASSWORD}" \
-    --import-dir "${ACCESS_TEAM_REPLAY_EXPORT_DIR}" \
+    --input-dir "${ACCESS_TEAM_REPLAY_EXPORT_DIR}" \
     --replace-existing \
     --dry-run \
     --yes \
@@ -1332,7 +1332,7 @@ run_access_smoke() {
     --url "${GRAFANA_URL}" \
     --basic-user "${GRAFANA_USER}" \
     --basic-password "${GRAFANA_PASSWORD}" \
-    --import-dir "${ACCESS_TEAM_REPLAY_EXPORT_DIR}" \
+    --input-dir "${ACCESS_TEAM_REPLAY_EXPORT_DIR}" \
     --replace-existing \
     --yes >/dev/null
 
@@ -1362,7 +1362,7 @@ run_access_smoke() {
     --url "${GRAFANA_URL}" \
     --basic-user "${GRAFANA_USER}" \
     --basic-password "${GRAFANA_PASSWORD}" \
-    --import-dir "${ACCESS_TEAM_REPLAY_EXPORT_DIR}" \
+    --input-dir "${ACCESS_TEAM_REPLAY_EXPORT_DIR}" \
     --replace-existing \
     --yes >/dev/null
 
@@ -1481,7 +1481,7 @@ run_access_smoke() {
     --url "${GRAFANA_URL}" \
     --basic-user "${GRAFANA_USER}" \
     --basic-password "${GRAFANA_PASSWORD}" \
-    --import-dir "${ACCESS_ORG_EXPORT_DIR}" \
+    --input-dir "${ACCESS_ORG_EXPORT_DIR}" \
     --replace-existing \
     --dry-run >"${org_import_dry_run_log}"
   # Dry-run does not inspect live org users, so the preview stays additive here.
@@ -1495,7 +1495,7 @@ run_access_smoke() {
     --url "${GRAFANA_URL}" \
     --basic-user "${GRAFANA_USER}" \
     --basic-password "${GRAFANA_PASSWORD}" \
-    --import-dir "${ACCESS_ORG_EXPORT_DIR}" \
+    --input-dir "${ACCESS_ORG_EXPORT_DIR}" \
     --replace-existing >/dev/null
 
   org_list_json="$(
@@ -1532,7 +1532,7 @@ run_access_smoke() {
     --url "${GRAFANA_URL}" \
     --basic-user "${GRAFANA_USER}" \
     --basic-password "${GRAFANA_PASSWORD}" \
-    --import-dir "${ACCESS_ORG_EXPORT_DIR}" \
+    --input-dir "${ACCESS_ORG_EXPORT_DIR}" \
     --replace-existing >/dev/null
 
   org_list_json="$(
@@ -1623,7 +1623,7 @@ run_access_smoke() {
   "$(access_bin)" access service-account import \
     --url "${GRAFANA_URL}" \
     --token "${GRAFANA_API_TOKEN}" \
-    --import-dir "${ACCESS_SERVICE_ACCOUNT_EXPORT_DIR}" \
+    --input-dir "${ACCESS_SERVICE_ACCOUNT_EXPORT_DIR}" \
     --replace-existing \
     --dry-run \
     --json >"${service_account_import_dry_run_json}"
@@ -1640,7 +1640,7 @@ run_access_smoke() {
   "$(access_bin)" access service-account import \
     --url "${GRAFANA_URL}" \
     --token "${GRAFANA_API_TOKEN}" \
-    --import-dir "${ACCESS_SERVICE_ACCOUNT_EXPORT_DIR}" \
+    --input-dir "${ACCESS_SERVICE_ACCOUNT_EXPORT_DIR}" \
     --replace-existing >/dev/null
 
   service_account_json="$(
@@ -1701,7 +1701,7 @@ run_access_smoke() {
   "$(access_bin)" access service-account import \
     --url "${GRAFANA_URL}" \
     --token "${GRAFANA_API_TOKEN}" \
-    --import-dir "${ACCESS_SERVICE_ACCOUNT_EXPORT_DIR}" \
+    --input-dir "${ACCESS_SERVICE_ACCOUNT_EXPORT_DIR}" \
     --replace-existing >/dev/null
 
   service_account_json="$(
@@ -1843,7 +1843,7 @@ run_datasource_smoke() {
   "$(datasource_bin)" datasource import \
     --url "${GRAFANA_URL}" \
     --token "${GRAFANA_API_TOKEN}" \
-    --import-dir "${DATASOURCE_EXPORT_DIR}" \
+    --input-dir "${DATASOURCE_EXPORT_DIR}" \
     --replace-existing \
     --dry-run \
     --json | tee "${dry_run_log}" >/dev/null
@@ -1872,7 +1872,7 @@ run_datasource_smoke() {
     --url "${GRAFANA_URL}" \
     --basic-user "${GRAFANA_USER}" \
     --basic-password "${GRAFANA_PASSWORD}" \
-    --import-dir "${DATASOURCE_MULTI_ORG_EXPORT_DIR}" \
+    --input-dir "${DATASOURCE_MULTI_ORG_EXPORT_DIR}" \
     --use-export-org \
     --only-org-id "${org_two_id}" \
     --replace-existing \
@@ -1907,7 +1907,7 @@ run_datasource_smoke() {
     --url "${GRAFANA_URL}" \
     --basic-user "${GRAFANA_USER}" \
     --basic-password "${GRAFANA_PASSWORD}" \
-    --import-dir "${DATASOURCE_MULTI_ORG_EXPORT_DIR}" \
+    --input-dir "${DATASOURCE_MULTI_ORG_EXPORT_DIR}" \
     --use-export-org \
     --only-org-id "${org_two_id}" \
     --replace-existing \
@@ -1934,7 +1934,7 @@ run_datasource_smoke() {
     --url "${GRAFANA_URL}" \
     --basic-user "${GRAFANA_USER}" \
     --basic-password "${GRAFANA_PASSWORD}" \
-    --import-dir "${DATASOURCE_MULTI_ORG_EXPORT_DIR}" \
+    --input-dir "${DATASOURCE_MULTI_ORG_EXPORT_DIR}" \
     --use-export-org \
     --only-org-id "${org_two_id}" \
     --replace-existing \
@@ -1964,7 +1964,7 @@ run_datasource_smoke() {
     --url "${GRAFANA_URL}" \
     --basic-user "${GRAFANA_USER}" \
     --basic-password "${GRAFANA_PASSWORD}" \
-    --import-dir "${DATASOURCE_MULTI_ORG_EXPORT_DIR}" \
+    --input-dir "${DATASOURCE_MULTI_ORG_EXPORT_DIR}" \
     --use-export-org \
     --only-org-id "${org_two_id}" \
     --replace-existing \
@@ -2014,7 +2014,7 @@ run_dashboard_smoke() {
   "$(dashboard_bin)" dashboard diff \
     --url "${GRAFANA_URL}" \
     --token "${GRAFANA_API_TOKEN}" \
-    --import-dir "${DASHBOARD_EXPORT_DIR}/raw"
+    --input-dir "${DASHBOARD_EXPORT_DIR}/raw"
 
   "$(dashboard_bin)" dashboard export \
     --url "${GRAFANA_URL}" \
@@ -2028,7 +2028,7 @@ run_dashboard_smoke() {
   "$(dashboard_bin)" dashboard import \
     --url "${GRAFANA_URL}" \
     --token "${GRAFANA_API_TOKEN}" \
-    --import-dir "${DASHBOARD_EXPORT_DIR}/raw" \
+    --input-dir "${DASHBOARD_EXPORT_DIR}/raw" \
     --replace-existing \
     --dry-run | tee "${dry_run_log}" >/dev/null
   grep -Eq 'Dry-run checked 1 dashboard\(s\)' "${dry_run_log}" || fail "dashboard dry-run import summary was not printed"
@@ -2037,7 +2037,7 @@ run_dashboard_smoke() {
   if "$(dashboard_bin)" dashboard diff \
     --url "${GRAFANA_URL}" \
     --token "${GRAFANA_API_TOKEN}" \
-    --import-dir "${DASHBOARD_EXPORT_DIR}/raw" >"${diff_log}" 2>&1; then
+    --input-dir "${DASHBOARD_EXPORT_DIR}/raw" >"${diff_log}" 2>&1; then
     fail "dashboard diff should have failed after live drift"
   fi
   grep -q 'Dashboard diff found 1 differing item(s).' "${diff_log}" || fail "dashboard diff drift summary was not printed"
@@ -2047,7 +2047,7 @@ run_dashboard_smoke() {
   "$(dashboard_bin)" dashboard import \
     --url "${GRAFANA_URL}" \
     --token "${GRAFANA_API_TOKEN}" \
-    --import-dir "${DASHBOARD_EXPORT_DIR}/raw" \
+    --input-dir "${DASHBOARD_EXPORT_DIR}/raw" \
     --replace-existing >/dev/null
 
   api GET "/api/dashboards/uid/smoke-dashboard" | grep -q '"uid":"smoke-dashboard"' \
@@ -2073,7 +2073,7 @@ run_dashboard_smoke() {
     --url "${GRAFANA_URL}" \
     --basic-user "${GRAFANA_USER}" \
     --basic-password "${GRAFANA_PASSWORD}" \
-    --import-dir "${MULTI_ORG_EXPORT_DIR}" \
+    --input-dir "${MULTI_ORG_EXPORT_DIR}" \
     --use-export-org \
     --only-org-id "${multi_org_org_two_id}" \
     --dry-run \
@@ -2106,7 +2106,7 @@ run_dashboard_smoke() {
     --url "${GRAFANA_URL}" \
     --basic-user "${GRAFANA_USER}" \
     --basic-password "${GRAFANA_PASSWORD}" \
-    --import-dir "${MULTI_ORG_EXPORT_DIR}" \
+    --input-dir "${MULTI_ORG_EXPORT_DIR}" \
     --use-export-org \
     --only-org-id "${multi_org_org_two_id}" \
     --dry-run \
@@ -2131,7 +2131,7 @@ run_dashboard_smoke() {
     --url "${GRAFANA_URL}" \
     --basic-user "${GRAFANA_USER}" \
     --basic-password "${GRAFANA_PASSWORD}" \
-    --import-dir "${MULTI_ORG_EXPORT_DIR}" \
+    --input-dir "${MULTI_ORG_EXPORT_DIR}" \
     --use-export-org \
     --only-org-id "${multi_org_org_two_id}" \
     --create-missing-orgs \
@@ -2159,7 +2159,7 @@ run_dashboard_smoke() {
     --url "${GRAFANA_URL}" \
     --basic-user "${GRAFANA_USER}" \
     --basic-password "${GRAFANA_PASSWORD}" \
-    --import-dir "${MULTI_ORG_EXPORT_DIR}" \
+    --input-dir "${MULTI_ORG_EXPORT_DIR}" \
     --use-export-org \
     --only-org-id "${multi_org_org_two_id}" \
     --create-missing-orgs >/dev/null
@@ -2196,25 +2196,25 @@ run_dashboard_authoring_smoke() {
 
   printf '%s\n' \
     '{"uid":"authoring-patch-smoke","title":"Dashboard Patch","schemaVersion":38,"panels":[]}' \
-    | "$(dashboard_bin)" dashboard patch-file \
+    | "$(dashboard_bin)" dashboard patch \
         --input - \
         --output "${stdin_patch_output}" \
         --folder-uid general >/dev/null
-  [[ -f "${stdin_patch_output}" ]] || fail "dashboard patch-file --input - did not write an output file"
+  [[ -f "${stdin_patch_output}" ]] || fail "dashboard patch --input - did not write an output file"
   jq -e '
     .uid == "authoring-patch-smoke"
     and .title == "Dashboard Patch"
     and .meta.folderUid == "general"
   ' "${stdin_patch_output}" >/dev/null \
-    || fail "dashboard patch-file --input - did not retain the authored draft content"
+    || fail "dashboard patch --input - did not retain the authored draft content"
 
   if printf '%s\n' \
     '{"uid":"authoring-patch-smoke","title":"Dashboard Patch","schemaVersion":38,"panels":[]}' \
-    | "$(dashboard_bin)" dashboard patch-file --input - --folder-uid general >/dev/null 2>"${WORK_DIR}/dashboard-authoring-patch-error.log"; then
-    fail "dashboard patch-file --input - should reject in-place stdin patching"
+    | "$(dashboard_bin)" dashboard patch --input - --folder-uid general >/dev/null 2>"${WORK_DIR}/dashboard-authoring-patch-error.log"; then
+    fail "dashboard patch --input - should reject in-place stdin patching"
   fi
-  grep -q 'patch-file --input - requires --output' "${WORK_DIR}/dashboard-authoring-patch-error.log" \
-    || fail "dashboard patch-file stdin guardrail did not print the expected error"
+  grep -q 'patch --input - requires --output' "${WORK_DIR}/dashboard-authoring-patch-error.log" \
+    || fail "dashboard patch stdin guardrail did not print the expected error"
 
   if printf '%s\n' \
     '{"uid":"authoring-watch-stdin","title":"Dashboard Watch STDIN","schemaVersion":38,"panels":[]}' \
@@ -2276,11 +2276,11 @@ run_dashboard_authoring_smoke() {
 }
 
 run_dashboard_inspection_smoke() {
-  local inspect_export_report_json="${WORK_DIR}/dashboard-inspect-export-report.json"
-  local inspect_export_governance_json="${WORK_DIR}/dashboard-inspect-export-governance.json"
-  local inspect_export_filter_json="${WORK_DIR}/dashboard-inspect-export-filter.json"
-  local inspect_live_report_json="${WORK_DIR}/dashboard-inspect-live-report.json"
-  local inspect_live_governance_json="${WORK_DIR}/dashboard-inspect-live-governance.json"
+  local inspect_export_report_json="${WORK_DIR}/dashboard-summary-local-report.json"
+  local inspect_export_governance_json="${WORK_DIR}/dashboard-summary-local-governance.json"
+  local inspect_export_filter_json="${WORK_DIR}/dashboard-summary-local-filter.json"
+  local inspect_live_report_json="${WORK_DIR}/dashboard-summary-live-report.json"
+  local inspect_live_governance_json="${WORK_DIR}/dashboard-summary-live-governance.json"
 
   seed_datasource_typed "" "Smoke Loki" "smoke-loki" "loki" "http://loki.invalid"
   seed_datasource_typed "" "Smoke Influx" "smoke-influx" "influxdb" "http://influxdb.invalid"
@@ -2296,37 +2296,37 @@ run_dashboard_inspection_smoke() {
     --overwrite \
     --without-dashboard-prompt >/dev/null
 
-  "$(dashboard_bin)" dashboard inspect-export \
-    --import-dir "${DASHBOARD_INSPECTION_EXPORT_DIR}/raw" \
+  "$(dashboard_bin)" dashboard summary \
+    --input-dir "${DASHBOARD_INSPECTION_EXPORT_DIR}/raw" \
     --output-format report-json >"${inspect_export_report_json}"
   jq -e '.summary.queryRecordCount >= 7' "${inspect_export_report_json}" >/dev/null \
-    || fail "dashboard inspect-export report-json did not emit the expected query rows"
+    || fail "dashboard summary local report-json did not emit the expected query rows"
   for family in prometheus loki flux sql search tracing; do
     jq -e --arg family "${family}" \
       '.queries | any(.dashboardUid == "inspect-core-families" and .datasourceFamily == $family)' \
       "${inspect_export_report_json}" >/dev/null \
-      || fail "dashboard inspect-export report-json did not retain ${family} family coverage"
+      || fail "dashboard summary local report-json did not retain ${family} family coverage"
   done
 
-  "$(dashboard_bin)" dashboard inspect-export \
-    --import-dir "${DASHBOARD_INSPECTION_EXPORT_DIR}/raw" \
+  "$(dashboard_bin)" dashboard summary \
+    --input-dir "${DASHBOARD_INSPECTION_EXPORT_DIR}/raw" \
     --output-format governance-json >"${inspect_export_governance_json}"
   jq -e '.summary.datasourceFamilyCount >= 6' "${inspect_export_governance_json}" >/dev/null \
-    || fail "dashboard inspect-export governance-json did not summarize the expected datasource families"
+    || fail "dashboard summary local governance-json did not summarize the expected datasource families"
   jq -e \
     '.dashboardDependencies | any(.dashboardUid == "inspect-core-families" and (.datasourceFamilies | index("search")) and (.datasourceFamilies | index("tracing")))' \
     "${inspect_export_governance_json}" >/dev/null \
-    || fail "dashboard inspect-export governance-json did not retain search/tracing family dependencies"
+    || fail "dashboard summary local governance-json did not retain search/tracing family dependencies"
 
-  "$(dashboard_bin)" dashboard inspect-export \
-    --import-dir "${DASHBOARD_INSPECTION_EXPORT_DIR}/raw" \
+  "$(dashboard_bin)" dashboard summary \
+    --input-dir "${DASHBOARD_INSPECTION_EXPORT_DIR}/raw" \
     --output-format report-json \
     --report-filter-datasource tracing >"${inspect_export_filter_json}"
   jq -e '(.queries | length >= 1) and (.queries | all(.datasourceFamily == "tracing"))' \
     "${inspect_export_filter_json}" >/dev/null \
-    || fail "dashboard inspect-export datasource-family filter did not narrow to tracing rows"
+    || fail "dashboard summary local datasource-family filter did not narrow to tracing rows"
 
-  "$(dashboard_bin)" dashboard inspect-live \
+  "$(dashboard_bin)" dashboard summary \
     --url "${GRAFANA_URL}" \
     --token "${GRAFANA_API_TOKEN}" \
     --output-format report-json >"${inspect_live_report_json}"
@@ -2334,19 +2334,19 @@ run_dashboard_inspection_smoke() {
     jq -e --arg family "${family}" \
       '.queries | any(.dashboardUid == "inspect-core-families" and .datasourceFamily == $family)' \
       "${inspect_live_report_json}" >/dev/null \
-      || fail "dashboard inspect-live report-json did not retain ${family} family coverage"
+      || fail "dashboard summary live report-json did not retain ${family} family coverage"
   done
 
-  "$(dashboard_bin)" dashboard inspect-live \
+  "$(dashboard_bin)" dashboard summary \
     --url "${GRAFANA_URL}" \
     --token "${GRAFANA_API_TOKEN}" \
     --output-format governance-json >"${inspect_live_governance_json}"
   jq -e '.summary.datasourceFamilyCount >= 6' "${inspect_live_governance_json}" >/dev/null \
-    || fail "dashboard inspect-live governance-json did not summarize the expected datasource families"
+    || fail "dashboard summary live governance-json did not summarize the expected datasource families"
   jq -e \
     '.dashboardDependencies | any(.dashboardUid == "inspect-core-families" and (.datasourceFamilies | index("search")) and (.datasourceFamilies | index("tracing")))' \
     "${inspect_live_governance_json}" >/dev/null \
-    || fail "dashboard inspect-live governance-json did not retain search/tracing family dependencies"
+    || fail "dashboard summary live governance-json did not retain search/tracing family dependencies"
 
   compare_normalized_report_json "dashboard-inspection-report-parity" \
     "${inspect_export_report_json}" \
@@ -2422,7 +2422,7 @@ run_alert_replay_smoke() {
     alert import \
     --url "${GRAFANA_URL}" \
     --token "${GRAFANA_API_TOKEN}" \
-    --import-dir "${ALERT_EXPORT_DIR}/raw" \
+    --input-dir "${ALERT_EXPORT_DIR}/raw" \
     --replace-existing \
     --dry-run \
     --json >"${dry_run_json}"
@@ -2440,7 +2440,7 @@ run_alert_replay_smoke() {
     alert import \
     --url "${GRAFANA_URL}" \
     --token "${GRAFANA_API_TOKEN}" \
-    --import-dir "${ALERT_EXPORT_DIR}/raw" \
+    --input-dir "${ALERT_EXPORT_DIR}/raw" \
     --replace-existing >/dev/null
 
   "$(alert_bin)" \
@@ -2467,7 +2467,7 @@ run_alert_replay_smoke() {
     alert import \
     --url "${GRAFANA_URL}" \
     --token "${GRAFANA_API_TOKEN}" \
-    --import-dir "${ALERT_EXPORT_DIR}/raw" \
+    --input-dir "${ALERT_EXPORT_DIR}/raw" \
     --replace-existing \
     --dry-run \
     --json >"${recreate_dry_run_json}"
@@ -2482,7 +2482,7 @@ run_alert_replay_smoke() {
     alert import \
     --url "${GRAFANA_URL}" \
     --token "${GRAFANA_API_TOKEN}" \
-    --import-dir "${ALERT_EXPORT_DIR}/raw" \
+    --input-dir "${ALERT_EXPORT_DIR}/raw" \
     --replace-existing >/dev/null
 
   api GET "/api/v1/provisioning/contact-points" | jq -e 'any(.uid == "smoke-webhook")' >/dev/null \

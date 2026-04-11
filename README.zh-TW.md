@@ -17,7 +17,7 @@
 
 ## 支援的工作流
 
-- **儀表板 (Dashboards)**：瀏覽、列表、匯出/匯入、比對 (diff)、審查、發佈與分析。支援 `raw` (API 直接匯入)、`prompt` (UI 匯入) 與 `provisioning` (檔案配置用) 三種路徑。
+- **儀表板 (Dashboards)**：瀏覽、列表、匯出/匯入、比對 (diff)、審查、修補、摘要、依賴關係檢視、政策檢查與截圖。以 `dashboard` 作為平面入口，搭配 `raw` (API 直接匯入)、`prompt` (UI 匯入) 與 `provisioning` (檔案配置用) 格式。
 - **資料來源 (Datasources)**：匯出時可先遮蔽敏感資訊，匯入時再補回認證，也能對應檔案配置用的輸出。
 - **告警 (Alerts)**：匯出/匯入、比對 (diff)、計畫與套用 (`plan`/`apply`) 以及路由預覽。
 - **存取控制 (Access)**：使用者、團隊、組織、服務帳號 (Service Account) 與 Token 管理。
@@ -34,7 +34,7 @@
 | 功能項 | 傳統作法 | 使用 `grafana-util` |
 | :--- | :--- | :--- |
 | **環境盤點** | 需手動切換 UI 或自行組合 API 呼叫以暸解現況。 | 使用 `observe live` 或 `observe overview` 快速取得環境統一視圖。 |
-| **儀表板路徑** | 難以區分 API 直接匯入與 UI 匯入所需的格式。 | 提供明確的 `raw`、`prompt` 與 `provisioning` 路徑，並具備 `migrate dashboard raw-to-prompt` 這類 migration 轉換工具。 |
+| **儀表板路徑** | 難以區分 API 直接匯入與 UI 匯入所需的格式。 | 提供平面化的 `dashboard` 路徑，並搭配 `raw`、`prompt` 與 `provisioning` 格式。 |
 | **資料來源** | 匯出後的憑證資訊不容易安全保存，也不容易直接對應檔案配置。 | 匯出時先遮蔽敏感資訊，匯入時再補回認證，並保留和檔案配置對應的內容。 |
 | **審查機制** | 直接套用變更，缺乏中間審查層。 | 使用 `change inspect`、`check` 與 `preview`，在變動正式伺服器前先完成審查。 |
 | **安全性** | 認證資訊容易散落在 Shell 歷史紀錄或明文檔案中。 | 透過 `config profile` 搭配作業系統 Keyring 或加密儲存空間管理憑證。 |
@@ -140,22 +140,19 @@ grafana-util observe live \
 grafana-util export dashboard --all-orgs --output-dir ./backup --progress
 ```
 
-### 3. 用機器可讀格式比對本地 artifact
+### 3. 用機器可讀格式比對本地 dashboard artifact
 ```bash
 # 輸出共用 dashboard diff contract。
-grafana-util advanced dashboard sync diff --input-dir ./backup/raw --output-format json
-
-# alert diff 對外以 --output-format json 為主；--json 仍保留相容。
-grafana-util advanced alert migrate diff --diff-dir ./alerts/raw --output-format json
+grafana-util dashboard diff --input-dir ./backup/raw --output-format json
 
 # datasource diff 的 JSON 會包含欄位層級的 before/after 變更。
-grafana-util advanced datasource diff --diff-dir ./datasources --input-format inventory --output-format json
+grafana-util datasource diff --diff-dir ./datasources --input-format inventory --output-format json
 ```
 
 ### 4. 分析儀表板相依性
 ```bash
 # 在匯入前檢查資料源參照是否失效或結構是否異常。
-grafana-util advanced dashboard analyze summary \
+grafana-util dashboard summary \
   --input-dir ./backup/raw \
   --input-format raw \
   --output-format tree-table
@@ -164,7 +161,7 @@ grafana-util advanced dashboard analyze summary \
 ### 5. 開啟儀表板互動式工作台
 ```bash
 # 開啟互動式的儀表板分析工作台。
-grafana-util advanced dashboard analyze summary \
+grafana-util dashboard browse \
   --input-dir ./backup/raw \
   --input-format raw \
   --interactive
@@ -172,7 +169,7 @@ grafana-util advanced dashboard analyze summary \
 
 ### 6. 預覽儀表板匯入變更
 ```bash
-grafana-util advanced dashboard sync import \
+grafana-util dashboard import \
   --input-dir ./backup/raw \
   --replace-existing \
   --dry-run \
@@ -182,16 +179,16 @@ grafana-util advanced dashboard sync import \
 ### 7. 儀表板快速反覆編修
 ```bash
 # 直接把本機產生的 dashboard JSON 送進 review，Grafana 不會被改到。
-cat cpu.json | grafana-util advanced dashboard draft review --input - --output-format json
+cat cpu.json | grafana-util dashboard review --input - --output-format json
 ```
 
 ### 8. 先看告警會怎麼變
 ```bash
 # 先看看這次改動會影響哪些告警。
-grafana-util advanced alert change plan --desired-dir ./alerts/desired --prune
+grafana-util alert change plan --desired-dir ./alerts/desired --prune
 
 # 先預覽告警最後會送到哪裡。
-grafana-util advanced alert author route preview \
+grafana-util alert author route preview \
   --desired-dir ./alerts/desired \
   --label team=sre --severity critical
 ```
@@ -200,7 +197,7 @@ grafana-util advanced alert author route preview \
 ```bash
 # 匯出時先遮蔽敏感資訊，匯入時再把連線資訊補回去。
 grafana-util export datasource --output-dir ./datasources
-grafana-util advanced datasource import --input-dir ./datasources --prompt-password
+grafana-util datasource import --input-dir ./datasources --prompt-password
 ```
 
 ---

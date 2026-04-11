@@ -82,7 +82,7 @@ grafana-util export dashboard --output-dir ./backups --overwrite --progress
 
 ```bash
 # 用途：如果你要先處理存取層資產，可以把 dashboard export 換成。
-grafana-util advanced access org list --table
+grafana-util access org list --table
 ```
 
 ## 接下來先讀哪些章節

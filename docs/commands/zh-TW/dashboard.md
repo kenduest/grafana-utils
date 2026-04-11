@@ -4,46 +4,59 @@
 
 | 工作流 | 常用子命令 |
 | --- | --- |
-| 盤點與瀏覽 live dashboard | `browse`、`list`、`get` |
-| 單一 dashboard 草稿 authoring | `get`、`clone-live`、`serve`、`patch-file`、`edit-live`、`review`、`publish` |
-| 匯出 / 匯入 / 比對 | `get`、`clone-live`、`export`、`import`、`diff`、`review`、`patch-file`、`publish`、`delete` |
-| 分析與報表 | `analyze`、`list-vars`、`topology` |
-| 變更前檢查 | `governance-gate` |
-| 拓樸與影響面 | `topology`、`impact` |
+| 盤點與瀏覽 dashboard | `browse`、`list`、`variables`、`get` |
+| 單一 dashboard 草稿 authoring | `get`、`clone`、`serve`、`patch`、`edit`、`review`、`publish` |
+| 匯出 / 匯入 / 轉換 | `get`、`clone`、`export`、`import`、`diff`、`review`、`patch`、`publish`、`delete`、`convert raw-to-prompt` |
+| 分析與報表 | `summary`、`variables`、`dependencies` |
+| 變更前檢查 | `policy` |
+| 相依性與影響面 | `dependencies`、`impact` |
 | 歷史與還原 | `history list`、`history restore`、`history export` |
 | 截圖與素材 | `screenshot` |
 
 ## 從這裡開始
 
-- 先看現況：`dashboard live browse` 或 `dashboard live list`
-- 先做草稿：`dashboard live fetch`、`dashboard live clone`、`dashboard sync export`
-- 先做比對：`dashboard sync diff`、`dashboard draft review`
-- 先做分析：`dashboard analyze summary --input-dir ...`、`dashboard analyze summary --url ...`、`dashboard live vars`
-- 先做上線前檢查：`dashboard governance-gate`
-- 先看影響面：`dashboard topology`、`dashboard impact`
-- 先處理歷史版本：`dashboard live history list`、`dashboard live history restore`、`dashboard live history export`
-- 先拿素材：`dashboard capture screenshot`
+- 先看現況：`dashboard browse` 或 `dashboard list`
+- 先做草稿：`dashboard get`、`dashboard clone`、`dashboard export`
+- 先做比對：`dashboard diff`、`dashboard review`
+- 先做分析：`dashboard summary --input-dir ...`、`dashboard summary --url ...`、`dashboard variables`
+- 先做上線前檢查：`dashboard policy`
+- 先看相依性與影響面：`dashboard dependencies`、`dashboard impact`
+- 先處理歷史版本：`dashboard history list`、`dashboard history restore`、`dashboard history export`
+- 先拿素材：`dashboard screenshot`
 
 ## 說明
 
-`grafana-util dashboard` 把 dashboard 相關工作收在同一個入口：從瀏覽、草稿、匯出、匯入、比對，到拓樸、影響面和截圖。它也可用 `grafana-util db` 呼叫。
+`grafana-util dashboard` 把 dashboard 相關工作收在同一個入口：從瀏覽、草稿、匯出、匯入、比對，到相依性、影響面、政策和截圖。它也可用 `grafana-util db` 呼叫。
 
-新的 canonical 分組方式是：
-- `dashboard live ...`
-- `dashboard draft ...`
-- `dashboard sync ...`
-- `dashboard analyze ...`
-- `dashboard capture ...`
+新的 canonical 路徑是：
+- `dashboard browse`
+- `dashboard list`
+- `dashboard variables`
+- `dashboard get`
+- `dashboard clone`
+- `dashboard edit`
+- `dashboard review`
+- `dashboard patch`
+- `dashboard serve`
+- `dashboard publish`
+- `dashboard export`
+- `dashboard import`
+- `dashboard diff`
+- `dashboard convert raw-to-prompt`
+- `dashboard summary`
+- `dashboard dependencies`
+- `dashboard policy`
+- `dashboard screenshot`
 
 如果是單一 dashboard 的 authoring 路徑，建議把它想成：
-- `dashboard live fetch` 或 `dashboard live clone`：先做草稿
-- `dashboard draft serve`：用本地 preview server 持續檢視草稿內容，必要時也能自動打開瀏覽器
-- `dashboard draft review`：先驗證草稿內容
-- `dashboard draft patch`：改寫本地中繼資料
-- `dashboard live edit`：從 live 拉一份進 editor，預設仍先落回本地草稿，而且會依 review 結果決定能不能回寫 live
-- `dashboard draft publish`：沿用 import pipeline 發回 Grafana
+- `dashboard get` 或 `dashboard clone`：先做草稿
+- `dashboard serve`：用本地 preview server 持續檢視草稿內容，必要時也能自動打開瀏覽器
+- `dashboard review`：先驗證草稿內容
+- `dashboard patch`：改寫本地中繼資料
+- `dashboard edit`：從 live 拉一份進 editor，預設仍先落回本地草稿，而且會依 review 結果決定能不能回寫 live
+- `dashboard publish`：沿用 import pipeline 發回 Grafana
 
-`review`、`patch-file`、`publish` 也都支援 `--input -`，可以直接吃標準輸入的一份 wrapped 或 bare dashboard JSON。這適合外部 generator 已經把 JSON 寫到 stdout 的情況。`patch-file --input -` 必須搭配 `--output`，若你是在本地反覆編修同一份檔案，則改用 `publish --watch`；它只支援本地檔案路徑，不支援 `--input -`。
+`review`、`patch`、`publish` 也都支援 `--input -`，可以直接吃標準輸入的一份 wrapped 或 bare dashboard JSON。這適合外部 generator 已經把 JSON 寫到 stdout 的情況。`patch --input -` 必須搭配 `--output`，若你是在本地反覆編修同一份檔案，則改用 `publish --watch`；它只支援本地檔案路徑，不支援 `--input -`。
 
 ## 歷史與還原工作流
 
@@ -64,14 +77,14 @@
 ## 成功判準
 
 - 你能在開始前就判斷這次是要看 live、做草稿、跑檢查，還是直接發佈
-- export / analyze / diff 的產物能互相對得起來，不會換個步驟就失去上下文
-- 需要交給 review 或 CI 時，可以把 topology / impact / governance-gate 的結果拿去重跑
+- export / summary / diff 的產物能互相對得起來，不會換個步驟就失去上下文
+- 需要交給 review 或 CI 時，可以把 dependencies / impact / policy 的結果拿去重跑
 
 ## 失敗時先檢查
 
 - 如果 browse 或 inspect 結果比預期少，先核對 `--profile`、`--url`、org 與權限
-- 如果 topology 或 impact 是空的，先確認你餵的是同一次 inspect 產物
-- 如果治理檢查看起來怪怪的，先看 `governance` 和 `queries` 是否來自相同來源
+- 如果 dependencies 或 impact 是空的，先確認你餵的是同一次 inspect 產物
+- 如果政策檢查看起來怪怪的，先看 `governance` 和 `queries` 是否來自相同來源
 
 ## 重點旗標
 
@@ -83,43 +96,43 @@
 ## 範例
 
 ```bash
-# 先看 live dashboard 長什麼樣，再決定下一步要走哪條工作流。
-grafana-util dashboard live browse --profile prod
+# 先看 dashboard 長什麼樣，再決定下一步要走哪條工作流。
+grafana-util dashboard browse --profile prod
 ```
 
 ```bash
 # 先盤點現況，再決定要走 browse 或 export。
-grafana-util dashboard live list --profile prod
+grafana-util dashboard list --profile prod
 ```
 
 ```bash
 # 先做 live 分析，再決定要不要匯出或截圖。
-grafana-util dashboard analyze summary --url http://localhost:3000 --basic-user admin --basic-password admin --interactive
+grafana-util dashboard summary --url http://localhost:3000 --basic-user admin --basic-password admin --interactive
 ```
 
 ```bash
-# 先產生治理輸出，留給 topology 或 governance-gate 接著用。
-grafana-util dashboard analyze summary --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-format governance
+# 先產生治理輸出，留給 dependencies 或 policy 接著用。
+grafana-util dashboard summary --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-format governance
 ```
 
 ```bash
 # 先從標準輸入 review 一份生成儀表板，再決定要不要 publish。
-jsonnet dashboards/cpu.jsonnet | grafana-util dashboard draft review --input - --output-format json
+jsonnet dashboards/cpu.jsonnet | grafana-util dashboard review --input - --output-format json
 ```
 
 ```bash
 # 編修本地草稿時，每次儲存後自動重跑 publish dry-run。
-grafana-util dashboard draft publish --url http://localhost:3000 --basic-user admin --basic-password admin --input ./drafts/cpu-main.json --dry-run --watch
+grafana-util dashboard publish --url http://localhost:3000 --basic-user admin --basic-password admin --input ./drafts/cpu-main.json --dry-run --watch
 ```
 
 ```bash
 # 開一個本地 preview server，持續檢視單一 dashboard 草稿。
-grafana-util dashboard draft serve --input ./drafts/cpu-main.json --port 18080 --open-browser
+grafana-util dashboard serve --input ./drafts/cpu-main.json --port 18080 --open-browser
 ```
 
 ```bash
 # 從 live dashboard 開始編修，但預設先輸出成新的本地草稿。
-grafana-util dashboard edit-live --profile prod --dashboard-uid cpu-main --output ./drafts/cpu-main.edited.json
+grafana-util dashboard edit --profile prod --dashboard-uid cpu-main --output ./drafts/cpu-main.edited.json
 ```
 
 ## 相關指令
@@ -127,32 +140,31 @@ grafana-util dashboard edit-live --profile prod --dashboard-uid cpu-main --outpu
 ### 盤點
 
 - [dashboard browse](./dashboard-browse.md)
-- [dashboard fetch-live](./dashboard-fetch-live.md)
-- [dashboard clone-live](./dashboard-clone-live.md)
+- [dashboard get](./dashboard-get.md)
+- [dashboard clone](./dashboard-clone.md)
 - [dashboard list](./dashboard-list.md)
 
-### 搬移
+### 匯出 / 匯入 / 轉換
 
 - [dashboard export](./dashboard-export.md)
 - [dashboard import](./dashboard-import.md)
-- [migrate dashboard raw-to-prompt](./migrate-dashboard-raw-to-prompt.md)
-- [dashboard patch-file](./dashboard-patch-file.md)
+- [dashboard convert raw-to-prompt](./dashboard-convert-raw-to-prompt.md)
+- [dashboard patch](./dashboard-patch.md)
 
 ### 草稿 authoring
 
 - [dashboard serve](./dashboard-serve.md)
-- [dashboard edit-live](./dashboard-edit-live.md)
+- [dashboard edit](./dashboard-edit-live.md)
 
 ### 分析與報表
 
-- [dashboard analyze（即時）](./dashboard-analyze-live.md)
-- [dashboard analyze（本地）](./dashboard-analyze-export.md)
-- [dashboard list-vars](./dashboard-list-vars.md)
-- [dashboard topology](./dashboard-topology.md)
+- [dashboard summary](./dashboard-summary.md)
+- [dashboard dependencies](./dashboard-dependencies.md)
+- [dashboard variables](./dashboard-variables.md)
 
 ### 變更前檢查
 
-- [dashboard governance-gate](./dashboard-governance-gate.md)
+- [dashboard policy](./dashboard-policy.md)
 
 ### 變更與套用
 

@@ -31,7 +31,7 @@ This chapter turns command families into end-to-end operator workflows so you ca
 - If the expected output does not line up with the stage you are in, resolve the mismatch before continuing.
 - If you still need exact flags more than workflow context, switch to the command reference.
 
-For the exact flags behind each workflow, see [observe](../../commands/en/observe.md), [export](../../commands/en/export.md), [change](../../commands/en/change.md), [config](../../commands/en/config.md), [config profile](../../commands/en/profile.md), and [advanced](../../commands/en/advanced.md).
+For the exact flags behind each workflow, see [observe](../../commands/en/observe.md), [export](../../commands/en/export.md), [change](../../commands/en/change.md), [config](../../commands/en/config.md), and [config profile](../../commands/en/profile.md).
 
 ---
 
@@ -81,12 +81,12 @@ Inventory all assets across all organizations.
 
 ```bash
 # Purpose: Inventory all assets across all organizations.
-grafana-util advanced dashboard live list --profile prod --all-orgs --with-sources --table
+grafana-util dashboard list --profile prod --all-orgs --with-sources --table
 ```
 
 ```bash
 # Purpose: Inventory all assets across all organizations.
-grafana-util advanced access org list --basic-user admin --basic-password admin --with-users --output-format yaml
+grafana-util access org list --basic-user admin --basic-password admin --with-users --output-format yaml
 ```
 **Expected Output:**
 ```text
@@ -149,12 +149,12 @@ Replay a backup into a live Grafana instance.
 
 ```bash
 # Purpose: Replay a backup into a live Grafana instance.
-grafana-util advanced dashboard sync import --input-dir ./backups/raw --replace-existing --dry-run --table
+grafana-util dashboard import --input-dir ./backups/raw --replace-existing --dry-run --table
 ```
 
 ```bash
 # Purpose: Replay a backup into a live Grafana instance.
-grafana-util advanced access team import --input-dir ./access-teams --replace-existing --dry-run --table
+grafana-util access team import --input-dir ./access-teams --replace-existing --dry-run --table
 ```
 **Expected Output:**
 ```text
@@ -186,7 +186,7 @@ grafana-util change check --desired-file ./desired.json --fetch-live --output-fo
 
 ```bash
 # Purpose: Move alerting changes through a reviewed lifecycle.
-grafana-util advanced alert change plan --profile prod --desired-dir ./alerts/desired --output-format json
+grafana-util alert change plan --profile prod --desired-dir ./alerts/desired --output-format json
 ```
 **Expected Output (Snippet):**
 ```text
@@ -213,17 +213,17 @@ Manage users, teams, and service accounts through snapshots.
 
 ```bash
 # Purpose: Manage users, teams, and service accounts through snapshots.
-grafana-util advanced access user import --input-dir ./access-users --dry-run --table
+grafana-util access user import --input-dir ./access-users --dry-run --table
 ```
 
 ```bash
 # Purpose: Manage users, teams, and service accounts through snapshots.
-grafana-util advanced access service-account token add --service-account-id 15 --token-name nightly --seconds-to-live 3600 --json
+grafana-util access service-account token add --service-account-id 15 --token-name nightly --seconds-to-live 3600 --json
 ```
 
 ```bash
 # Purpose: Manage users, teams, and service accounts through snapshots.
-grafana-util advanced access service-account token delete --service-account-id 15 --token-name nightly --yes --json
+grafana-util access service-account token delete --service-account-id 15 --token-name nightly --yes --json
 ```
 **Expected Output:**
 ```text

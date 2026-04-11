@@ -184,7 +184,7 @@ use vars::inspect_dashboard_variables;
 fn analyze_args_to_export_args(args: AnalyzeArgs) -> Result<InspectExportArgs> {
     let input_dir = args
         .input_dir
-        .ok_or_else(|| message("dashboard analyze local mode requires --input-dir."))?;
+        .ok_or_else(|| message("dashboard summary local mode requires --input-dir."))?;
     Ok(InspectExportArgs {
         input_dir,
         input_type: args.input_type,
@@ -493,7 +493,7 @@ fn execute_dashboard_inspect_at_path(
 }
 
 pub fn execute_dashboard_inspect_export(args: &InspectExportArgs) -> Result<DashboardWebRunOutput> {
-    let temp_dir = inspect_live::TempInspectDir::new("inspect-export-web")?;
+    let temp_dir = inspect_live::TempInspectDir::new("summary-export-web")?;
     let input_dir = inspect::resolve_inspect_export_import_dir(
         &temp_dir.path,
         &args.input_dir,
@@ -505,7 +505,7 @@ pub fn execute_dashboard_inspect_export(args: &InspectExportArgs) -> Result<Dash
 }
 
 pub fn execute_dashboard_inspect_live(args: &InspectLiveArgs) -> Result<DashboardWebRunOutput> {
-    let temp_dir = inspect_live::TempInspectDir::new("inspect-live-web")?;
+    let temp_dir = inspect_live::TempInspectDir::new("summary-live-web")?;
     let export_args = ExportArgs {
         common: args.common.clone(),
         output_dir: temp_dir.path.clone(),
@@ -696,7 +696,7 @@ pub fn run_dashboard_cli_with_client(
                 print_supported_dashboard_report_columns();
                 return Ok(());
             }
-            // `--help-full` is handled here because inspect-export can be executed
+            // `--help-full` is handled here because summary-export can be executed
             // both from the unified CLI and from direct dashboard parser paths.
             if inspect_args.help_full {
                 print!("{}", render_inspect_export_help_full());

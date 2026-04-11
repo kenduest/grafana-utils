@@ -67,8 +67,6 @@ pub(crate) mod help_styles;
 pub mod http;
 /// Internal browser/session helpers for screenshot and interactive flows.
 pub(crate) mod interactive_browser;
-/// Migration and repair workflows that transform Grafana artifacts between formats.
-pub mod migrate;
 /// Artifact-driven project overview assembly for staged dashboard and sync inputs.
 pub mod overview;
 /// Repo-local profile namespace for listing, showing, and initializing config files.

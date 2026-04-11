@@ -39,6 +39,6 @@ grafana-util dashboard screenshot --dashboard-url 'https://grafana.example.com/d
 ```
 
 ## 相關指令
-- [dashboard list-vars](./dashboard-list-vars.md)
-- [dashboard analyze（即時）](./dashboard-analyze-live.md)
-- [dashboard topology](./dashboard-topology.md)
+- [dashboard variables](./dashboard-variables.md)
+- [dashboard summary](./dashboard-summary.md)
+- [dashboard dependencies](./dashboard-dependencies.md)

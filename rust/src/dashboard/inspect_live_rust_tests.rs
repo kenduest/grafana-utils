@@ -94,7 +94,7 @@ fn parse_cli_supports_inspect_live_baseline_output_formats() {
     ] {
         let args = parse_cli_from([
             "grafana-util",
-            "inspect-live",
+            "summary-live",
             "--url",
             "https://grafana.example.com",
             "--output-format",
@@ -108,7 +108,7 @@ fn parse_cli_supports_inspect_live_baseline_output_formats() {
                 assert!(!inspect_args.json);
                 assert!(!inspect_args.table);
             }
-            _ => panic!("expected inspect-live command"),
+            _ => panic!("expected summary-live command"),
         }
     }
 }
@@ -340,7 +340,7 @@ fn snapshot_live_dashboard_export_with_fetcher_reports_dashboard_uid_on_fetch_fa
 
     assert!(error
         .to_string()
-        .contains("Failed to fetch live dashboard uid=cpu-main during analyze-live: boom"));
+        .contains("Failed to fetch live dashboard uid=cpu-main during summary-live: boom"));
     assert_eq!(error.kind(), "context");
 }
 

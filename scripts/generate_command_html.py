@@ -80,8 +80,8 @@ HANDBOOK_CONTEXT_BY_COMMAND = {
 
 COMMAND_AUDIENCE_HINTS = {
     "dashboard": {
-        "en": "Best for SREs, Grafana operators, and responders working with dashboard inventory, migration, inspection, or screenshots.",
-        "zh-TW": "適合 SRE、Grafana 維運人員，以及要處理 dashboard 盤點、搬遷、檢查或截圖的人。",
+        "en": "Best for SREs, Grafana operators, and responders working with dashboard inventory, inspection, export, policy, or screenshots.",
+        "zh-TW": "適合 SRE、Grafana 維運人員，以及要處理 dashboard 盤點、檢查、匯出、政策或截圖的人。",
     },
     "datasource": {
         "en": "Best for operators who manage Grafana data source configuration, dependency checks, and recovery paths.",
@@ -118,10 +118,6 @@ COMMAND_AUDIENCE_HINTS = {
     "change": {
         "en": "Best for review-first workflows where you want summary, preflight, plan, and apply to stay explicit.",
         "zh-TW": "適合 review-first 流程，想把 summary、preflight、plan 與 apply 清楚分開的人。",
-    },
-    "migrate": {
-        "en": "Best for artifact repair and normalization work before import, replay, or UI upload into another Grafana environment.",
-        "zh-TW": "適合在匯入、回放或 UI upload 之前，先做 artifact 修補與正規化的人。",
     },
     "snapshot": {
         "en": "Best for readers who need a local snapshot bundle for offline review, backup, or handoff work.",

@@ -81,7 +81,7 @@ This chapter provides practical solutions for common Grafana operational headach
 
 ```bash
 # Generate a report of all required datasources in your export tree
-grafana-util dashboard analyze --input-dir ./backups/raw --input-format raw --output-format dependency
+grafana-util dashboard dependencies --input-dir ./backups/raw --input-format raw --output-format dependency
 ```
 
 **What to check**: Ensure every datasource listed in the dependency report exists in your target Grafana's `datasource list`.
@@ -110,12 +110,12 @@ grafana-util dashboard analyze --input-dir ./backups/raw --input-format raw --ou
 
 **After**: The patch stays mechanical, reviewable, and previewed before live replay.
 
-**Solution**: Use `patch-file` in a loop, then preview the result before replaying it.
+**Solution**: Use `patch` in a loop, then preview the result before replaying it.
 
 ```bash
-# Purpose: Solution: Use patch-file in a loop, then preview the result before replaying it.
+# Purpose: Solution: Use patch in a loop, then preview the result before replaying it.
 for file in ./dashboards/raw/*.json; do
-  grafana-util dashboard patch-file --input "$file" --tag "ManagedBySRE" --output "$file"
+  grafana-util dashboard patch --input "$file" --tag "ManagedBySRE" --output "$file"
 done
 
 grafana-util dashboard import --input-dir ./dashboards/raw --replace-existing --dry-run --table

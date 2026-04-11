@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>dashboard edit-live · grafana-util docs</title>
+  <title>dashboard edit · grafana-util docs</title>
   <style>:root {
   color-scheme: light dark;
   --font-scale: 1;
@@ -736,7 +736,7 @@ code[class*="language-"],pre[class*="language-"]{color:#ccc;background:none;font
       <div class="topbar">
   <a class="brand" href="../../index.html">grafana-util docs</a>
   <div class="themebar">
-    <select id="page-locale-select" aria-label="Language switch"><option value="" selected>Language: English</option><option value="../zh-TW/dashboard-edit-live.html">Switch to 繁體中文</option></select><select id="jump-select" aria-label="Jump"><option value="" selected>Jump to...</option><optgroup label="Handbook"><option value="../../handbook/en/index.html">Overview</option><option value="../../handbook/en/what-is-grafana-util.html">What grafana-util is for</option><option value="../../handbook/en/getting-started.html">Getting Started</option><option value="../../handbook/en/role-new-user.html">New User Handbook</option><option value="../../handbook/en/role-sre-ops.html">SRE / Operator Handbook</option><option value="../../handbook/en/role-automation-ci.html">Automation / CI Handbook</option><option value="../../handbook/en/architecture.html">Architecture &amp; Design Principles</option><option value="../../handbook/en/dashboard.html">Dashboard Operator Handbook</option><option value="../../handbook/en/datasource.html">Datasource Operator Handbook</option><option value="../../handbook/en/alert.html">Alert Operator Handbook</option><option value="../../handbook/en/access.html">Access Management (Identity &amp; Access)</option><option value="../../handbook/en/change-overview-status.html">Project Readiness &amp; Change Overview</option><option value="../../handbook/en/scenarios.html">Operator Scenarios</option><option value="../../handbook/en/recipes.html">Best Practices &amp; Real-World Recipes</option><option value="../../handbook/en/reference.html">Technical Reference</option><option value="../../handbook/en/troubleshooting.html">Troubleshooting &amp; Glossary</option></optgroup><optgroup label="Commands"><option value="dashboard.html">Dashboard</option><option value="migrate.html">Migrate</option><option value="alert.html">Alert</option><option value="datasource.html">Datasource</option><option value="access.html">Access</option><option value="config.html">Config</option><option value="observe.html">Observe</option><option value="change.html">Change</option><option value="snapshot.html">Snapshot</option></optgroup></select>
+    <select id="page-locale-select" aria-label="Language switch"><option value="" selected>Language: English</option><option value="../zh-TW/dashboard-edit-live.html">Switch to 繁體中文</option></select><select id="jump-select" aria-label="Jump"><option value="" selected>Jump to...</option><optgroup label="Handbook"><option value="../../handbook/en/index.html">Overview</option><option value="../../handbook/en/what-is-grafana-util.html">What grafana-util is for</option><option value="../../handbook/en/getting-started.html">Getting Started</option><option value="../../handbook/en/role-new-user.html">New User Handbook</option><option value="../../handbook/en/role-sre-ops.html">SRE / Operator Handbook</option><option value="../../handbook/en/role-automation-ci.html">Automation / CI Handbook</option><option value="../../handbook/en/architecture.html">Architecture &amp; Design Principles</option><option value="../../handbook/en/dashboard.html">Dashboard Operator Handbook</option><option value="../../handbook/en/datasource.html">Datasource Operator Handbook</option><option value="../../handbook/en/alert.html">Alert Operator Handbook</option><option value="../../handbook/en/access.html">Access Management (Identity &amp; Access)</option><option value="../../handbook/en/change-overview-status.html">Project Readiness &amp; Change Overview</option><option value="../../handbook/en/scenarios.html">Operator Scenarios</option><option value="../../handbook/en/recipes.html">Best Practices &amp; Real-World Recipes</option><option value="../../handbook/en/reference.html">Technical Reference</option><option value="../../handbook/en/troubleshooting.html">Troubleshooting &amp; Glossary</option></optgroup><optgroup label="Commands"><option value="dashboard.html">Dashboard</option><option value="alert.html">Alert</option><option value="datasource.html">Datasource</option><option value="access.html">Access</option><option value="config.html">Config</option><option value="observe.html">Observe</option><option value="change.html">Change</option><option value="snapshot.html">Snapshot</option></optgroup></select>
     <select id="font-select" aria-label="Font Size">
       <option value="0.9">Font: Compact</option>
       <option value="1">Font: Default</option>
@@ -758,9 +758,9 @@ code[class*="language-"],pre[class*="language-"]{color:#ccc;background:none;font
 </aside>
 
   <article class="article">
-    <div class="breadcrumbs"><a href="../../index.html">Home</a> / Commands / dashboard edit-live</div>
+    <div class="breadcrumbs"><a href="../../index.html">Home</a> / Commands / dashboard edit</div>
 
-    <h1><span class="hero-title-main">dashboard edit-live</span></h1>
+    <h1><span class="hero-title-main">dashboard edit</span></h1>
 
 
     <section class="command-intro">
@@ -774,7 +774,7 @@ code[class*="language-"],pre[class*="language-"]{color:#ccc;background:none;font
 </div>
 <div class="command-intro-block">
   <p class="command-intro-label">Who this page is for</p>
-  <p class="command-intro-text">Best for SREs, Grafana operators, and responders working with dashboard inventory, migration, inspection, or screenshots.</p>
+  <p class="command-intro-text">Best for SREs, Grafana operators, and responders working with dashboard inventory, inspection, export, policy, or screenshots.</p>
 </div>
 </div>
 </section>
@@ -788,15 +788,15 @@ code[class*="language-"],pre[class*="language-"]{color:#ccc;background:none;font
 <ul><li>The command opens <code>$VISUAL</code>, then <code>$EDITOR</code>, then falls back to <code>vi</code>.</li><li>With neither <code>--output</code> nor <code>--apply-live</code>, the command keeps the edit session ephemeral and automatically runs a live <code>publish --dry-run</code> preview instead of writing a draft file.</li><li>With <code>--output</code>, the command writes the edited draft to disk and stops there unless you also add <code>--publish-dry-run</code>.</li><li>After editing, the command prints a review summary that includes blocking validation issues and the suggested next action.</li><li><code>--apply-live</code> only proceeds when the edited draft keeps <code>dashboard.id</code> null, preserves the source dashboard UID, and has no blocking review issues.</li><li>The edited payload must still contain <code>dashboard.uid</code>.</li></ul>
 <h2 id="examples">Examples</h2>
 <pre><code># Purpose: Edit one live dashboard and preview the live publish without writing a draft file.
-grafana-util dashboard edit-live --profile prod --dashboard-uid cpu-main</code></pre>
+grafana-util dashboard edit --profile prod --dashboard-uid cpu-main</code></pre>
 <pre><code># Purpose: Edit one live dashboard and keep the result as a local draft.
-grafana-util dashboard edit-live --url http://localhost:3000 --basic-user admin --basic-password admin --dashboard-uid cpu-main --output ./drafts/cpu-main.edited.json</code></pre>
+grafana-util dashboard edit --url http://localhost:3000 --basic-user admin --basic-password admin --dashboard-uid cpu-main --output ./drafts/cpu-main.edited.json</code></pre>
 <pre><code># Purpose: Edit one live dashboard, save the draft, and immediately preview the publish.
-grafana-util dashboard edit-live --profile prod --dashboard-uid cpu-main --output ./drafts/cpu-main.edited.json --publish-dry-run</code></pre>
+grafana-util dashboard edit --profile prod --dashboard-uid cpu-main --output ./drafts/cpu-main.edited.json --publish-dry-run</code></pre>
 <pre><code># Purpose: Edit one live dashboard and explicitly write the result back to Grafana.
-grafana-util dashboard edit-live --profile prod --dashboard-uid cpu-main --apply-live --yes --message &#x27;Hotfix CPU dashboard&#x27;</code></pre>
+grafana-util dashboard edit --profile prod --dashboard-uid cpu-main --apply-live --yes --message &#x27;Hotfix CPU dashboard&#x27;</code></pre>
 <h2 id="related-commands">Related commands</h2>
-<ul><li><a href="dashboard-fetch-live.html">dashboard fetch-live</a></li><li><a href="dashboard-clone-live.html">dashboard clone-live</a></li><li><a href="dashboard-publish.html">dashboard publish</a></li></ul>
+<ul><li><a href="dashboard-get.html">dashboard get</a></li><li><a href="dashboard-clone.html">dashboard clone</a></li><li><a href="dashboard-publish.html">dashboard publish</a></li></ul>
     
   </article>
   <aside class="sidebar">

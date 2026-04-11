@@ -111,8 +111,8 @@ Your automation path is in good shape when:
 - [config profile](../../commands/en/profile.md)
 - [observe](../../commands/en/observe.md)
 - [change](../../commands/en/change.md)
-- [advanced access service-account](../../commands/en/advanced.md)
-- [advanced access service-account token](../../commands/en/advanced.md)
+- [access service-account](../../commands/en/access.md)
+- [access service-account token](../../commands/en/access.md)
 - [full command index](../../commands/en/index.md)
 
 ## Common mistakes and limits

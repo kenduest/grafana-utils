@@ -17,7 +17,7 @@ Its main strengths are a review-first workflow, separate paths for dashboard imp
 
 ## Supported Workflows
 
-- **Dashboards**: Browse, list, export/import, diff, review, publish, and analyze. Supports `raw` (API-driven import), `prompt` (UI import), and `provisioning` (file-based) paths.
+- **Dashboards**: Browse, list, export/import, diff, review, patch, summarize, inspect dependencies, set policy, and capture screenshots. Use `dashboard` as the flat root, with `raw` (API-driven import), `prompt` (UI import), and `provisioning` (file-based) formats.
 - **Datasources**: Masked recovery, secret-aware imports, and provisioning projection.
 - **Alerts**: Export/import, diffing, planning (`plan`/`apply`), and routing preview.
 - **Access**: Management of users, teams, organizations, service accounts, and tokens.
@@ -34,7 +34,7 @@ Its main strengths are a review-first workflow, separate paths for dashboard imp
 | Feature | Legacy Approach | with `grafana-util` |
 | :--- | :--- | :--- |
 | **Discovery** | Manual UI navigation or ad-hoc API calls to understand current state. | Start with `observe live` or `observe overview` for a unified environment snapshot. |
-| **Dashboard Paths** | Ambiguity between API-driven import and UI import formats. | Dedicated paths for `raw`, `prompt`, and `provisioning` with migration tools like `migrate dashboard raw-to-prompt`. |
+| **Dashboard Paths** | Ambiguity between API-driven import and UI import formats. | Dedicated flat `dashboard` paths with `raw`, `prompt`, and `provisioning` formats. |
 | **Reviews** | Changes applied directly without an intermediate review surface. | Use `change inspect`, `check`, and `preview` to audit changes before they touch the live server. |
 | **Security** | Secrets often stored in shell history or plaintext files. | Centralized `config profile` management with OS keyring or encrypted storage. |
 
@@ -139,22 +139,19 @@ grafana-util observe live \
 grafana-util export dashboard --all-orgs --output-dir ./backup --progress
 ```
 
-### 3. Diff local artifacts with machine-readable output
+### 3. Diff local dashboard artifacts with machine-readable output
 ```bash
 # Emit the shared dashboard diff contract.
-grafana-util advanced dashboard sync diff --input-dir ./backup/raw --output-format json
-
-# Keep alert diff canonical on --output-format json; --json remains a compatibility alias.
-grafana-util advanced alert migrate diff --diff-dir ./alerts/raw --output-format json
+grafana-util dashboard diff --input-dir ./backup/raw --output-format json
 
 # Datasource diff JSON includes field-level before/after changes.
-grafana-util advanced datasource diff --diff-dir ./datasources --input-format inventory --output-format json
+grafana-util datasource diff --diff-dir ./datasources --input-format inventory --output-format json
 ```
 
 ### 4. Analyze dashboard dependencies
 ```bash
 # Audit datasource references and structure before import.
-grafana-util advanced dashboard analyze summary \
+grafana-util dashboard summary \
   --input-dir ./backup/raw \
   --input-format raw \
   --output-format tree-table
@@ -162,8 +159,8 @@ grafana-util advanced dashboard analyze summary \
 
 ### 5. Open the dashboard TUI
 ```bash
-# Open the interactive dashboard analysis workbench.
-grafana-util advanced dashboard analyze summary \
+# Open the interactive dashboard browse workbench.
+grafana-util dashboard browse \
   --input-dir ./backup/raw \
   --input-format raw \
   --interactive
@@ -171,7 +168,7 @@ grafana-util advanced dashboard analyze summary \
 
 ### 6. Dry-run dashboard import
 ```bash
-grafana-util advanced dashboard sync import \
+grafana-util dashboard import \
   --input-dir ./backup/raw \
   --replace-existing \
   --dry-run \
@@ -181,16 +178,16 @@ grafana-util advanced dashboard sync import \
 ### 7. Rapid dashboard iteration
 ```bash
 # Review a locally generated dashboard JSON without touching Grafana.
-cat cpu.json | grafana-util advanced dashboard draft review --input - --output-format json
+cat cpu.json | grafana-util dashboard review --input - --output-format json
 ```
 
 ### 8. Review alerts before you change them
 ```bash
 # See what the alert changes would do before applying them.
-grafana-util advanced alert change plan --desired-dir ./alerts/desired --prune
+grafana-util alert change plan --desired-dir ./alerts/desired --prune
 
 # Preview where an alert would go.
-grafana-util advanced alert author route preview \
+grafana-util alert author route preview \
   --desired-dir ./alerts/desired \
   --label team=sre --severity critical
 ```
@@ -199,7 +196,7 @@ grafana-util advanced alert author route preview \
 ```bash
 # Export with secrets masked, then restore the connection details when you import.
 grafana-util export datasource --output-dir ./datasources
-grafana-util advanced datasource import --input-dir ./datasources --prompt-password
+grafana-util datasource import --input-dir ./datasources --prompt-password
 ```
 
 ---

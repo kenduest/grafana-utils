@@ -454,7 +454,7 @@ pub(crate) fn run_dashboard_governance_gate(args: &GovernanceGateArgs) -> Result
         }
         #[cfg(not(feature = "tui"))]
         {
-            return super::tui_not_built("governance-gate --interactive");
+            return super::tui_not_built("policy --interactive");
         }
     }
     match args.output_format {

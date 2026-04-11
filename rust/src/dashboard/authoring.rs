@@ -117,7 +117,7 @@ fn validate_publish_args(args: &PublishArgs) -> Result<()> {
 fn validate_patch_file_args(args: &PatchFileArgs) -> Result<()> {
     if is_stdin_path(&args.input) && args.output.is_none() {
         return Err(message(
-            "patch-file --input - requires --output because standard input cannot be overwritten in place.",
+            "patch --input - requires --output because standard input cannot be overwritten in place.",
         ));
     }
     Ok(())
@@ -220,17 +220,15 @@ fn build_authoring_document(
 }
 
 fn patch_dashboard_document(document: &mut Value, args: &PatchFileArgs) -> Result<()> {
-    let object = document.as_object_mut().ok_or_else(|| {
-        message("Dashboard patch-file expects a JSON object at the document root.")
-    })?;
+    let object = document
+        .as_object_mut()
+        .ok_or_else(|| message("Dashboard patch expects a JSON object at the document root."))?;
     let has_wrapper = object.contains_key("dashboard");
     if has_wrapper {
         let dashboard = object
             .get_mut("dashboard")
             .and_then(Value::as_object_mut)
-            .ok_or_else(|| {
-                message("Dashboard patch-file expects dashboard to be a JSON object.")
-            })?;
+            .ok_or_else(|| message("Dashboard patch expects dashboard to be a JSON object."))?;
         if let Some(name) = args.name.as_ref() {
             dashboard.insert("title".to_string(), Value::String(name.clone()));
         }
@@ -264,7 +262,7 @@ fn patch_dashboard_document(document: &mut Value, args: &PatchFileArgs) -> Resul
             .or_insert_with(|| Value::Object(Map::new()));
         let meta = meta
             .as_object_mut()
-            .ok_or_else(|| message("Dashboard patch-file expects meta to be a JSON object."))?;
+            .ok_or_else(|| message("Dashboard patch expects meta to be a JSON object."))?;
         if let Some(folder_uid) = args.folder_uid.as_ref() {
             meta.insert("folderUid".to_string(), Value::String(folder_uid.clone()));
         }
@@ -292,7 +290,7 @@ fn review_next_action(has_blocking_issues: bool, dashboard_id_is_null: bool) -> 
     let base_action = if dashboard_id_is_null {
         "publish --dry-run"
     } else {
-        "patch-file"
+        "patch"
     };
     if has_blocking_issues {
         format!("fix blocking issues, then {base_action}")

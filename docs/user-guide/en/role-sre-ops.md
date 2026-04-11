@@ -82,7 +82,7 @@ If you need to start from the access layer instead, swap the last line for:
 
 ```bash
 # Purpose: If you need to start from the access layer instead, swap the last line for.
-grafana-util advanced access org list --table
+grafana-util access org list --table
 ```
 
 If you are checking a host directly, Basic auth is the safest fallback for broad visibility:

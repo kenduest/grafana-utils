@@ -135,7 +135,7 @@ grafana-util dashboard history export --url http://localhost:3000 --token "$GRAF
 
 ## 相關指令
 - [dashboard list](./dashboard-list.md)
-- [dashboard analyze（即時）](./dashboard-analyze-live.md)
-- [dashboard analyze（本地）](./dashboard-analyze-export.md)
+- [dashboard summary](./dashboard-summary.md)
+- [dashboard dependencies](./dashboard-dependencies.md)
 - [dashboard review](./dashboard-review.md)
 - [dashboard export](./dashboard-export.md)

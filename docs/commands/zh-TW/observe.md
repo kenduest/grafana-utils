@@ -33,7 +33,7 @@ grafana-util observe staged --dashboard-export-dir ./dashboards/raw --alert-expo
 grafana-util observe overview --dashboard-export-dir ./dashboards/raw --alert-export-dir ./alerts/raw --output-format text
 ```
 
-相關指令：`grafana-util change`、`grafana-util export`、`grafana-util config profile`、`grafana-util advanced`。
+相關指令：`grafana-util change`、`grafana-util export`、`grafana-util config profile`。
 
 ## `staged`
 

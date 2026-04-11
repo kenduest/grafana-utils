@@ -22,17 +22,17 @@ When to use:
   - Capture one dashboard before patching, diffing, or publishing locally.
 
 Related commands:
-  - dashboard clone-live  Fetch then override title, UID, or folder metadata.
+  - dashboard clone  Fetch then override title, UID, or folder metadata.
   - dashboard review      Inspect one local draft before publish.
   - dashboard publish     Send one reviewed local draft back to Grafana.
 
 Examples:
 
   Fetch one live dashboard and write a local draft file:
-    grafana-util dashboard fetch-live --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --dashboard-uid cpu-main --output ./cpu-main.json
+    grafana-util dashboard get --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --dashboard-uid cpu-main --output ./cpu-main.json
 
   Fetch one dashboard with Basic auth and a saved profile:
-    grafana-util dashboard fetch-live --profile prod --url http://localhost:3000 --basic-user admin --basic-password admin --dashboard-uid cpu-main --output ./cpu-main.json"#;
+    grafana-util dashboard get --profile prod --url http://localhost:3000 --basic-user admin --basic-password admin --dashboard-uid cpu-main --output ./cpu-main.json"#;
 
 pub(crate) const DASHBOARD_CLONE_LIVE_AFTER_HELP: &str = r#"What it does:
   Fetch one live dashboard into a local draft and optionally override title, UID, or folder metadata before saving it.
@@ -42,17 +42,17 @@ When to use:
   - Prepare a publishable variant without mutating the source dashboard first.
 
 Related commands:
-  - dashboard fetch-live  Fetch the live dashboard without changing any metadata.
-  - dashboard patch-file  Adjust the local draft after the initial clone step.
+  - dashboard get    Fetch the live dashboard without changing any metadata.
+  - dashboard patch  Adjust the local draft after the initial clone step.
   - dashboard publish     Push the reviewed clone into Grafana.
 
 Examples:
 
   Clone one live dashboard, keep the source UID and title, and write a local draft:
-    grafana-util dashboard clone-live --url http://localhost:3000 --basic-user admin --basic-password admin --source-uid cpu-main --output ./cpu-main-clone.json
+    grafana-util dashboard clone --url http://localhost:3000 --basic-user admin --basic-password admin --source-uid cpu-main --output ./cpu-main-clone.json
 
   Clone a live dashboard with a new title, UID, and folder UID:
-    grafana-util dashboard clone-live --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --source-uid cpu-main --name 'CPU Clone' --uid cpu-main-clone --folder-uid infra --output ./cpu-main-clone.json"#;
+    grafana-util dashboard clone --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --source-uid cpu-main --name 'CPU Clone' --uid cpu-main-clone --folder-uid infra --output ./cpu-main-clone.json"#;
 
 pub(crate) const DASHBOARD_SERVE_AFTER_HELP: &str = r#"Examples:
 
@@ -170,13 +170,13 @@ pub(crate) const DASHBOARD_DIFF_AFTER_HELP: &str = r#"Examples:
 pub(crate) const DASHBOARD_PATCH_FILE_AFTER_HELP: &str = r#"Examples:
 
   Patch a raw export file in place:
-    grafana-util dashboard patch-file --input ./dashboards/raw/cpu-main.json --name 'CPU Overview' --folder-uid infra --tag prod --tag sre
+    grafana-util dashboard patch --input ./dashboards/raw/cpu-main.json --name 'CPU Overview' --folder-uid infra --tag prod --tag sre
 
   Patch one draft file into a new output path:
-    grafana-util dashboard patch-file --input ./drafts/cpu-main.json --output ./drafts/cpu-main-patched.json --uid cpu-main --message 'Add folder metadata before publish'
+    grafana-util dashboard patch --input ./drafts/cpu-main.json --output ./drafts/cpu-main-patched.json --uid cpu-main --message 'Add folder metadata before publish'
 
   Patch one dashboard from standard input into an explicit output file:
-    jsonnet dashboards/cpu.jsonnet | grafana-util dashboard patch-file --input - --output ./drafts/cpu-main.json --folder-uid infra"#;
+    jsonnet dashboards/cpu.jsonnet | grafana-util dashboard patch --input - --output ./drafts/cpu-main.json --folder-uid infra"#;
 
 pub(crate) const DASHBOARD_REVIEW_AFTER_HELP: &str = r#"What it does:
   Review one local dashboard draft without touching Grafana and render the draft in text, YAML, or JSON form.
@@ -186,8 +186,8 @@ When to use:
   - Confirm folder, tags, UID, panels, and datasource references in CI or local review.
 
 Related commands:
-  - dashboard fetch-live  Fetch a live dashboard into a local draft first.
-  - dashboard patch-file  Adjust the local draft before review.
+  - dashboard get    Fetch a live dashboard into a local draft first.
+  - dashboard patch  Adjust the local draft before review.
   - dashboard publish     Send the reviewed draft to Grafana.
 
 Examples:
@@ -210,8 +210,8 @@ When to use:
 
 Related commands:
   - dashboard review      Inspect the local draft before publish.
-  - dashboard fetch-live  Start from the current live dashboard state.
-  - dashboard clone-live  Prepare a new variant before publish.
+  - dashboard get    Start from the current live dashboard state.
+  - dashboard clone  Prepare a new variant before publish.
 
 Examples:
 
@@ -231,89 +231,89 @@ pub(crate) const DASHBOARD_ANALYZE_AFTER_HELP: &str = r#"What it does:
   Analyze dashboards from live Grafana or a local export tree and render summary, governance, dependency, or queries-json outputs.
 
 When to use:
-  - Inspect a live environment before topology, governance-gate, or impact checks.
+  - Inspect a live environment before dependency, policy, or impact checks.
   - Reuse a local export tree in CI without calling Grafana again.
 
 Related commands:
-  - dashboard topology         Show which dashboards, variables, data sources, and alerts depend on each other.
-  - dashboard governance-gate  Check dashboard findings against a policy.
-  - dashboard list-vars        List one dashboard's current variables only.
+  - dashboard dependencies  Show which dashboards, variables, data sources, and alerts depend on each other.
+  - dashboard policy        Check dashboard findings against a policy.
+  - dashboard variables     List one dashboard's current variables only.
 
 Examples:
 
   Analyze live Grafana and render governance JSON:
-    grafana-util dashboard analyze --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-format governance-json
+    grafana-util dashboard summary --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-format governance-json
 
   Analyze a raw export tree without calling Grafana:
-    grafana-util dashboard analyze --input-dir ./dashboards/raw --input-format raw --output-format tree-table
+    grafana-util dashboard summary --input-dir ./dashboards/raw --input-format raw --output-format tree-table
 
   Analyze a repo-backed Git Sync dashboard tree from the repo root:
-    grafana-util dashboard analyze --input-dir ./grafana-oac-repo --input-format git-sync --output-format governance
+    grafana-util dashboard summary --input-dir ./grafana-oac-repo --input-format git-sync --output-format governance
 "#;
 
 pub(crate) const DASHBOARD_ANALYZE_EXPORT_AFTER_HELP: &str = r#"Examples:
 
   Render an operator-summary table from raw exports:
-    grafana-util dashboard analyze --input-dir ./dashboards/raw --input-format raw --output-format table
+    grafana-util dashboard summary --input-dir ./dashboards/raw --input-format raw --output-format table
 
   Open the interactive analysis workbench over raw exports:
-    grafana-util dashboard analyze --input-dir ./dashboards/raw --input-format raw --interactive
+    grafana-util dashboard summary --input-dir ./dashboards/raw --input-format raw --interactive
 
   Render the machine-readable governance artifact from raw exports:
-    grafana-util dashboard analyze --input-dir ./dashboards/raw --input-format raw --output-format governance-json
+    grafana-util dashboard summary --input-dir ./dashboards/raw --input-format raw --output-format governance-json
 
   Render the queries-json artifact from raw exports:
-    grafana-util dashboard analyze --input-dir ./dashboards/raw --input-format raw --output-format queries-json
+    grafana-util dashboard summary --input-dir ./dashboards/raw --input-format raw --output-format queries-json
 
   Inspect a file-provisioning tree from the provisioning root:
-    grafana-util dashboard analyze --input-dir ./dashboards/provisioning --input-format provisioning --output-format tree-table"#;
+    grafana-util dashboard summary --input-dir ./dashboards/provisioning --input-format provisioning --output-format tree-table"#;
 
 pub(crate) const DASHBOARD_ANALYZE_LIVE_AFTER_HELP: &str = r#"Examples:
 
   Render governance JSON from live Grafana:
-    grafana-util dashboard analyze --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-format governance-json
+    grafana-util dashboard summary --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-format governance-json
 
   Render the queries-json artifact from live Grafana:
-    grafana-util dashboard analyze --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-format queries-json
+    grafana-util dashboard summary --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-format queries-json
 
   Open the interactive analysis workbench over live Grafana:
-    grafana-util dashboard analyze --url http://localhost:3000 --basic-user admin --basic-password admin --interactive"#;
+    grafana-util dashboard summary --url http://localhost:3000 --basic-user admin --basic-password admin --interactive"#;
 
 pub(crate) const DASHBOARD_LIST_VARS_AFTER_HELP: &str = r#"Examples:
 
   List variables from a browser URL directly:
-    grafana-util dashboard list-vars --dashboard-url 'https://grafana.example.com/d/cpu-main/cpu-overview?var-cluster=prod-a' --token "$GRAFANA_API_TOKEN" --output-format table
+    grafana-util dashboard variables --dashboard-url 'https://grafana.example.com/d/cpu-main/cpu-overview?var-cluster=prod-a' --token "$GRAFANA_API_TOKEN" --output-format table
 
   List one dashboard UID with a vars-query fragment:
-    grafana-util dashboard list-vars --url https://grafana.example.com --dashboard-uid cpu-main --vars-query 'var-cluster=prod-a&var-instance=node01' --token "$GRAFANA_API_TOKEN" --output-format json
+    grafana-util dashboard variables --url https://grafana.example.com --dashboard-uid cpu-main --vars-query 'var-cluster=prod-a&var-instance=node01' --token "$GRAFANA_API_TOKEN" --output-format json
 
   List variables from one local dashboard JSON file:
-    grafana-util dashboard list-vars --input ./dashboards/raw/cpu-main.json --output-format yaml
+    grafana-util dashboard variables --input ./dashboards/raw/cpu-main.json --output-format yaml
 
   List variables from one local export tree:
-    grafana-util dashboard list-vars --input-dir ./dashboards/raw --dashboard-uid cpu-main --output-format table"#;
+    grafana-util dashboard variables --input-dir ./dashboards/raw --dashboard-uid cpu-main --output-format table"#;
 
 pub(crate) const DASHBOARD_GOVERNANCE_GATE_AFTER_HELP: &str = r#"Examples:
 
   Check live Grafana directly with a JSON/YAML policy file:
-    grafana-util dashboard governance-gate --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --policy-source file --policy ./policy.yaml
+    grafana-util dashboard policy --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --policy-source file --policy ./policy.yaml
 
   Check an export tree without calling Grafana:
-    grafana-util dashboard governance-gate --policy-source builtin --builtin-policy default --input-dir ./dashboards/raw --input-format raw
+    grafana-util dashboard policy --policy-source builtin --builtin-policy default --input-dir ./dashboards/raw --input-format raw
 
   Advanced reuse: recheck saved analysis artifacts and write normalized JSON:
-    grafana-util dashboard governance-gate --policy-source builtin --builtin-policy default --governance ./governance.json --queries ./queries.json --output-format json --json-output ./governance-check.json"#;
+    grafana-util dashboard policy --policy-source builtin --builtin-policy default --governance ./governance.json --queries ./queries.json --output-format json --json-output ./governance-check.json"#;
 
 pub(crate) const DASHBOARD_TOPOLOGY_AFTER_HELP: &str = r#"Examples:
 
   Analyze live Grafana directly and render Mermaid:
-    grafana-util dashboard topology --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-format mermaid
+    grafana-util dashboard dependencies --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-format mermaid
 
   Analyze an export tree without calling Grafana:
-    grafana-util dashboard topology --input-dir ./dashboards/raw --input-format raw --output-format text
+    grafana-util dashboard dependencies --input-dir ./dashboards/raw --input-format raw --output-format text
 
-  Advanced reuse: render Graphviz DOT through the graph alias from saved analysis artifacts:
-    grafana-util dashboard graph --governance ./governance.json --queries ./queries.json --alert-contract ./alert-contract.json --output-format dot --output-file ./dashboard-topology.dot"#;
+  Advanced reuse: render Graphviz DOT from saved analysis artifacts:
+    grafana-util dashboard dependencies --governance ./governance.json --queries ./queries.json --alert-contract ./alert-contract.json --output-format dot --output-file ./dashboard-dependencies.dot"#;
 
 pub(crate) const DASHBOARD_IMPACT_AFTER_HELP: &str = r#"Examples:
 
@@ -351,10 +351,10 @@ pub(crate) const DASHBOARD_SCREENSHOT_AFTER_HELP: &str = r#"Examples:
 pub(crate) const DASHBOARD_CLI_AFTER_HELP: &str = r#"Examples:
 
   Fetch one live dashboard into a local draft:
-    grafana-util dashboard fetch-live --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --dashboard-uid cpu-main --output ./cpu-main.json
+    grafana-util dashboard get --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --dashboard-uid cpu-main --output ./cpu-main.json
 
   Clone one live dashboard with a new UID and folder:
-    grafana-util dashboard clone-live --url http://localhost:3000 --basic-user admin --basic-password admin --source-uid cpu-main --uid cpu-main-clone --folder-uid infra --output ./cpu-main-clone.json
+    grafana-util dashboard clone --url http://localhost:3000 --basic-user admin --basic-password admin --source-uid cpu-main --uid cpu-main-clone --folder-uid infra --output ./cpu-main-clone.json
 
   Export dashboards from local Grafana with Basic auth:
     grafana-util dashboard export --url http://localhost:3000 --basic-user admin --basic-password admin --output-dir ./dashboards --overwrite
@@ -373,7 +373,7 @@ pub(crate) const DASHBOARD_CLI_AFTER_HELP: &str = r#"Examples:
     grafana-util dashboard diff --url http://localhost:3000 --basic-user admin --basic-password admin --input-dir ./dashboards/raw
 
   Patch a local dashboard file before publishing:
-    grafana-util dashboard patch-file --input ./dashboards/raw/cpu-main.json --name 'CPU Overview' --folder-uid infra --tag prod --tag sre
+    grafana-util dashboard patch --input ./dashboards/raw/cpu-main.json --name 'CPU Overview' --folder-uid infra --tag prod --tag sre
 
   Publish one local draft to Grafana:
     grafana-util dashboard publish --url http://localhost:3000 --basic-user admin --basic-password admin --input ./drafts/cpu-main.json --dry-run --table

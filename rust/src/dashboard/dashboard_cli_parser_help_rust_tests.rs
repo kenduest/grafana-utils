@@ -4,11 +4,7 @@ use super::super::{
     SimpleOutputFormat,
 };
 use crate::cli_help_examples::paint_section;
-use crate::dashboard::{
-    DashboardImportInputFormat, RawToPromptLogFormat, RawToPromptOutputFormat,
-    RawToPromptResolution,
-};
-use crate::migrate::{MigrateCliArgs, MigrateCommand, MigrateDashboardCommand};
+use crate::dashboard::DashboardImportInputFormat;
 use clap::{CommandFactory, Parser};
 use std::path::PathBuf;
 
@@ -36,17 +32,6 @@ pub(super) fn render_dashboard_history_subcommand_help(name: &str) -> String {
         .unwrap_or_else(|| panic!("missing history {name} subcommand"))
         .render_help()
         .to_string()
-}
-
-pub(super) fn render_migrate_subcommand_help(path: &[&str]) -> String {
-    let mut command = MigrateCliArgs::command();
-    let mut current = &mut command;
-    for segment in path {
-        current = current
-            .find_subcommand_mut(segment)
-            .unwrap_or_else(|| panic!("missing migrate subcommand {segment}"));
-    }
-    current.render_help().to_string()
 }
 
 #[test]
@@ -649,7 +634,7 @@ fn parse_cli_supports_provisioning_diff_input_format() {
 fn parse_cli_supports_patch_file_command() {
     let args = parse_cli_from([
         "grafana-util",
-        "patch-file",
+        "patch",
         "--input",
         "./drafts/cpu-main.json",
         "--output",
@@ -681,7 +666,7 @@ fn parse_cli_supports_patch_file_command() {
             assert_eq!(patch_args.message.as_deref(), Some("Promote CPU dashboard"));
             assert_eq!(patch_args.tags, vec!["prod", "sre"]);
         }
-        _ => panic!("expected patch-file command"),
+        _ => panic!("expected patch command"),
     }
 }
 
@@ -689,7 +674,7 @@ fn parse_cli_supports_patch_file_command() {
 fn parse_cli_supports_patch_file_stdin_input() {
     let args = parse_cli_from([
         "grafana-util",
-        "patch-file",
+        "patch",
         "--input",
         "-",
         "--output",
@@ -704,7 +689,7 @@ fn parse_cli_supports_patch_file_stdin_input() {
                 Some(PathBuf::from("./drafts/cpu-main.json"))
             );
         }
-        _ => panic!("expected patch-file command"),
+        _ => panic!("expected patch command"),
     }
 }
 
@@ -794,7 +779,7 @@ fn diff_help_mentions_provisioning_input_format() {
 
 #[test]
 fn patch_file_help_mentions_in_place_and_output_paths() {
-    let help = render_dashboard_subcommand_help("patch-file");
+    let help = render_dashboard_subcommand_help("patch");
     assert!(help.contains("--input"));
     assert!(help.contains("--output"));
     assert!(help.contains("--name"));
@@ -805,66 +790,6 @@ fn patch_file_help_mentions_in_place_and_output_paths() {
     assert!(help.contains("Patch a raw export file in place"));
     assert!(help.contains("Patch one draft file into a new output path"));
     assert!(help.contains("Patch one dashboard from standard input into an explicit output file"));
-}
-
-#[test]
-fn migrate_raw_to_prompt_help_mentions_defaults_and_output_controls() {
-    let help = render_migrate_subcommand_help(&["dashboard", "raw-to-prompt"]);
-    assert!(help.contains("--input-file"));
-    assert!(help.contains("--input-dir"));
-    assert!(help.contains("--output-file"));
-    assert!(help.contains("--output-dir"));
-    assert!(help.contains("--output-format"));
-    assert!(help.contains("--no-header"));
-    assert!(help.contains("--color"));
-    assert!(help.contains("--progress"));
-    assert!(help.contains("--verbose"));
-    assert!(help.contains("--dry-run"));
-    assert!(help.contains("--log-file"));
-    assert!(help.contains("--log-format"));
-    assert!(help.contains("--resolution"));
-    assert!(help.contains("--datasource-map"));
-    assert!(help.contains("sibling .prompt.json"));
-    assert!(help.contains("prompt/ lane"));
-    assert!(help.contains("Convert raw dashboard exports into prompt lane artifacts."));
-    assert!(help.contains("Convert one raw export root into a sibling prompt/ lane"));
-}
-
-#[test]
-fn parse_migrate_cli_supports_dashboard_raw_to_prompt_command_flags() {
-    let args: MigrateCliArgs = MigrateCliArgs::parse_from([
-        "grafana-util migrate",
-        "dashboard",
-        "raw-to-prompt",
-        "--input-file",
-        "./dashboards/raw/cpu-main.json",
-        "--output-format",
-        "yaml",
-        "--log-format",
-        "json",
-        "--resolution",
-        "strict",
-        "--profile",
-        "prod",
-        "--org-id",
-        "2",
-    ]);
-
-    match args.command {
-        MigrateCommand::Dashboard { command } => match command {
-            MigrateDashboardCommand::RawToPrompt(inner) => {
-                assert_eq!(
-                    inner.input_file,
-                    vec![PathBuf::from("./dashboards/raw/cpu-main.json")]
-                );
-                assert_eq!(inner.output_format, RawToPromptOutputFormat::Yaml);
-                assert_eq!(inner.log_format, RawToPromptLogFormat::Json);
-                assert_eq!(inner.resolution, RawToPromptResolution::Strict);
-                assert_eq!(inner.profile.as_deref(), Some("prod"));
-                assert_eq!(inner.org_id, Some(2));
-            }
-        },
-    }
 }
 
 #[test]
@@ -1545,7 +1470,7 @@ fn parse_cli_supports_import_use_export_org_flags() {
 fn parse_cli_supports_dashboard_get_and_clone_live_commands() {
     let get_args = parse_cli_from([
         "grafana-util",
-        "fetch-live",
+        "get",
         "--profile",
         "prod",
         "--dashboard-uid",
@@ -1555,7 +1480,7 @@ fn parse_cli_supports_dashboard_get_and_clone_live_commands() {
     ]);
     let clone_args = parse_cli_from([
         "grafana-util",
-        "clone-live",
+        "clone",
         "--source-uid",
         "cpu-main",
         "--name",
@@ -1574,7 +1499,7 @@ fn parse_cli_supports_dashboard_get_and_clone_live_commands() {
             assert_eq!(args.dashboard_uid, "cpu-main");
             assert_eq!(args.output, PathBuf::from("./cpu-main.json"));
         }
-        _ => panic!("expected fetch-live command"),
+        _ => panic!("expected get command"),
     }
 
     match clone_args.command {
@@ -1585,24 +1510,23 @@ fn parse_cli_supports_dashboard_get_and_clone_live_commands() {
             assert_eq!(args.folder_uid.as_deref(), Some("infra"));
             assert_eq!(args.output, PathBuf::from("./cpu-main-clone.json"));
         }
-        _ => panic!("expected clone-live command"),
+        _ => panic!("expected clone command"),
     }
 }
 
 #[test]
 fn dashboard_fetch_live_help_mentions_local_draft_and_output_path() {
-    let help = render_dashboard_subcommand_help("fetch-live");
+    let help = render_dashboard_subcommand_help("get");
     assert!(help.contains("API-safe local JSON draft"));
     assert!(help.contains("What it does:"));
     assert!(help.contains("When to use:"));
     assert!(help.contains("--dashboard-uid"));
     assert!(help.contains("--output"));
-    assert!(help.contains("grafana-util dashboard fetch-live"));
 }
 
 #[test]
 fn dashboard_clone_live_help_mentions_override_flags() {
-    let help = render_dashboard_subcommand_help("clone-live");
+    let help = render_dashboard_subcommand_help("clone");
     assert!(help.contains("optional overrides"));
     assert!(help.contains("What it does:"));
     assert!(help.contains("Related commands:"));
@@ -1610,19 +1534,17 @@ fn dashboard_clone_live_help_mentions_override_flags() {
     assert!(help.contains("--name"));
     assert!(help.contains("--uid"));
     assert!(help.contains("--folder-uid"));
-    assert!(help.contains("grafana-util dashboard clone-live"));
 }
 
 #[test]
 fn dashboard_fetch_live_help_colorizes_section_headings_and_example_commands() {
     let help = crate::dashboard::maybe_render_dashboard_subcommand_help_from_os_args(
-        ["grafana-util", "dashboard", "fetch-live", "--help"],
+        ["grafana-util", "dashboard", "get", "--help"],
         true,
     )
     .expect("expected dashboard subcommand help");
     assert!(help.contains(&paint_section("What it does:")));
     assert!(help.contains(&paint_section("Examples:")));
-    assert!(help.contains("grafana-util dashboard fetch-live"));
 }
 
 #[test]

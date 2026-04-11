@@ -2,13 +2,17 @@ use super::{
     dispatch_with_handlers, maybe_render_unified_help_from_os_args, parse_cli_from,
     render_unified_help_text, CliArgs, UnifiedCommand,
 };
+use crate::alert::AlertGroupCommand;
 use crate::cli_help_examples::{paint_section, paint_support};
 use crate::dashboard::SimpleOutputFormat;
+use crate::dashboard::{
+    parse_cli_from as parse_dashboard_cli_from, DashboardCliArgs, DashboardCommand,
+};
 use crate::help_styles::CLI_HELP_STYLES;
 use crate::profile_cli::ProfileCommand;
 use crate::resource::{ResourceCommand, ResourceKind, ResourceOutputFormat};
 use clap::builder::styling::AnsiColor;
-use clap::CommandFactory;
+use clap::{CommandFactory, Parser};
 use std::cell::RefCell;
 use std::path::Path;
 
@@ -23,26 +27,64 @@ fn render_cli_help_path(path: &[&str]) -> String {
     current.render_help().to_string()
 }
 
+fn render_dashboard_help_path(path: &[&str]) -> String {
+    let mut command = DashboardCliArgs::command();
+    let mut current = &mut command;
+    for segment in path {
+        current = current
+            .find_subcommand_mut(segment)
+            .unwrap_or_else(|| panic!("missing dashboard subcommand {segment}"));
+    }
+    current.render_help().to_string()
+}
+
 #[test]
-fn unified_help_mentions_common_and_advanced_surfaces() {
+fn unified_help_mentions_common_surfaces_without_legacy_dashboard_paths() {
     let help = render_unified_help_text(false);
     assert!(help.contains("config profile add"));
     assert!(help.contains("observe overview"));
     assert!(help.contains("export dashboard"));
     assert!(help.contains("export alert"));
     assert!(help.contains("change preview"));
-    assert!(help.contains("advanced dashboard sync import"));
-    assert!(!help.contains("dashboard capture screenshot"));
+    assert!(help.contains("dashboard export"));
+    assert!(help.contains("dashboard summary"));
+    assert!(!help.contains("advanced dashboard"));
+    assert!(!help.contains("dashboard live"));
+    assert!(!help.contains("dashboard draft"));
+    assert!(!help.contains("dashboard sync"));
+    assert!(!help.contains("dashboard analyze"));
+    assert!(!help.contains("dashboard capture"));
     assert!(!help.contains("alert migrate export"));
 }
 
 #[test]
-fn advanced_help_groups_domains_and_examples() {
-    let help = render_cli_help_path(&["advanced"]);
-    assert!(help.contains("dashboard"));
-    assert!(help.contains("alert"));
-    assert!(help.contains("Examples:"));
-    assert!(help.contains("advanced dashboard sync import"));
+fn dashboard_help_uses_flat_paths_and_short_help() {
+    let help =
+        maybe_render_unified_help_from_os_args(["grafana-util", "dashboard", "--help"], false)
+            .unwrap();
+    assert!(help.contains("browse"));
+    assert!(help.contains("variables"));
+    assert!(help.contains("get"));
+    assert!(help.contains("clone"));
+    assert!(help.contains("edit-live"));
+    assert!(help.contains("export"));
+    assert!(help.contains("import"));
+    assert!(help.contains("review"));
+    assert!(help.contains("patch"));
+    assert!(help.contains("serve"));
+    assert!(help.contains("publish"));
+    assert!(help.contains("summary"));
+    assert!(help.contains("dependencies"));
+    assert!(help.contains("impact"));
+    assert!(help.contains("policy"));
+    assert!(help.contains("screenshot"));
+    assert!(!help.contains("live         browse, list, vars, fetch, clone, edit, delete, history"));
+    assert!(!help.contains("draft        review, patch, serve, publish"));
+    assert!(!help.contains("sync         export, import, diff, convert"));
+    assert!(!help.contains("analyze      summary, topology, impact, governance"));
+    assert!(!help.contains("capture      screenshot"));
+    assert!(!help.contains("advanced dashboard live"));
+    assert!(!help.contains("migrate dashboard"));
 }
 
 #[test]
@@ -122,10 +164,8 @@ fn export_dashboard_help_colorizes_option_descriptions_as_secondary_text() {
 fn observe_overview_help_uses_canonical_examples() {
     assert!(crate::overview::OVERVIEW_HELP_TEXT
         .contains("grafana-util observe overview --dashboard-export-dir ./dashboards/raw"));
-    assert!(
-        crate::overview::OVERVIEW_LIVE_HELP_TEXT
-            .contains("grafana-util observe overview live --url http://localhost:3000 --token")
-    );
+    assert!(crate::overview::OVERVIEW_LIVE_HELP_TEXT
+        .contains("grafana-util observe overview live --url http://localhost:3000 --token"));
     let help = render_cli_help_path(&["observe", "overview"]);
     assert!(!help.contains("grafana-util overview"));
 }
@@ -134,38 +174,27 @@ fn observe_overview_help_uses_canonical_examples() {
 fn config_profile_help_uses_canonical_examples() {
     let help = render_cli_help_path(&["config", "profile"]);
     assert!(help.contains("grafana-util config profile list"));
-    assert!(help.contains(
-        "grafana-util config profile show --profile prod --output-format yaml"
-    ));
-    assert!(help.contains(
-        "grafana-util config profile validate --profile prod"
-    ));
-    assert!(help.contains(
-        "grafana-util config profile add prod --url https://grafana.example.com"
-    ));
-    assert!(help.contains(
-        "grafana-util config profile init --overwrite"
-    ));
+    assert!(help.contains("grafana-util config profile show --profile prod --output-format yaml"));
+    assert!(help.contains("grafana-util config profile validate --profile prod"));
+    assert!(help.contains("grafana-util config profile add prod --url https://grafana.example.com"));
+    assert!(help.contains("grafana-util config profile init --overwrite"));
     let current_help = render_cli_help_path(&["config", "profile", "current"]);
-    assert!(current_help.contains(
-        "observe live, observe overview"
-    ));
+    assert!(current_help.contains("observe live, observe overview"));
     assert!(!help.contains("grafana-util profile"));
 }
 
 #[test]
-fn advanced_dashboard_sync_import_help_shows_grouped_headings_and_examples() {
-    let help = render_cli_help_path(&["advanced", "dashboard", "sync", "import"]);
-    assert!(help.contains("Connection Options"));
-    assert!(help.contains("Routing Options"));
-    assert!(help.contains("Review Output Options"));
-    assert!(help.contains("Examples:"));
-    assert!(help.contains("grafana-util advanced dashboard sync import"));
+fn dashboard_convert_help_shows_flat_subcommand() {
+    let help = render_cli_help_path(&["dashboard", "convert"]);
+    assert!(help.contains("Run dashboard format conversion workflows."));
+    assert!(help.contains("raw-to-prompt"));
+    assert!(!help.contains("advanced dashboard"));
+    assert!(!help.contains("sync"));
 }
 
 #[test]
-fn advanced_dashboard_sync_export_help_uses_short_export_flags() {
-    let help = render_cli_help_path(&["advanced", "dashboard", "sync", "export"]);
+fn dashboard_export_help_uses_short_export_flags() {
+    let help = render_cli_help_path(&["dashboard", "export"]);
     assert!(help.contains("--without-raw"));
     assert!(help.contains("--provider-name <NAME>"));
     assert!(help.contains("--provider-update-interval-seconds <SECONDS>"));
@@ -174,17 +203,35 @@ fn advanced_dashboard_sync_export_help_uses_short_export_flags() {
 }
 
 #[test]
-fn dashboard_short_help_uses_grouped_lanes_only() {
+fn dashboard_short_help_uses_flat_paths_only() {
     let help =
-        maybe_render_unified_help_from_os_args(["grafana-util", "dashboard", "-h"], false).unwrap();
-    assert!(help.contains("live         browse, list, vars, fetch, clone, edit, delete, history"));
-    assert!(help.contains("draft        review, patch, serve, publish"));
-    assert!(help.contains("sync         export, import, diff, convert"));
-    assert!(help.contains("analyze      summary, topology, impact, governance"));
-    assert!(help.contains("capture      screenshot"));
-    assert!(!help.contains("fetch-live"));
-    assert!(!help.contains("clone-live"));
-    assert!(!help.contains("list-vars"));
+        maybe_render_unified_help_from_os_args(["grafana-util", "dashboard", "--help"], false)
+            .unwrap();
+    assert!(help.contains("browse"));
+    assert!(help.contains("list"));
+    assert!(help.contains("variables"));
+    assert!(help.contains("get"));
+    assert!(help.contains("clone"));
+    assert!(help.contains("edit-live"));
+    assert!(help.contains("delete"));
+    assert!(help.contains("history"));
+    assert!(help.contains("review"));
+    assert!(help.contains("patch"));
+    assert!(help.contains("serve"));
+    assert!(help.contains("publish"));
+    assert!(help.contains("export"));
+    assert!(help.contains("import"));
+    assert!(help.contains("diff"));
+    assert!(help.contains("summary"));
+    assert!(help.contains("dependencies"));
+    assert!(help.contains("impact"));
+    assert!(help.contains("policy"));
+    assert!(help.contains("screenshot"));
+    assert!(!help.contains("live         browse, list, vars, fetch, clone, edit, delete, history"));
+    assert!(!help.contains("draft        review, patch, serve, publish"));
+    assert!(!help.contains("sync         export, import, diff, convert"));
+    assert!(!help.contains("analyze      summary, topology, impact, governance"));
+    assert!(!help.contains("capture      screenshot"));
 }
 
 #[test]
@@ -326,79 +373,27 @@ fn parse_cli_supports_task_first_export_surface() {
 }
 
 #[test]
-fn parse_cli_supports_advanced_dashboard_surface() {
-    let args: CliArgs = parse_cli_from([
+fn parse_dashboard_cli_supports_flat_dashboard_surface() {
+    let browse_args = parse_dashboard_cli_from([
         "grafana-util",
-        "advanced",
-        "dashboard",
-        "sync",
-        "import",
-        "--input-dir",
-        "./dashboards/raw",
-        "--dry-run",
-        "--table",
+        "browse",
+        "--url",
+        "https://grafana.example.com",
+        "--basic-user",
+        "admin",
+        "--basic-password",
+        "admin",
     ]);
-
-    match args.command {
-        UnifiedCommand::Advanced { command } => match command {
-            super::AdvancedCommand::Dashboard { command } => match command {
-                super::DashboardGroupCommand::Sync { command } => match command {
-                    super::DashboardSyncCommand::Import(inner) => {
-                        assert_eq!(inner.input_dir, Path::new("./dashboards/raw"));
-                        assert!(inner.dry_run);
-                        assert!(inner.table);
-                    }
-                    _ => panic!("expected advanced dashboard sync import"),
-                },
-                _ => panic!("expected advanced dashboard sync"),
-            },
-            _ => panic!("expected advanced dashboard"),
-        },
-        _ => panic!("expected advanced command"),
-    }
-}
-
-#[test]
-fn parse_cli_supports_grouped_dashboard_surfaces() {
-    let live_args: CliArgs = parse_cli_from([
+    let review_args = parse_dashboard_cli_from([
         "grafana-util",
-        "dashboard",
-        "live",
-        "fetch",
-        "--dashboard-uid",
-        "cpu-main",
-        "--output",
-        "./cpu-main.json",
-    ]);
-    let draft_args: CliArgs = parse_cli_from([
-        "grafana-util",
-        "dashboard",
-        "draft",
         "review",
         "--input",
         "./drafts/cpu-main.json",
     ]);
-    let sync_args: CliArgs = parse_cli_from([
+    let analyze_args =
+        parse_dashboard_cli_from(["grafana-util", "summary", "--input-dir", "./dashboards/raw"]);
+    let screenshot_args = parse_dashboard_cli_from([
         "grafana-util",
-        "dashboard",
-        "sync",
-        "export",
-        "--output-dir",
-        "./dashboards",
-        "--overwrite",
-    ]);
-    let analyze_args: CliArgs = parse_cli_from([
-        "grafana-util",
-        "dashboard",
-        "analyze",
-        "summary",
-        "--input-dir",
-        "./dashboards/raw",
-    ]);
-    let capture_args: CliArgs = parse_cli_from([
-        "grafana-util",
-        "dashboard",
-        "capture",
         "screenshot",
         "--dashboard-uid",
         "cpu-main",
@@ -406,83 +401,59 @@ fn parse_cli_supports_grouped_dashboard_surfaces() {
         "./cpu-main.png",
     ]);
 
-    match live_args.command {
-        UnifiedCommand::Dashboard { command } => match command {
-            super::DashboardGroupCommand::Live { command } => match command {
-                super::DashboardLiveCommand::Fetch(inner) => {
-                    assert_eq!(inner.dashboard_uid, "cpu-main");
-                    assert_eq!(inner.output, Path::new("./cpu-main.json"));
-                }
-                _ => panic!("expected dashboard live fetch"),
-            },
-            _ => panic!("expected dashboard live"),
-        },
-        _ => panic!("expected dashboard command"),
+    match browse_args.command {
+        DashboardCommand::Browse(inner) => {
+            assert_eq!(inner.common.url, "https://grafana.example.com");
+        }
+        _ => panic!("expected dashboard browse"),
     }
 
-    match draft_args.command {
-        UnifiedCommand::Dashboard { command } => match command {
-            super::DashboardGroupCommand::Draft { command } => match command {
-                super::DashboardDraftCommand::Review(inner) => {
-                    assert_eq!(inner.input, Path::new("./drafts/cpu-main.json"));
-                }
-                _ => panic!("expected dashboard draft review"),
-            },
-            _ => panic!("expected dashboard draft"),
-        },
-        _ => panic!("expected dashboard command"),
-    }
-
-    match sync_args.command {
-        UnifiedCommand::Dashboard { command } => match command {
-            super::DashboardGroupCommand::Sync { command } => match command {
-                super::DashboardSyncCommand::Export(inner) => {
-                    assert_eq!(inner.output_dir, Path::new("./dashboards"));
-                    assert!(inner.overwrite);
-                }
-                _ => panic!("expected dashboard sync export"),
-            },
-            _ => panic!("expected dashboard sync"),
-        },
-        _ => panic!("expected dashboard command"),
+    match review_args.command {
+        DashboardCommand::Review(inner) => {
+            assert_eq!(inner.input, Path::new("./drafts/cpu-main.json"));
+        }
+        _ => panic!("expected dashboard review"),
     }
 
     match analyze_args.command {
-        UnifiedCommand::Dashboard { command } => match command {
-            super::DashboardGroupCommand::Analyze { command } => match command {
-                super::DashboardAnalyzeCommand::Summary(inner) => {
-                    assert_eq!(
-                        inner.input_dir.as_deref(),
-                        Some(Path::new("./dashboards/raw"))
-                    );
-                }
-                _ => panic!("expected dashboard analyze summary"),
-            },
-            _ => panic!("expected dashboard analyze"),
-        },
-        _ => panic!("expected dashboard command"),
+        DashboardCommand::Analyze(inner) => {
+            assert_eq!(
+                inner.input_dir.as_deref(),
+                Some(Path::new("./dashboards/raw"))
+            );
+        }
+        _ => panic!("expected dashboard summary"),
     }
 
-    match capture_args.command {
-        UnifiedCommand::Dashboard { command } => match command {
-            super::DashboardGroupCommand::Capture { command } => match command {
-                super::DashboardCaptureCommand::Screenshot(inner) => {
-                    assert_eq!(inner.dashboard_uid.as_deref(), Some("cpu-main"));
-                    assert_eq!(inner.output, Path::new("./cpu-main.png"));
-                }
-            },
-            _ => panic!("expected dashboard capture"),
-        },
-        _ => panic!("expected dashboard command"),
+    match screenshot_args.command {
+        DashboardCommand::Screenshot(inner) => {
+            assert_eq!(inner.dashboard_uid.as_deref(), Some("cpu-main"));
+            assert_eq!(inner.output, Path::new("./cpu-main.png"));
+        }
+        _ => panic!("expected dashboard screenshot"),
     }
 }
 
 #[test]
-fn parse_cli_supports_grouped_dashboard_convert_surface() {
+fn parse_dashboard_cli_rejects_legacy_grouped_and_compatibility_paths() {
+    for args in [
+        vec!["grafana-util", "advanced", "dashboard", "live", "browse"],
+        vec!["grafana-util", "migrate", "dashboard", "raw-to-prompt"],
+        vec!["grafana-util", "live", "browse"],
+        vec!["grafana-util", "draft", "review"],
+        vec!["grafana-util", "sync", "export"],
+        vec!["grafana-util", "analyze", "summary"],
+        vec!["grafana-util", "capture", "screenshot"],
+    ] {
+        let _error = DashboardCliArgs::try_parse_from(args).unwrap_err();
+    }
+}
+
+#[test]
+fn parse_cli_supports_dashboard_convert_surface() {
     let args: CliArgs = parse_cli_from([
         "grafana-util",
         "dashboard",
-        "sync",
         "convert",
         "raw-to-prompt",
         "--input-file",
@@ -491,29 +462,25 @@ fn parse_cli_supports_grouped_dashboard_convert_surface() {
 
     match args.command {
         UnifiedCommand::Dashboard { command } => match command {
-            super::DashboardGroupCommand::Sync { command } => match command {
-                super::DashboardSyncCommand::Convert { command } => match command {
-                    super::DashboardSyncConvertCommand::RawToPrompt(inner) => {
-                        assert_eq!(
-                            inner.input_file,
-                            vec![Path::new("./dashboards/raw/cpu-main.json").to_path_buf()]
-                        );
-                    }
-                },
-                _ => panic!("expected dashboard sync convert"),
+            super::DashboardRootCommand::Convert { command } => match command {
+                super::DashboardConvertCommand::RawToPrompt(inner) => {
+                    assert_eq!(
+                        inner.input_file,
+                        vec![Path::new("./dashboards/raw/cpu-main.json").to_path_buf()]
+                    );
+                }
             },
-            _ => panic!("expected dashboard sync"),
+            _ => panic!("expected dashboard convert"),
         },
         _ => panic!("expected dashboard command"),
     }
 }
 
 #[test]
-fn parse_cli_supports_grouped_alert_surfaces() {
-    let migrate_args: CliArgs = parse_cli_from([
+fn parse_cli_supports_flat_alert_surface() {
+    let export_args: CliArgs = parse_cli_from([
         "grafana-util",
         "alert",
-        "migrate",
         "export",
         "--output-dir",
         "./alerts",
@@ -522,9 +489,7 @@ fn parse_cli_supports_grouped_alert_surfaces() {
     let author_rule_args: CliArgs = parse_cli_from([
         "grafana-util",
         "alert",
-        "author",
-        "rule",
-        "add",
+        "add-rule",
         "--desired-dir",
         "./alerts/desired",
         "--name",
@@ -544,8 +509,7 @@ fn parse_cli_supports_grouped_alert_surfaces() {
     let scaffold_args: CliArgs = parse_cli_from([
         "grafana-util",
         "alert",
-        "scaffold",
-        "rule",
+        "new-rule",
         "--desired-dir",
         "./alerts/desired",
         "--name",
@@ -554,7 +518,6 @@ fn parse_cli_supports_grouped_alert_surfaces() {
     let change_args: CliArgs = parse_cli_from([
         "grafana-util",
         "alert",
-        "change",
         "plan",
         "--desired-dir",
         "./alerts/desired",
@@ -562,88 +525,74 @@ fn parse_cli_supports_grouped_alert_surfaces() {
         "json",
     ]);
 
-    match migrate_args.command {
-        UnifiedCommand::Alert(inner) => match inner.command {
-            super::AlertCommandSurface::Migrate { command } => match command {
-                super::AlertMigrateCommand::Export(inner) => {
-                    assert_eq!(inner.output_dir, Path::new("./alerts"));
-                    assert!(inner.overwrite);
-                }
-                _ => panic!("expected alert migrate export"),
-            },
-            _ => panic!("expected alert migrate"),
+    match export_args.command {
+        UnifiedCommand::Alert { command, .. } => match command {
+            AlertGroupCommand::Export(inner) => {
+                assert_eq!(inner.output_dir, Path::new("./alerts"));
+                assert!(inner.overwrite);
+            }
+            _ => panic!("expected alert export"),
         },
         _ => panic!("expected alert command"),
     }
 
     match author_rule_args.command {
-        UnifiedCommand::Alert(inner) => match inner.command {
-            super::AlertCommandSurface::Author { command } => match command {
-                super::AlertAuthorCommand::Rule { command } => match command {
-                    super::AlertAuthorRuleCommand::Add(inner) => {
-                        assert_eq!(inner.base.desired_dir, Path::new("./alerts/desired"));
-                        assert_eq!(inner.name, "cpu-high");
-                        assert_eq!(inner.folder, "platform-alerts");
-                    }
-                    _ => panic!("expected alert author rule add"),
-                },
-                _ => panic!("expected alert author rule"),
-            },
-            _ => panic!("expected alert author"),
+        UnifiedCommand::Alert { command, .. } => match command {
+            AlertGroupCommand::AddRule(inner) => {
+                assert_eq!(inner.base.desired_dir, Path::new("./alerts/desired"));
+                assert_eq!(inner.name, "cpu-high");
+                assert_eq!(inner.folder, "platform-alerts");
+            }
+            _ => panic!("expected alert add-rule"),
         },
         _ => panic!("expected alert command"),
     }
 
     match scaffold_args.command {
-        UnifiedCommand::Alert(inner) => match inner.command {
-            super::AlertCommandSurface::Scaffold { command } => match command {
-                super::AlertScaffoldCommand::Rule(inner) => {
-                    assert_eq!(inner.desired_dir, Path::new("./alerts/desired"));
-                    assert_eq!(inner.name, "cpu-main");
-                }
-                _ => panic!("expected alert scaffold rule"),
-            },
-            _ => panic!("expected alert scaffold"),
+        UnifiedCommand::Alert { command, .. } => match command {
+            AlertGroupCommand::NewRule(inner) => {
+                assert_eq!(inner.desired_dir, Path::new("./alerts/desired"));
+                assert_eq!(inner.name, "cpu-main");
+            }
+            _ => panic!("expected alert new-rule"),
         },
         _ => panic!("expected alert command"),
     }
 
     match change_args.command {
-        UnifiedCommand::Alert(inner) => match inner.command {
-            super::AlertCommandSurface::Change { command } => match command {
-                super::AlertChangeCommand::Plan(inner) => {
-                    assert_eq!(inner.desired_dir, Path::new("./alerts/desired"));
-                    assert_eq!(format!("{:?}", inner.output_format), "Json");
-                }
-                _ => panic!("expected alert change plan"),
-            },
-            _ => panic!("expected alert change"),
+        UnifiedCommand::Alert { command, .. } => match command {
+            AlertGroupCommand::Plan(inner) => {
+                assert_eq!(inner.desired_dir, Path::new("./alerts/desired"));
+                assert_eq!(format!("{:?}", inner.output_format), "Json");
+            }
+            _ => panic!("expected alert plan"),
         },
         _ => panic!("expected alert command"),
     }
 }
 
 #[test]
-fn docs_describe_grouped_surfaces_without_compatibility_language() {
+fn docs_describe_dashboard_and_legacy_compatibility_surfaces() {
     let en_index = include_str!("../../docs/commands/en/index.md");
     assert!(en_index.contains("Start Here"));
     assert!(en_index.contains("Common Tasks"));
-    assert!(en_index.contains("Advanced Tasks"));
+    assert!(en_index.contains("dashboard convert raw-to-prompt"));
+    assert!(!en_index.contains("advanced dashboard"));
+    assert!(!en_index.contains("migrate dashboard"));
+    assert!(en_index.contains("dashboard"));
     assert!(en_index.contains("observe"));
     assert!(en_index.contains("export"));
     assert!(en_index.contains("config profile"));
-    assert!(!en_index.contains("Compatibility Pages"));
-    assert!(!en_index.contains("compatibility aliases remain"));
 
     let zh_index = include_str!("../../docs/commands/zh-TW/index.md");
     assert!(zh_index.contains("先從這裡開始"));
     assert!(zh_index.contains("常用工作"));
-    assert!(zh_index.contains("進階工作"));
+    assert!(zh_index.contains("dashboard convert raw-to-prompt"));
+    assert!(!zh_index.contains("advanced dashboard"));
+    assert!(!zh_index.contains("migrate dashboard"));
     assert!(zh_index.contains("observe"));
     assert!(zh_index.contains("export"));
     assert!(zh_index.contains("config profile"));
-    assert!(!zh_index.contains("相容頁面"));
-    assert!(!zh_index.contains("相容別名"));
 }
 
 #[test]

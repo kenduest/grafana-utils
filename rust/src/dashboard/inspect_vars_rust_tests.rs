@@ -17,7 +17,7 @@ use tempfile::tempdir;
 fn parse_inspect_vars_args_supports_dashboard_url_only() {
     let args = match parse_cli_from([
         "grafana-util",
-        "inspect-vars",
+        "variables",
         "--dashboard-url",
         "https://grafana.example.com/d/infra-main/infra-overview?var-datasource=prom-main",
         "--output-format",
@@ -28,7 +28,7 @@ fn parse_inspect_vars_args_supports_dashboard_url_only() {
     .command
     {
         DashboardCommand::InspectVars(args) => args,
-        other => panic!("expected inspect-vars args, got {other:?}"),
+        other => panic!("expected variables args, got {other:?}"),
     };
 
     assert_eq!(args.dashboard_uid, None);
@@ -44,7 +44,7 @@ fn parse_inspect_vars_args_supports_dashboard_url_only() {
 fn parse_inspect_vars_args_accepts_vars_query() {
     let args = match parse_cli_from([
         "grafana-util",
-        "inspect-vars",
+        "variables",
         "--dashboard-uid",
         "infra-main",
         "--vars-query",
@@ -55,7 +55,7 @@ fn parse_inspect_vars_args_accepts_vars_query() {
     .command
     {
         DashboardCommand::InspectVars(args) => args,
-        other => panic!("expected inspect-vars args, got {other:?}"),
+        other => panic!("expected variables args, got {other:?}"),
     };
 
     assert_eq!(args.dashboard_uid.as_deref(), Some("infra-main"));
@@ -69,25 +69,22 @@ fn parse_inspect_vars_args_accepts_vars_query() {
 fn parse_inspect_vars_args_supports_output_file() {
     let args = match parse_cli_from([
         "grafana-util",
-        "inspect-vars",
+        "variables",
         "--dashboard-uid",
         "infra-main",
         "--output-file",
-        "/tmp/inspect-vars.json",
+        "/tmp/variables.json",
         "--token",
         "secret",
     ])
     .command
     {
         DashboardCommand::InspectVars(args) => args,
-        other => panic!("expected inspect-vars args, got {other:?}"),
+        other => panic!("expected variables args, got {other:?}"),
     };
 
     assert_eq!(args.dashboard_uid.as_deref(), Some("infra-main"));
-    assert_eq!(
-        args.output_file,
-        Some(PathBuf::from("/tmp/inspect-vars.json"))
-    );
+    assert_eq!(args.output_file, Some(PathBuf::from("/tmp/variables.json")));
     assert!(!args.also_stdout);
 }
 
@@ -216,11 +213,11 @@ fn execute_dashboard_variable_inspection_supports_local_import_dir() {
 fn parse_inspect_vars_args_supports_also_stdout() {
     let args = match parse_cli_from([
         "grafana-util",
-        "inspect-vars",
+        "variables",
         "--dashboard-uid",
         "infra-main",
         "--output-file",
-        "/tmp/inspect-vars.json",
+        "/tmp/variables.json",
         "--also-stdout",
         "--token",
         "secret",
@@ -228,13 +225,10 @@ fn parse_inspect_vars_args_supports_also_stdout() {
     .command
     {
         DashboardCommand::InspectVars(args) => args,
-        other => panic!("expected inspect-vars args, got {other:?}"),
+        other => panic!("expected variables args, got {other:?}"),
     };
 
-    assert_eq!(
-        args.output_file,
-        Some(PathBuf::from("/tmp/inspect-vars.json"))
-    );
+    assert_eq!(args.output_file, Some(PathBuf::from("/tmp/variables.json")));
     assert!(args.also_stdout);
 }
 
@@ -242,7 +236,7 @@ fn parse_inspect_vars_args_supports_also_stdout() {
 fn parse_inspect_vars_args_supports_text_and_yaml_output_formats() {
     let text_args = match parse_cli_from([
         "grafana-util",
-        "inspect-vars",
+        "variables",
         "--dashboard-uid",
         "infra-main",
         "--output-format",
@@ -253,12 +247,12 @@ fn parse_inspect_vars_args_supports_text_and_yaml_output_formats() {
     .command
     {
         DashboardCommand::InspectVars(args) => args,
-        other => panic!("expected inspect-vars args, got {other:?}"),
+        other => panic!("expected variables args, got {other:?}"),
     };
 
     let yaml_args = match parse_cli_from([
         "grafana-util",
-        "inspect-vars",
+        "variables",
         "--dashboard-uid",
         "infra-main",
         "--output-format",
@@ -269,7 +263,7 @@ fn parse_inspect_vars_args_supports_text_and_yaml_output_formats() {
     .command
     {
         DashboardCommand::InspectVars(args) => args,
-        other => panic!("expected inspect-vars args, got {other:?}"),
+        other => panic!("expected variables args, got {other:?}"),
     };
 
     assert_eq!(text_args.output_format, Some(SimpleOutputFormat::Text));

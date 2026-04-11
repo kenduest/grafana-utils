@@ -39,4 +39,4 @@ grafana-util dashboard serve --script 'jsonnet dashboards/cpu.jsonnet' --watch .
 ## 相關指令
 - [dashboard review](./dashboard-review.md)
 - [dashboard publish](./dashboard-publish.md)
-- [dashboard edit-live](./dashboard-edit-live.md)
+- [dashboard edit](./dashboard-edit-live.md)

@@ -27,7 +27,7 @@ grafana-util dashboard diff --url http://localhost:3000 --basic-user admin --bas
 ## Related commands
 - [dashboard export](./dashboard-export.md)
 - [dashboard import](./dashboard-import.md)
-- [dashboard analyze (local)](./dashboard-analyze-export.md)
+- [dashboard dependencies](./dashboard-dependencies.md)
 - [Shared diff JSON contract](../../user-guide/en/diff-json-contract.md)
 
 CLI schema lookup:

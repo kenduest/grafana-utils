@@ -43,6 +43,6 @@ grafana-util dashboard import --url http://localhost:3000 --basic-user admin --b
 
 ## Related commands
 - [dashboard export](./dashboard-export.md)
-- [migrate dashboard raw-to-prompt](./migrate-dashboard-raw-to-prompt.md)
+- [dashboard convert raw-to-prompt](./dashboard-convert-raw-to-prompt.md)
 - [dashboard diff](./dashboard-diff.md)
 - [dashboard publish](./dashboard-publish.md)

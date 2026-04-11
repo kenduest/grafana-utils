@@ -307,7 +307,7 @@ pub struct InspectVarsArgs {
     #[arg(
         long,
         value_name = "QUERY",
-        help = "Grafana variable query-string fragment, for example 'var-env=prod&var-host=web01'. This overlays current values in list-vars output."
+        help = "Grafana variable query-string fragment, for example 'var-env=prod&var-host=web01'. This overlays current values in variables output."
     )]
     pub vars_query: Option<String>,
     #[arg(
@@ -324,16 +324,16 @@ pub struct InspectVarsArgs {
     #[arg(
         long,
         default_value_t = false,
-        help = "Do not print table or CSV headers when rendering list-vars output."
+        help = "Do not print table or CSV headers when rendering variables output."
     )]
     pub no_header: bool,
-    #[arg(long, help = "Write list-vars output to this file.")]
+    #[arg(long, help = "Write variables output to this file.")]
     pub output_file: Option<PathBuf>,
     #[arg(
         long,
         default_value_t = false,
         requires = "output_file",
-        help = "When --output-file is set, also print list-vars output to stdout."
+        help = "When --output-file is set, also print variables output to stdout."
     )]
     pub also_stdout: bool,
 }
@@ -550,7 +550,7 @@ pub struct InspectExportArgs {
         long,
         value_enum,
         conflicts_with_all = ["text", "table", "csv", "json", "yaml"],
-        help = "Single-flag output selector for dashboard analyze output. Use text, table, csv, json, yaml, tree, tree-table, dependency, dependency-json, governance, governance-json, or queries-json."
+        help = "Single-flag output selector for dashboard summary output. Use text, table, csv, json, yaml, tree, tree-table, dependency, dependency-json, governance, governance-json, or queries-json."
     )]
     pub output_format: Option<InspectOutputFormat>,
     #[arg(
@@ -579,7 +579,7 @@ pub struct InspectExportArgs {
     #[arg(
         long,
         default_value_t = false,
-        help = "Show extended help with analysis examples for dashboard analyze."
+        help = "Show extended help with analysis examples for dashboard summary."
     )]
     pub help_full: bool,
     #[arg(
@@ -670,7 +670,7 @@ pub struct InspectLiveArgs {
         long,
         value_enum,
         conflicts_with_all = ["text", "table", "csv", "json", "yaml"],
-        help = "Single-flag output selector for dashboard analyze output. Use text, table, csv, json, yaml, tree, tree-table, dependency, dependency-json, governance, governance-json, or queries-json."
+        help = "Single-flag output selector for dashboard summary output. Use text, table, csv, json, yaml, tree, tree-table, dependency, dependency-json, governance, governance-json, or queries-json."
     )]
     pub output_format: Option<InspectOutputFormat>,
     #[arg(
@@ -705,7 +705,7 @@ pub struct InspectLiveArgs {
     #[arg(
         long,
         default_value_t = false,
-        help = "Show extended help with analysis examples for dashboard analyze."
+        help = "Show extended help with analysis examples for dashboard summary."
     )]
     pub help_full: bool,
     #[arg(
@@ -739,7 +739,7 @@ pub struct GovernanceGateArgs {
     #[arg(
         long,
         default_value_t = DEFAULT_PAGE_SIZE,
-        help = "Dashboard search page size when governance-gate stages live analysis artifacts."
+        help = "Dashboard search page size when policy stages live analysis artifacts."
     )]
     pub page_size: usize,
     #[arg(
@@ -831,7 +831,7 @@ pub struct TopologyArgs {
     #[arg(
         long,
         default_value_t = DEFAULT_PAGE_SIZE,
-        help = "Dashboard search page size when topology stages live analysis artifacts."
+        help = "Dashboard search page size when dependencies stages live analysis artifacts."
     )]
     pub page_size: usize,
     #[arg(
@@ -891,20 +891,20 @@ pub struct TopologyArgs {
     pub output_format: TopologyOutputFormat,
     #[arg(
         long,
-        help = "Optional path to also write the rendered topology output."
+        help = "Optional path to also write the rendered dependency output."
     )]
     pub output_file: Option<PathBuf>,
     #[arg(
         long,
         default_value_t = false,
         requires = "output_file",
-        help = "When --output-file is set, also print the rendered topology to stdout."
+        help = "When --output-file is set, also print the rendered dependency output to stdout."
     )]
     pub also_stdout: bool,
     #[arg(
         long,
         default_value_t = false,
-        help = "Open an interactive terminal browser over topology nodes and edges."
+        help = "Open an interactive terminal browser over dependency nodes and edges."
     )]
     pub interactive: bool,
 }

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>dashboard edit-live · grafana-util docs</title>
+  <title>dashboard edit · grafana-util docs</title>
   <style>:root {
   color-scheme: light dark;
   --font-scale: 1;
@@ -736,7 +736,7 @@ code[class*="language-"],pre[class*="language-"]{color:#ccc;background:none;font
       <div class="topbar">
   <a class="brand" href="../../index.html">grafana-util docs</a>
   <div class="themebar">
-    <select id="page-locale-select" aria-label="Language switch"><option value="" selected>Language: 繁體中文</option><option value="../en/dashboard-edit-live.html">Switch to English</option></select><select id="jump-select" aria-label="Jump"><option value="" selected>快速跳轉...</option><optgroup label="使用手冊"><option value="../../handbook/zh-TW/index.html">概觀</option><option value="../../handbook/zh-TW/what-is-grafana-util.html">這個工具是做什麼的</option><option value="../../handbook/zh-TW/getting-started.html">開始使用</option><option value="../../handbook/zh-TW/role-new-user.html">新手快速入門</option><option value="../../handbook/zh-TW/role-sre-ops.html">SRE / 維運角色導讀</option><option value="../../handbook/zh-TW/role-automation-ci.html">自動化 / CI 角色導讀</option><option value="../../handbook/zh-TW/architecture.html">系統架構與設計原則</option><option value="../../handbook/zh-TW/dashboard.html">Dashboard 維運人員手冊</option><option value="../../handbook/zh-TW/datasource.html">Data source 維運手冊</option><option value="../../handbook/zh-TW/alert.html">Alert 維運人員手冊</option><option value="../../handbook/zh-TW/access.html">身分與存取管理</option><option value="../../handbook/zh-TW/change-overview-status.html">專案狀態與變更總覽</option><option value="../../handbook/zh-TW/scenarios.html">維運情境手冊</option><option value="../../handbook/zh-TW/recipes.html">實戰錦囊與最佳實踐</option><option value="../../handbook/zh-TW/reference.html">技術參考手冊</option><option value="../../handbook/zh-TW/troubleshooting.html">疑難排解與名詞解釋</option></optgroup><optgroup label="指令參考"><option value="dashboard.html">Dashboard</option><option value="migrate.html">Migrate</option><option value="alert.html">Alert</option><option value="datasource.html">Datasource</option><option value="access.html">Access</option><option value="config.html">Config</option><option value="observe.html">Observe</option><option value="change.html">Change</option><option value="snapshot.html">Snapshot</option></optgroup></select>
+    <select id="page-locale-select" aria-label="Language switch"><option value="" selected>Language: 繁體中文</option><option value="../en/dashboard-edit-live.html">Switch to English</option></select><select id="jump-select" aria-label="Jump"><option value="" selected>快速跳轉...</option><optgroup label="使用手冊"><option value="../../handbook/zh-TW/index.html">概觀</option><option value="../../handbook/zh-TW/what-is-grafana-util.html">這個工具是做什麼的</option><option value="../../handbook/zh-TW/getting-started.html">開始使用</option><option value="../../handbook/zh-TW/role-new-user.html">新手快速入門</option><option value="../../handbook/zh-TW/role-sre-ops.html">SRE / 維運角色導讀</option><option value="../../handbook/zh-TW/role-automation-ci.html">自動化 / CI 角色導讀</option><option value="../../handbook/zh-TW/architecture.html">系統架構與設計原則</option><option value="../../handbook/zh-TW/dashboard.html">Dashboard 維運人員手冊</option><option value="../../handbook/zh-TW/datasource.html">Data source 維運手冊</option><option value="../../handbook/zh-TW/alert.html">Alert 維運人員手冊</option><option value="../../handbook/zh-TW/access.html">身分與存取管理</option><option value="../../handbook/zh-TW/change-overview-status.html">專案狀態與變更總覽</option><option value="../../handbook/zh-TW/scenarios.html">維運情境手冊</option><option value="../../handbook/zh-TW/recipes.html">實戰錦囊與最佳實踐</option><option value="../../handbook/zh-TW/reference.html">技術參考手冊</option><option value="../../handbook/zh-TW/troubleshooting.html">疑難排解與名詞解釋</option></optgroup><optgroup label="指令參考"><option value="dashboard.html">Dashboard</option><option value="alert.html">Alert</option><option value="datasource.html">Datasource</option><option value="access.html">Access</option><option value="config.html">Config</option><option value="observe.html">Observe</option><option value="change.html">Change</option><option value="snapshot.html">Snapshot</option></optgroup></select>
     <select id="font-select" aria-label="Font Size">
       <option value="0.9">Font: Compact</option>
       <option value="1">Font: Default</option>
@@ -758,9 +758,9 @@ code[class*="language-"],pre[class*="language-"]{color:#ccc;background:none;font
 </aside>
 
   <article class="article">
-    <div class="breadcrumbs"><a href="../../index.html">Home</a> / Commands / dashboard edit-live</div>
+    <div class="breadcrumbs"><a href="../../index.html">Home</a> / Commands / dashboard edit</div>
 
-    <h1><span class="hero-title-main">dashboard edit-live</span></h1>
+    <h1><span class="hero-title-main">dashboard edit</span></h1>
 
 
     <section class="command-intro">
@@ -774,7 +774,7 @@ code[class*="language-"],pre[class*="language-"]{color:#ccc;background:none;font
 </div>
 <div class="command-intro-block">
   <p class="command-intro-label">適合誰</p>
-  <p class="command-intro-text">適合 SRE、Grafana 維運人員，以及要處理 dashboard 盤點、搬遷、檢查或截圖的人。</p>
+  <p class="command-intro-text">適合 SRE、Grafana 維運人員，以及要處理 dashboard 盤點、檢查、匯出、政策或截圖的人。</p>
 </div>
 </div>
 </section>
@@ -788,13 +788,13 @@ code[class*="language-"],pre[class*="language-"]{color:#ccc;background:none;font
 <ul><li>指令會依序使用 <code>$VISUAL</code>、<code>$EDITOR</code>，最後回退到 <code>vi</code>。</li><li>沒有帶 <code>--apply-live</code> 時，這個指令一定會把結果寫成本地草稿。</li><li>編修完成後，指令會印出 review 摘要，包含阻擋性驗證問題與建議的下一步。</li><li><code>--apply-live</code> 只有在編修後的草稿維持 <code>dashboard.id</code> 為 null、保留原始 dashboard UID、且沒有阻擋性 review 問題時才會繼續。</li><li>編修後的 payload 仍必須保留 <code>dashboard.uid</code>。</li></ul>
 <h2 id="範例">範例</h2>
 <pre><code># 用途：編修一份 live dashboard，並把結果保留成本地草稿。
-grafana-util dashboard edit-live --profile prod --dashboard-uid cpu-main --output ./drafts/cpu-main.edited.json</code></pre>
+grafana-util dashboard edit --profile prod --dashboard-uid cpu-main --output ./drafts/cpu-main.edited.json</code></pre>
 <pre><code># 用途：編修一份 live dashboard，並使用預設輸出路徑 ./cpu-main.edited.json。
-grafana-util dashboard edit-live --url http://localhost:3000 --basic-user admin --basic-password admin --dashboard-uid cpu-main</code></pre>
+grafana-util dashboard edit --url http://localhost:3000 --basic-user admin --basic-password admin --dashboard-uid cpu-main</code></pre>
 <pre><code># 用途：編修一份 live dashboard，並明確回寫到 Grafana。
-grafana-util dashboard edit-live --profile prod --dashboard-uid cpu-main --apply-live --yes --message &#x27;Hotfix CPU dashboard&#x27;</code></pre>
+grafana-util dashboard edit --profile prod --dashboard-uid cpu-main --apply-live --yes --message &#x27;Hotfix CPU dashboard&#x27;</code></pre>
 <h2 id="相關指令">相關指令</h2>
-<ul><li><a href="dashboard-fetch-live.html">dashboard fetch-live</a></li><li><a href="dashboard-clone-live.html">dashboard clone-live</a></li><li><a href="dashboard-publish.html">dashboard publish</a></li></ul>
+<ul><li><a href="dashboard-get.html">dashboard get</a></li><li><a href="dashboard-clone.html">dashboard clone</a></li><li><a href="dashboard-publish.html">dashboard publish</a></li></ul>
     
   </article>
   <aside class="sidebar">

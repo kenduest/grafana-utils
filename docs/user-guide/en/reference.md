@@ -42,7 +42,7 @@ The long form is usually better for scripts and reusable snippets. The short for
 
 - not every command exposes every shorthand flag
 - some commands only support one or two output shapes
-- `dashboard topology` is intentionally different: it supports `text`, `json`, `mermaid`, and `dot`, and does not have shortcut flags such as `--table`
+- `dashboard dependencies` is intentionally different: it supports `text`, `json`, `mermaid`, and `dot`, and does not have shortcut flags such as `--table`
 - file-writing flags such as `--output-file` or `--output` on draft/export commands mean destination paths, not render formats
 
 If you are unsure, always trust the per-command reference page over a generic rule of thumb.
@@ -441,7 +441,7 @@ Why these examples matter:
 | Direct format selectors | `--text`, `--table`, `--csv`, `--json`, `--yaml` | `text` / `table` / `csv` / `json` / `yaml` | Common on list, review, inspect, and some dry-run mutation surfaces. |
 | Single selector for common formats | `--output-format <FORMAT>` | `text` / `table` / `csv` / `json` / `yaml` | Some commands also define command-specific values such as `governance`, `governance-json`, `queries-json`, `mermaid`, or `dot`. |
 | Live `observe` entrypoint | `--output-format <FORMAT>` | `table` / `csv` / `text` / `json` / `yaml` / `interactive` | These live entrypoints now use the same standard selector. |
-| Write the rendered result to a file | `--output-file <PATH>` or a command-specific flag | command-specific | Common on topology, governance-gate, screenshot, and similar output-producing commands. |
+| Write the rendered result to a file | `--output-file <PATH>` or a command-specific flag | command-specific | Common on dependencies, policy, screenshot, and similar output-producing commands. |
 
 ### 1. Table or JSON selection
 ```bash
@@ -490,7 +490,7 @@ Both live entrypoints now use `--output-format`.
 - `raw/` is the API-safe replay/import lane.
 - `prompt/` is the Grafana UI import lane.
 - `dashboard export` writes the prompt lane for you.
-- `migrate dashboard raw-to-prompt` converts ordinary or raw dashboard JSON into prompt JSON when you need to repair or migrate a dashboard for Grafana UI import.
+- `dashboard convert raw-to-prompt` converts ordinary or raw dashboard JSON into prompt JSON when you need to repair or migrate a dashboard for Grafana UI import.
 - `dashboard import` consumes `raw/` or `provisioning/` input; it does not consume `prompt/`.
 
 ---

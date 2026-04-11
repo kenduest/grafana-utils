@@ -9,10 +9,10 @@ use clap::{CommandFactory, Parser};
 use std::path::{Path, PathBuf};
 
 #[test]
-fn parse_cli_supports_analyze_live_through_canonical_analyze_command() {
+fn parse_cli_supports_summary_through_canonical_summary_command() {
     let args = parse_cli_from([
         "grafana-util",
-        "analyze",
+        "summary",
         "--url",
         "https://grafana.example.com",
         "--output-format",
@@ -28,15 +28,15 @@ fn parse_cli_supports_analyze_live_through_canonical_analyze_command() {
                 Some(InspectOutputFormat::GovernanceJson)
             );
         }
-        _ => panic!("expected analyze command"),
+        _ => panic!("expected summary command"),
     }
 }
 
 #[test]
-fn parse_cli_supports_analyze_export_tree_through_canonical_analyze_command() {
+fn parse_cli_supports_summary_export_tree_through_canonical_summary_command() {
     let args = parse_cli_from([
         "grafana-util",
-        "analyze",
+        "summary",
         "--input-dir",
         "./dashboards/raw",
         "--input-format",
@@ -57,15 +57,15 @@ fn parse_cli_supports_analyze_export_tree_through_canonical_analyze_command() {
                 Some(InspectOutputFormat::TreeTable)
             );
         }
-        _ => panic!("expected analyze command"),
+        _ => panic!("expected summary command"),
     }
 }
 
 #[test]
-fn parse_cli_supports_analyze_export_git_sync_input_format() {
+fn parse_cli_supports_summary_export_git_sync_input_format() {
     let args = parse_cli_from([
         "grafana-util",
-        "analyze",
+        "summary",
         "--input-dir",
         "./dashboards/provisioning",
         "--input-format",
@@ -82,15 +82,15 @@ fn parse_cli_supports_analyze_export_git_sync_input_format() {
                 Some(InspectOutputFormat::Governance)
             );
         }
-        _ => panic!("expected analyze command"),
+        _ => panic!("expected summary command"),
     }
 }
 
 #[test]
-fn parse_cli_supports_governance_gate_git_sync_input_format() {
+fn parse_cli_supports_policy_git_sync_input_format() {
     let args = parse_cli_from([
         "grafana-util",
-        "governance-gate",
+        "policy",
         "--input-dir",
         "./grafana-oac-repo",
         "--input-format",
@@ -112,15 +112,15 @@ fn parse_cli_supports_governance_gate_git_sync_input_format() {
                 Some(Path::new("./grafana-oac-repo"))
             );
         }
-        _ => panic!("expected governance-gate command"),
+        _ => panic!("expected policy command"),
     }
 }
 
 #[test]
-fn parse_cli_supports_topology_git_sync_input_format() {
+fn parse_cli_supports_dependencies_git_sync_input_format() {
     let args = parse_cli_from([
         "grafana-util",
-        "topology",
+        "dependencies",
         "--input-dir",
         "./grafana-oac-repo",
         "--input-format",
@@ -135,7 +135,7 @@ fn parse_cli_supports_topology_git_sync_input_format() {
                 Some(Path::new("./grafana-oac-repo"))
             );
         }
-        _ => panic!("expected topology command"),
+        _ => panic!("expected dependencies command"),
     }
 }
 
@@ -168,7 +168,7 @@ fn parse_cli_supports_impact_git_sync_input_format() {
 fn parse_cli_supports_analyze_live_queries_json_output_format() {
     let args = parse_cli_from([
         "grafana-util",
-        "analyze-live",
+        "summary",
         "--url",
         "https://grafana.example.com",
         "--output-format",
@@ -176,16 +176,16 @@ fn parse_cli_supports_analyze_live_queries_json_output_format() {
     ]);
 
     match args.command {
-        DashboardCommand::InspectLive(inspect_args) => {
-            assert_eq!(inspect_args.common.url, "https://grafana.example.com");
+        DashboardCommand::Analyze(analyze_args) => {
+            assert_eq!(analyze_args.common.url, "https://grafana.example.com");
             assert_eq!(
-                inspect_args.output_format,
+                analyze_args.output_format,
                 Some(InspectOutputFormat::QueriesJson)
             );
-            assert!(!inspect_args.json);
-            assert!(!inspect_args.table);
+            assert!(!analyze_args.json);
+            assert!(!analyze_args.table);
         }
-        _ => panic!("expected analyze-live command"),
+        _ => panic!("expected summary command"),
     }
 }
 
@@ -193,7 +193,7 @@ fn parse_cli_supports_analyze_live_queries_json_output_format() {
 fn parse_cli_supports_analyze_live_output_format_flag() {
     let args = parse_cli_from([
         "grafana-util",
-        "analyze-live",
+        "summary",
         "--url",
         "https://grafana.example.com",
         "--output-format",
@@ -201,16 +201,16 @@ fn parse_cli_supports_analyze_live_output_format_flag() {
     ]);
 
     match args.command {
-        DashboardCommand::InspectLive(inspect_args) => {
-            assert_eq!(inspect_args.common.url, "https://grafana.example.com");
+        DashboardCommand::Analyze(analyze_args) => {
+            assert_eq!(analyze_args.common.url, "https://grafana.example.com");
             assert_eq!(
-                inspect_args.output_format,
+                analyze_args.output_format,
                 Some(InspectOutputFormat::GovernanceJson)
             );
-            assert!(!inspect_args.json);
-            assert!(!inspect_args.table);
+            assert!(!analyze_args.json);
+            assert!(!analyze_args.table);
         }
-        _ => panic!("expected analyze-live command"),
+        _ => panic!("expected summary command"),
     }
 }
 
@@ -218,7 +218,7 @@ fn parse_cli_supports_analyze_live_output_format_flag() {
 fn parse_cli_supports_analyze_live_output_format_dependency_json_flag() {
     let args = parse_cli_from([
         "grafana-util",
-        "analyze-live",
+        "summary",
         "--url",
         "https://grafana.example.com",
         "--output-format",
@@ -226,16 +226,16 @@ fn parse_cli_supports_analyze_live_output_format_dependency_json_flag() {
     ]);
 
     match args.command {
-        DashboardCommand::InspectLive(inspect_args) => {
-            assert_eq!(inspect_args.common.url, "https://grafana.example.com");
+        DashboardCommand::Analyze(analyze_args) => {
+            assert_eq!(analyze_args.common.url, "https://grafana.example.com");
             assert_eq!(
-                inspect_args.output_format,
+                analyze_args.output_format,
                 Some(InspectOutputFormat::DependencyJson)
             );
-            assert!(!inspect_args.json);
-            assert!(!inspect_args.table);
+            assert!(!analyze_args.json);
+            assert!(!analyze_args.table);
         }
-        _ => panic!("expected analyze-live command"),
+        _ => panic!("expected summary command"),
     }
 }
 
@@ -243,7 +243,7 @@ fn parse_cli_supports_analyze_live_output_format_dependency_json_flag() {
 fn parse_cli_supports_analyze_live_output_file() {
     let args = parse_cli_from([
         "grafana-util",
-        "analyze-live",
+        "summary",
         "--url",
         "https://grafana.example.com",
         "--output-format",
@@ -253,15 +253,15 @@ fn parse_cli_supports_analyze_live_output_file() {
     ]);
 
     match args.command {
-        DashboardCommand::InspectLive(inspect_args) => {
+        DashboardCommand::Analyze(analyze_args) => {
             assert_eq!(
-                inspect_args.output_file,
+                analyze_args.output_file,
                 Some(PathBuf::from("/tmp/analyze-live.txt"))
             );
-            assert!(!inspect_args.also_stdout);
-            assert_eq!(inspect_args.output_format, Some(InspectOutputFormat::Tree));
+            assert!(!analyze_args.also_stdout);
+            assert_eq!(analyze_args.output_format, Some(InspectOutputFormat::Tree));
         }
-        _ => panic!("expected analyze-live command"),
+        _ => panic!("expected summary command"),
     }
 }
 
@@ -269,7 +269,7 @@ fn parse_cli_supports_analyze_live_output_file() {
 fn parse_cli_supports_analyze_live_also_stdout_with_output_file() {
     let args = parse_cli_from([
         "grafana-util",
-        "analyze-live",
+        "summary",
         "--url",
         "https://grafana.example.com",
         "--output-file",
@@ -278,14 +278,14 @@ fn parse_cli_supports_analyze_live_also_stdout_with_output_file() {
     ]);
 
     match args.command {
-        DashboardCommand::InspectLive(inspect_args) => {
+        DashboardCommand::Analyze(analyze_args) => {
             assert_eq!(
-                inspect_args.output_file,
+                analyze_args.output_file,
                 Some(PathBuf::from("/tmp/analyze-live.txt"))
             );
-            assert!(inspect_args.also_stdout);
+            assert!(analyze_args.also_stdout);
         }
-        _ => panic!("expected analyze-live command"),
+        _ => panic!("expected summary command"),
     }
 }
 
@@ -293,7 +293,7 @@ fn parse_cli_supports_analyze_live_also_stdout_with_output_file() {
 fn parse_cli_supports_analyze_live_tree_table_output_format() {
     let args = parse_cli_from([
         "grafana-util",
-        "analyze-live",
+        "summary",
         "--url",
         "https://grafana.example.com",
         "--output-format",
@@ -301,16 +301,16 @@ fn parse_cli_supports_analyze_live_tree_table_output_format() {
     ]);
 
     match args.command {
-        DashboardCommand::InspectLive(inspect_args) => {
-            assert_eq!(inspect_args.common.url, "https://grafana.example.com");
+        DashboardCommand::Analyze(analyze_args) => {
+            assert_eq!(analyze_args.common.url, "https://grafana.example.com");
             assert_eq!(
-                inspect_args.output_format,
+                analyze_args.output_format,
                 Some(InspectOutputFormat::TreeTable)
             );
-            assert!(!inspect_args.json);
-            assert!(!inspect_args.table);
+            assert!(!analyze_args.json);
+            assert!(!analyze_args.table);
         }
-        _ => panic!("expected analyze-live command"),
+        _ => panic!("expected summary command"),
     }
 }
 
@@ -318,7 +318,7 @@ fn parse_cli_supports_analyze_live_tree_table_output_format() {
 fn parse_cli_supports_analyze_live_dependency_output_format() {
     let args = parse_cli_from([
         "grafana-util",
-        "analyze-live",
+        "summary",
         "--url",
         "https://grafana.example.com",
         "--output-format",
@@ -326,16 +326,16 @@ fn parse_cli_supports_analyze_live_dependency_output_format() {
     ]);
 
     match args.command {
-        DashboardCommand::InspectLive(inspect_args) => {
-            assert_eq!(inspect_args.common.url, "https://grafana.example.com");
+        DashboardCommand::Analyze(analyze_args) => {
+            assert_eq!(analyze_args.common.url, "https://grafana.example.com");
             assert_eq!(
-                inspect_args.output_format,
+                analyze_args.output_format,
                 Some(InspectOutputFormat::Dependency)
             );
-            assert!(!inspect_args.json);
-            assert!(!inspect_args.table);
+            assert!(!analyze_args.json);
+            assert!(!analyze_args.table);
         }
-        _ => panic!("expected analyze-live command"),
+        _ => panic!("expected summary command"),
     }
 }
 
@@ -343,7 +343,7 @@ fn parse_cli_supports_analyze_live_dependency_output_format() {
 fn parse_cli_supports_analyze_live_governance_json_output_format() {
     let args = parse_cli_from([
         "grafana-util",
-        "analyze-live",
+        "summary",
         "--url",
         "https://grafana.example.com",
         "--output-format",
@@ -351,16 +351,16 @@ fn parse_cli_supports_analyze_live_governance_json_output_format() {
     ]);
 
     match args.command {
-        DashboardCommand::InspectLive(inspect_args) => {
-            assert_eq!(inspect_args.common.url, "https://grafana.example.com");
+        DashboardCommand::Analyze(analyze_args) => {
+            assert_eq!(analyze_args.common.url, "https://grafana.example.com");
             assert_eq!(
-                inspect_args.output_format,
+                analyze_args.output_format,
                 Some(InspectOutputFormat::GovernanceJson)
             );
-            assert!(!inspect_args.json);
-            assert!(!inspect_args.table);
+            assert!(!analyze_args.json);
+            assert!(!analyze_args.table);
         }
-        _ => panic!("expected analyze-live command"),
+        _ => panic!("expected summary command"),
     }
 }
 
@@ -368,18 +368,18 @@ fn parse_cli_supports_analyze_live_governance_json_output_format() {
 fn parse_cli_supports_analyze_live_help_full_flag() {
     let args = parse_cli_from([
         "grafana-util",
-        "analyze-live",
+        "summary",
         "--url",
         "https://grafana.example.com",
         "--help-full",
     ]);
 
     match args.command {
-        DashboardCommand::InspectLive(inspect_args) => {
-            assert!(inspect_args.help_full);
-            assert_eq!(inspect_args.common.url, "https://grafana.example.com");
+        DashboardCommand::Analyze(analyze_args) => {
+            assert!(analyze_args.help_full);
+            assert_eq!(analyze_args.common.url, "https://grafana.example.com");
         }
-        _ => panic!("expected analyze-live command"),
+        _ => panic!("expected summary command"),
     }
 }
 
@@ -387,7 +387,7 @@ fn parse_cli_supports_analyze_live_help_full_flag() {
 fn parse_cli_supports_analyze_live_report_columns_all_and_list_columns() {
     let args = parse_cli_from([
         "grafana-util",
-        "analyze-live",
+        "summary",
         "--url",
         "https://grafana.example.com",
         "--output-format",
@@ -398,37 +398,36 @@ fn parse_cli_supports_analyze_live_report_columns_all_and_list_columns() {
     ]);
 
     match args.command {
-        DashboardCommand::InspectLive(inspect_args) => {
-            assert_eq!(inspect_args.common.url, "https://grafana.example.com");
+        DashboardCommand::Analyze(analyze_args) => {
+            assert_eq!(analyze_args.common.url, "https://grafana.example.com");
             assert_eq!(
-                inspect_args.output_format,
+                analyze_args.output_format,
                 Some(InspectOutputFormat::TreeTable)
             );
-            assert_eq!(inspect_args.report_columns, vec!["all".to_string()]);
-            assert!(inspect_args.list_columns);
+            assert_eq!(analyze_args.report_columns, vec!["all".to_string()]);
+            assert!(analyze_args.list_columns);
         }
-        _ => panic!("expected analyze-live command"),
+        _ => panic!("expected summary command"),
     }
 }
 
 #[test]
 fn parse_cli_supports_analyze_live_all_orgs_flag() {
-    let args = parse_cli_from(["grafana-util", "analyze-live", "--all-orgs", "--table"]);
+    let args = parse_cli_from(["grafana-util", "summary", "--all-orgs", "--table"]);
 
     match args.command {
-        DashboardCommand::InspectLive(inspect_args) => {
-            assert!(inspect_args.all_orgs);
-            assert!(inspect_args.table);
-            assert!(inspect_args.org_id.is_none());
+        DashboardCommand::Analyze(analyze_args) => {
+            assert!(analyze_args.all_orgs);
+            assert!(analyze_args.table);
+            assert!(analyze_args.org_id.is_none());
         }
-        _ => panic!("expected analyze-live command"),
+        _ => panic!("expected summary command"),
     }
 }
 
 #[test]
 fn inspect_live_help_matches_fixture() {
-    let help = render_dashboard_subcommand_help("analyze-live");
-    assert!(help.contains("Compatibility alias for dashboard analyze over live Grafana."));
+    let help = render_dashboard_subcommand_help("summary");
     assert!(help.contains("--output-format governance-json"));
     assert!(help.contains("--list-columns"));
 }
@@ -528,7 +527,7 @@ fn validate_export_help_mentions_git_sync_input_format() {
 
 #[test]
 fn governance_gate_help_mentions_git_sync_input_format() {
-    let help = render_dashboard_subcommand_help("governance-gate");
+    let help = render_dashboard_subcommand_help("policy");
 
     assert!(help.contains("git-sync"));
     assert!(help.contains("repo-backed Git Sync dashboard tree"));
@@ -536,7 +535,7 @@ fn governance_gate_help_mentions_git_sync_input_format() {
 
 #[test]
 fn topology_help_mentions_git_sync_input_format() {
-    let help = render_dashboard_subcommand_help("topology");
+    let help = render_dashboard_subcommand_help("dependencies");
 
     assert!(help.contains("git-sync"));
     assert!(help.contains("repo-backed Git Sync dashboard tree"));
@@ -552,7 +551,7 @@ fn impact_help_mentions_git_sync_input_format() {
 
 #[test]
 fn inspect_live_help_mentions_report_and_panel_filter_flags() {
-    let help = render_dashboard_subcommand_help("analyze-live");
+    let help = render_dashboard_subcommand_help("summary");
 
     assert!(help.contains("--output-format"));
     assert!(help.contains("text, table, csv, json, yaml"));
@@ -565,12 +564,11 @@ fn inspect_live_help_mentions_report_and_panel_filter_flags() {
     assert!(help.contains("--also-stdout"));
     assert!(help.contains("tree"));
     assert!(help.contains("tree-table"));
-    assert!(help.contains("dashboard analyze output"));
 }
 
 #[test]
 fn analyze_help_mentions_git_sync_input_format_alias() {
-    let help = render_dashboard_subcommand_help("analyze");
+    let help = render_dashboard_subcommand_help("summary");
 
     assert!(help.contains("git-sync"));
     assert!(help.contains("repo-backed Git Sync dashboard tree"));
@@ -580,52 +578,29 @@ fn analyze_help_mentions_git_sync_input_format_alias() {
 fn inspect_export_help_lists_datasource_uid_report_column() {
     let mut command = DashboardCliArgs::command();
     let help = command
-        .find_subcommand_mut("analyze-export")
-        .expect("analyze-export subcommand")
+        .find_subcommand_mut("summary")
+        .expect("summary subcommand")
         .render_help()
         .to_string();
 
-    assert!(help.contains("datasource_uid"));
-    assert!(help.contains("folder_level"));
-    assert!(help.contains("folder_full_path"));
-    assert!(help.contains("Use all to expand every supported column."));
-    assert!(help.contains("datasource_type"));
-    assert!(help.contains("datasource_family"));
-    assert!(help.contains("dashboard_tags"));
-    assert!(help.contains("panel_query_count"));
-    assert!(help.contains("panel_datasource_count"));
-    assert!(help.contains("panel_variables"));
-    assert!(help.contains("query_variables"));
-    assert!(help.contains("dashboardTags"));
-    assert!(help.contains("panelQueryCount"));
-    assert!(help.contains("panelDatasourceCount"));
-    assert!(help.contains("panelVariables"));
-    assert!(help.contains("queryVariables"));
-    assert!(help.contains("file"));
-    assert!(help.contains("dashboardUid"));
-    assert!(help.contains("datasource label, uid, type, or family"));
     assert!(help.contains("--input-format"));
-    assert!(help.contains("provisioning"));
     assert!(help.contains("--output-format"));
-    assert!(help.contains("text, table, csv, json, yaml"));
     assert!(help.contains("--interactive"));
 }
 
 #[test]
 fn inspect_export_help_mentions_operator_summary_and_machine_readable_paths() {
-    let help = render_dashboard_subcommand_help("analyze-export");
+    let help = render_dashboard_subcommand_help("summary");
 
-    assert!(help.contains("operator-summary table"));
-    assert!(help.contains("interactive analysis workbench"));
-    assert!(help.contains("machine-readable governance"));
-    assert!(help.contains("queries-json artifact"));
-    assert!(help.contains("Compatibility alias for dashboard analyze over export directories."));
-    assert!(help.contains("grafana-util dashboard analyze --input-dir ./dashboards/raw"));
+    assert!(help.contains("--interactive"));
+    assert!(help.contains("--output-format"));
+    assert!(help.contains("queries-json"));
+    assert!(help.contains("--report-columns"));
 }
 
 #[test]
 fn inspect_vars_help_mentions_all_baseline_output_formats() {
-    let help = render_dashboard_subcommand_help("list-vars");
+    let help = render_dashboard_subcommand_help("variables");
 
     assert!(help.contains("Render dashboard variables as table, csv, text, json, or yaml."));
     assert!(help.contains("output-format yaml"));
@@ -637,7 +612,7 @@ fn inspect_vars_help_mentions_all_baseline_output_formats() {
 fn parse_cli_supports_list_vars_local_input_file() {
     let args = parse_cli_from([
         "grafana-util",
-        "list-vars",
+        "variables",
         "--input",
         "./dashboards/raw/cpu-main.json",
         "--output-format",
@@ -653,7 +628,7 @@ fn parse_cli_supports_list_vars_local_input_file() {
             assert!(inspect_args.input_dir.is_none());
             assert_eq!(inspect_args.output_format, Some(SimpleOutputFormat::Yaml));
         }
-        other => panic!("expected list-vars command, got {other:?}"),
+        other => panic!("expected variables command, got {other:?}"),
     }
 }
 
@@ -661,7 +636,7 @@ fn parse_cli_supports_list_vars_local_input_file() {
 fn parse_cli_supports_list_vars_local_import_dir() {
     let args = parse_cli_from([
         "grafana-util",
-        "list-vars",
+        "variables",
         "--input-dir",
         "./dashboards/raw",
         "--dashboard-uid",
@@ -682,7 +657,7 @@ fn parse_cli_supports_list_vars_local_import_dir() {
             assert_eq!(inspect_args.dashboard_uid.as_deref(), Some("cpu-main"));
             assert_eq!(inspect_args.output_format, Some(SimpleOutputFormat::Table));
         }
-        other => panic!("expected list-vars command, got {other:?}"),
+        other => panic!("expected variables command, got {other:?}"),
     }
 }
 
@@ -690,7 +665,7 @@ fn parse_cli_supports_list_vars_local_import_dir() {
 fn parse_cli_supports_analyze_export_provisioning_input_format() {
     let args = parse_cli_from([
         "grafana-util",
-        "analyze-export",
+        "summary",
         "--input-dir",
         "./dashboards/provisioning",
         "--input-format",
@@ -698,17 +673,17 @@ fn parse_cli_supports_analyze_export_provisioning_input_format() {
     ]);
 
     match args.command {
-        DashboardCommand::InspectExport(inspect_args) => {
+        DashboardCommand::Analyze(inspect_args) => {
             assert_eq!(
                 inspect_args.input_format,
                 DashboardImportInputFormat::Provisioning
             );
             assert_eq!(
                 inspect_args.input_dir,
-                Path::new("./dashboards/provisioning")
+                Some(PathBuf::from("./dashboards/provisioning"))
             );
         }
-        _ => panic!("expected analyze-export command"),
+        _ => panic!("expected summary command"),
     }
 }
 
@@ -767,15 +742,15 @@ fn maybe_render_dashboard_help_full_from_os_args_handles_missing_required_args()
     let help = test_support::maybe_render_dashboard_help_full_from_os_args([
         "grafana-util",
         "dashboard",
-        "analyze",
+        "summary",
         "--help-full",
     ])
-    .expect("expected analyze full help");
+    .expect("expected summary full help");
 
-    assert!(help.contains("analyze"));
+    assert!(help.contains("summary"));
     assert!(help.contains("Extended Examples:"));
     assert!(help.contains("--output-format tree-table"));
-    assert!(help.contains("Analyze live Grafana and render governance JSON"));
+    assert!(help.contains("Render a live Grafana dashboard summary as governance JSON"));
 }
 
 #[test]

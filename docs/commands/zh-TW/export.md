@@ -45,7 +45,6 @@ grafana-util export access service-account --output-dir ./access-service-account
 
 ## 相關指令
 
-- [advanced](./advanced.md)
 - [dashboard export](./dashboard-export.md)
 - [alert export](./alert-export.md)
 - [datasource export](./datasource-export.md)

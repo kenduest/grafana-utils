@@ -1,4 +1,4 @@
-# dashboard edit-live
+# dashboard edit
 
 ## 用途
 把一份 live dashboard 拉進外部 editor 編修，且預設仍先落成安全的本地草稿。
@@ -24,20 +24,20 @@
 ## 範例
 ```bash
 # 用途：編修一份 live dashboard，並把結果保留成本地草稿。
-grafana-util dashboard edit-live --profile prod --dashboard-uid cpu-main --output ./drafts/cpu-main.edited.json
+grafana-util dashboard edit --profile prod --dashboard-uid cpu-main --output ./drafts/cpu-main.edited.json
 ```
 
 ```bash
 # 用途：編修一份 live dashboard，並使用預設輸出路徑 ./cpu-main.edited.json。
-grafana-util dashboard edit-live --url http://localhost:3000 --basic-user admin --basic-password admin --dashboard-uid cpu-main
+grafana-util dashboard edit --url http://localhost:3000 --basic-user admin --basic-password admin --dashboard-uid cpu-main
 ```
 
 ```bash
 # 用途：編修一份 live dashboard，並明確回寫到 Grafana。
-grafana-util dashboard edit-live --profile prod --dashboard-uid cpu-main --apply-live --yes --message 'Hotfix CPU dashboard'
+grafana-util dashboard edit --profile prod --dashboard-uid cpu-main --apply-live --yes --message 'Hotfix CPU dashboard'
 ```
 
 ## 相關指令
-- [dashboard fetch-live](./dashboard-fetch-live.md)
-- [dashboard clone-live](./dashboard-clone-live.md)
+- [dashboard get](./dashboard-get.md)
+- [dashboard clone](./dashboard-clone.md)
 - [dashboard publish](./dashboard-publish.md)

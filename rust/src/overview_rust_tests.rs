@@ -422,10 +422,8 @@ fn overview_args_parse_and_help_expose_output_mode() {
 
     assert!(crate::overview::OVERVIEW_HELP_TEXT
         .contains("grafana-util observe overview --dashboard-export-dir ./dashboards/raw"));
-    assert!(
-        crate::overview::OVERVIEW_LIVE_HELP_TEXT
-            .contains("grafana-util observe overview live --url http://localhost:3000 --token")
-    );
+    assert!(crate::overview::OVERVIEW_LIVE_HELP_TEXT
+        .contains("grafana-util observe overview live --url http://localhost:3000 --token"));
     let help = OverviewCliArgs::command().render_long_help().to_string();
     assert!(!help.contains("grafana-util overview"));
 }
@@ -566,10 +564,8 @@ fn overview_args_reject_dashboard_export_and_provisioning_inputs_together() {
 fn overview_cli_help_exposes_staged_and_live_shapes() {
     assert!(crate::overview::OVERVIEW_HELP_TEXT
         .contains("grafana-util observe overview --dashboard-export-dir ./dashboards/raw"));
-    assert!(
-        crate::overview::OVERVIEW_LIVE_HELP_TEXT
-            .contains("grafana-util observe overview live --url http://localhost:3000 --token")
-    );
+    assert!(crate::overview::OVERVIEW_LIVE_HELP_TEXT
+        .contains("grafana-util observe overview live --url http://localhost:3000 --token"));
     let overview_help = OverviewCliArgs::command().render_long_help().to_string();
     assert!(!overview_help.contains("grafana-util overview"));
 }

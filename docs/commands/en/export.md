@@ -7,7 +7,7 @@
 Use this namespace when the job is straightforward export or backup and you do not want to start from a domain-heavy tree.
 
 ## Description
-`export` is intentionally narrow. It wraps the existing domain export flows without changing their underlying behavior. This keeps first-run usage simple while preserving the deeper `advanced` and compatibility trees for expert work.
+`export` is intentionally narrow. It wraps the existing domain export flows without changing their underlying behavior. This keeps first-run usage simple while preserving the deeper domain trees for expert work.
 
 ## Subcommands
 
@@ -45,7 +45,6 @@ grafana-util export access service-account --output-dir ./access-service-account
 
 ## Related commands
 
-- [advanced](./advanced.md)
 - [dashboard export](./dashboard-export.md)
 - [alert export](./alert-export.md)
 - [datasource export](./datasource-export.md)

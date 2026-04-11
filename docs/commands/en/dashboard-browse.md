@@ -45,5 +45,5 @@ grafana-util dashboard browse --workspace ./grafana-oac-repo --path 'Platform / 
 
 ## Related commands
 - [dashboard list](./dashboard-list.md)
-- [dashboard fetch-live](./dashboard-fetch-live.md)
+- [dashboard get](./dashboard-get.md)
 - [dashboard delete](./dashboard-delete.md)

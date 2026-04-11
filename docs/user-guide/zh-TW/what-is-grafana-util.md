@@ -72,8 +72,8 @@
 
 README 和手冊首頁要短，先露出大家最常用的工作流；更細的 command 樹放在 docs index 和各自的指令頁。
 
-- 放在 README / 首頁：`observe live`、`observe overview`、`export dashboard|alert|datasource`、`change inspect/check/preview/apply`、`config profile`、`advanced dashboard`、`advanced alert`、`advanced datasource`、`access`。
-- 放在 docs index 和逐指令頁：`dashboard browse/fetch-live/clone-live/serve/edit-live/delete/history/list-vars/governance-gate/topology/impact/screenshot`、`datasource browse/types/list/add/modify/delete`、`snapshot`、`resource`、以及相容別名頁面。
+- 放在 README / 首頁：`observe live`、`observe overview`、`export dashboard|alert|datasource`、`change inspect/check/preview/apply`、`config profile`、`dashboard browse/list/export/import/diff/review/patch/summary/dependencies/policy`、`alert`、`datasource`、`access`。
+- 放在 docs index 和逐指令頁：`dashboard get/clone/serve/edit-live/delete/history/variables/impact/screenshot/convert raw-to-prompt`、`datasource browse/types/list/add/modify/delete`、`snapshot`、`resource`、以及相容別名頁面。
 
 ## 主要目標
 
@@ -89,7 +89,7 @@ README 和手冊首頁要短，先露出大家最常用的工作流；更細的 
 | :--- | :--- | :--- |
 | 環境狀態檢查 | `observe live` / `observe staged` | 看 live 或 staged 狀態是否健康、是否適合往下做 |
 | 全域總覽 | `observe overview` | 快速盤點整體 Grafana 環境、先決定下一步要往哪裡鑽 |
-| Dashboard 維運 | `dashboard` | 匯出、匯入、diff、inspect、截圖、拓樸分析 |
+| Dashboard 維運 | `dashboard` | 瀏覽、列表、匯出/匯入、diff、審查、修補、摘要、依賴關係、政策與截圖 |
 | Data source 維運 | `datasource` | data source 盤點、匯出、匯入、diff、修改與恢復 |
 | 告警治理 | `alert` | 告警規則、通知路由、contact point、plan / apply |
 | 身分與存取 | `access` | org、user、team、service account 與 token 管理 |

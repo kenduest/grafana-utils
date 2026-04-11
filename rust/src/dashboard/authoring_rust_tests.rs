@@ -145,20 +145,20 @@ fn review_dashboard_file_reports_wrapped_metadata_and_patch_file_next_action() {
     assert!(!review.dashboard_id_is_null);
     assert!(review.meta_message_present);
     assert!(review.blocking_issues.is_empty());
-    assert_eq!(review.suggested_next_action, "patch-file");
+    assert_eq!(review.suggested_next_action, "patch");
 
     let text = render_dashboard_review_text(&review);
     assert!(text.iter().any(|line| line == "Kind: wrapped"));
     assert!(text.iter().any(|line| line == "dashboard.id: non-null"));
     let table = render_dashboard_review_table(&review);
-    assert!(table.iter().any(|line| line.contains("patch-file")));
+    assert!(table.iter().any(|line| line.contains("patch")));
     let csv = render_dashboard_review_csv(&review);
     assert!(csv.iter().any(|line| line.contains("blocking_issues")));
     let json_output = render_dashboard_review_json(&review).unwrap();
     assert!(json_output.contains("\"kind\": \"grafana-utils-dashboard-authoring-review\""));
-    assert!(json_output.contains("\"suggestedNextAction\": \"patch-file\""));
+    assert!(json_output.contains("\"suggestedNextAction\": \"patch\""));
     let yaml_output = render_dashboard_review_yaml(&review).unwrap();
-    assert!(yaml_output.contains("suggestedNextAction: patch-file"));
+    assert!(yaml_output.contains("suggestedNextAction: patch"));
 }
 
 #[test]

@@ -1,4 +1,4 @@
-//! Feature-oriented inspect-export regressions.
+//! Feature-oriented summary-export regressions.
 //! Keeps the export-inspection parser coverage separate from the large dashboard test file.
 
 use super::test_support::{
@@ -14,7 +14,7 @@ use tempfile::tempdir;
 fn parse_cli_supports_inspect_export_json_flag() {
     let args = parse_cli_from([
         "grafana-util",
-        "inspect-export",
+        "summary-export",
         "--input-dir",
         "./dashboards/raw",
         "--json",
@@ -26,7 +26,7 @@ fn parse_cli_supports_inspect_export_json_flag() {
             assert!(inspect_args.json);
             assert!(!inspect_args.table);
         }
-        _ => panic!("expected inspect-export command"),
+        _ => panic!("expected summary-export command"),
     }
 }
 
@@ -34,7 +34,7 @@ fn parse_cli_supports_inspect_export_json_flag() {
 fn parse_cli_supports_inspect_export_output_format_flag() {
     let args = parse_cli_from([
         "grafana-util",
-        "inspect-export",
+        "summary-export",
         "--input-dir",
         "./dashboards/raw",
         "--output-format",
@@ -51,7 +51,7 @@ fn parse_cli_supports_inspect_export_output_format_flag() {
             assert!(!inspect_args.json);
             assert!(!inspect_args.table);
         }
-        _ => panic!("expected inspect-export command"),
+        _ => panic!("expected summary-export command"),
     }
 }
 
@@ -66,7 +66,7 @@ fn parse_cli_supports_inspect_export_baseline_output_formats() {
     ] {
         let args = parse_cli_from([
             "grafana-util",
-            "inspect-export",
+            "summary-export",
             "--input-dir",
             "./dashboards/raw",
             "--output-format",
@@ -80,7 +80,7 @@ fn parse_cli_supports_inspect_export_baseline_output_formats() {
                 assert!(!inspect_args.json);
                 assert!(!inspect_args.table);
             }
-            _ => panic!("expected inspect-export command"),
+            _ => panic!("expected summary-export command"),
         }
     }
 }
@@ -89,7 +89,7 @@ fn parse_cli_supports_inspect_export_baseline_output_formats() {
 fn parse_cli_supports_inspect_export_output_format_dependency_flag() {
     let args = parse_cli_from([
         "grafana-util",
-        "inspect-export",
+        "summary-export",
         "--input-dir",
         "./dashboards/raw",
         "--output-format",
@@ -106,7 +106,7 @@ fn parse_cli_supports_inspect_export_output_format_dependency_flag() {
             assert!(!inspect_args.json);
             assert!(!inspect_args.table);
         }
-        _ => panic!("expected inspect-export command"),
+        _ => panic!("expected summary-export command"),
     }
 }
 
@@ -114,27 +114,27 @@ fn parse_cli_supports_inspect_export_output_format_dependency_flag() {
 fn parse_cli_supports_inspect_export_output_file() {
     let args = parse_cli_from([
         "grafana-util",
-        "inspect-export",
+        "summary-export",
         "--input-dir",
         "./dashboards/raw",
         "--output-format",
         "queries-json",
         "--output-file",
-        "/tmp/inspect-export.txt",
+        "/tmp/summary-export.txt",
     ]);
 
     match args.command {
         DashboardCommand::InspectExport(inspect_args) => {
             assert_eq!(
                 inspect_args.output_file,
-                Some(PathBuf::from("/tmp/inspect-export.txt"))
+                Some(PathBuf::from("/tmp/summary-export.txt"))
             );
             assert_eq!(
                 inspect_args.output_format,
                 Some(InspectOutputFormat::QueriesJson)
             );
         }
-        _ => panic!("expected inspect-export command"),
+        _ => panic!("expected summary-export command"),
     }
 }
 
@@ -142,7 +142,7 @@ fn parse_cli_supports_inspect_export_output_file() {
 fn parse_cli_supports_inspect_export_interactive_flag() {
     let args = parse_cli_from([
         "grafana-util",
-        "inspect-export",
+        "summary-export",
         "--input-dir",
         "./dashboards/raw",
         "--interactive",
@@ -153,7 +153,7 @@ fn parse_cli_supports_inspect_export_interactive_flag() {
             assert_eq!(inspect_args.input_dir, Path::new("./dashboards/raw"));
             assert!(inspect_args.interactive);
         }
-        _ => panic!("expected inspect-export command"),
+        _ => panic!("expected summary-export command"),
     }
 }
 
@@ -161,7 +161,7 @@ fn parse_cli_supports_inspect_export_interactive_flag() {
 fn parse_cli_supports_inspect_export_input_type_flag() {
     let args = parse_cli_from([
         "grafana-util",
-        "inspect-export",
+        "summary-export",
         "--input-dir",
         "./dashboards",
         "--input-type",
@@ -176,7 +176,7 @@ fn parse_cli_supports_inspect_export_input_type_flag() {
                 Some(InspectExportInputType::Source)
             );
         }
-        _ => panic!("expected inspect-export command"),
+        _ => panic!("expected summary-export command"),
     }
 }
 
@@ -184,7 +184,7 @@ fn parse_cli_supports_inspect_export_input_type_flag() {
 fn parse_cli_supports_inspect_export_report_json_flag() {
     let args = parse_cli_from([
         "grafana-util",
-        "inspect-export",
+        "summary-export",
         "--input-dir",
         "./dashboards/raw",
         "--output-format",
@@ -201,7 +201,7 @@ fn parse_cli_supports_inspect_export_report_json_flag() {
             assert!(!inspect_args.json);
             assert!(!inspect_args.table);
         }
-        _ => panic!("expected inspect-export command"),
+        _ => panic!("expected summary-export command"),
     }
 }
 
@@ -209,7 +209,7 @@ fn parse_cli_supports_inspect_export_report_json_flag() {
 fn parse_cli_supports_inspect_export_report_csv_flag() {
     let args = parse_cli_from([
         "grafana-util",
-        "inspect-export",
+        "summary-export",
         "--input-dir",
         "./dashboards/raw",
         "--output-format",
@@ -223,7 +223,7 @@ fn parse_cli_supports_inspect_export_report_csv_flag() {
             assert!(!inspect_args.json);
             assert!(!inspect_args.table);
         }
-        _ => panic!("expected inspect-export command"),
+        _ => panic!("expected summary-export command"),
     }
 }
 
@@ -231,7 +231,7 @@ fn parse_cli_supports_inspect_export_report_csv_flag() {
 fn parse_cli_supports_inspect_export_report_tree_flag() {
     let args = parse_cli_from([
         "grafana-util",
-        "inspect-export",
+        "summary-export",
         "--input-dir",
         "./dashboards/raw",
         "--output-format",
@@ -245,7 +245,7 @@ fn parse_cli_supports_inspect_export_report_tree_flag() {
             assert!(!inspect_args.json);
             assert!(!inspect_args.table);
         }
-        _ => panic!("expected inspect-export command"),
+        _ => panic!("expected summary-export command"),
     }
 }
 
@@ -253,7 +253,7 @@ fn parse_cli_supports_inspect_export_report_tree_flag() {
 fn parse_cli_supports_inspect_export_report_tree_table_flag() {
     let args = parse_cli_from([
         "grafana-util",
-        "inspect-export",
+        "summary-export",
         "--input-dir",
         "./dashboards/raw",
         "--output-format",
@@ -270,7 +270,7 @@ fn parse_cli_supports_inspect_export_report_tree_table_flag() {
             assert!(!inspect_args.json);
             assert!(!inspect_args.table);
         }
-        _ => panic!("expected inspect-export command"),
+        _ => panic!("expected summary-export command"),
     }
 }
 
@@ -278,7 +278,7 @@ fn parse_cli_supports_inspect_export_report_tree_table_flag() {
 fn parse_cli_supports_inspect_export_report_dependency_flag() {
     let args = parse_cli_from([
         "grafana-util",
-        "inspect-export",
+        "summary-export",
         "--input-dir",
         "./dashboards/raw",
         "--output-format",
@@ -295,7 +295,7 @@ fn parse_cli_supports_inspect_export_report_dependency_flag() {
             assert!(!inspect_args.json);
             assert!(!inspect_args.table);
         }
-        _ => panic!("expected inspect-export command"),
+        _ => panic!("expected summary-export command"),
     }
 }
 
@@ -303,7 +303,7 @@ fn parse_cli_supports_inspect_export_report_dependency_flag() {
 fn parse_cli_supports_inspect_export_report_dependency_json_flag() {
     let args = parse_cli_from([
         "grafana-util",
-        "inspect-export",
+        "summary-export",
         "--input-dir",
         "./dashboards/raw",
         "--output-format",
@@ -320,7 +320,7 @@ fn parse_cli_supports_inspect_export_report_dependency_json_flag() {
             assert!(!inspect_args.json);
             assert!(!inspect_args.table);
         }
-        _ => panic!("expected inspect-export command"),
+        _ => panic!("expected summary-export command"),
     }
 }
 
@@ -328,7 +328,7 @@ fn parse_cli_supports_inspect_export_report_dependency_json_flag() {
 fn parse_cli_supports_inspect_export_report_governance_flag() {
     let args = parse_cli_from([
         "grafana-util",
-        "inspect-export",
+        "summary-export",
         "--input-dir",
         "./dashboards/raw",
         "--output-format",
@@ -345,7 +345,7 @@ fn parse_cli_supports_inspect_export_report_governance_flag() {
             assert!(!inspect_args.json);
             assert!(!inspect_args.table);
         }
-        _ => panic!("expected inspect-export command"),
+        _ => panic!("expected summary-export command"),
     }
 }
 
@@ -505,7 +505,7 @@ fn analyze_export_dir_requires_input_type_for_dashboard_root_with_raw_and_prompt
 fn parse_cli_supports_inspect_export_help_full_flag() {
     let args = parse_cli_from([
         "grafana-util",
-        "inspect-export",
+        "summary-export",
         "--input-dir",
         "./dashboards/raw",
         "--help-full",
@@ -516,7 +516,7 @@ fn parse_cli_supports_inspect_export_help_full_flag() {
             assert!(inspect_args.help_full);
             assert_eq!(inspect_args.input_dir, Path::new("./dashboards/raw"));
         }
-        _ => panic!("expected inspect-export command"),
+        _ => panic!("expected summary-export command"),
     }
 }
 
@@ -524,7 +524,7 @@ fn parse_cli_supports_inspect_export_help_full_flag() {
 fn parse_cli_supports_inspect_export_report_columns_and_filter() {
     let args = parse_cli_from([
         "grafana-util",
-        "inspect-export",
+        "summary-export",
         "--input-dir",
         "./dashboards/raw",
         "--output-format",
@@ -559,7 +559,7 @@ fn parse_cli_supports_inspect_export_report_columns_and_filter() {
             );
             assert_eq!(inspect_args.report_filter_panel_id, Some("7".to_string()));
         }
-        _ => panic!("expected inspect-export command"),
+        _ => panic!("expected summary-export command"),
     }
 }
 
@@ -567,7 +567,7 @@ fn parse_cli_supports_inspect_export_report_columns_and_filter() {
 fn parse_cli_supports_inspect_export_report_columns_all() {
     let args = parse_cli_from([
         "grafana-util",
-        "inspect-export",
+        "summary-export",
         "--input-dir",
         "./dashboards/raw",
         "--output-format",
@@ -584,7 +584,7 @@ fn parse_cli_supports_inspect_export_report_columns_all() {
             );
             assert_eq!(inspect_args.report_columns, vec!["all".to_string()]);
         }
-        _ => panic!("expected inspect-export command"),
+        _ => panic!("expected summary-export command"),
     }
 }
 
@@ -592,7 +592,7 @@ fn parse_cli_supports_inspect_export_report_columns_all() {
 fn parse_cli_supports_inspect_export_list_columns() {
     let args = parse_cli_from([
         "grafana-util",
-        "inspect-export",
+        "summary-export",
         "--input-dir",
         "./dashboards/raw",
         "--list-columns",
@@ -603,6 +603,6 @@ fn parse_cli_supports_inspect_export_list_columns() {
             assert!(inspect_args.list_columns);
             assert!(inspect_args.report_columns.is_empty());
         }
-        _ => panic!("expected inspect-export command"),
+        _ => panic!("expected summary-export command"),
     }
 }

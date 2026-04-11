@@ -81,7 +81,7 @@
 
 ```bash
 # 用途：解決方案：匯入前先跑 pre-import inspection。
-grafana-util dashboard analyze --input-dir ./backups/raw --input-format raw --output-format dependency
+grafana-util dashboard dependencies --input-dir ./backups/raw --input-format raw --output-format dependency
 ```
 
 **檢查重點**：確認依賴報告列出的每個 datasource，都存在於目標環境的 `datasource list`。
@@ -110,12 +110,12 @@ grafana-util dashboard analyze --input-dir ./backups/raw --input-format raw --ou
 
 **採用後**：修改仍然是機械式的，但過程可以 review，匯入前也還能先 preview。
 
-**解決方案**：在迴圈中使用 `patch-file`，然後在 replay 前先 preview。
+**解決方案**：在迴圈中使用 `patch`，然後在 replay 前先 preview。
 
 ```bash
-# 用途：解決方案：在迴圈中使用 patch-file，然後在 replay 前先 preview。
+# 用途：解決方案：在迴圈中使用 patch，然後在 replay 前先 preview。
 for file in ./dashboards/raw/*.json; do
-  grafana-util dashboard patch-file --input "$file" --tag "ManagedBySRE" --output "$file"
+  grafana-util dashboard patch --input "$file" --tag "ManagedBySRE" --output "$file"
 done
 
 grafana-util dashboard import --input-dir ./dashboards/raw --replace-existing --dry-run --table

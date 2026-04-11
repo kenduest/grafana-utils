@@ -736,7 +736,7 @@ code[class*="language-"],pre[class*="language-"]{color:#ccc;background:none;font
       <div class="topbar">
   <a class="brand" href="../../index.html">grafana-util docs</a>
   <div class="themebar">
-    <select id="page-locale-select" aria-label="Language switch"><option value="" selected>Language: 繁體中文</option><option value="../en/scenarios.html">Switch to English</option></select><select id="jump-select" aria-label="Jump"><option value="" selected>快速跳轉...</option><optgroup label="使用手冊"><option value="index.html">概觀</option><option value="what-is-grafana-util.html">這個工具是做什麼的</option><option value="getting-started.html">開始使用</option><option value="role-new-user.html">新手快速入門</option><option value="role-sre-ops.html">SRE / 維運角色導讀</option><option value="role-automation-ci.html">自動化 / CI 角色導讀</option><option value="architecture.html">系統架構與設計原則</option><option value="dashboard.html">Dashboard 維運人員手冊</option><option value="datasource.html">Data source 維運手冊</option><option value="alert.html">Alert 維運人員手冊</option><option value="access.html">身分與存取管理</option><option value="change-overview-status.html">專案狀態與變更總覽</option><option value="scenarios.html">維運情境手冊</option><option value="recipes.html">實戰錦囊與最佳實踐</option><option value="reference.html">技術參考手冊</option><option value="troubleshooting.html">疑難排解與名詞解釋</option></optgroup><optgroup label="指令參考"><option value="../../commands/zh-TW/dashboard.html">Dashboard</option><option value="../../commands/zh-TW/migrate.html">Migrate</option><option value="../../commands/zh-TW/alert.html">Alert</option><option value="../../commands/zh-TW/datasource.html">Datasource</option><option value="../../commands/zh-TW/access.html">Access</option><option value="../../commands/zh-TW/config.html">Config</option><option value="../../commands/zh-TW/observe.html">Observe</option><option value="../../commands/zh-TW/change.html">Change</option><option value="../../commands/zh-TW/snapshot.html">Snapshot</option></optgroup></select>
+    <select id="page-locale-select" aria-label="Language switch"><option value="" selected>Language: 繁體中文</option><option value="../en/scenarios.html">Switch to English</option></select><select id="jump-select" aria-label="Jump"><option value="" selected>快速跳轉...</option><optgroup label="使用手冊"><option value="index.html">概觀</option><option value="what-is-grafana-util.html">這個工具是做什麼的</option><option value="getting-started.html">開始使用</option><option value="role-new-user.html">新手快速入門</option><option value="role-sre-ops.html">SRE / 維運角色導讀</option><option value="role-automation-ci.html">自動化 / CI 角色導讀</option><option value="architecture.html">系統架構與設計原則</option><option value="dashboard.html">Dashboard 維運人員手冊</option><option value="datasource.html">Data source 維運手冊</option><option value="alert.html">Alert 維運人員手冊</option><option value="access.html">身分與存取管理</option><option value="change-overview-status.html">專案狀態與變更總覽</option><option value="scenarios.html">維運情境手冊</option><option value="recipes.html">實戰錦囊與最佳實踐</option><option value="reference.html">技術參考手冊</option><option value="troubleshooting.html">疑難排解與名詞解釋</option></optgroup><optgroup label="指令參考"><option value="../../commands/zh-TW/dashboard.html">Dashboard</option><option value="../../commands/zh-TW/alert.html">Alert</option><option value="../../commands/zh-TW/datasource.html">Datasource</option><option value="../../commands/zh-TW/access.html">Access</option><option value="../../commands/zh-TW/config.html">Config</option><option value="../../commands/zh-TW/observe.html">Observe</option><option value="../../commands/zh-TW/change.html">Change</option><option value="../../commands/zh-TW/snapshot.html">Snapshot</option></optgroup></select>
     <select id="font-select" aria-label="Font Size">
       <option value="0.9">Font: Compact</option>
       <option value="1">Font: Default</option>
@@ -799,9 +799,9 @@ Live status: ready</code></pre>
 <p><strong>採用前</strong>：你知道環境裡有 dashboard、org、使用者，但很難快速回答「現在到底有哪些東西」。</p>
 <p><strong>採用後</strong>：你可以用 dashboard inventory 搭配 access inventory，把目前 estate 狀態先講清楚，再決定要不要匯出、回放或整理。</p>
 <pre><code># 用途：盤點跨 org 的資產。
-grafana-util advanced dashboard live list --profile prod --all-orgs --with-sources --table</code></pre>
+grafana-util dashboard list --profile prod --all-orgs --with-sources --table</code></pre>
 <pre><code># 用途：盤點跨 org 的資產。
-grafana-util advanced access org list --basic-user admin --basic-password admin --with-users --output-format yaml</code></pre>
+grafana-util access org list --basic-user admin --basic-password admin --with-users --output-format yaml</code></pre>
 <p><strong>預期輸出：</strong></p>
 <pre><code>UID        TITLE             FOLDER    ORG   SOURCES
 cpu-view   CPU Metrics       Metrics   1     prometheus-main
@@ -836,9 +836,9 @@ Exported service account inventory -&gt; access-service-accounts/service-account
 <p><strong>採用前</strong>：回放常常是先執行再看結果，直到覆寫到不該動的東西才發現問題。</p>
 <p><strong>採用後</strong>：你會先看 dry-run 的表格化結果，再決定這次回放是否安全、是否會覆蓋既有資產。</p>
 <pre><code># 用途：把備份回放到 live Grafana 實例。
-grafana-util advanced dashboard sync import --input-dir ./backups/raw --replace-existing --dry-run --table</code></pre>
+grafana-util dashboard import --input-dir ./backups/raw --replace-existing --dry-run --table</code></pre>
 <pre><code># 用途：把備份回放到 live Grafana 實例。
-grafana-util advanced access team import --input-dir ./access-teams --replace-existing --dry-run --table</code></pre>
+grafana-util access team import --input-dir ./access-teams --replace-existing --dry-run --table</code></pre>
 <p><strong>預期輸出：</strong></p>
 <pre><code>UID        TITLE          ACTION   DESTINATION
 cpu-view   CPU Metrics    update   exists
@@ -855,7 +855,7 @@ grafana-util change inspect --desired-file ./desired.json</code></pre>
 <pre><code># 用途：告警變更應遵循受審查的生命週期。
 grafana-util change check --desired-file ./desired.json --fetch-live --output-format json</code></pre>
 <pre><code># 用途：告警變更應遵循受審查的生命週期。
-grafana-util advanced alert change plan --profile prod --desired-dir ./alerts/desired --output-format json</code></pre>
+grafana-util alert change plan --profile prod --desired-dir ./alerts/desired --output-format json</code></pre>
 <p><strong>預期輸出 (摘要片段)：</strong></p>
 <pre><code>CHANGE PACKAGE SUMMARY:
 - dashboards: 5 modified, 2 added
@@ -873,11 +873,11 @@ PREFLIGHT CHECK:
 <h2 id="6-身份快照回放-access-management">6. 身份快照回放 (Access Management)</h2>
 <p>透過快照管理使用者、team 與 service account。</p>
 <pre><code># 用途：透過快照管理使用者、team 與 service account。
-grafana-util advanced access user import --input-dir ./access-users --dry-run --table</code></pre>
+grafana-util access user import --input-dir ./access-users --dry-run --table</code></pre>
 <pre><code># 用途：透過快照管理使用者、team 與 service account。
-grafana-util advanced access service-account token add --service-account-id 15 --token-name nightly --seconds-to-live 3600 --json</code></pre>
+grafana-util access service-account token add --service-account-id 15 --token-name nightly --seconds-to-live 3600 --json</code></pre>
 <pre><code># 用途：透過快照管理使用者、team 與 service account。
-grafana-util advanced access service-account token delete --service-account-id 15 --token-name nightly --yes --json</code></pre>
+grafana-util access service-account token delete --service-account-id 15 --token-name nightly --yes --json</code></pre>
 <p><strong>預期輸出：</strong></p>
 <pre><code>LOGIN       ROLE    ACTION   STATUS
 dev-admin   Admin   update   existing

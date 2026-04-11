@@ -70,13 +70,13 @@ pub enum DashboardCommand {
     )]
     List(ListArgs),
     #[command(
-        name = "fetch-live",
+        name = "get",
         about = "Fetch one live dashboard into an API-safe local JSON draft.",
         after_help = DASHBOARD_FETCH_LIVE_AFTER_HELP
     )]
     Get(GetArgs),
     #[command(
-        name = "clone-live",
+        name = "clone",
         about = "Clone one live dashboard into a local draft with optional overrides.",
         after_help = DASHBOARD_CLONE_LIVE_AFTER_HELP
     )]
@@ -128,7 +128,7 @@ pub enum DashboardCommand {
     )]
     Diff(DiffArgs),
     #[command(
-        name = "patch-file",
+        name = "patch",
         about = "Patch one local dashboard JSON file in place or to a new path.",
         after_help = DASHBOARD_PATCH_FILE_AFTER_HELP
     )]
@@ -146,43 +146,39 @@ pub enum DashboardCommand {
     )]
     Publish(PublishArgs),
     #[command(
-        name = "analyze",
-        about = "Analyze dashboards from live Grafana or a local export tree and build summary or governance artifacts.",
+        name = "summary",
+        about = "Summarize dashboards from live Grafana or a local export tree and build summary or governance artifacts.",
         after_help = DASHBOARD_ANALYZE_AFTER_HELP
     )]
     Analyze(AnalyzeArgs),
     #[command(
-        name = "analyze-export",
+        name = "summary-export",
         hide = true,
-        alias = "inspect-export",
-        about = "Compatibility alias for dashboard analyze over export directories.",
+        about = "Analyze dashboards from local export directories.",
         after_help = DASHBOARD_ANALYZE_EXPORT_AFTER_HELP
     )]
     InspectExport(InspectExportArgs),
     #[command(
-        name = "analyze-live",
+        name = "summary-live",
         hide = true,
-        alias = "inspect-live",
-        about = "Compatibility alias for dashboard analyze over live Grafana.",
+        about = "Analyze dashboards from live Grafana.",
         after_help = DASHBOARD_ANALYZE_LIVE_AFTER_HELP
     )]
     InspectLive(InspectLiveArgs),
     #[command(
-        name = "list-vars",
-        alias = "inspect-vars",
+        name = "variables",
         about = "List dashboard templating variables and datasource-like choices from live Grafana or a local dashboard file.",
         after_help = DASHBOARD_LIST_VARS_AFTER_HELP
     )]
     InspectVars(InspectVarsArgs),
     #[command(
-        name = "governance-gate",
+        name = "policy",
         about = "Check dashboard findings against a policy from live Grafana or a local export tree.",
         after_help = DASHBOARD_GOVERNANCE_GATE_AFTER_HELP
     )]
     GovernanceGate(GovernanceGateArgs),
     #[command(
-        name = "topology",
-        visible_alias = "graph",
+        name = "dependencies",
         about = "Show dashboard dependencies directly from live Grafana or a local export tree.",
         after_help = DASHBOARD_TOPOLOGY_AFTER_HELP
     )]

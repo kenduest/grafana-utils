@@ -48,7 +48,7 @@ pub enum RawToPromptResolution {
     Strict,
 }
 
-/// Output selectors for dashboard governance-gate reports.
+/// Output selectors for dashboard policy reports.
 #[derive(Debug, Clone, Copy, ValueEnum, PartialEq, Eq)]
 pub enum GovernanceGateOutputFormat {
     Text,
@@ -62,7 +62,7 @@ pub enum GovernancePolicySource {
     Builtin,
 }
 
-/// Output selectors for dashboard topology rendering.
+/// Output selectors for dashboard dependency rendering.
 #[derive(Debug, Clone, Copy, ValueEnum, PartialEq, Eq)]
 pub enum TopologyOutputFormat {
     Text,
