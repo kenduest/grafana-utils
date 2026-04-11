@@ -7,20 +7,22 @@ grafana\-util\-dashboard \- dashboard browse, export, import, summary, dependenc
 .PP
 .B grafana-util db [\fISUBCOMMAND\fR] [\fIOPTIONS\fR]
 .SH DESCRIPTION
-grafana\-util dashboard is the namespace for dashboard workflows: browse, list, variables, get, clone, edit, review, patch, serve, publish, export, import, convert, summary, dependencies, policy, history, and screenshots. The same namespace is also available as grafana\-util db.
+grafana\-util dashboard is the namespace for dashboard workflows. It keeps dashboard commands flat for fast terminal use, but groups the help and docs by task: browse and inspect, export and import, review and diff, edit and publish, and capture. The same namespace is also available as grafana\-util db.
 .PP
 Use this namespace when you need to inspect dashboards, pull one live dashboard into a local draft, compare local files with Grafana, normalize dashboard JSON for UI upload, or publish a prepared dashboard back to Grafana.
-.SH WORKFLOW LANES
+.SH COMMAND GROUPS
 .PP
-\- dashboard browse / dashboard list / dashboard variables / dashboard get / dashboard clone / dashboard edit / dashboard delete / dashboard history: live dashboard operations.
+The command path stays flat, such as grafana\-util dashboard list, so experienced operators do not need extra namespace depth. Use the groups below to choose the right command faster.
 .PP
-\- dashboard review / dashboard patch / dashboard serve / dashboard publish: local draft workflows.
+\- Browse & Inspect: find, read, or inspect dashboards before deciding what to do. Commands: browse, list, get, variables, history.
 .PP
-\- dashboard export / dashboard import / dashboard diff / dashboard convert raw\-to\-prompt: moving dashboards between local artifacts and Grafana.
+\- Export & Import: move dashboard artifacts between Grafana, raw JSON, prompt JSON, or provisioning files. Commands: export, import, convert raw\-to\-prompt.
 .PP
-\- dashboard summary / dashboard dependencies / dashboard policy: analysis and governance checks.
+\- Review & Diff: collect proof, compare state, analyze dependencies, review blast radius, or run governance checks. Commands: diff, review, summary, dependencies, impact, policy.
 .PP
-\- dashboard screenshot: reproducible visual proof.
+\- Edit & Publish: create or change one local draft, then publish or delete deliberately. Commands: get, clone, patch, serve, edit\-live, publish, delete.
+.PP
+\- Operate & Capture: capture visual evidence for reports, incidents, or handoff. Commands: screenshot.
 .PP
 For single\-dashboard authoring, the local draft path is:
 .PP
@@ -32,7 +34,7 @@ For single\-dashboard authoring, the local draft path is:
 .PP
 \- dashboard patch to rewrite local metadata
 .PP
-\- dashboard edit to fetch one live dashboard into an editor with a safe local\-draft default and a review\-aware apply gate
+\- dashboard edit\-live to fetch one live dashboard into an editor with a safe local\-draft default and a review\-aware apply gate
 .PP
 \- dashboard publish to replay that draft back through the import pipeline
 .PP
@@ -43,7 +45,7 @@ Choose this page when the task is dashboard work but you are still deciding whet
 .IP \(bu 2
 Before: dashboard work is often split across UI browsing, one\-off exports, local JSON edits, and ad hoc screenshot or review steps.
 .IP \(bu 2
-After: the dashboard namespace keeps browse, inspect, review, normalize, and capture in one place, so you can pick the lane first and then jump to the matching subcommand.
+After: the dashboard namespace keeps browse, inspect, review, normalize, and capture in one place, with grouped help so you can pick the lane first and then jump to the matching flat subcommand.
 .SH SUBCOMMANDS
 .TP
 .B browse
@@ -76,7 +78,7 @@ Review one local dashboard JSON file without touching Grafana. Use when: You wan
 .B serve
 Serve one or more dashboard drafts through a lightweight local preview server. Use when: You are iterating on one dashboard draft, one draft directory, or one generator command and want a local browser surface without publishing back to Grafana after every workspace.
 .TP
-.B edit
+.B edit\-live
 Fetch one live dashboard into an external editor, then preview, save, or apply the edited result. Use when: Grafana already has the closest source dashboard and you want to edit that payload directly, while keeping a clear choice between preview\-only, saved draft, and direct live apply flows.
 .TP
 .B publish
@@ -144,7 +146,7 @@ summary and dependencies are read\-only analysis commands, not mutation paths.
 browse and screenshot operate against live Grafana state.
 .SH EXAMPLES
 .PP
-grafana\-util dashboard is the namespace for dashboard workflows: browse, list, variables, get, clone, edit, review, patch, serve, publish, export, import, convert, summary, dependencies, policy, history, and screenshots. The same namespace is also available as grafana\-util db.
+grafana\-util dashboard is the namespace for dashboard workflows. It keeps dashboard commands flat for fast terminal use, but groups the help and docs by task: browse and inspect, export and import, review and diff, edit and publish, and capture. The same namespace is also available as grafana\-util db.
 .EX
 grafana-util dashboard --help
 .EE

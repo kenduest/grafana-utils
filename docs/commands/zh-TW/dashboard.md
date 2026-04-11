@@ -1,17 +1,14 @@
 # dashboard
 
-## 這一頁對應的工作流
+## 指令分類
 
-| 工作流 | 常用子命令 |
-| --- | --- |
-| 盤點與瀏覽 dashboard | `browse`、`list`、`variables`、`get` |
-| 單一 dashboard 草稿 authoring | `get`、`clone`、`serve`、`patch`、`edit`、`review`、`publish` |
-| 匯出 / 匯入 / 轉換 | `get`、`clone`、`export`、`import`、`diff`、`review`、`patch`、`publish`、`delete`、`convert raw-to-prompt` |
-| 分析與報表 | `summary`、`variables`、`dependencies` |
-| 變更前檢查 | `policy` |
-| 相依性與影響面 | `dependencies`、`impact` |
-| 歷史與還原 | `history list`、`history restore`、`history export` |
-| 截圖與素材 | `screenshot` |
+- 瀏覽與檢視：先找 dashboard、讀內容、看變數或歷史版本。常用子命令：`browse`、`list`、`get`、`variables`、`history`。
+- 匯出與匯入：在 Grafana、raw JSON、prompt JSON、provisioning 檔案之間搬移 dashboard。常用子命令：`export`、`import`、`convert raw-to-prompt`。
+- 審查與比對：做差異比對、草稿檢查、相依性分析、影響面或治理檢查。常用子命令：`diff`、`review`、`summary`、`dependencies`、`impact`、`policy`。
+- 編修與發佈：建立或修改本地草稿，再有意識地發佈或刪除。常用子命令：`get`、`clone`、`patch`、`serve`、`edit-live`、`publish`、`delete`。
+- 操作與截圖：為報告、事故或交接取得視覺證據。常用子命令：`screenshot`。
+
+指令路徑仍維持扁平，例如 `grafana-util dashboard list`。分類只用在 help 與文件導覽，避免再加一層不必要的 namespace。
 
 ## 從這裡開始
 
@@ -26,7 +23,7 @@
 
 ## 說明
 
-`grafana-util dashboard` 把 dashboard 相關工作收在同一個入口：從瀏覽、草稿、匯出、匯入、比對，到相依性、影響面、政策和截圖。它也可用 `grafana-util db` 呼叫。
+`grafana-util dashboard` 把 dashboard 相關工作收在同一個入口：從瀏覽、草稿、匯出、匯入、比對，到相依性、影響面、政策和截圖。它也可用 `grafana-util db` 呼叫。命令本身維持扁平，help 和文件用分組降低閱讀壓力。
 
 新的 canonical 路徑是：
 - `dashboard browse`
@@ -34,7 +31,7 @@
 - `dashboard variables`
 - `dashboard get`
 - `dashboard clone`
-- `dashboard edit`
+- `dashboard edit-live`
 - `dashboard review`
 - `dashboard patch`
 - `dashboard serve`
@@ -53,7 +50,7 @@
 - `dashboard serve`：用本地 preview server 持續檢視草稿內容，必要時也能自動打開瀏覽器
 - `dashboard review`：先驗證草稿內容
 - `dashboard patch`：改寫本地中繼資料
-- `dashboard edit`：從 live 拉一份進 editor，預設仍先落回本地草稿，而且會依 review 結果決定能不能回寫 live
+- `dashboard edit-live`：從 live 拉一份進 editor，預設仍先落回本地草稿，而且會依 review 結果決定能不能回寫 live
 - `dashboard publish`：沿用 import pipeline 發回 Grafana
 
 `review`、`patch`、`publish` 也都支援 `--input -`，可以直接吃標準輸入的一份 wrapped 或 bare dashboard JSON。這適合外部 generator 已經把 JSON 寫到 stdout 的情況。`patch --input -` 必須搭配 `--output`，若你是在本地反覆編修同一份檔案，則改用 `publish --watch`；它只支援本地檔案路徑，不支援 `--input -`。
@@ -132,47 +129,44 @@ grafana-util dashboard serve --input ./drafts/cpu-main.json --port 18080 --open-
 
 ```bash
 # 從 live dashboard 開始編修，但預設先輸出成新的本地草稿。
-grafana-util dashboard edit --profile prod --dashboard-uid cpu-main --output ./drafts/cpu-main.edited.json
+grafana-util dashboard edit-live --profile prod --dashboard-uid cpu-main --output ./drafts/cpu-main.edited.json
 ```
 
 ## 相關指令
 
-### 盤點
+### 瀏覽與檢視
 
 - [dashboard browse](./dashboard-browse.md)
-- [dashboard get](./dashboard-get.md)
-- [dashboard clone](./dashboard-clone.md)
 - [dashboard list](./dashboard-list.md)
+- [dashboard get](./dashboard-get.md)
+- [dashboard variables](./dashboard-variables.md)
+- [dashboard history](./dashboard-history.md)
 
-### 匯出 / 匯入 / 轉換
+### 匯出與匯入
 
 - [dashboard export](./dashboard-export.md)
 - [dashboard import](./dashboard-import.md)
 - [dashboard convert raw-to-prompt](./dashboard-convert-raw-to-prompt.md)
-- [dashboard patch](./dashboard-patch.md)
 
-### 草稿 authoring
+### 審查與比對
 
-- [dashboard serve](./dashboard-serve.md)
-- [dashboard edit](./dashboard-edit-live.md)
-
-### 分析與報表
-
+- [dashboard diff](./dashboard-diff.md)
+- [dashboard review](./dashboard-review.md)
 - [dashboard summary](./dashboard-summary.md)
 - [dashboard dependencies](./dashboard-dependencies.md)
-- [dashboard variables](./dashboard-variables.md)
-
-### 變更前檢查
-
+- [dashboard impact](./dashboard-impact.md)
 - [dashboard policy](./dashboard-policy.md)
 
-### 變更與套用
+### 編修與發佈
 
-- [dashboard review](./dashboard-review.md)
+- [dashboard get](./dashboard-get.md)
+- [dashboard clone](./dashboard-clone.md)
+- [dashboard patch](./dashboard-patch.md)
+- [dashboard serve](./dashboard-serve.md)
+- [dashboard edit-live](./dashboard-edit-live.md)
 - [dashboard publish](./dashboard-publish.md)
 - [dashboard delete](./dashboard-delete.md)
-- [dashboard diff](./dashboard-diff.md)
 
-### 截圖與素材
+### 操作與截圖
 
 - [dashboard screenshot](./dashboard-screenshot.md)

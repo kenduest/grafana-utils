@@ -79,9 +79,9 @@ class GenerateManpagesTests(unittest.TestCase):
         generated = module.generate_manpages()
         dashboard_manpage = generated["grafana-util-dashboard.1"]
 
-        self.assertIn(".SH WORKFLOW LANES", dashboard_manpage)
-        self.assertIn(".SH WORKFLOW LANES", dashboard_manpage)
-        self.assertIn("dashboard review / dashboard patch / dashboard serve / dashboard publish", dashboard_manpage)
+        self.assertIn(".SH COMMAND GROUPS", dashboard_manpage)
+        self.assertIn("Browse & Inspect: find, read, or inspect dashboards", dashboard_manpage)
+        self.assertIn("Edit & Publish: create or change one local draft", dashboard_manpage)
         self.assertIn("Choose this page when the task is dashboard work", dashboard_manpage)
         self.assertIn(".SH BEFORE / AFTER", dashboard_manpage)
         self.assertIn(".SH SUCCESS CRITERIA", dashboard_manpage)

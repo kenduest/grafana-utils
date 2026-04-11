@@ -29,7 +29,7 @@ The checked-in English command reference pages under docs/commands/en/ are the h
 .SH TOP-LEVEL COMMANDS
 .TP
 .B dashboard
-grafana\-util dashboard is the namespace for dashboard workflows: browse, list, variables, get, clone, edit, review, patch, serve, publish, export, import, convert, summary, dependencies, policy, history, and screenshots. The same namespace is also available as grafana\-util db. Use when: You need to inspect dashboards, pull one live dashboard into a local draft, compare local files with Grafana, normalize dashboard JSON for UI upload, or publish a prepared dashboard back to Grafana.
+grafana\-util dashboard is the namespace for dashboard workflows. It keeps dashboard commands flat for fast terminal use, but groups the help and docs by task: browse and inspect, export and import, review and diff, edit and publish, and capture. The same namespace is also available as grafana\-util db. Use when: You need to inspect dashboards, pull one live dashboard into a local draft, compare local files with Grafana, normalize dashboard JSON for UI upload, or publish a prepared dashboard back to Grafana.
 .TP
 .B alert
 Run the alerting command surface for exporting, importing, diffing, planning, applying, deleting, authoring, and listing Grafana alert resources. Use when: Export local alert bundles from Grafana.; Import or diff alert bundles against live Grafana state.; Build and apply a reviewed alert management plan.; Author staged rules, contact points, routes, and templates.; List live alert rules, contact points, mute timings, and templates.
@@ -84,7 +84,7 @@ Review one local dashboard JSON file without touching Grafana. Use when: You wan
 .B grafana\-util\-dashboard\-serve(1)
 Serve one or more dashboard drafts through a lightweight local preview server. Use when: You are iterating on one dashboard draft, one draft directory, or one generator command and want a local browser surface without publishing back to Grafana after every workspace.
 .TP
-.B grafana\-util\-dashboard\-edit(1)
+.B grafana\-util\-dashboard\-edit\-live(1)
 Fetch one live dashboard into an external editor, then preview, save, or apply the edited result. Use when: Grafana already has the closest source dashboard and you want to edit that payload directly, while keeping a clear choice between preview\-only, saved draft, and direct live apply flows.
 .TP
 .B grafana\-util\-dashboard\-publish(1)
@@ -258,10 +258,6 @@ export dashboard, datasource, and access inventory into a local snapshot bundle.
 .TP
 .B grafana\-util\-snapshot\-review(1)
 review a local snapshot inventory without touching Grafana. Use when: Want to inspect an exported snapshot root as table, csv, text, json, yaml, or interactive output.
-.SS dashboard
-.TP
-.B grafana\-util\-dashboard\-edit\-live(1)
-Fetch one live dashboard into an external editor, then preview, save, or apply the edited result. Use when: Grafana already has the closest source dashboard and you want to edit that payload directly, while keeping a clear choice between preview\-only, saved draft, and direct live apply flows.
 .SS export
 .TP
 .B grafana\-util\-export(1)

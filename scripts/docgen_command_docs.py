@@ -41,6 +41,8 @@ SECTION_ALIASES = {
     "說明": "Description",
     "Description": "Description",
     "Workflow notes": "Workflow notes",
+    "Command groups": "Command groups",
+    "指令分類": "Command groups",
     "Workflow lanes": "Workflow lanes",
     "這一頁對應的工作流": "Workflow lanes",
     "Choose this page when": "Choose this page when",
@@ -75,6 +77,8 @@ LABEL_ALIASES = {
     "驗證說明": "Auth notes",
     "Description": "Description",
     "說明": "Description",
+    "Command groups": "Command groups",
+    "指令分類": "Command groups",
     "Workflow lanes": "Workflow lanes",
     "這一頁對應的工作流": "Workflow lanes",
     "Choose this page when": "Choose this page when",
@@ -117,6 +121,7 @@ class CommandDocPage:
     purpose: str
     when: str
     when_lines: tuple[str, ...]
+    command_group_lines: tuple[str, ...]
     workflow_lines: tuple[str, ...]
     choose_lines: tuple[str, ...]
     before_after_lines: tuple[str, ...]
@@ -273,6 +278,7 @@ def parse_command_page(path: Path, cli_path: str) -> CommandDocPage:
         purpose=extract_paragraph(purpose_source.get("Purpose", [])),
         when=extract_paragraph(purpose_source.get("When to use", [])),
         when_lines=tuple(extract_text_lines(purpose_source.get("When to use", []))),
+        command_group_lines=tuple(extract_text_lines(sections.get("Command groups", []))),
         workflow_lines=tuple(extract_text_lines(sections.get("Workflow lanes", []))),
         choose_lines=tuple(extract_text_lines(sections.get("Choose this page when", []))),
         before_after_lines=tuple(extract_text_lines(sections.get("Before / After", []))),
@@ -301,6 +307,7 @@ def parse_inline_subcommands(path: Path, cli_path: str) -> list[CommandDocPage]:
                 purpose=extract_paragraph(labels.get("Purpose", [])),
                 when=extract_paragraph(labels.get("When to use", [])),
                 when_lines=tuple(extract_text_lines(labels.get("When to use", []))),
+                command_group_lines=tuple(extract_text_lines(labels.get("Command groups", []))),
                 workflow_lines=tuple(extract_text_lines(labels.get("Workflow lanes", []))),
                 choose_lines=tuple(extract_text_lines(labels.get("Choose this page when", []))),
                 before_after_lines=tuple(extract_text_lines(labels.get("Before / After", []))),

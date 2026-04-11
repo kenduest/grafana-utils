@@ -1,7 +1,7 @@
 # dashboard
 
 ## Purpose
-`grafana-util dashboard` is the namespace for dashboard workflows: browse, list, variables, get, clone, edit, review, patch, serve, publish, export, import, convert, summary, dependencies, policy, history, and screenshots. The same namespace is also available as `grafana-util db`.
+`grafana-util dashboard` is the namespace for dashboard workflows. It keeps dashboard commands flat for fast terminal use, but groups the help and docs by task: browse and inspect, export and import, review and diff, edit and publish, and capture. The same namespace is also available as `grafana-util db`.
 
 ## When to use
 Use this namespace when you need to inspect dashboards, pull one live dashboard into a local draft, compare local files with Grafana, normalize dashboard JSON for UI upload, or publish a prepared dashboard back to Grafana.
@@ -11,20 +11,22 @@ Open this page first when the work is about the full dashboard workflow rather t
 
 If you are an SRE, Grafana operator, or responder, this page should help you decide which dashboard path to open next. If you already know the exact action, jump from here into the matching subcommand page for the concrete flags and examples.
 
-## Workflow lanes
+## Command groups
 
-- **`dashboard browse` / `dashboard list` / `dashboard variables` / `dashboard get` / `dashboard clone` / `dashboard edit` / `dashboard delete` / `dashboard history`**: live dashboard operations.
-- **`dashboard review` / `dashboard patch` / `dashboard serve` / `dashboard publish`**: local draft workflows.
-- **`dashboard export` / `dashboard import` / `dashboard diff` / `dashboard convert raw-to-prompt`**: moving dashboards between local artifacts and Grafana.
-- **`dashboard summary` / `dashboard dependencies` / `dashboard policy`**: analysis and governance checks.
-- **`dashboard screenshot`**: reproducible visual proof.
+The command path stays flat, such as `grafana-util dashboard list`, so experienced operators do not need extra namespace depth. Use the groups below to choose the right command faster.
+
+- Browse & Inspect: find, read, or inspect dashboards before deciding what to do. Commands: `browse`, `list`, `get`, `variables`, `history`.
+- Export & Import: move dashboard artifacts between Grafana, raw JSON, prompt JSON, or provisioning files. Commands: `export`, `import`, `convert raw-to-prompt`.
+- Review & Diff: collect proof, compare state, analyze dependencies, review blast radius, or run governance checks. Commands: `diff`, `review`, `summary`, `dependencies`, `impact`, `policy`.
+- Edit & Publish: create or change one local draft, then publish or delete deliberately. Commands: `get`, `clone`, `patch`, `serve`, `edit-live`, `publish`, `delete`.
+- Operate & Capture: capture visual evidence for reports, incidents, or handoff. Commands: `screenshot`.
 
 For single-dashboard authoring, the local draft path is:
 - `dashboard get` or `dashboard clone` to start from one live dashboard
 - `dashboard serve` to keep one or more drafts open in a local preview browser while you edit
 - `dashboard review` to verify one draft
 - `dashboard patch` to rewrite local metadata
-- `dashboard edit` to fetch one live dashboard into an editor with a safe local-draft default and a review-aware apply gate
+- `dashboard edit-live` to fetch one live dashboard into an editor with a safe local-draft default and a review-aware apply gate
 - `dashboard publish` to replay that draft back through the import pipeline
 
 `review`, `patch`, and `publish` also accept `--input -` for one wrapped or bare dashboard JSON document from standard input. Use that when an external generator already writes the dashboard JSON to stdout. `patch --input -` requires `--output`, and `publish --watch` is the local-file variant for repeated save-and-preview loops and does not support `--input -`.
@@ -34,7 +36,7 @@ Choose this page when the task is dashboard work but you are still deciding whet
 ## Before / After
 
 - **Before**: dashboard work is often split across UI browsing, one-off exports, local JSON edits, and ad hoc screenshot or review steps.
-- **After**: the `dashboard` namespace keeps browse, inspect, review, normalize, and capture in one place, so you can pick the lane first and then jump to the matching subcommand.
+- **After**: the `dashboard` namespace keeps browse, inspect, review, normalize, and capture in one place, with grouped help so you can pick the lane first and then jump to the matching flat subcommand.
 
 ## What success looks like
 
@@ -101,7 +103,7 @@ grafana-util dashboard serve --input ./drafts/cpu-main.json --port 18080 --open-
 
 ```bash
 # Purpose: Pull one live dashboard into an external editor and keep the result as a local draft by default.
-grafana-util dashboard edit --profile prod --dashboard-uid cpu-main --output ./drafts/cpu-main.edited.json
+grafana-util dashboard edit-live --profile prod --dashboard-uid cpu-main --output ./drafts/cpu-main.edited.json
 ```
 
 ```bash
@@ -116,41 +118,39 @@ grafana-util dashboard summary --url http://localhost:3000 --basic-user admin --
 
 ## Related commands
 
-### Browse and Inventory
+### Browse & Inspect
 
 - [dashboard browse](./dashboard-browse.md)
 - [dashboard list](./dashboard-list.md)
 - [dashboard get](./dashboard-get.md)
-- [dashboard summary](./dashboard-summary.md)
-- [dashboard dependencies](./dashboard-dependencies.md)
 - [dashboard variables](./dashboard-variables.md)
+- [dashboard history](./dashboard-history.md)
 
-### Export, Import, and Convert
+### Export & Import
 
-- [dashboard clone](./dashboard-clone.md)
 - [dashboard export](./dashboard-export.md)
 - [dashboard import](./dashboard-import.md)
 - [dashboard convert raw-to-prompt](./dashboard-convert-raw-to-prompt.md)
-- [dashboard patch](./dashboard-patch.md)
 
-### Author
-
-- [dashboard serve](./dashboard-serve.md)
-- [dashboard edit](./dashboard-edit-live.md)
-
-### Review Before Mutate
+### Review & Diff
 
 - [dashboard diff](./dashboard-diff.md)
 - [dashboard review](./dashboard-review.md)
-- [dashboard publish](./dashboard-publish.md)
-- [dashboard delete](./dashboard-delete.md)
+- [dashboard summary](./dashboard-summary.md)
+- [dashboard dependencies](./dashboard-dependencies.md)
 - [dashboard policy](./dashboard-policy.md)
 - [dashboard impact](./dashboard-impact.md)
 
-### History
+### Edit & Publish
 
-- [dashboard history](./dashboard-history.md)
+- [dashboard get](./dashboard-get.md)
+- [dashboard clone](./dashboard-clone.md)
+- [dashboard patch](./dashboard-patch.md)
+- [dashboard serve](./dashboard-serve.md)
+- [dashboard edit-live](./dashboard-edit-live.md)
+- [dashboard publish](./dashboard-publish.md)
+- [dashboard delete](./dashboard-delete.md)
 
-### Capture
+### Operate & Capture
 
 - [dashboard screenshot](./dashboard-screenshot.md)

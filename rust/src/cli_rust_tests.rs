@@ -53,6 +53,11 @@ fn dashboard_help_uses_flat_paths_and_short_help() {
     let help =
         maybe_render_unified_help_from_os_args(["grafana-util", "dashboard", "--help"], false)
             .unwrap();
+    assert!(help.contains("Browse & Inspect:"));
+    assert!(help.contains("Export & Import:"));
+    assert!(help.contains("Review & Diff:"));
+    assert!(help.contains("Edit & Publish:"));
+    assert!(help.contains("Operate & Capture:"));
     assert!(help.contains("browse"));
     assert!(help.contains("variables"));
     assert!(help.contains("get"));
@@ -76,6 +81,7 @@ fn dashboard_help_uses_flat_paths_and_short_help() {
     assert!(!help.contains("capture      screenshot"));
     assert!(!help.contains("advanced dashboard live"));
     assert!(!help.contains("migrate dashboard"));
+    assert!(!help.contains("Common tasks:"));
 }
 
 #[test]
@@ -198,6 +204,11 @@ fn dashboard_short_help_uses_flat_paths_only() {
     let help =
         maybe_render_unified_help_from_os_args(["grafana-util", "dashboard", "--help"], false)
             .unwrap();
+    assert!(help.contains("Browse & Inspect:"));
+    assert!(help.contains("Export & Import:"));
+    assert!(help.contains("Review & Diff:"));
+    assert!(help.contains("Edit & Publish:"));
+    assert!(help.contains("Operate & Capture:"));
     assert!(help.contains("browse"));
     assert!(help.contains("list"));
     assert!(help.contains("variables"));
@@ -223,6 +234,7 @@ fn dashboard_short_help_uses_flat_paths_only() {
     assert!(!help.contains("sync         export, import, diff, convert"));
     assert!(!help.contains("analyze      summary, topology, impact, governance"));
     assert!(!help.contains("capture      screenshot"));
+    assert!(!help.contains("Common tasks:"));
 }
 
 #[test]

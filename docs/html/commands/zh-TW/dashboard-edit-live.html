@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>dashboard edit · grafana-util docs</title>
+  <title>dashboard edit-live · grafana-util docs</title>
   <style>:root {
   color-scheme: light dark;
   --font-scale: 1;
@@ -758,9 +758,9 @@ code[class*="language-"],pre[class*="language-"]{color:#ccc;background:none;font
 </aside>
 
   <article class="article">
-    <div class="breadcrumbs"><a href="../../index.html">Home</a> / Commands / dashboard edit</div>
+    <div class="breadcrumbs"><a href="../../index.html">Home</a> / Commands / dashboard edit-live</div>
 
-    <h1><span class="hero-title-main">dashboard edit</span></h1>
+    <h1><span class="hero-title-main">dashboard edit-live</span></h1>
 
 
     <section class="command-intro">
@@ -783,16 +783,16 @@ code[class*="language-"],pre[class*="language-"]{color:#ccc;background:none;font
 <h2 id="何時使用">何時使用</h2>
 <p>當 Grafana 裡已經有最接近的來源 dashboard，你想直接從那份 live payload 開始改，但不希望預設就直接回寫 Grafana 時，使用這個指令。</p>
 <h2 id="重點旗標">重點旗標</h2>
-<ul><li><code>--dashboard-uid</code>：要編修的 live Grafana dashboard UID。</li><li><code>--output</code>：編修後要寫出的本地草稿路徑。未指定時，預設是 <code>./&lt;uid&gt;.edited.json</code>。</li><li><code>--apply-live</code>：把編修後的 payload 直接寫回 Grafana，而不是寫成本地草稿。</li><li><code>--yes</code>：搭配 <code>--apply-live</code> 必填，因為它會變更 live Grafana。</li><li><code>--message</code>：<code>--apply-live</code> 寫回 Grafana 時使用的 revision message。</li><li><code>--profile</code>、<code>--url</code>、<code>--token</code>、<code>--basic-user</code>、<code>--basic-password</code>：live Grafana 連線設定。</li></ul>
+<ul><li><code>--dashboard-uid</code>：要編修的 live Grafana dashboard UID。</li><li><code>--output</code>：編修後要寫出的本地草稿路徑。未指定時，<code>edit-live</code> 會保持暫存編修，不建立本地草稿檔。</li><li><code>--publish-dry-run</code>：搭配 <code>--output</code> 時，先儲存本地草稿，再立即執行等效的 <code>dashboard publish --dry-run</code> 預覽。</li><li><code>--apply-live</code>：把編修後的 payload 直接寫回 Grafana，而不是寫成本地草稿。</li><li><code>--yes</code>：搭配 <code>--apply-live</code> 必填，因為它會變更 live Grafana。</li><li><code>--message</code>：<code>--apply-live</code> 寫回 Grafana 時使用的 revision message。</li><li><code>--profile</code>、<code>--url</code>、<code>--token</code>、<code>--basic-user</code>、<code>--basic-password</code>：live Grafana 連線設定。</li></ul>
 <h2 id="補充說明">補充說明</h2>
-<ul><li>指令會依序使用 <code>$VISUAL</code>、<code>$EDITOR</code>，最後回退到 <code>vi</code>。</li><li>沒有帶 <code>--apply-live</code> 時，這個指令一定會把結果寫成本地草稿。</li><li>編修完成後，指令會印出 review 摘要，包含阻擋性驗證問題與建議的下一步。</li><li><code>--apply-live</code> 只有在編修後的草稿維持 <code>dashboard.id</code> 為 null、保留原始 dashboard UID、且沒有阻擋性 review 問題時才會繼續。</li><li>編修後的 payload 仍必須保留 <code>dashboard.uid</code>。</li></ul>
+<ul><li>指令會依序使用 <code>$VISUAL</code>、<code>$EDITOR</code>，最後回退到 <code>vi</code>。</li><li>未指定 <code>--output</code> 或 <code>--apply-live</code> 時，這次編修只保持暫存，並自動執行 live <code>publish --dry-run</code> 預覽，不寫出草稿檔。</li><li>有指定 <code>--output</code> 時，指令會把編修後的草稿寫到磁碟；除非同時加上 <code>--publish-dry-run</code>，否則不會繼續預覽 publish。</li><li>編修完成後，指令會印出 review 摘要，包含阻擋性驗證問題與建議的下一步。</li><li><code>--apply-live</code> 只有在編修後的草稿維持 <code>dashboard.id</code> 為 null、保留原始 dashboard UID、且沒有阻擋性 review 問題時才會繼續。</li><li>編修後的 payload 仍必須保留 <code>dashboard.uid</code>。</li></ul>
 <h2 id="範例">範例</h2>
 <pre><code># 用途：編修一份 live dashboard，並把結果保留成本地草稿。
-grafana-util dashboard edit --profile prod --dashboard-uid cpu-main --output ./drafts/cpu-main.edited.json</code></pre>
-<pre><code># 用途：編修一份 live dashboard，並使用預設輸出路徑 ./cpu-main.edited.json。
-grafana-util dashboard edit --url http://localhost:3000 --basic-user admin --basic-password admin --dashboard-uid cpu-main</code></pre>
+grafana-util dashboard edit-live --profile prod --dashboard-uid cpu-main --output ./drafts/cpu-main.edited.json</code></pre>
+<pre><code># 用途：編修一份 live dashboard，不寫出草稿檔，只預覽 live publish。
+grafana-util dashboard edit-live --url http://localhost:3000 --basic-user admin --basic-password admin --dashboard-uid cpu-main</code></pre>
 <pre><code># 用途：編修一份 live dashboard，並明確回寫到 Grafana。
-grafana-util dashboard edit --profile prod --dashboard-uid cpu-main --apply-live --yes --message &#x27;Hotfix CPU dashboard&#x27;</code></pre>
+grafana-util dashboard edit-live --profile prod --dashboard-uid cpu-main --apply-live --yes --message &#x27;Hotfix CPU dashboard&#x27;</code></pre>
 <h2 id="相關指令">相關指令</h2>
 <ul><li><a href="dashboard-get.html">dashboard get</a></li><li><a href="dashboard-clone.html">dashboard clone</a></li><li><a href="dashboard-publish.html">dashboard publish</a></li></ul>
     

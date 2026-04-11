@@ -428,7 +428,15 @@ pub(crate) fn colorize_help_examples(text: &str) -> String {
 
 pub(crate) fn colorize_dashboard_short_help(text: &str) -> String {
     let mut colored = text.to_string();
-    for heading in ["Usage:", "Common tasks:", "More help:"] {
+    for heading in [
+        "Usage:",
+        "Browse & Inspect:",
+        "Export & Import:",
+        "Review & Diff:",
+        "Edit & Publish:",
+        "Operate & Capture:",
+        "More help:",
+    ] {
         let colored_heading = paint_section(heading);
         colored = colored.replace(heading, &colored_heading);
     }

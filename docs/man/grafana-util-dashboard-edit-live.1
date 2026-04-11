@@ -3,7 +3,7 @@
 .SH NAME
 grafana\-util\-dashboard\-edit\-live \- Fetch one live dashboard into an external editor, then preview, save, or apply the edited result.
 .SH SYNOPSIS
-.B grafana-util dashboard edit live [\fIOPTIONS\fR]
+.B grafana-util dashboard edit-live [\fIOPTIONS\fR]
 .SH DESCRIPTION
 Fetch one live dashboard into an external editor, then preview, save, or apply the edited result.
 .PP
@@ -34,7 +34,8 @@ live Grafana connection settings.
 .PP
 Fetch one live dashboard into an external editor, then preview, save, or apply the edited result.
 .EX
-grafana-util dashboard edit --profile prod --dashboard-uid cpu-main
+grafana-util dashboard edit-live --profile prod --dashboard-uid cpu-main
 .EE
 .SH SEE ALSO
-\fBgrafana-util\fR(1)
+\fBgrafana-util\fR(1),
+\fBgrafana-util-dashboard\fR(1)
