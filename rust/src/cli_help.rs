@@ -761,7 +761,9 @@ fn command_path_before_help(args: &[String], help_index: usize) -> Vec<String> {
 fn should_render_path_help_before_root_match(path: &[String]) -> bool {
     match path.first().map(String::as_str) {
         None => false,
-        Some("dashboard" | "db") if path.len() <= 2 => false,
+        Some("dashboard" | "db") if path.len() <= 2 => {
+            matches!(path.get(1).map(String::as_str), Some("convert"))
+        }
         Some(root)
             if path.len() == 1
                 && matches!(root, "alert" | "datasource" | "access" | "workspace") =>

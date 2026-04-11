@@ -12,7 +12,7 @@ use crate::help_styles::CLI_HELP_STYLES;
 use crate::profile_cli::ProfileCommand;
 use crate::resource::{ResourceCommand, ResourceKind, ResourceOutputFormat};
 use clap::builder::styling::AnsiColor;
-use clap::{CommandFactory, Parser};
+use clap::{Command, CommandFactory, Parser};
 use std::cell::RefCell;
 use std::path::Path;
 
@@ -25,6 +25,41 @@ fn render_cli_help_path(path: &[&str]) -> String {
             .unwrap_or_else(|| panic!("missing cli subcommand {segment}"));
     }
     current.render_help().to_string()
+}
+
+fn collect_public_leaf_command_paths(
+    command: &Command,
+    path: &mut Vec<String>,
+    output: &mut Vec<Vec<String>>,
+) {
+    let visible_subcommands = command
+        .get_subcommands()
+        .filter(|subcommand| !subcommand.is_hide_set())
+        .collect::<Vec<_>>();
+    if visible_subcommands.is_empty() {
+        if !path.is_empty() {
+            output.push(path.clone());
+        }
+        return;
+    }
+    for subcommand in visible_subcommands {
+        path.push(subcommand.get_name().to_string());
+        collect_public_leaf_command_paths(subcommand, path, output);
+        path.pop();
+    }
+}
+
+fn render_public_leaf_help(path: &[String]) -> Option<String> {
+    let mut args = vec!["grafana-util".to_string()];
+    args.extend(path.iter().cloned());
+    args.push("--help".to_string());
+    maybe_render_unified_help_from_os_args(args.clone(), false).or_else(|| {
+        crate::dashboard::maybe_render_dashboard_subcommand_help_from_os_args(args, false)
+    })
+}
+
+fn has_examples_section(help: &str) -> bool {
+    help.starts_with("Examples:") || help.contains("\nExamples:")
 }
 
 #[test]
@@ -46,6 +81,67 @@ fn unified_help_mentions_common_surfaces_without_legacy_dashboard_paths() {
     assert!(!help.contains("dashboard analyze"));
     assert!(!help.contains("dashboard capture"));
     assert!(!help.contains("alert migrate export"));
+}
+
+#[test]
+fn public_leaf_subcommand_help_includes_examples_section() {
+    let command = CliArgs::command();
+    let mut paths = Vec::new();
+    collect_public_leaf_command_paths(&command, &mut Vec::new(), &mut paths);
+    let missing = paths
+        .iter()
+        .filter_map(|path| {
+            let help = render_public_leaf_help(path).unwrap_or_else(|| {
+                panic!("missing public help for grafana-util {}", path.join(" "))
+            });
+            (!has_examples_section(&help)).then(|| format!("grafana-util {}", path.join(" ")))
+        })
+        .collect::<Vec<_>>();
+    assert!(
+        missing.is_empty(),
+        "leaf command help missing Examples section:\n{}",
+        missing.join("\n")
+    );
+}
+
+#[test]
+fn dashboard_convert_help_uses_unified_nested_renderer() {
+    let convert_help = maybe_render_unified_help_from_os_args(
+        ["grafana-util", "dashboard", "convert", "--help"],
+        false,
+    )
+    .expect("expected dashboard convert help");
+    assert!(convert_help.contains("raw-to-prompt"));
+
+    let raw_to_prompt_help = maybe_render_unified_help_from_os_args(
+        [
+            "grafana-util",
+            "dashboard",
+            "convert",
+            "raw-to-prompt",
+            "--help",
+        ],
+        false,
+    )
+    .expect("expected raw-to-prompt help");
+    assert!(raw_to_prompt_help.contains("Examples:"));
+    assert!(raw_to_prompt_help.contains("grafana-util dashboard convert raw-to-prompt"));
+}
+
+#[test]
+fn removed_dashboard_group_help_paths_do_not_panic() {
+    for legacy_group in ["live", "draft", "sync", "analyze", "capture"] {
+        let args = ["grafana-util", "dashboard", legacy_group, "--help"];
+        assert!(
+            maybe_render_unified_help_from_os_args(args, false).is_none(),
+            "unified help should not intercept removed dashboard group {legacy_group}"
+        );
+        assert!(
+            crate::dashboard::maybe_render_dashboard_subcommand_help_from_os_args(args, false)
+                .is_none(),
+            "dashboard help hook should not panic or render removed dashboard group {legacy_group}"
+        );
+    }
 }
 
 #[test]

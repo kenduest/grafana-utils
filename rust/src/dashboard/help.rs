@@ -17,7 +17,7 @@ fn ensure_trailing_blank_line(mut text: String) -> String {
     text
 }
 
-fn render_dashboard_subcommand_help_text(subcommand_name: &str, colorize: bool) -> String {
+fn render_dashboard_subcommand_help_text(subcommand_name: &str, colorize: bool) -> Option<String> {
     let canonical_name = match subcommand_name {
         other => other,
     };
@@ -30,12 +30,10 @@ fn render_dashboard_subcommand_help_text(subcommand_name: &str, colorize: bool) 
             ColorChoice::Never
         });
     command = configured;
-    let subcommand = command
-        .find_subcommand_mut(canonical_name)
-        .unwrap_or_else(|| panic!("missing dashboard subcommand {canonical_name}"));
+    let subcommand = command.find_subcommand_mut(canonical_name)?;
     let mut output = Vec::new();
-    subcommand.write_long_help(&mut output).unwrap();
-    let text = String::from_utf8(output).expect("dashboard help should be valid UTF-8");
+    subcommand.write_long_help(&mut output).ok()?;
+    let text = String::from_utf8(output).ok()?;
     let usage_prefix = format!("Usage: {canonical_name}");
     let text = text.replacen(
         &usage_prefix,
@@ -43,9 +41,11 @@ fn render_dashboard_subcommand_help_text(subcommand_name: &str, colorize: bool) 
         1,
     );
     if colorize {
-        ensure_trailing_blank_line(colorize_dashboard_subcommand_help(&text))
+        Some(ensure_trailing_blank_line(
+            colorize_dashboard_subcommand_help(&text),
+        ))
     } else {
-        ensure_trailing_blank_line(text)
+        Some(ensure_trailing_blank_line(text))
     }
 }
 
@@ -54,7 +54,7 @@ fn render_dashboard_subcommand_help_text(subcommand_name: &str, colorize: bool) 
 /// Args: see function signature.
 /// Returns: see implementation.
 pub fn render_inspect_export_help_full() -> String {
-    let mut text = render_dashboard_subcommand_help_text("summary", false);
+    let mut text = render_dashboard_subcommand_help_text("summary", false).unwrap_or_default();
     text.push_str(INSPECT_EXPORT_HELP_FULL_EXAMPLES);
     text
 }
@@ -64,7 +64,7 @@ pub fn render_inspect_export_help_full() -> String {
 /// Args: see function signature.
 /// Returns: see implementation.
 pub fn render_inspect_live_help_full() -> String {
-    let mut text = render_dashboard_subcommand_help_text("summary", false);
+    let mut text = render_dashboard_subcommand_help_text("summary", false).unwrap_or_default();
     text.push_str(INSPECT_LIVE_HELP_FULL_EXAMPLES);
     text
 }
@@ -91,15 +91,17 @@ where
             .map(String::as_str)
         {
             if !matches!(command, "history" | "convert") {
-                return Some(render_dashboard_subcommand_help_text(command, colorize));
+                return render_dashboard_subcommand_help_text(command, colorize);
             }
         }
     }
     match rest {
         [dashboard, command, flag]
-            if dashboard == "dashboard" && (flag == "--help" || flag == "-h") =>
+            if dashboard == "dashboard"
+                && !matches!(command.as_str(), "history" | "convert")
+                && (flag == "--help" || flag == "-h") =>
         {
-            Some(render_dashboard_subcommand_help_text(command, colorize))
+            render_dashboard_subcommand_help_text(command, colorize)
         }
         _ => None,
     }
@@ -121,12 +123,12 @@ where
     let rest = args.get(1..).unwrap_or(&[]);
     match rest {
         [dashboard, command, ..] if dashboard == "dashboard" && command == "summary" => {
-            let mut text = render_dashboard_subcommand_help_text("summary", false);
+            let mut text = render_dashboard_subcommand_help_text("summary", false)?;
             text.push_str(SUMMARY_HELP_FULL_EXAMPLES);
             Some(text)
         }
         [command, ..] if command == "summary" => {
-            let mut text = render_dashboard_subcommand_help_text("summary", false);
+            let mut text = render_dashboard_subcommand_help_text("summary", false)?;
             text.push_str(SUMMARY_HELP_FULL_EXAMPLES);
             Some(text)
         }

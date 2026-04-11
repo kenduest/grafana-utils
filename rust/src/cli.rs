@@ -26,7 +26,7 @@ use crate::cli_help::{
     UNIFIED_SYNC_HELP_TEXT,
 };
 use crate::cli_help_examples::UNIFIED_HELP_TEXT;
-use crate::common::{json_color_choice, set_json_color_choice, CliColorChoice, Result};
+use crate::common::{json_color_choice, message, set_json_color_choice, CliColorChoice, Result};
 use crate::dashboard::{
     run_dashboard_cli, run_raw_to_prompt, AnalyzeArgs, BrowseArgs, CloneLiveArgs, DashboardCliArgs,
     DashboardCommand, DashboardHistoryArgs, DeleteArgs, DiffArgs, EditLiveArgs,
@@ -39,7 +39,7 @@ use crate::overview::{run_overview_cli, OverviewArgs, OverviewCliArgs, OverviewC
 use crate::profile_cli::{run_profile_cli, ProfileCliArgs};
 use crate::project_status_command::{
     run_project_status_cli, ProjectStatusCliArgs, ProjectStatusLiveArgs, ProjectStatusStagedArgs,
-    ProjectStatusSubcommand,
+    ProjectStatusSubcommand, PROJECT_STATUS_LIVE_HELP_TEXT, PROJECT_STATUS_STAGED_HELP_TEXT,
 };
 use crate::resource::{run_resource_cli, ResourceCliArgs, ResourceCommand};
 use crate::snapshot::{run_snapshot_cli, SnapshotCommand};
@@ -47,6 +47,10 @@ use crate::sync::{run_sync_cli, SyncGroupCommand};
 
 const EXPORT_HELP_TEXT: &str = "Examples:\n\n  [Dashboard backup]\n    grafana-util export dashboard --output-dir ./dashboards --overwrite\n\n  [Alert backup]\n    grafana-util export alert --output-dir ./alerts --overwrite\n\n  [Datasource inventory]\n    grafana-util export datasource --output-dir ./datasources\n\n  [Access inventory]\n    grafana-util export access service-account --output-dir ./access-service-accounts";
 const EXPORT_ACCESS_HELP_TEXT: &str = "Examples:\n\n  Export Grafana users into a local bundle:\n    grafana-util export access user --output-dir ./access-users --overwrite\n\n  Export Grafana teams into a local bundle:\n    grafana-util export access team --output-dir ./access-teams --overwrite\n\n  Export Grafana service accounts into a local bundle:\n    grafana-util export access service-account --output-dir ./access-service-accounts --overwrite";
+const EXPORT_ACCESS_USER_HELP_TEXT: &str = "Examples:\n\n  Export Grafana users into a local bundle:\n    grafana-util export access user --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --output-dir ./access-users --overwrite";
+const EXPORT_ACCESS_ORG_HELP_TEXT: &str = "Examples:\n\n  Export Grafana organizations into a local bundle:\n    grafana-util export access org --url http://localhost:3000 --basic-user admin --basic-password admin --output-dir ./access-orgs --overwrite";
+const EXPORT_ACCESS_TEAM_HELP_TEXT: &str = "Examples:\n\n  Export Grafana teams into a local bundle:\n    grafana-util export access team --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --output-dir ./access-teams --overwrite";
+const EXPORT_ACCESS_SERVICE_ACCOUNT_HELP_TEXT: &str = "Examples:\n\n  Export Grafana service accounts into a local bundle:\n    grafana-util export access service-account --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --output-dir ./access-service-accounts --overwrite";
 const EXPORT_DASHBOARD_HELP_TEXT: &str = "Notes:\n  - Writes raw/, prompt/, and provisioning/ by default.\n  - Use Basic auth with --all-orgs.\n  - Use --flat for files directly under each variant directory.\n  - Use --include-history to add history/ under each exported org scope.\n  - The provider file is provisioning/provisioning/dashboards.yaml.\n  - Keep raw/ for API import or diff, prompt/ for UI import, and provisioning/ for file provisioning.\n\nExamples:\n\n  Export dashboards from the current org:\n    grafana-util export dashboard --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --output-dir ./dashboards --overwrite\n\n  Export dashboards across all visible orgs:\n    grafana-util export dashboard --url http://localhost:3000 --basic-user admin --basic-password admin --all-orgs --output-dir ./dashboards --overwrite";
 const EXPORT_ALERT_HELP_TEXT: &str = "Examples:\n\n  Export alerting resources from Grafana:\n    grafana-util export alert --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --output-dir ./alerts --overwrite";
 const EXPORT_DATASOURCE_HELP_TEXT: &str = "Examples:\n\n  Export datasource inventory into a local artifact tree:\n    grafana-util export datasource --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --output-dir ./datasources --overwrite";
@@ -54,11 +58,20 @@ const ALERT_MIGRATE_HELP_TEXT: &str = "Examples:\n\n  [Import]\n    grafana-util
 const ALERT_MIGRATE_EXPORT_HELP_TEXT: &str = "Examples:\n\n  Export alerting resources with overwrite enabled:\n    grafana-util alert migrate export --url http://localhost:3000 --token \"$GRAFANA_API_TOKEN\" --output-dir ./alerts --overwrite";
 const ALERT_MIGRATE_IMPORT_HELP_TEXT: &str = "Examples:\n\n  Preview a replace-existing import before execution as structured JSON:\n    grafana-util alert migrate import --url http://localhost:3000 --input-dir ./alerts/raw --replace-existing --dry-run --json\n\n  Re-map linked dashboards and panels during import:\n    grafana-util alert migrate import --url http://localhost:3000 --input-dir ./alerts/raw --replace-existing --dashboard-uid-map ./dashboard-map.json --panel-id-map ./panel-map.json";
 const ALERT_MIGRATE_DIFF_HELP_TEXT: &str = "Examples:\n\n  Compare a local export against Grafana as structured JSON:\n    grafana-util alert migrate diff --url http://localhost:3000 --diff-dir ./alerts/raw --output-format json";
+const VERSION_HELP_TEXT: &str =
+    "Examples:\n\n  Print the human-readable version:\n    grafana-util version\n\n  Print machine-readable version details:\n    grafana-util version --json";
+const DASHBOARD_RAW_TO_PROMPT_HELP_TEXT: &str = "Examples:\n\n  Convert one raw dashboard JSON file into a prompt artifact:\n    grafana-util dashboard convert raw-to-prompt --input ./dashboards/raw/cpu-main.json --output ./dashboards/prompt/cpu-main.prompt.json\n\n  Convert a raw export tree into the prompt lane:\n    grafana-util dashboard convert raw-to-prompt --input-dir ./dashboards/raw --output-dir ./dashboards/prompt --output-format table";
 #[derive(Debug, Clone, Subcommand)]
 pub enum StatusCommand {
-    #[command(about = "Render shared project-wide live status.")]
+    #[command(
+        about = "Render shared project-wide live status.",
+        after_help = PROJECT_STATUS_LIVE_HELP_TEXT
+    )]
     Live(ProjectStatusLiveArgs),
-    #[command(about = "Render shared project-wide staged status.")]
+    #[command(
+        about = "Render shared project-wide staged status.",
+        after_help = PROJECT_STATUS_STAGED_HELP_TEXT
+    )]
     Staged(ProjectStatusStagedArgs),
     #[command(about = "Render project-wide staged or live overview.")]
     Overview {
@@ -87,15 +100,25 @@ pub enum ConfigCommand {
 
 #[derive(Debug, Clone, Subcommand)]
 pub enum ExportAccessCommand {
-    #[command(about = "Export Grafana users into a local reviewable bundle.")]
+    #[command(
+        about = "Export Grafana users into a local reviewable bundle.",
+        after_help = EXPORT_ACCESS_USER_HELP_TEXT
+    )]
     User(UserExportArgs),
-    #[command(about = "Export Grafana org inventory into a local reviewable bundle.")]
+    #[command(
+        about = "Export Grafana org inventory into a local reviewable bundle.",
+        after_help = EXPORT_ACCESS_ORG_HELP_TEXT
+    )]
     Org(OrgExportArgs),
-    #[command(about = "Export Grafana teams into a local reviewable bundle.")]
+    #[command(
+        about = "Export Grafana teams into a local reviewable bundle.",
+        after_help = EXPORT_ACCESS_TEAM_HELP_TEXT
+    )]
     Team(TeamExportArgs),
     #[command(
         name = "service-account",
-        about = "Export Grafana service accounts into a local reviewable bundle."
+        about = "Export Grafana service accounts into a local reviewable bundle.",
+        after_help = EXPORT_ACCESS_SERVICE_ACCOUNT_HELP_TEXT
     )]
     ServiceAccount(ServiceAccountExportArgs),
 }
@@ -131,7 +154,8 @@ pub enum ExportCommand {
 pub enum DashboardConvertCommand {
     #[command(
         name = "raw-to-prompt",
-        about = "Convert raw dashboard exports into prompt lane artifacts."
+        about = "Convert raw dashboard exports into prompt lane artifacts.",
+        after_help = DASHBOARD_RAW_TO_PROMPT_HELP_TEXT
     )]
     RawToPrompt(RawToPromptArgs),
 }
@@ -425,7 +449,10 @@ pub enum AlertCommandSurface {
 
 #[derive(Debug, Clone, Subcommand)]
 pub enum UnifiedCommand {
-    #[command(about = "Print the current grafana-util version.")]
+    #[command(
+        about = "Print the current grafana-util version.",
+        after_help = VERSION_HELP_TEXT
+    )]
     Version(VersionArgs),
     #[command(
         name = "status",
@@ -677,7 +704,10 @@ where
                 color: json_color_choice(),
                 command,
             }),
-            other => run_project_status(wrap_project_status(other).expect("status command path")),
+            other => run_project_status(
+                wrap_project_status(other)
+                    .ok_or_else(|| message("Unsupported status command path."))?,
+            ),
         },
         UnifiedCommand::Export { command } => match command {
             ExportCommand::Dashboard(inner) => {
