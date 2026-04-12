@@ -657,7 +657,7 @@ html[lang="zh-TW"] .sidebar { font-family: var(--font-zh); letter-spacing: 0; }
   letter-spacing: -0.025em;
 }
 .landing-summary {
-  max-width: 56ch;
+  max-width: 78ch;
   margin: 0;
   font-size: 0.96rem;
   line-height: 1.68;
@@ -918,111 +918,74 @@ code[class*="language-"],pre[class*="language-"]{color:#ccc;background:none;font
 
 <h1><span class="hero-title-main">Developer Guide</span></h1><p class="hero-summary">Maintainer routing for runtime, docs, contracts, and release work.</p>
 
-<section class="section-index"><h2>Guide Map</h2><p class="section-index-summary">Jump straight to the repo concern you are touching instead of scanning the whole maintainer guide.</p><ul class="section-index-list layout-grid"><li><a href="#start-here">Start Here</a></li><li><a href="#repo-priorities">Repo Priorities</a></li><li><a href="#user-facing-cli-surface">User-Facing CLI Surface</a></li><li><a href="#code-architecture-map">Code Architecture Map</a></li><li><a href="#documentation-map">Documentation Map</a></li><li><a href="#validation-and-build-guide">Validation And Build Guide</a></li><li><a href="#high-signal-project-rules">High-Signal Project Rules</a></li><li><a href="#maintainer-personas">Maintainer Personas</a></li><li><a href="#quick-routing-table">Quick Routing Table</a></li><li><a href="#maintenance-standard">Maintenance Standard</a></li></ul></section><p>This page is the maintainer entrypoint for the repo.</p>
-<p>Use it to orient quickly, then jump to the narrower document that matches the kind of change you are making. Keep this file short, indexed by concern, and free of long contract detail that belongs in the dedicated internal docs.</p>
+<section class="section-index"><h2>Guide Map</h2><p class="section-index-summary">Jump straight to the repo concern you are touching instead of scanning the whole maintainer guide.</p><ul class="section-index-list layout-grid"><li><a href="#start-here">Start Here</a></li><li><a href="#repo-priorities">Repo Priorities</a></li><li><a href="#current-public-cli-shape">Current Public CLI Shape</a></li><li><a href="#choose-your-lane">Choose Your Lane</a></li><li><a href="#documentation-boundaries">Documentation Boundaries</a></li><li><a href="#validation-defaults">Validation Defaults</a></li><li><a href="#maintenance-rules">Maintenance Rules</a></li><li><a href="#when-to-update-other-maintainer-docs">When To Update Other Maintainer Docs</a></li></ul></section><p>This page is the maintainer landing page for the repo.</p>
+<p>Use it to orient quickly, decide which lane you are in, and jump to the document or code surface that actually owns the change. Do not turn this file into a second spec, a second quickstart, or a long policy dump.</p>
 <h2 id="start-here">Start Here</h2>
-<p>If this is your first time entering the repo, open <code>docs/internal/maintainer-quickstart.md</code> first.</p>
-<p>If you are working on:</p>
-<p>start with <code>rust/src/cli.rs</code>, the domain runtime modules under <code>rust/src/</code>, and the architecture walkthroughs in <code>docs/overview-rust.md</code> and <code>docs/internal/overview-architecture.md</code></p>
-<p>start with <code>README.md</code>, <code>README.zh-TW.md</code>, <code>docs/user-guide/</code>, <code>docs/commands/</code>, and the generated-docs notes listed below</p>
-<p>start with <code>docs/internal/docs-architecture-guardrails.md</code></p>
-<p>start with <code>docs/internal/generated-docs-architecture.md</code> and <code>docs/internal/generated-docs-playbook.md</code></p>
-<p>start with <code>docs/internal/contract-doc-map.md</code></p>
-<p>start with <code>Makefile</code> and the repo scripts under <code>scripts/</code></p>
-<p>start with <code>docs/internal/ai-status.md</code> and <code>docs/internal/ai-changes.md</code></p>
-<p>start with <code>docs/internal/ai-workflow-note.md</code></p>
-<ul><li>runtime and CLI behavior:</li><li>command or handbook docs:</li><li>docs architecture or handbook/manual boundary changes:</li><li>generated <code>man</code> or HTML docs:</li><li>contract or schema changes:</li><li>validation, build, or release workflow:</li><li>change history or current AI-maintained status:</li><li>AI-assisted maintainer workflow:</li></ul>
-<p>If you prefer to route by maintainer persona instead of by subsystem, open <code>docs/internal/maintainer-role-map.md</code>.</p>
-<p>For Rust layering, split thresholds, hotspot order, and architecture-lint usage, see <code>docs/internal/rust-architecture-guardrails.md</code>.</p>
+<p>If you just entered the repo:</p>
+<ol><li><code>README.md</code></li></ol>
+<ul><li>public product shape and operator-facing entrypoints</li></ul>
+<ol><li><code>docs/internal/maintainer-quickstart.md</code></li></ol>
+<ul><li>first-entry maintainer routing</li></ul>
+<ol><li><code>rust/src/cli.rs</code></li></ol>
+<ul><li>public CLI topology and namespace wiring</li></ul>
+<ol><li><code>docs/internal/maintainer-role-map.md</code></li></ol>
+<ul><li>routing by maintainer persona</li></ul>
+<ol><li><code>docs/internal/contract-doc-map.md</code></li></ol>
+<ul><li>where stable contracts and policy docs live</li></ul>
+<ol><li><code>Makefile</code></li></ol>
+<ul><li>supported validation and generation entrypoints</li></ul>
+<p>If you are returning to the repo after time away, start with <code>docs/internal/maintainer-quickstart.md</code> first and treat this page as the short map, not the full walkthrough.</p>
 <h2 id="repo-priorities">Repo Priorities</h2>
-<ul><li>Supported implementation surface: Rust under <code>rust/src/</code></li><li>Legacy reference surface: Python under <code>python/grafana_utils/</code></li><li>Operator-facing docs: <code>README.md</code>, <code>README.zh-TW.md</code>, <code>docs/user-guide/</code></li><li>Command-reference docs: <code>docs/commands/</code></li><li>Generated artifact docs: <code>docs/man/</code>, <code>docs/html/</code></li></ul>
-<p>Treat the Rust runtime as the supported product surface. Keep the Python package as legacy maintainer reference material unless a task explicitly targets the Python lane.</p>
-<h2 id="user-facing-cli-surface">User-Facing CLI Surface</h2>
-<p>Current maintained public namespaces:</p>
-<ul><li><code>grafana-util dashboard</code></li><li><code>grafana-util alert</code></li><li><code>grafana-util access</code></li><li><code>grafana-util status</code></li><li><code>grafana-util status live</code></li><li><code>grafana-util status overview</code></li><li><code>grafana-util status resource</code></li><li><code>grafana-util status snapshot</code></li><li><code>grafana-util workspace</code></li><li><code>grafana-util export</code></li><li><code>grafana-util config</code></li></ul>
-<p>Treat <code>rust/src/cli.rs</code> as the command-topology entrypoint and the domain facade modules as the runtime dispatch layer.</p>
-<h2 id="code-architecture-map">Code Architecture Map</h2>
-<p>Primary code paths:</p>
-<ul><li><code>rust/src/cli.rs</code></li><li>namespaced CLI dispatch and help routing</li><li><code>rust/src/cli_help.rs</code></li><li>unified help rendering and example blocks kept out of <code>cli.rs</code></li><li><code>rust/src/dashboard/</code></li><li>dashboard export, import, diff, inspect, prompt-export, authoring, and screenshot workflows</li><li><code>rust/src/datasource.rs</code></li><li>datasource list, export, import, diff, add, modify, and delete workflows</li><li><code>rust/src/alert.rs</code></li><li>alerting export, import, diff, planning, apply, and shared alert helpers</li><li><code>rust/src/access/</code></li><li>org, user, team, and service-account workflows plus shared helpers</li><li><code>rust/src/sync/</code></li><li>internal runtime namespace behind the public <code>change</code> workflow</li><li><code>rust/src/sync/apply_contract.rs</code></li><li>typed apply-intent envelope shared by local builders and live execution</li><li><code>python/grafana_utils/</code></li><li>legacy Python reference implementation</li><li><code>python/tests/</code></li><li>legacy Python regression coverage</li></ul>
-<p>Architecture walkthroughs:</p>
-<ul><li><code>docs/overview-rust.md</code></li><li><code>docs/overview-python.md</code></li><li><code>docs/internal/overview-architecture.md</code></li></ul>
-<h2 id="documentation-map">Documentation Map</h2>
-<p>Use different docs for different purposes. Do not overload one file with every concern.</p>
-<h3 id="public-operator-docs">Public Operator Docs</h3>
-<ul><li><code>README.md</code></li><li><code>README.zh-TW.md</code></li><li><code>docs/user-guide/en/</code></li><li><code>docs/user-guide/zh-TW/</code></li></ul>
-<p>Use these for workflow, intent, examples, recommended order, and operator guidance.</p>
-<h3 id="command-reference-source">Command Reference Source</h3>
-<ul><li><code>docs/commands/en/</code></li><li><code>docs/commands/zh-TW/</code></li></ul>
-<p>Use these as the source layer for per-command reference content. They are also the source for generated manpages and command-reference HTML.</p>
-<h3 id="generated-docs-design-and-maintenance">Generated Docs Design And Maintenance</h3>
-<ul><li><code>docs/internal/generated-docs-architecture.md</code></li><li>design, source-of-truth model, output tree, generator responsibilities</li><li><code>docs/internal/generated-docs-playbook.md</code></li><li>step-by-step maintenance recipes for common docs-generator tasks</li><li><code>scripts/contracts/command-surface.json</code></li><li>machine-readable CLI/docs sync contract for public paths, legacy replacements, routing, and <code>--help-full</code> support</li></ul>
-<p>Generated artifact ownership:</p>
-<ul><li><code>scripts/generate_manpages.py</code></li><li>owns <code>docs/man/*.1</code></li><li><code>scripts/generate_command_html.py</code></li><li>owns the HTML docs site rooted at <code>docs/html/index.html</code></li></ul>
-<p>Regeneration commands:</p>
-<pre><code># Purpose: Regeneration commands.
-make man
-make man-check
-make html
-make html-check</code></pre>
-<p>GitHub Pages deployment lives in <code>.github/workflows/docs-pages.yml</code>. It runs <code>make html</code>, uploads <code>docs/html/</code>, and publishes the site rooted at <code>docs/html/index.html</code>.</p>
-<h3 id="contract-and-policy-docs">Contract And Policy Docs</h3>
-<ul><li><code>docs/internal/maintainer-quickstart.md</code></li><li>first-entry routing for new maintainers and AI agents</li><li><code>docs/internal/ai-workflow-note.md</code></li><li>repo-specific AI-assisted maintenance workflow</li><li><code>docs/internal/contract-doc-map.md</code></li><li><code>docs/internal/export-root-output-layering-policy.md</code></li><li><code>docs/internal/dashboard-export-root-contract.md</code></li><li><code>docs/internal/datasource-masked-recovery-contract.md</code></li><li><code>docs/internal/alert-access-contract-policy.md</code></li><li><code>docs/internal/profile-secret-storage-architecture.md</code></li><li><code>docs/internal/maintainer-role-map.md</code></li></ul>
-<p>Use these for typed contract details, compatibility rules, stable field inventories, and policy boundaries. Do not duplicate that level of detail in this file.</p>
-<h3 id="trace-and-change-history">Trace And Change History</h3>
-<ul><li><code>docs/internal/ai-status.md</code></li><li><code>docs/internal/ai-changes.md</code></li><li><code>docs/internal/archive/</code></li></ul>
-<p>Use these for current trace and condensed history. Keep architecture or contract detail in the design/spec docs, not in the trace files.</p>
-<h2 id="validation-and-build-guide">Validation And Build Guide</h2>
-<p>Use the repo-maintained commands first instead of ad hoc one-offs.</p>
-<p>Primary entrypoint:</p>
-<ul><li><code>Makefile</code></li></ul>
-<p>Common maintainer flows:</p>
-<pre><code># Purpose: Validation And Build Guide.
+<ul><li>maintained implementation surface:</li><li><code>rust/src/</code></li><li>legacy reference surface:</li><li><code>python/grafana_utils/</code></li><li>public operator docs:</li><li><code>README.md</code>, <code>README.zh-TW.md</code>, <code>docs/user-guide/</code></li><li>command-reference source:</li><li><code>docs/commands/</code></li><li>generated artifacts:</li><li><code>docs/man/</code>, <code>docs/html/</code></li></ul>
+<p>Rust is the supported product surface. Python is legacy reference material unless the task explicitly targets the Python lane.</p>
+<h2 id="current-public-cli-shape">Current Public CLI Shape</h2>
+<p>Treat these namespaces as the maintained public surface:</p>
+<ul><li><code>grafana-util dashboard</code></li><li><code>grafana-util alert</code></li><li><code>grafana-util access</code></li><li><code>grafana-util status</code></li><li><code>grafana-util workspace</code></li><li><code>grafana-util export</code></li><li><code>grafana-util config</code></li></ul>
+<p>For command topology and help routing, start with <code>rust/src/cli.rs</code>. For help rendering specifically, also check <code>rust/src/cli_help.rs</code>.</p>
+<h2 id="choose-your-lane">Choose Your Lane</h2>
+<p>If the task is mostly:</p>
+<p><code>docs/internal/generated-docs-playbook.md</code>, and the generator scripts under <code>scripts/</code></p>
+<p><code>docs/internal/ai-change-closure-rules.md</code></p>
+<ul><li>runtime behavior, flags, parser rules, help, or dispatch:</li><li>start with <code>rust/src/cli.rs</code> and the owning Rust module under <code>rust/src/</code></li><li>dashboard behavior:</li><li>start with <code>rust/src/dashboard/</code></li><li>datasource behavior:</li><li>start with <code>rust/src/datasource.rs</code></li><li>alert behavior:</li><li>start with <code>rust/src/alert.rs</code></li><li>access behavior:</li><li>start with <code>rust/src/access/</code></li><li>status, snapshot, resource, or workspace/change runtime behavior:</li><li>start with <code>rust/src/sync/</code></li><li>handbook or command docs:</li><li>start with <code>README.md</code>, <code>README.zh-TW.md</code>, <code>docs/user-guide/</code>, and <code>docs/commands/</code></li><li>generated HTML or manpages:</li><li>start with <code>docs/internal/generated-docs-architecture.md</code>,</li><li>contract or schema meaning:</li><li>start with <code>docs/internal/contract-doc-map.md</code></li><li>secret storage or profile behavior:</li><li>start with <code>docs/internal/profile-secret-storage-architecture.md</code></li><li>build, packaging, install, or release workflow:</li><li>start with <code>Makefile</code>, <code>scripts/</code>, <code>rust/Cargo.toml</code>, and <code>python/pyproject.toml</code></li><li>AI-assisted maintainer workflow:</li><li>start with <code>docs/internal/ai-workflow-note.md</code> and</li></ul>
+<p>If you prefer role-based routing instead of subsystem routing, use <code>docs/internal/maintainer-role-map.md</code>.</p>
+<h2 id="documentation-boundaries">Documentation Boundaries</h2>
+<p>Keep the doc families separate:</p>
+<ul><li><code>README.md</code>, <code>README.zh-TW.md</code>, <code>docs/user-guide/</code></li><li>workflow, intent, examples, recommended reading order</li><li><code>docs/commands/</code></li><li>per-command reference content and exact syntax</li><li><code>docs/man/</code>, <code>docs/html/</code></li><li>generated artifacts, not primary source</li><li><code>docs/internal/*.md</code></li><li>maintainer contracts, policy, architecture, and workflow notes</li><li><code>docs/internal/ai-status.md</code>, <code>docs/internal/ai-changes.md</code></li><li>trace and condensed history, not long-form design docs</li></ul>
+<p>If a change starts crossing those boundaries, use <code>docs/internal/docs-architecture-guardrails.md</code>.</p>
+<h2 id="validation-defaults">Validation Defaults</h2>
+<p>Prefer repo-owned commands over ad hoc one-offs.</p>
+<p>Common entrypoints:</p>
+<pre><code># Purpose: Common maintainer validation entrypoints.
 make help
 make test
-make test-python
 make test-rust
+make test-python
 make man-check
-make html-check</code></pre>
-<p>Live dashboard authoring validation:</p>
-<ul><li><code>make test-rust-live</code></li><li>runs the repo-owned Docker-backed Rust live smoke path</li><li>now includes dashboard stdin review/patch/publish coverage plus <code>publish --watch</code> recovery behavior</li><li>treat this as the maintained end-to-end validation entrypoint for the dashboard authoring lane instead of ad hoc one-off localhost checks</li></ul>
-<p>Release and artifact guidance:</p>
-<ul><li>keep version bumps and release validation in the standard maintainer flow documented by the <code>Makefile</code>, repo scripts, and release notes</li><li>for Linux artifact validation, build the release artifact first, then run that artifact inside a Linux container</li><li>do not default to throwaway <code>cargo run</code> or broad ad hoc container commands unless you are debugging the build lane itself</li><li>reuse fixed Docker image and container names for repo-maintained Linux validation flows so repeated runs replace the same runtime instead of leaving many short-lived containers behind</li></ul>
-<p>Browser-enabled build policy:</p>
-<ul><li>the default Rust build should stay lean and omit the <code>browser</code> feature</li><li>browser support is an explicit secondary build lane</li><li>only the <code>*-browser</code> build targets and release assets should include <code>headless_chrome</code></li></ul>
-<p>Dashboard watch implementation policy:</p>
-<ul><li>keep <code>dashboard publish --watch</code> as a repo-owned polling watcher for now</li><li>do not switch to an event-based watcher unless repeated live usage shows a concrete polling problem such as missed saves, unacceptable latency, or platform-specific instability</li><li>if that lane ever changes, preserve the current operator-facing behavior: local-file-only scope, stdin rejection, transient-failure recovery, and explicit status messages</li></ul>
-<h2 id="high-signal-project-rules">High-Signal Project Rules</h2>
-<p>and <code>docs/user-guide/</code>; do not make them a second command reference.</p>
-<p>internal docs, and trace docs each own one job. Use <code>docs/internal/docs-architecture-guardrails.md</code> when a change starts crossing those lines.</p>
-<ul><li>Prefer updating Rust behavior and help text first; treat Python as legacy reference unless the task explicitly requires parity work there.</li><li>Keep public usage guidance in <code>README.md</code>, <code>README.zh-TW.md</code>, and the user guides.</li><li>Keep command-reference detail in <code>docs/commands/</code>.</li><li>Keep handbook/manual workflow and intent in <code>README.md</code>, <code>README.zh-TW.md</code>,</li><li>Keep generated docs logic narrow and documented through the generated-docs architecture and playbook.</li><li>Keep CLI/docs routing in sync with <code>scripts/contracts/command-surface.json</code> and <code>make quality-docs-surface</code>.</li><li>Keep typed contracts in the dedicated internal policy/spec docs.</li><li>Treat the shared diff JSON contract as one family: bump <code>schemaVersion</code> only for breaking changes to the envelope or required field semantics, keep it stable for additive backward-compatible fields, and update <code>dashboard diff</code>, <code>alert diff</code>, and <code>datasource diff</code> together.</li><li>Treat <code>schemas/manifests/**/{contracts,routes}.json</code> as the source of truth for machine-readable CLI contracts that now participate in the schema system.</li><li>Treat <code>schemas/jsonschema/*<em>/</em>.schema.json</code> and <code>schemas/help/*<em>/</em>.txt</code> as generated artifacts derived from those manifests via <code>make schema</code>; do not hand-edit them as the primary source.</li><li>Treat golden payload fixtures such as <code>fixtures/shared_diff_golden_cases.json</code> and <code>fixtures/machine_schema_golden_cases.json</code> as validation artifacts, not as the canonical field inventory.</li><li>Prefer repo-owned typed envelopes over ad hoc maps when a workflow already owns the shape.</li><li>Keep facades thin: <code>cli.rs</code> and domain <code>mod.rs</code> files should route, normalize, and re-export, not absorb downstream contract logic.</li><li>Keep Rust layer boundaries explicit: CLI topology, dispatch spine, domain runtime, workflow/service, contract/model, render, and fixtures each own one job. Use <code>docs/internal/rust-architecture-guardrails.md</code> when a change starts crossing those lines.</li><li>Keep docs layer boundaries explicit: manual, command docs, generated docs,</li><li>Keep comments high-signal: explain ownership, invariants, and non-obvious behavior; do not narrate obvious control flow.</li><li>Keep trace/history notes in <code>docs/internal/ai-status.md</code> and <code>docs/internal/ai-changes.md</code>.</li><li>For new live workflow code, prefer adding one workflow-level helper under <code>rust/src/grafana_api/</code> and keep raw <code>&quot;/api/...&quot;</code> contract ownership there instead of reintroducing those paths inside command runtimes. Keep <code>with_request</code> style seams for tests and adapters, not as a second production main path.</li></ul>
-<h2 id="maintainer-personas">Maintainer Personas</h2>
-<p>start with <code>rust/src/cli.rs</code>, the domain modules under <code>rust/src/</code>, and <code>docs/internal/maintainer-role-map.md</code>.</p>
-<p>start with <code>docs/internal/maintainer-quickstart.md</code>, <code>docs/internal/generated-docs-architecture.md</code>, <code>docs/internal/generated-docs-playbook.md</code>, and <code>scripts/generate_command_html.py</code>.</p>
-<p>start with <code>docs/internal/maintainer-quickstart.md</code>, <code>docs/internal/contract-doc-map.md</code>, and the linked policy docs.</p>
-<p>start with <code>docs/internal/maintainer-quickstart.md</code>, <code>Makefile</code>, <code>scripts/</code>, and <code>docs/internal/maintainer-role-map.md</code>.</p>
-<ul><li>Runtime / CLI maintainer:</li><li>Docs / docs-generator maintainer:</li><li>Contract / schema maintainer:</li><li>Build / release maintainer:</li></ul>
-<h2 id="quick-routing-table">Quick Routing Table</h2>
-<p>If the task is:</p>
-<p><code>rust/src/cli.rs</code></p>
-<p><code>rust/src/dashboard/</code></p>
-<p><code>rust/src/datasource.rs</code></p>
-<p><code>rust/src/alert.rs</code></p>
-<p><code>rust/src/access/</code></p>
-<p><code>rust/src/sync/</code> and the related project-status/overview modules</p>
-<p><code>scripts/generate_manpages.py</code>, <code>scripts/generate_command_html.py</code>, and the generated-docs internal docs</p>
-<p><code>Makefile</code> and <code>scripts/</code></p>
-<p><code>docs/internal/contract-doc-map.md</code></p>
-<ul><li>CLI topology or help routing:</li><li>dashboard lane behavior:</li><li>datasource lane behavior:</li><li>alert lane behavior:</li><li>access lane behavior:</li><li>change/status/overview runtime behavior:</li><li>generated docs behavior:</li><li>build, validation, and release commands:</li><li>contract boundaries:</li></ul>
-<h2 id="maintenance-standard">Maintenance Standard</h2>
-<p>When you make a meaningful architecture, contract, or generated-docs workflow change:</p>
-<ul><li>update the narrow spec/design doc first</li><li>update this maintainer map only if the entrypoint or routing changed</li><li>update <code>docs/internal/ai-status.md</code> and <code>docs/internal/ai-changes.md</code> when the repo policy says the change is meaningful enough to trace</li><li>for docs-only updates, validate with <code>git diff --check</code> and the narrow docs checks that match the touched files</li></ul>
+make html-check
+make quality-docs-surface
+make quality-ai-workflow</code></pre>
+<p>For generated docs work:</p>
+<pre><code># Purpose: Regenerate derived docs artifacts.
+make man
+make html</code></pre>
+<h2 id="maintenance-rules">Maintenance Rules</h2>
+<p>task explicitly needs parity work there.</p>
+<p><code>scripts/contracts/command-surface.json</code>.</p>
+<p><code>docs/man/</code> as if they were canonical.</p>
+<p>normalize, not absorb downstream contract logic.</p>
+<p>behavior rather than narrating control flow.</p>
+<ul><li>Update Rust behavior and help text first; treat Python as legacy unless the</li><li>Keep public CLI/docs routing in sync with</li><li>Keep generated docs derived from source; do not patch <code>docs/html/</code> or</li><li>Keep contract detail in the dedicated internal policy/spec docs, not here.</li><li>Keep facades thin: <code>cli.rs</code> and domain <code>mod.rs</code> files should route and</li><li>Keep handbook/manual content and command-reference content separate.</li><li>Keep comments high-signal: explain ownership, invariants, and non-obvious</li></ul>
+<h2 id="when-to-update-other-maintainer-docs">When To Update Other Maintainer Docs</h2>
+<p>When you make a meaningful architecture, contract, or workflow change:</p>
+<p>when the change is meaningful enough to trace</p>
+<ul><li>update the owning narrow spec or internal doc first</li><li>update this page only if maintainer entry routing changed</li><li>update <code>docs/internal/ai-status.md</code> and <code>docs/internal/ai-changes.md</code> only</li></ul>
 <p>For the current summary/spec/trace split, start with <a href="/Users/kendlee/work/grafana-utils/docs/internal/contract-doc-map.md"><code>docs/internal/contract-doc-map.md</code></a>.</p>
 
 </article>
 <aside class="sidebar">
   <button class="sidebar-toggle sidebar-toggle-right" type="button" aria-expanded="true" aria-label="Toggle page sidebar">▶</button>
   <div class="sidebar-content">
-    <section class="sidebar-section"><h2>On This Page</h2><ul class="toc-list"><li class="toc-level-2"><a href="#start-here"><span class="toc-label">Start Here</span></a></li><li class="toc-level-2"><a href="#repo-priorities"><span class="toc-label">Repo Priorities</span></a></li><li class="toc-level-2"><a href="#user-facing-cli-surface"><span class="toc-label">User-Facing CLI Surface</span></a></li><li class="toc-level-2"><a href="#code-architecture-map"><span class="toc-label">Code Architecture Map</span></a></li><li class="toc-level-2"><a href="#documentation-map"><span class="toc-label">Documentation Map</span></a></li><li class="toc-level-3"><a href="#public-operator-docs"><span class="toc-label">Public Operator Docs</span></a></li><li class="toc-level-3"><a href="#command-reference-source"><span class="toc-label">Command Reference Source</span></a></li><li class="toc-level-3"><a href="#generated-docs-design-and-maintenance"><span class="toc-label">Generated Docs Design And Maintenance</span></a></li><li class="toc-level-3"><a href="#contract-and-policy-docs"><span class="toc-label">Contract And Policy Docs</span></a></li><li class="toc-level-3"><a href="#trace-and-change-history"><span class="toc-label">Trace And Change History</span></a></li><li class="toc-level-2"><a href="#validation-and-build-guide"><span class="toc-label">Validation And Build Guide</span></a></li><li class="toc-level-2"><a href="#high-signal-project-rules"><span class="toc-label">High-Signal Project Rules</span></a></li><li class="toc-level-2"><a href="#maintainer-personas"><span class="toc-label">Maintainer Personas</span></a></li><li class="toc-level-2"><a href="#quick-routing-table"><span class="toc-label">Quick Routing Table</span></a></li><li class="toc-level-2"><a href="#maintenance-standard"><span class="toc-label">Maintenance Standard</span></a></li></ul></section>
+    <section class="sidebar-section"><h2>On This Page</h2><ul class="toc-list"><li class="toc-level-2"><a href="#start-here"><span class="toc-label">Start Here</span></a></li><li class="toc-level-2"><a href="#repo-priorities"><span class="toc-label">Repo Priorities</span></a></li><li class="toc-level-2"><a href="#current-public-cli-shape"><span class="toc-label">Current Public CLI Shape</span></a></li><li class="toc-level-2"><a href="#choose-your-lane"><span class="toc-label">Choose Your Lane</span></a></li><li class="toc-level-2"><a href="#documentation-boundaries"><span class="toc-label">Documentation Boundaries</span></a></li><li class="toc-level-2"><a href="#validation-defaults"><span class="toc-label">Validation Defaults</span></a></li><li class="toc-level-2"><a href="#maintenance-rules"><span class="toc-label">Maintenance Rules</span></a></li><li class="toc-level-2"><a href="#when-to-update-other-maintainer-docs"><span class="toc-label">When To Update Other Maintainer Docs</span></a></li></ul></section>
   </div>
 </aside>
 

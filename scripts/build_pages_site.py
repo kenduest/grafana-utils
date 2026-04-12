@@ -15,8 +15,9 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from docgen_common import REPO_ROOT, write_outputs
-from generate_command_html import HtmlBuildConfig, VersionLink, generate_outputs, page_shell, html_list
-from generate_command_html import render_landing_locale_select, render_template
+from docsite_html_common import render_template
+from docsite_html_nav import render_landing_locale_select
+from generate_command_html import HtmlBuildConfig, VersionLink, generate_outputs, page_shell
 
 
 SEMVER_TAG_RE = re.compile(r"^v(\d+)\.(\d+)\.(\d+)$")
