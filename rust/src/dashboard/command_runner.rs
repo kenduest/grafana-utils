@@ -1,11 +1,7 @@
 //! Dashboard CLI execution and orchestration.
-use crate::common::{
-    message, print_supported_columns, render_json_value, set_json_color_choice, Result,
-};
+use crate::common::{message, print_supported_columns, set_json_color_choice, Result};
 use crate::http::JsonHttpClient;
-use crate::tabular_output::render_yaml;
-use serde_json::{json, Map, Value};
-use std::path::Path;
+use serde_json::Value;
 
 use super::browse;
 use super::delete;
@@ -20,6 +16,11 @@ use super::inspect;
 use super::inspect_live;
 use super::inspect_report::SUPPORTED_REPORT_COLUMN_IDS;
 use super::list;
+pub use super::run_inspect::{
+    execute_dashboard_inspect_export, execute_dashboard_inspect_live,
+    execute_dashboard_inspect_vars,
+};
+pub use super::run_list::execute_dashboard_list;
 use super::screenshot::capture_dashboard_screenshot;
 use super::serve::run_dashboard_serve;
 use super::topology::{run_dashboard_impact, run_dashboard_topology};
@@ -27,11 +28,10 @@ use super::validate::run_dashboard_validate_export;
 use super::vars::inspect_dashboard_variables;
 #[allow(unused_imports)]
 use super::{
-    build_api_client, build_dashboard_review, build_http_client, build_http_client_for_org,
-    build_http_client_for_org_from_api, materialize_dashboard_common_auth,
+    build_dashboard_review, build_http_client, materialize_dashboard_common_auth,
     render_inspect_export_help_full, render_inspect_live_help_full, AnalyzeArgs, DashboardCliArgs,
-    DashboardCommand, DashboardHistorySubcommand, DashboardImportInputFormat, ExportArgs,
-    InspectExportArgs, InspectLiveArgs, InspectVarsArgs, ListArgs, ReviewArgs, SimpleOutputFormat,
+    DashboardCommand, DashboardHistorySubcommand, InspectExportArgs, InspectLiveArgs, ReviewArgs,
+    SimpleOutputFormat,
 };
 
 const DASHBOARD_LIST_OUTPUT_COLUMNS: &[&str] = &[
@@ -59,92 +59,6 @@ const DASHBOARD_IMPORT_OUTPUT_COLUMNS: &[&str] = &[
 
 fn print_supported_dashboard_report_columns() {
     print_supported_columns(SUPPORTED_REPORT_COLUMN_IDS);
-}
-
-fn rendered_output_to_lines(output: String) -> Vec<String> {
-    output
-        .trim_end_matches('\n')
-        .split('\n')
-        .map(str::to_string)
-        .collect()
-}
-
-pub(crate) fn collect_dashboard_list_summaries(args: &ListArgs) -> Result<Vec<Map<String, Value>>> {
-    let mut summaries = Vec::new();
-    if args.all_orgs {
-        let admin_api = build_api_client(&args.common)?;
-        let admin_client = admin_api.http_client();
-        let orgs = list::list_orgs_with_request(|method, path, params, payload| {
-            admin_client.request_json(method, path, params, payload)
-        })?;
-        for org in orgs {
-            let org_id = list::org_id_value(&org)?;
-            let org_client = build_http_client_for_org_from_api(&admin_api, org_id)?;
-            let mut scoped = list::collect_list_dashboards_with_request(
-                &mut |method, path, params, payload| {
-                    org_client.request_json(method, path, params, payload)
-                },
-                args,
-                Some(&org),
-                None,
-            )?;
-            summaries.append(&mut scoped);
-        }
-        return Ok(summaries);
-    }
-    if let Some(org_id) = args.org_id {
-        let org_client = build_http_client_for_org(&args.common, org_id)?;
-        return list::collect_list_dashboards_with_request(
-            &mut |method, path, params, payload| {
-                org_client.request_json(method, path, params, payload)
-            },
-            args,
-            None,
-            None,
-        );
-    }
-    let client = build_http_client(&args.common)?;
-    list::collect_list_dashboards_with_request(
-        &mut |method, path, params, payload| client.request_json(method, path, params, payload),
-        args,
-        None,
-        None,
-    )
-}
-
-// Build a single dashboard list output document used by reusable execution callers.
-pub fn execute_dashboard_list(args: &ListArgs) -> Result<super::DashboardWebRunOutput> {
-    let summaries = collect_dashboard_list_summaries(args)?;
-    let rows = list::render_dashboard_summary_json(&summaries, &args.output_columns);
-    let text_lines = if args.json {
-        rendered_output_to_lines(render_json_value(&rows)?)
-    } else if args.yaml {
-        rendered_output_to_lines(render_yaml(&rows)?)
-    } else if args.csv {
-        list::render_dashboard_summary_csv(&summaries, &args.output_columns)
-    } else if args.text {
-        let mut lines = summaries
-            .iter()
-            .map(list::format_dashboard_summary_line)
-            .collect::<Vec<String>>();
-        lines.push(String::new());
-        lines.push(format!("Listed {} dashboard(s).", summaries.len()));
-        lines
-    } else {
-        let mut lines =
-            list::render_dashboard_summary_table(&summaries, &args.output_columns, !args.no_header);
-        lines.push(String::new());
-        lines.push(format!("Listed {} dashboard(s).", summaries.len()));
-        lines
-    };
-    Ok(super::DashboardWebRunOutput {
-        document: json!({
-            "kind": "grafana-utils-dashboard-list",
-            "dashboardCount": summaries.len(),
-            "rows": rows,
-        }),
-        text_lines,
-    })
 }
 
 fn analyze_args_to_export_args(args: AnalyzeArgs) -> Result<InspectExportArgs> {
@@ -207,157 +121,6 @@ fn request_json_with_client(
     payload: Option<&Value>,
 ) -> Result<Option<Value>> {
     client.request_json(method, path, params, payload)
-}
-
-// Inspect path dispatcher:
-// validate args, build selected report/summary variants, and return a shared web output.
-fn execute_dashboard_inspect_at_path(
-    args: &InspectExportArgs,
-    input_dir: &Path,
-    expected_variant: &str,
-) -> Result<super::DashboardWebRunOutput> {
-    inspect::validate_inspect_export_report_args(args)?;
-    if let Some(report_format) = inspect::effective_inspect_report_format(args) {
-        let report = inspect::apply_query_report_filters(
-            inspect::build_export_inspection_query_report_for_variant(input_dir, expected_variant)?,
-            args.report_filter_datasource.as_deref(),
-            args.report_filter_panel_id.as_deref(),
-        );
-        let rendered = inspect::render_export_inspection_report_output(
-            args,
-            input_dir,
-            expected_variant,
-            report_format,
-            &report,
-        )?;
-        let document = match report_format {
-            super::InspectExportReportFormat::Governance
-            | super::InspectExportReportFormat::GovernanceJson => {
-                let summary = inspect::build_export_inspection_summary_for_variant(
-                    input_dir,
-                    expected_variant,
-                )?;
-                serde_json::to_value(
-                    super::inspect_governance::build_export_inspection_governance_document(
-                        &summary, &report,
-                    ),
-                )?
-            }
-            super::InspectExportReportFormat::Dependency
-            | super::InspectExportReportFormat::DependencyJson => {
-                let metadata = super::load_export_metadata(input_dir, Some(expected_variant))?;
-                let datasource_inventory =
-                    super::load_datasource_inventory(input_dir, metadata.as_ref())?;
-                crate::dashboard_inspection_dependency_contract::build_offline_dependency_contract_from_report_rows(
-                    &report.queries,
-                    &datasource_inventory,
-                )
-            }
-            super::InspectExportReportFormat::QueriesJson
-            | super::InspectExportReportFormat::Tree
-            | super::InspectExportReportFormat::TreeTable
-            | super::InspectExportReportFormat::Csv
-            | super::InspectExportReportFormat::Table => serde_json::to_value(
-                super::inspect_report::build_export_inspection_query_report_document(&report),
-            )?,
-        };
-        return Ok(super::DashboardWebRunOutput {
-            document,
-            text_lines: rendered_output_to_lines(rendered.output),
-        });
-    }
-
-    let summary =
-        inspect::build_export_inspection_summary_for_variant(input_dir, expected_variant)?;
-    let rendered = inspect::render_export_inspection_summary_output(args, &summary)?;
-    Ok(super::DashboardWebRunOutput {
-        document: serde_json::to_value(super::build_export_inspection_summary_document(&summary))?,
-        text_lines: rendered_output_to_lines(rendered),
-    })
-}
-
-// Export-backed inspect path: materialize input dir, normalize output variant, then reuse the
-// shared `execute_dashboard_inspect_at_path` output path.
-pub fn execute_dashboard_inspect_export(
-    args: &InspectExportArgs,
-) -> Result<super::DashboardWebRunOutput> {
-    let temp_dir = inspect_live::TempInspectDir::new("summary-export-web")?;
-    let input_dir = inspect::resolve_inspect_export_import_dir(
-        &temp_dir.path,
-        &args.input_dir,
-        args.input_format,
-        args.input_type,
-        args.interactive,
-    )?;
-    execute_dashboard_inspect_at_path(args, &input_dir.input_dir, input_dir.expected_variant)
-}
-
-// Live inspect path: fetch dashboards into a temp export dir and convert into export-style input.
-pub fn execute_dashboard_inspect_live(
-    args: &InspectLiveArgs,
-) -> Result<super::DashboardWebRunOutput> {
-    let temp_dir = inspect_live::TempInspectDir::new("summary-live-web")?;
-    let export_args = ExportArgs {
-        common: args.common.clone(),
-        output_dir: temp_dir.path.clone(),
-        page_size: args.page_size,
-        org_id: args.org_id,
-        all_orgs: args.all_orgs,
-        flat: false,
-        overwrite: false,
-        without_dashboard_raw: false,
-        without_dashboard_prompt: true,
-        without_dashboard_provisioning: true,
-        include_history: false,
-        provisioning_provider_name: "grafana-utils-dashboards".to_string(),
-        provisioning_provider_org_id: None,
-        provisioning_provider_path: None,
-        provisioning_provider_disable_deletion: false,
-        provisioning_provider_allow_ui_updates: false,
-        provisioning_provider_update_interval_seconds: 30,
-        dry_run: false,
-        progress: args.progress,
-        verbose: false,
-    };
-    let _ = export::export_dashboards_with_org_clients(&export_args)?;
-    let inspect_import_dir = inspect_live::prepare_inspect_live_import_dir(&temp_dir.path, args)?;
-    let inspect_args = InspectExportArgs {
-        input_dir: inspect_import_dir,
-        input_type: None,
-        input_format: DashboardImportInputFormat::Raw,
-        text: args.text,
-        csv: args.csv,
-        json: args.json,
-        table: args.table,
-        yaml: args.yaml,
-        output_format: args.output_format,
-        report_columns: args.report_columns.clone(),
-        list_columns: args.list_columns,
-        report_filter_datasource: args.report_filter_datasource.clone(),
-        report_filter_panel_id: args.report_filter_panel_id.clone(),
-        help_full: args.help_full,
-        no_header: args.no_header,
-        output_file: None,
-        also_stdout: false,
-        interactive: false,
-    };
-    execute_dashboard_inspect_at_path(
-        &inspect_args,
-        &inspect_args.input_dir,
-        super::RAW_EXPORT_SUBDIR,
-    )
-}
-
-// Variable-inspection execution path: render variable diagnostics into shared run output shape.
-pub fn execute_dashboard_inspect_vars(
-    args: &InspectVarsArgs,
-) -> Result<super::DashboardWebRunOutput> {
-    let document = super::vars::execute_dashboard_variable_inspection(args)?;
-    let rendered = super::vars::render_dashboard_variable_output(args, &document)?;
-    Ok(super::DashboardWebRunOutput {
-        document: serde_json::to_value(document)?,
-        text_lines: rendered_output_to_lines(rendered),
-    })
 }
 
 pub(crate) fn review_dashboard_file(args: &ReviewArgs) -> Result<()> {

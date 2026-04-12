@@ -10,6 +10,12 @@ Current AI-maintained status only.
 - Keep this file short and current. Additive historical detail belongs in `docs/internal/archive/`.
 - Older entries moved to [`ai-status-archive-2026-04-13.md`](/Users/kendlee/work/grafana-utils/docs/internal/archive/ai-status-archive-2026-04-13.md).
 
+## 2026-04-13 - Split Rust facade and CLI-args hotspots
+- State: Done
+- Scope: dashboard reusable runners, access dispatch/auth materialization, datasource local-list/diff/import-export support helpers, sync CLI args modules, Rust maintainability reporter, and Rust maintainer architecture notes.
+- Current Update: moved dashboard list/inspect reusable execution out of `command_runner`, split access routing and auth materialization out of `access/mod.rs`, split datasource local list/diff rendering and import/export IO/org routing out of root facades, split sync CLI argument definitions by command family, and added a read-only oversized-file/re-export reporter.
+- Result: public CLI behavior and output contracts are unchanged; `cargo test --quiet --lib` passes with 1461 passed / 1 ignored, and the new Python maintainability reporter tests pass.
+
 ## 2026-04-13 - Fix docs portal, landing, and manpage HTML navigation
 - State: Done
 - Scope: GitHub Pages version portal generator, portal copy contract, local landing source/CSS, generated HTML/manpages, manpage router contract, manpage HTML renderer/CSS, Pages assembly script, focused script tests, and generated-docs maintainer notes.
@@ -42,10 +48,3 @@ Current AI-maintained status only.
 - Baseline: `rust/src/cli_help/routing.rs` still mixes orchestration, flat help inventory rendering, contextual clap help shaping, option-heading inference, ANSI stripping, and inferred-subcommand normalization in one large file.
 - Current Update: kept `routing.rs` as the orchestration layer, moved contextual clap help shaping plus inferred-heading logic into `cli_help/contextual.rs`, and moved flat inventory rendering into `cli_help/flat.rs` without changing unified help entrypoints.
 - Result: unified help routing now has clearer seams between routing, contextual rendering, and flat inventory rendering; focused Rust help tests and `dashboard` help-full coverage still pass after the split.
-
-## 2026-04-12 - Add AI trace maintenance tool
-- State: Done
-- Scope: `scripts/ai_trace.py`, `scripts/check_ai_workflow.py`, Python tests, and AI trace docs.
-- Baseline: AI trace files require manual entry insertion, size control, and archive movement; `quality-ai-workflow` only checks whether trace files were touched for meaningful internal docs changes.
-- Current Update: added a structured AI trace helper with `add`, `compact`, and `check-size` commands, then wired trace length checks into the existing workflow gate.
-- Result: AI trace files can now be updated and compacted through one helper instead of manual Markdown movement; `quality-ai-workflow` now fails when current trace files exceed the configured active-entry limits.

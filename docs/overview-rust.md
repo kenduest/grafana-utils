@@ -100,6 +100,7 @@ execution plans、gap lists、或 progress snapshots，改到 `docs/internal/arc
   - `rust/src/sync/mod.rs`
   - 這些檔案應維持在「command topology、normalize、client/request wiring、top-level dispatch」層級，不承接細部資料契約或 renderer 細節。
   - 如果 facade 開始持有穩定 envelope、跨模組 shape 或 workflow 規則，就把那段邏輯下放到專屬 contract / submodule。
+  - 如果單一 facade 或 runner 開始同時處理 local/live 分流、auth materialization、輸出格式、TUI fallback，優先拆成 `dispatch`、`auth_materialize`、`run_*` 或 `*_render` 類子模組，不要繼續往 root 塞分支。
 
 - Typed contract / shared model：
   - `rust/src/dashboard/inspect_summary.rs`, `rust/src/dashboard/inspect_report.rs`
@@ -143,6 +144,7 @@ execution plans、gap lists、或 progress snapshots，改到 `docs/internal/arc
 
 - 如果模組名稱帶 `render`、`report`、`summary`，先假設它是 presentation 或 typed-output boundary，不是 command owner。
 - 如果模組名稱帶 `state`、`workbench`、`interactive`、`tui`，先假設它承接互動流程或畫面狀態，不是核心 API contract。
+- 如果模組名稱帶 `dispatch`、`auth_materialize`、`run_*`，先假設它是 facade 瘦身後的 command handoff，不應再往裡塞資料 contract 或 renderer。
 - 如果要找「真正的入口」，先回到各 domain 的 `mod.rs` 或單檔 facade（如 `alert.rs`, `datasource.rs`）。
 
 ### 2.5 Contract 與 test split
@@ -252,6 +254,7 @@ execution plans、gap lists、或 progress snapshots，改到 `docs/internal/arc
 
 - `cargo doc --no-deps --document-private-items`
 - `rg -n "run_.*_cli|dispatch_with_handlers|normalize_.*command" rust/src`
+- `python3 scripts/rust_maintainability_report.py --root rust/src`
 
 ### 行為變更時
 

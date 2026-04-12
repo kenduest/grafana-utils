@@ -84,6 +84,8 @@ mod raw_to_prompt_output;
 mod raw_to_prompt_plan;
 mod raw_to_prompt_resolution;
 mod raw_to_prompt_types;
+mod run_inspect;
+mod run_list;
 mod screenshot;
 mod serve;
 mod source_loader;
