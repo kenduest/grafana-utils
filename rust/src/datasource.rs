@@ -147,6 +147,8 @@ fn resolve_local_datasource_list_format(
     }
 }
 
+// Local list mode executes without live API calls:
+// resolve staged/local datasource artifacts and render output in the chosen format.
 fn run_local_datasource_list(args: &DatasourceListArgs) -> Result<()> {
     if args.all_orgs || args.org_id.is_some() {
         return Err(message(

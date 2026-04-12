@@ -623,6 +623,8 @@ fn build_route_preview_matches(current_policy: &Map<String, Value>, args: &Alert
     json!(matches)
 }
 
+// Alert handlers are split by semantic family (plan/apply, authoring, export/diff/list)
+// and each returns a structured action document via a common printer.
 fn run_alert_plan_cli(args: &AlertCliArgs) -> Result<()> {
     let desired_dir = args
         .desired_dir

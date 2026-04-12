@@ -557,6 +557,7 @@ fn materialize_snapshot_common_auth(common: CommonCliArgs) -> Result<CommonCliAr
     )
 }
 
+// Build and execute Access CLI commands for each selected Access snapshot lane.
 fn run_snapshot_access_exports_with_handler<FA>(
     args: &super::SnapshotExportArgs,
     selection: &super::SnapshotExportSelection,
@@ -605,6 +606,7 @@ fn write_snapshot_root_metadata_file(args: &super::SnapshotExportArgs) -> Result
     Ok(())
 }
 
+// Coordinate snapshot export by delegating each selected lane to its domain handler.
 pub(crate) fn run_snapshot_export_selected_with_handlers<FD, FS, FA>(
     args: super::SnapshotExportArgs,
     selection: &super::SnapshotExportSelection,
@@ -757,6 +759,7 @@ fn normalize_snapshot_datasource_dir(temp_root: &Path, datasource_dir: &Path) ->
     Ok(normalized_dir)
 }
 
+// Build normalized snapshot review documents once, then route to a caller-provided renderer.
 pub(crate) fn run_snapshot_review_document_with_handler<FO>(
     args: super::SnapshotReviewArgs,
     mut run_review: FO,

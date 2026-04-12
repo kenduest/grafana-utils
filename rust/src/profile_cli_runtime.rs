@@ -451,6 +451,8 @@ pub(crate) fn apply_profile_add_with_store<S: OsSecretStore>(
     })
 }
 
+// Profile command handlers are grouped by concern:
+// list/read show, current-state diagnostics, live validation, and persistence operations.
 fn run_profile_list() -> Result<()> {
     let (path, config) = load_profile_config_at_resolved_path()?;
     for name in config.profiles.keys() {
