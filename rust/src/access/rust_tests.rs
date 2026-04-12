@@ -6,7 +6,8 @@ use super::{
     cli_defs::CommonCliArgsNoOrgId,
     org::{
         delete_org_with_request, diff_orgs_with_request, export_orgs_with_request,
-        import_orgs_with_request, list_orgs_with_request, modify_org_with_request,
+        import_orgs_with_request, list_orgs_with_request, modify_org_with_request, org_csv_headers,
+        org_summary_line, org_table_headers, org_table_rows,
     },
     parse_cli_from,
     pending_delete::{
@@ -162,6 +163,73 @@ fn load_access_bundle_contract_cases() -> Vec<Value> {
     .and_then(Value::as_array)
     .cloned()
     .unwrap_or_default()
+}
+
+#[test]
+fn org_list_table_rows_include_user_summaries_only_when_requested() {
+    let rows = vec![Map::from_iter(vec![
+        ("id".to_string(), json!("1")),
+        ("name".to_string(), json!("Main Org.")),
+        ("userCount".to_string(), json!("2")),
+        (
+            "users".to_string(),
+            json!([
+                {"userId": "7", "login": "alice", "email": "alice@example.com", "name": "Alice", "orgRole": "Admin"},
+                {"userId": "8", "login": "bob", "email": "bob@example.com", "name": "Bob", "orgRole": "Viewer"}
+            ]),
+        ),
+    ])];
+
+    assert_eq!(org_table_headers(false), vec!["ID", "NAME", "USER_COUNT"]);
+    assert_eq!(org_csv_headers(false), vec!["id", "name", "userCount"]);
+    assert_eq!(
+        org_table_rows(&rows, false),
+        vec![vec![
+            "1".to_string(),
+            "Main Org.".to_string(),
+            "2".to_string()
+        ]]
+    );
+
+    assert_eq!(
+        org_table_headers(true),
+        vec!["ID", "NAME", "USER_COUNT", "USERS"]
+    );
+    assert_eq!(
+        org_csv_headers(true),
+        vec!["id", "name", "userCount", "users"]
+    );
+    assert_eq!(
+        org_table_rows(&rows, true),
+        vec![vec![
+            "1".to_string(),
+            "Main Org.".to_string(),
+            "2".to_string(),
+            "alice(Admin); bob(Viewer)".to_string()
+        ]]
+    );
+}
+
+#[test]
+fn org_summary_line_includes_users_when_requested() {
+    let row = Map::from_iter(vec![
+        ("id".to_string(), json!("4")),
+        ("name".to_string(), json!("Audit Org")),
+        ("userCount".to_string(), json!("1")),
+        (
+            "users".to_string(),
+            json!([{"userId": "9", "email": "audit@example.com", "orgRole": "Editor"}]),
+        ),
+    ]);
+
+    assert_eq!(
+        org_summary_line(&row, false),
+        "id=4 name=Audit Org userCount=1"
+    );
+    assert_eq!(
+        org_summary_line(&row, true),
+        "id=4 name=Audit Org userCount=1 users=audit@example.com(Editor)"
+    );
 }
 
 #[path = "access_cli_rust_tests.rs"]

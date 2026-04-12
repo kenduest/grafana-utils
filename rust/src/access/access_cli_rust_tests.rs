@@ -38,6 +38,37 @@ fn parse_cli_supports_user_list() {
 }
 
 #[test]
+fn parse_cli_infers_unique_long_option_prefixes() {
+    let args = parse_cli_from(["grafana-util access", "user", "list", "--all-o", "--tab"]);
+
+    match args.command {
+        AccessCommand::User {
+            command: UserCommand::List(list_args),
+        } => {
+            assert_eq!(list_args.scope, Scope::Global);
+            assert!(list_args.all_orgs);
+            assert!(list_args.table);
+        }
+        _ => panic!("expected user list"),
+    }
+}
+
+#[test]
+fn parse_cli_rejects_ambiguous_long_option_prefixes() {
+    let error =
+        AccessCliRoot::try_parse_from(["grafana-util access", "user", "list", "--output", "json"])
+            .unwrap_err();
+
+    let rendered = error.to_string();
+    assert!(rendered.contains("--output"));
+    assert!(
+        rendered.contains("--output-format")
+            || rendered.contains("--output-columns")
+            || rendered.contains("possible values")
+    );
+}
+
+#[test]
 fn parse_cli_supports_user_list_output_columns_all_and_list_columns() {
     let args = parse_cli_from([
         "grafana-util access",

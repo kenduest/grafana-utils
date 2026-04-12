@@ -9,6 +9,20 @@ Current AI-maintained status only.
 - Detailed 2026-04-01 through 2026-04-12 entries moved to [`archive/ai-status-archive-2026-04-12.md`](/Users/kendlee/work/grafana-utils/docs/internal/archive/ai-status-archive-2026-04-12.md).
 - Keep this file short and current. Additive historical detail belongs in `docs/internal/archive/`.
 
+## 2026-04-12 - Infer unique long option prefixes
+- State: Done
+- Scope: `rust/src/cli.rs`, `rust/src/access/cli_defs.rs`, CLI parser tests, and AI trace docs.
+- Baseline: unique-prefix matching worked for subcommands, but long options such as `--all-o` only produced a suggestion for `--all-orgs` instead of resolving the unique match.
+- Current Update: enabled Clap unique long-argument inference on the unified root parser and access parser, with tests for inferred unique prefixes and rejected ambiguous prefixes.
+- Result: `grafana-util access user list --all-o --tab` now parses as `--all-orgs --table`; ambiguous or invalid long prefixes still stay on Clap's error path.
+
+## 2026-04-12 - Show org users in list table output
+- State: Done
+- Scope: `rust/src/access/org.rs`, `rust/src/access/org_workflows.rs`, access Rust tests, and AI trace docs.
+- Baseline: `grafana-util access org list --with-users --table` fetched `/api/orgs/{id}/users` and updated `userCount`, but table and CSV output still rendered only `ID`, `NAME`, and `USER_COUNT`, so operator-visible user names were hidden unless JSON/YAML was used.
+- Current Update: added shared org list headers/row helpers so `--with-users` adds user summaries to text, table, and CSV output while default org list output stays unchanged.
+- Result: `grafana-util access org list --with-users --table` now includes a `USERS` column with labels such as `alice(Admin); bob(Viewer)`.
+
 ## 2026-04-12 - Remove legacy CLI compatibility
 - State: Done
 - Scope: `rust/src/bin/grafana-util.rs`, `rust/src/cli.rs`, `rust/src/cli_help.rs`, `rust/src/cli_help_examples.rs`, `rust/src/cli_help/grouped_specs.rs`, `rust/src/cli_rust_tests.rs`, `scripts/check_docs_surface.py`, `scripts/contracts/command-surface.json`, command-reference docs, and generated-doc source contracts.

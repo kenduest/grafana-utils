@@ -591,6 +591,7 @@ pub enum AccessCommand {
     name = "grafana-util access",
     about = "List and manage Grafana users, orgs, teams, and service accounts.",
     after_help = ACCESS_ROOT_HELP_TEXT,
+    infer_long_args(true),
     styles = crate::help_styles::CLI_HELP_STYLES
 )]
 /// Struct definition for AccessCliRoot.

@@ -1,5 +1,13 @@
 # ai-learnings.md
 
+## 2026-04-12 - Infer unique long option prefixes
+- Mistake/Symptom: repeated focused Rust test attempts used invalid multiple `cargo test` filters, then Cargo printed `error: test failed, to rerun pass --lib` after normal lib-test failures, creating noisy and misleading iteration.
+- Root Cause: `cargo test` accepts at most one positional test filter before `--`; Cargo's `--lib` line is a rerun hint for the failed target, not a diagnostic or a better next command.
+- Fix: use one broad, intentional filter such as `long_option` or a full suite target; treat `to rerun pass --lib` as informational unless narrowing to the lib target is specifically useful.
+- Prevention: before running focused Rust tests, choose one filter string or run the owning suite; do not concatenate multiple test names in one `cargo test` command.
+- Keywords: cargo test multiple filters --lib rerun hint focused tests Rust test filter
+- Refs: `cargo test --manifest-path rust/Cargo.toml --quiet long_option -- --test-threads=1`
+
 ## 2026-04-06 - keyring needs explicit backend features on macOS
 - Mistake/Symptom: a macOS Keychain compatibility smoke failed because `SystemOsSecretStore` could not read an item that had just been written with the `security` CLI.
 - Root Cause: `keyring = "3"` was added without `apple-native`, and the crate falls back to its `mock` backend on macOS when that feature is absent.

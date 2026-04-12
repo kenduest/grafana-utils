@@ -32,9 +32,9 @@ use super::org_import_export_diff::{
 use super::{
     add_user_to_org_with_request, create_organization_with_request,
     delete_organization_with_request, list_org_users_with_request, list_organizations_with_request,
-    lookup_org_by_identity, normalize_org_row, normalize_org_user_row, org_matches,
-    org_summary_line, org_table_rows, update_org_user_role_with_request,
-    update_organization_with_request, validate_basic_auth_only,
+    lookup_org_by_identity, normalize_org_row, normalize_org_user_row, org_csv_headers,
+    org_matches, org_summary_line, org_table_headers, org_table_rows,
+    update_org_user_role_with_request, update_organization_with_request, validate_basic_auth_only,
 };
 use crate::common::render_json_value;
 
@@ -68,18 +68,24 @@ where
     } else if args.yaml {
         println!("{}", render_yaml(&rows)?);
     } else if args.table {
-        for line in format_table(&["ID", "NAME", "USER_COUNT"], &org_table_rows(&rows)) {
+        for line in format_table(
+            &org_table_headers(args.with_users),
+            &org_table_rows(&rows, args.with_users),
+        ) {
             println!("{line}");
         }
         println!();
         println!("Listed {} org(s) at {}", rows.len(), args.common.url);
     } else if args.csv {
-        for line in render_csv(&["id", "name", "userCount"], &org_table_rows(&rows)) {
+        for line in render_csv(
+            &org_csv_headers(args.with_users),
+            &org_table_rows(&rows, args.with_users),
+        ) {
             println!("{line}");
         }
     } else {
         for row in &rows {
-            println!("{}", org_summary_line(row));
+            println!("{}", org_summary_line(row, args.with_users));
         }
         println!();
         println!("Listed {} org(s) at {}", rows.len(), args.common.url);
@@ -107,7 +113,10 @@ pub(crate) fn list_orgs_from_input_dir(args: &OrgListArgs) -> Result<usize> {
     } else if args.yaml {
         println!("{}", render_yaml(&rows)?);
     } else if args.table {
-        for line in format_table(&["ID", "NAME", "USER_COUNT"], &org_table_rows(&rows)) {
+        for line in format_table(
+            &org_table_headers(args.with_users),
+            &org_table_rows(&rows, args.with_users),
+        ) {
             println!("{line}");
         }
         println!();
@@ -117,12 +126,15 @@ pub(crate) fn list_orgs_from_input_dir(args: &OrgListArgs) -> Result<usize> {
             input_dir.display()
         );
     } else if args.csv {
-        for line in render_csv(&["id", "name", "userCount"], &org_table_rows(&rows)) {
+        for line in render_csv(
+            &org_csv_headers(args.with_users),
+            &org_table_rows(&rows, args.with_users),
+        ) {
             println!("{line}");
         }
     } else {
         for row in &rows {
-            println!("{}", org_summary_line(row));
+            println!("{}", org_summary_line(row, args.with_users));
         }
         println!();
         println!(

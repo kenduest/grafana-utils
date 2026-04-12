@@ -247,6 +247,37 @@ fn inferred_root_subcommand_dispatches_through_clap_parser() {
 }
 
 #[test]
+fn inferred_unique_long_option_dispatches_through_unified_parser() {
+    let args = parse_cli_from(["grafana-util", "access", "user", "list", "--all-o", "--tab"]);
+    match args.command {
+        UnifiedCommand::Access(access_args) => match access_args.command {
+            crate::access::AccessCommand::User {
+                command: crate::access::UserCommand::List(list_args),
+            } => {
+                assert!(list_args.all_orgs);
+                assert!(list_args.table);
+            }
+            other => panic!("expected access user list command, got {other:?}"),
+        },
+        other => panic!("expected access command, got {other:?}"),
+    }
+}
+
+#[test]
+fn ambiguous_long_option_prefix_stays_on_clap_error_path() {
+    let error =
+        CliArgs::try_parse_from(["grafana-util", "access", "user", "list", "--output", "json"])
+            .expect_err("--output should be ambiguous for access user list");
+    let rendered = error.to_string();
+    assert!(rendered.contains("--output"));
+    assert!(
+        rendered.contains("--output-format")
+            || rendered.contains("--output-columns")
+            || rendered.contains("possible values")
+    );
+}
+
+#[test]
 fn grouped_help_only_advertises_supported_help_full_paths() {
     for args in [
         ["grafana-util", "dashboard"],

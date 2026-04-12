@@ -252,25 +252,84 @@ fn org_matches(org: &Map<String, Value>, args: &OrgListArgs) -> bool {
     true
 }
 
-fn org_table_rows(rows: &[Map<String, Value>]) -> Vec<Vec<String>> {
+pub(crate) fn org_user_summary(row: &Map<String, Value>) -> String {
+    let Some(Value::Array(users)) = row.get("users") else {
+        return "-".to_string();
+    };
+    if users.is_empty() {
+        return "-".to_string();
+    }
+    let labels = users
+        .iter()
+        .filter_map(Value::as_object)
+        .map(|user| {
+            let identity = [
+                string_field(user, "login", ""),
+                string_field(user, "email", ""),
+                string_field(user, "name", ""),
+                scalar_text(user.get("userId")),
+            ]
+            .into_iter()
+            .find(|value| !value.is_empty())
+            .unwrap_or_else(|| "-".to_string());
+            let role = string_field(user, "orgRole", "");
+            if role.is_empty() {
+                identity
+            } else {
+                format!("{identity}({role})")
+            }
+        })
+        .collect::<Vec<String>>();
+    if labels.is_empty() {
+        "-".to_string()
+    } else {
+        labels.join("; ")
+    }
+}
+
+pub(crate) fn org_table_headers(with_users: bool) -> Vec<&'static str> {
+    if with_users {
+        vec!["ID", "NAME", "USER_COUNT", "USERS"]
+    } else {
+        vec!["ID", "NAME", "USER_COUNT"]
+    }
+}
+
+pub(crate) fn org_csv_headers(with_users: bool) -> Vec<&'static str> {
+    if with_users {
+        vec!["id", "name", "userCount", "users"]
+    } else {
+        vec!["id", "name", "userCount"]
+    }
+}
+
+pub(crate) fn org_table_rows(rows: &[Map<String, Value>], with_users: bool) -> Vec<Vec<String>> {
     rows.iter()
         .map(|row| {
-            vec![
+            let mut cells = vec![
                 scalar_text(row.get("id")),
                 string_field(row, "name", ""),
                 scalar_text(row.get("userCount")),
-            ]
+            ];
+            if with_users {
+                cells.push(org_user_summary(row));
+            }
+            cells
         })
         .collect()
 }
 
-fn org_summary_line(row: &Map<String, Value>) -> String {
-    format!(
+pub(crate) fn org_summary_line(row: &Map<String, Value>, with_users: bool) -> String {
+    let mut line = format!(
         "id={} name={} userCount={}",
         scalar_text(row.get("id")),
         string_field(row, "name", ""),
         scalar_text(row.get("userCount"))
-    )
+    );
+    if with_users {
+        line.push_str(&format!(" users={}", org_user_summary(row)));
+    }
+    line
 }
 
 fn lookup_org_by_identity<F>(
