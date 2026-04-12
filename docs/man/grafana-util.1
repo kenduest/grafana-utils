@@ -41,7 +41,7 @@ grafana\-util datasource is the namespace for catalog lookup, inventory reads, e
 Run the access\-management command surface for users, orgs, teams, and service accounts. Use when: List live or local access inventory.; Create, modify, export, import, diff, or delete access resources.; Manage service\-account tokens.
 .TP
 .B config
-open repo\-local configuration workflows for repeatable Grafana access. Use when: Want to manage repo\-local defaults instead of repeating live connection flags in every command.
+explain what the grafana\-util config namespace is for, when to stay at the root, and when to move into config profile. Use when: Need the setup model before picking a profile subcommand; Are deciding between direct flags and repo\-local \-\-profile usage; Need to understand where URL, auth defaults, and secret handling should live
 .TP
 .B status
 read live and staged Grafana state through one canonical status surface. Use when: Want readiness, overview, snapshot, or direct live reads without moving into mutation work.

@@ -27,13 +27,6 @@ The public first-run CLI is organized around a small task-first surface:
 - [datasource](./datasource.md): datasource inventory and lifecycle workflows
 - [access](./access.md): user, team, org, and service-account workflows
 
-If older notes mention removed roots, use the current task names instead:
-
-- `profile ...` from older notes -> `grafana-util config profile ...`
-- `resource ...` from older notes -> `grafana-util status resource ...`
-- legacy overview root -> `grafana-util status overview ...`
-- `snapshot ...` from older notes -> `grafana-util status snapshot ...`
-
 ## Which command should I use?
 
 | Need | Start with |

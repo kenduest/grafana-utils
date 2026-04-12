@@ -21,8 +21,6 @@
 
 `grafana-util alert` 把告警工作流收在同一個較淺的入口，並依任務把 help 分成盤點、搬移、撰寫與審查幾個區塊：從盤點、匯出、比對，到路由設計、草稿撰寫，再到 plan / apply。這頁適合先搞懂規則、通知路由與 contact point 的關係，再決定要往哪個子命令深入。
 
-目前公開命令不使用舊的 `alert live ...`、`alert migrate ...`、`alert author ...` 分層；請直接使用 `grafana-util alert list-rules`、`grafana-util alert export`、`grafana-util alert init`、`grafana-util alert preview-route` 這類 current path。
-
 ## 這一組頁面怎麼讀比較不會亂
 
 1. 先看這頁，判斷你是在做 inventory、authoring、routing，還是 apply。

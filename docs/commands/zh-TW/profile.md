@@ -6,7 +6,7 @@
 
 適用時機：當你想把 Grafana 連線預設放在目前 checkout，之後再用 `--profile` 重複使用。
 
-說明：如果你想先理解整個 profile 工作流，再決定要進哪個子命令，先看這一頁最合適。公開入口是 `grafana-util config profile`；舊的 top-level `profile` root 已不再是可直接執行的主入口。這個指令群組是 repo-local 連線預設、secret 處理，以及本機與 CI 重複執行方式的入口。
+說明：如果你想先理解整個 profile 工作流，再決定要進哪個子命令，先看這一頁最合適。這個指令群組是 repo-local 連線預設、secret 處理，以及本機與 CI 重複執行方式的入口。
 
 如果你要先理解 namespace 層級，而不是直接看某個 subcommand，先回 [config](./config.md)。
 

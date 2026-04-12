@@ -13,18 +13,6 @@
     "access",
     "workspace"
   ],
-  "legacy_replacements": {
-    "advanced dashboard": "dashboard",
-    "alert author": "alert",
-    "alert author route preview": "alert preview-route",
-    "alert author route set": "alert set-route",
-    "alert live": "alert",
-    "alert migrate": "alert",
-    "overview": "status overview",
-    "profile": "config profile",
-    "resource": "status resource",
-    "snapshot": "status snapshot"
-  },
   "doc_pages": {
     "alert": "alert.md",
     "config": "config.md",

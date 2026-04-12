@@ -931,9 +931,7 @@ code[class*="language-"],pre[class*="language-"]{color:#ccc;background:none;font
 <h2 id="何時使用">何時使用</h2>
 <p>當你需要先做唯讀的 live lookup，但 <code>dashboard</code>、<code>alert</code>、<code>datasource</code>、<code>access</code>、<code>workspace</code> 還沒有對應的高階工作流時，可以先用這個命名空間。</p>
 <h2 id="說明">說明</h2>
-<p>這個命名空間刻意比主要維運工作流更通用、更窄。它的目的不是取代既有的高階操作，而是提供一條唯讀資源查詢路徑，讓你能先檢查少數支援的 live Grafana resource kinds。</p>
-<p>舊的 top-level <code>grafana-util resource ...</code> 已不是公開入口；請改用 <code>grafana-util status resource ...</code>。</p>
-<p>把它當成通用查詢工具，不是日常 mutation 的主入口。</p>
+<p>這個命名空間刻意比主要維運工作流更通用、更窄。它的目的不是取代既有的高階操作，而是提供一條唯讀資源查詢路徑，讓你能先檢查少數支援的 live Grafana resource kinds。把它當成通用查詢工具，不是日常 mutation 的主入口。</p>
 <h2 id="使用方式">使用方式</h2>
 <ul><li>先用 <code>status resource describe</code> 看各 kind 的 selector 格式與 endpoint 形狀。</li><li>先用 <code>status resource kinds</code> 看目前支援哪些 live resource kinds。</li><li>需要盤點某一類資源時，用 <code>status resource list &lt;kind&gt;</code>。</li><li>需要抓某一筆完整 live payload 時，用 <code>status resource get &lt;kind&gt;/&lt;identity&gt;</code>。</li></ul>
 <h2 id="目前支援的-kinds">目前支援的 kinds</h2>

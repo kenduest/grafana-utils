@@ -55,13 +55,6 @@
 | Datasource | [datasource](./datasource.md) | inventory、類型查找、匯出匯入、live mutation |
 | Access | [access](./access.md) | user、org、team、service account、token |
 
-如果舊筆記提到已移除的 root，請直接改用目前的 task name：
-
-- `profile ...` -> `grafana-util config profile ...`
-- `resource ...` -> `grafana-util status resource ...`
-- `snapshot ...` -> `grafana-util status snapshot ...`
-- legacy overview root -> `grafana-util status overview ...`
-
 ## 我該用哪個指令？
 
 | 需求 | 先從這裡開始 |

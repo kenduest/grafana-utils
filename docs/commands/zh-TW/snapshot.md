@@ -6,7 +6,7 @@
 
 適用時機：當你想建立一個本機 snapshot root，收錄 dashboard、datasource 與 access inventory，供後續檢視時。
 
-說明：如果你需要一份離線 snapshot，之後不用重新連到 Grafana 也能繼續檢視，先看這一頁最合適。目前公開入口是 `grafana-util status snapshot`，不是已移除的 top-level `grafana-util snapshot` root。這個指令群組適合交接、備份、事件回顧，或任何想先留下本機 artifact 再往下分析的工作流。snapshot export 現在會把 dashboard、datasource、access 幾條 lane 收斂到同一個 root，並寫出 `snapshot-metadata.json`，讓後續工具不用靠猜路徑就能找出 lane。
+說明：如果你需要一份離線 snapshot，之後不用重新連到 Grafana 也能繼續檢視，先看這一頁最合適。這個指令群組適合交接、備份、事件回顧，或任何想先留下本機 artifact 再往下分析的工作流。snapshot export 現在會把 dashboard、datasource、access 幾條 lane 收斂到同一個 root，並寫出 `snapshot-metadata.json`，讓後續工具不用靠猜路徑就能找出 lane。
 
 ## 採用前後對照
 

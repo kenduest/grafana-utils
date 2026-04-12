@@ -933,7 +933,7 @@ code[class*="language-"],pre[class*="language-"]{color:#ccc;background:none;font
 <h2 id="root">Root</h2>
 <p>Purpose: list, inspect, validate, add, and initialize repo-local <code>grafana-util</code> profiles through the current <code>config profile</code> entrypoint.</p>
 <p>When to use: when you want to keep Grafana connection defaults in the current checkout and reuse them with <code>--profile</code>.</p>
-<p>Description: open this page when you want to understand the full profile workflow before choosing one subcommand. The public entrypoint is <code>grafana-util config profile</code>; the old top-level <code>profile</code> root is no longer a runnable onboarding path. This namespace covers repo-local connection defaults, secret handling, and non-interactive command reuse across local work, SRE tasks, and CI jobs.</p>
+<p>Description: open this page when you want to understand the full profile workflow before choosing one subcommand. This namespace covers repo-local connection defaults, secret handling, and non-interactive command reuse across local work, SRE tasks, and CI jobs.</p>
 <p>If you want the namespace-level overview before picking one subcommand, go back to <a href="config.html">config</a>.</p>
 <h2 id="before-after">Before / After</h2>
 <ul><li><strong>Before</strong>: connection settings live in scattered flags or ad hoc shell history, so the same live command is hard to repeat later.</li><li><strong>After</strong>: a named profile keeps URL, auth, and secret handling in one place so live commands stay shorter and easier to reuse.</li></ul>

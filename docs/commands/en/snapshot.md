@@ -6,7 +6,7 @@ Purpose: export and review Grafana snapshot inventory bundles.
 
 When to use: when you want a local snapshot root that captures dashboard, datasource, and access inventory for later inspection.
 
-Description: open this page when you need an offline snapshot of Grafana inventory that can be reviewed later without talking to the server again. The current public entrypoint is `grafana-util status snapshot`, not the removed top-level `grafana-util snapshot` root. This snapshot surface is useful for handoff, backup, incident review, or any workflow where you want one local artifact before moving into deeper analysis. Snapshot exports stage dashboard, datasource, and access lanes under one root and also write `snapshot-metadata.json` so later tooling can discover those lanes without guessing paths.
+Description: open this page when you need an offline snapshot of Grafana inventory that can be reviewed later without talking to the server again. This snapshot surface is useful for handoff, backup, incident review, or any workflow where you want one local artifact before moving into deeper analysis. Snapshot exports stage dashboard, datasource, and access lanes under one root and also write `snapshot-metadata.json` so later tooling can discover those lanes without guessing paths.
 
 ## Before / After
 

@@ -7,11 +7,7 @@ Run generic read-only Grafana resource queries through the `status` namespace.
 Use this when you need a read-only live lookup before a richer workflow exists in `dashboard`, `alert`, `datasource`, `access`, or `workspace`.
 
 ## Description
-This namespace is intentionally narrower and more generic than the main operator workflows. It exists so you can inspect a supported live Grafana resource kind without waiting for a full domain-specific command surface.
-
-The old top-level `grafana-util resource ...` path is no longer the public entrypoint. Use `grafana-util status resource ...` instead.
-
-Treat this as a read-only utility surface, not as the primary entrypoint for day-to-day mutation work.
+This namespace is intentionally narrower and more generic than the main operator workflows. It exists so you can inspect a supported live Grafana resource kind without waiting for a full domain-specific command surface. Treat it as a read-only utility surface, not as the primary entrypoint for day-to-day mutation work.
 
 ## Workflow
 - Start with `status resource describe` to see the supported selector patterns and endpoint shape for each kind.

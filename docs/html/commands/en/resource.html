@@ -931,9 +931,7 @@ code[class*="language-"],pre[class*="language-"]{color:#ccc;background:none;font
 <h2 id="when-to-use">When to use</h2>
 <p>Use this when you need a read-only live lookup before a richer workflow exists in <code>dashboard</code>, <code>alert</code>, <code>datasource</code>, <code>access</code>, or <code>workspace</code>.</p>
 <h2 id="description">Description</h2>
-<p>This namespace is intentionally narrower and more generic than the main operator workflows. It exists so you can inspect a supported live Grafana resource kind without waiting for a full domain-specific command surface.</p>
-<p>The old top-level <code>grafana-util resource ...</code> path is no longer the public entrypoint. Use <code>grafana-util status resource ...</code> instead.</p>
-<p>Treat this as a read-only utility surface, not as the primary entrypoint for day-to-day mutation work.</p>
+<p>This namespace is intentionally narrower and more generic than the main operator workflows. It exists so you can inspect a supported live Grafana resource kind without waiting for a full domain-specific command surface. Treat it as a read-only utility surface, not as the primary entrypoint for day-to-day mutation work.</p>
 <h2 id="workflow">Workflow</h2>
 <ul><li>Start with <code>status resource describe</code> to see the supported selector patterns and endpoint shape for each kind.</li><li>Use <code>status resource kinds</code> to see the currently supported live resource kinds.</li><li>Use <code>status resource list &lt;kind&gt;</code> when you need inventory for one kind.</li><li>Use <code>status resource get &lt;kind&gt;/&lt;identity&gt;</code> when you need the full live payload for one item.</li></ul>
 <h2 id="supported-kinds">Supported kinds</h2>

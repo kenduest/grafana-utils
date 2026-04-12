@@ -921,7 +921,6 @@ code[class*="language-"],pre[class*="language-"]{color:#ccc;background:none;font
 <ul><li><strong>live Grafana</strong>：先用 <code>list-*</code> 盤點，必要時再 <code>export</code></li><li><strong>desired-state / 本地草稿樹</strong>：先用 <code>plan</code> 看變更，再決定 <code>apply</code></li><li><strong>單一規則或 contact point 草稿</strong>：先用 <code>new-<em></code>、<code>add-</em></code> 或 <code>clone-rule</code></li><li><strong>通知路由</strong>：先走 <code>preview-route</code>，確認結果後再 <code>set-route</code></li></ul>
 <h2 id="這個入口是做什麼的">這個入口是做什麼的</h2>
 <p><code>grafana-util alert</code> 把告警工作流收在同一個較淺的入口，並依任務把 help 分成盤點、搬移、撰寫與審查幾個區塊：從盤點、匯出、比對，到路由設計、草稿撰寫，再到 plan / apply。這頁適合先搞懂規則、通知路由與 contact point 的關係，再決定要往哪個子命令深入。</p>
-<p>目前公開命令不使用舊的 <code>alert live ...</code>、<code>alert migrate ...</code>、<code>alert author ...</code> 分層；請直接使用 <code>grafana-util alert list-rules</code>、<code>grafana-util alert export</code>、<code>grafana-util alert init</code>、<code>grafana-util alert preview-route</code> 這類 current path。</p>
 <h2 id="這一組頁面怎麼讀比較不會亂">這一組頁面怎麼讀比較不會亂</h2>
 <ol><li>先看這頁，判斷你是在做 inventory、authoring、routing，還是 apply。</li><li>進到子命令頁後，先看「何時使用」與「最短成功路徑」。</li><li>再確認輸入來源是 live、本地 desired-state，還是單一草稿檔。</li><li>最後才看完整 flags 與輸出格式。</li></ol>
 <h2 id="採用前後對照">採用前後對照</h2>

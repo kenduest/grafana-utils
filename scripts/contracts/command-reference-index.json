@@ -24,16 +24,6 @@
           ]
         },
         {
-          "title": "Removed roots",
-          "type": "bullet_text",
-          "items": [
-            "`profile ...` from older notes -> `grafana-util config profile ...`",
-            "`resource ...` from older notes -> `grafana-util status resource ...`",
-            "legacy overview root -> `grafana-util status overview ...`",
-            "`snapshot ...` from older notes -> `grafana-util status snapshot ...`"
-          ]
-        },
-        {
           "title": "Which command should I use?",
           "type": "table",
           "columns": ["Need", "Start with"],
@@ -135,16 +125,6 @@
             ["Alert", "[alert](./alert.md)", "inventory、authoring、route、plan / apply"],
             ["Datasource", "[datasource](./datasource.md)", "inventory、類型查找、匯出匯入、live mutation"],
             ["Access", "[access](./access.md)", "user、org、team、service account、token"]
-          ]
-        },
-        {
-          "title": "移除的 root 與替代寫法",
-          "type": "bullet_text",
-          "items": [
-            "`profile ...` -> `grafana-util config profile ...`",
-            "`resource ...` -> `grafana-util status resource ...`",
-            "`snapshot ...` -> `grafana-util status snapshot ...`",
-            "legacy overview root -> `grafana-util status overview ...`"
           ]
         },
         {

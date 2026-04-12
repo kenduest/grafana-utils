@@ -7,11 +7,7 @@
 當你需要先做唯讀的 live lookup，但 `dashboard`、`alert`、`datasource`、`access`、`workspace` 還沒有對應的高階工作流時，可以先用這個命名空間。
 
 ## 說明
-這個命名空間刻意比主要維運工作流更通用、更窄。它的目的不是取代既有的高階操作，而是提供一條唯讀資源查詢路徑，讓你能先檢查少數支援的 live Grafana resource kinds。
-
-舊的 top-level `grafana-util resource ...` 已不是公開入口；請改用 `grafana-util status resource ...`。
-
-把它當成通用查詢工具，不是日常 mutation 的主入口。
+這個命名空間刻意比主要維運工作流更通用、更窄。它的目的不是取代既有的高階操作，而是提供一條唯讀資源查詢路徑，讓你能先檢查少數支援的 live Grafana resource kinds。把它當成通用查詢工具，不是日常 mutation 的主入口。
 
 ## 使用方式
 - 先用 `status resource describe` 看各 kind 的 selector 格式與 endpoint 形狀。

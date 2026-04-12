@@ -42,9 +42,6 @@ MARKDOWN_LINK_RE = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
 HEADING_COMMAND_RE = re.compile(r"^# `(?P<command>grafana-util(?: [^`]+)?)`$")
 HEADING_PLAIN_COMMAND_RE = re.compile(r"^# (?P<command>grafana-util .+)$")
 HEADING_BARE_PATH_RE = re.compile(r"^# (?P<command>[a-z0-9][a-z0-9 -]*)$")
-REMOVED_ROOT_HEADING_RE = re.compile(
-    r"^# (?:(?:Removed root path)|(?:已移除的 root path))[:：]\s*`(?P<command>grafana-util(?: [^`]+)?)`$"
-)
 HELP_CACHE: dict[tuple[tuple[str, ...], str], bool] = {}
 
 
@@ -187,7 +184,6 @@ def heading_command_tokens(text: str) -> tuple[int, tuple[str, ...]] | None:
         (HEADING_COMMAND_RE, True),
         (HEADING_PLAIN_COMMAND_RE, True),
         (HEADING_BARE_PATH_RE, False),
-        (REMOVED_ROOT_HEADING_RE, True),
     ):
         match = pattern.match(line)
         if match is None:
@@ -264,14 +260,6 @@ def validate_command_doc_locale_parity(surface: dict[str, object]) -> list[Findi
                     continue
                 line_number, path_tokens = value
                 resolved = resolve_cli_path(list(path_tokens))
-                legacy_replacements = surface.get("legacy_replacements", {})
-                is_legacy_removed_page = (
-                    first_heading(texts[locale]) is not None
-                    and REMOVED_ROOT_HEADING_RE.match(first_heading(texts[locale])[1]) is not None
-                )
-                if resolved is None and is_legacy_removed_page and isinstance(legacy_replacements, dict):
-                    if " ".join(path_tokens) in legacy_replacements:
-                        continue
                 if resolved is None or resolved != path_tokens:
                     findings.append(
                         Finding(
@@ -312,14 +300,6 @@ def validate_command_doc_locale_parity(surface: dict[str, object]) -> list[Findi
                         )
                     )
     return findings
-
-
-def replacement_for(path_tokens: list[str], replacements: dict[str, str]) -> tuple[str, str] | None:
-    for length in range(len(path_tokens), 0, -1):
-        prefix = " ".join(path_tokens[:length])
-        if prefix in replacements:
-            return prefix, replacements[prefix]
-    return None
 
 
 def run_help(path_tokens: tuple[str, ...], help_flag: str) -> bool:
@@ -368,9 +348,7 @@ def resolve_cli_path(path_tokens: list[str]) -> tuple[str, ...] | None:
 
 def validate_commands(path: Path, text: str, surface: dict[str, object]) -> list[Finding]:
     findings: list[Finding] = []
-    replacements = surface.get("legacy_replacements", {})
     help_full_supported = set(surface.get("help_full_supported", []))
-    assert isinstance(replacements, dict)
     candidates = joined_command_lines(text)
     for line_number, raw in candidates:
         tokens = tokenize_command(raw)
@@ -378,17 +356,6 @@ def validate_commands(path: Path, text: str, surface: dict[str, object]) -> list
             continue
         path_tokens = command_tokens_before_flags(tokens)
         if not path_tokens:
-            continue
-        replacement = replacement_for(path_tokens, replacements)  # type: ignore[arg-type]
-        if replacement is not None:
-            legacy, target = replacement
-            findings.append(
-                Finding(
-                    path,
-                    line_number,
-                    f"legacy command path `grafana-util {legacy}`; use `grafana-util {target}`",
-                )
-            )
             continue
         resolved = resolve_cli_path(path_tokens)
         if resolved is None:

@@ -9,6 +9,13 @@ Current AI-maintained status only.
 - Detailed 2026-04-01 through 2026-04-12 entries moved to [`archive/ai-status-archive-2026-04-12.md`](/Users/kendlee/work/grafana-utils/docs/internal/archive/ai-status-archive-2026-04-12.md).
 - Keep this file short and current. Additive historical detail belongs in `docs/internal/archive/`.
 
+## 2026-04-12 - Remove legacy CLI compatibility
+- State: Done
+- Scope: `rust/src/bin/grafana-util.rs`, `rust/src/cli.rs`, `rust/src/cli_help.rs`, `rust/src/cli_help_examples.rs`, `rust/src/cli_help/grouped_specs.rs`, `rust/src/cli_rust_tests.rs`, `scripts/check_docs_surface.py`, `scripts/contracts/command-surface.json`, command-reference docs, and generated-doc source contracts.
+- Baseline: the binary carried a legacy pre-check that intercepted removed roots and emitted replacement hints; `cli.rs` still defined unused old alert grouping schema; the docs surface contract and checker still allowed legacy replacement mappings.
+- Current Update: removed the legacy pre-check, deleted the legacy hint module, removed unused old alert grouping schema, removed legacy replacement support from the docs-surface contract/checker, kept alert short help on real flat commands only, and made colored contextual help highlight option entries, inline `--flag` references, and example captions.
+- Result: removed command paths now follow the normal Clap rejection path, public command docs/contracts no longer preserve a compatibility mapping for old roots, and CLI help keeps arguments plus example captions visibly highlighted in colored output.
+
 ## 2026-04-12 - Re-scope Developer Guide as a maintainer landing page
 - State: Done
 - Scope: `docs/DEVELOPER.md`, `docs/internal/maintainer-quickstart.md`, `docs/internal/ai-workflow-note.md`, `docs/internal/ai-change-closure-rules.md`, `docs/internal/task-brief-template.md`, `docs/internal/README.md`, plus the repo-maintained AI trace files required by the maintainer-doc workflow gate.

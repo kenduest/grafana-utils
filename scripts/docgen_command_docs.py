@@ -103,10 +103,6 @@ COMMAND_SUBSECTION_LABELS = frozenset(
     }
 )
 
-REMOVED_ROOT_TITLE_RE = re.compile(
-    r"^(?:Removed root path|已移除的 root path)[:：]\s*(grafana-util(?: [^`]+)?)$"
-)
-
 NON_COMMAND_SECTION_TITLES = frozenset(
     {
         "Before / After",
@@ -211,9 +207,6 @@ def command_doc_cli_path(path: Path, fallback_cli_path: str | None = None) -> st
     cleaned = clean_markdown(title)
     if cleaned.startswith("grafana-util "):
         return cleaned
-    removed_match = REMOVED_ROOT_TITLE_RE.match(cleaned)
-    if removed_match is not None:
-        return removed_match.group(1)
     if re.fullmatch(r"[a-z0-9][a-z0-9 -]*", cleaned):
         return f"grafana-util {cleaned}"
     return fallback_cli_path

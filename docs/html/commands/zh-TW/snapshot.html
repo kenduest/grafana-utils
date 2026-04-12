@@ -929,7 +929,7 @@ code[class*="language-"],pre[class*="language-"]{color:#ccc;background:none;font
 <h2 id="root">Root</h2>
 <p>用途：匯出並檢視 Grafana snapshot inventory bundles。</p>
 <p>適用時機：當你想建立一個本機 snapshot root，收錄 dashboard、datasource 與 access inventory，供後續檢視時。</p>
-<p>說明：如果你需要一份離線 snapshot，之後不用重新連到 Grafana 也能繼續檢視，先看這一頁最合適。目前公開入口是 <code>grafana-util status snapshot</code>，不是已移除的 top-level <code>grafana-util snapshot</code> root。這個指令群組適合交接、備份、事件回顧，或任何想先留下本機 artifact 再往下分析的工作流。snapshot export 現在會把 dashboard、datasource、access 幾條 lane 收斂到同一個 root，並寫出 <code>snapshot-metadata.json</code>，讓後續工具不用靠猜路徑就能找出 lane。</p>
+<p>說明：如果你需要一份離線 snapshot，之後不用重新連到 Grafana 也能繼續檢視，先看這一頁最合適。這個指令群組適合交接、備份、事件回顧，或任何想先留下本機 artifact 再往下分析的工作流。snapshot export 現在會把 dashboard、datasource、access 幾條 lane 收斂到同一個 root，並寫出 <code>snapshot-metadata.json</code>，讓後續工具不用靠猜路徑就能找出 lane。</p>
 <h2 id="採用前後對照">採用前後對照</h2>
 <ul><li><strong>採用前</strong>：snapshot 式檢視通常代表要重新查 Grafana，或一個一個打開 dashboard、datasource 與 access 資料。</li><li><strong>採用後</strong>：先匯出，再把本機 bundle 當成可重複檢視的 artifact，不用再碰 live server。</li></ul>
 <h2 id="成功判準">成功判準</h2>
