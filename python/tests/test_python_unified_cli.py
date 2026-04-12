@@ -154,7 +154,7 @@ class UnifiedCliTests(unittest.TestCase):
         self.assertEqual(exc.exception.code, 0)
         help_text = stdout.getvalue()
         self.assertIn("grafana-util datasource", help_text)
-        self.assertIn("{types,list,export,import,diff,add,modify,delete}", help_text)
+        self.assertIn("{types,list,export,import,diff,browse,add,modify,delete}", help_text)
 
     def test_unified_build_parser_registers_datasource_modify_subcommand(self):
         parser = unified_cli.build_parser()
@@ -163,6 +163,7 @@ class UnifiedCliTests(unittest.TestCase):
         datasource_action = datasource_parser._subparsers._group_actions[0]
 
         self.assertIn("types", datasource_action.choices)
+        self.assertIn("browse", datasource_action.choices)
         self.assertIn("modify", datasource_action.choices)
 
     def test_unified_parse_args_supports_dashboard_namespace(self):

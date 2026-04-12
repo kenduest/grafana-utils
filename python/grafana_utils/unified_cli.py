@@ -106,6 +106,7 @@ DATASOURCE_COMMAND_HELP = {
     "export": "Export live Grafana datasource inventory as normalized JSON files.",
     "import": "Import datasource inventory JSON through the Grafana API.",
     "diff": "Compare exported datasource inventory with the current Grafana state.",
+    "browse": "Browse live Grafana datasource inventory in an interactive terminal.",
 }
 SYNC_COMMAND_HELP = {
     "scan": "Scan staged workspace artifacts and summarize local resource state.",
