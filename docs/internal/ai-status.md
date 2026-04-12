@@ -9,6 +9,12 @@ Current AI-maintained status only.
 - Detailed 2026-04-01 through 2026-04-12 entries moved to [`archive/ai-status-archive-2026-04-12.md`](/Users/kendlee/work/grafana-utils/docs/internal/archive/ai-status-archive-2026-04-12.md).
 - Keep this file short and current. Additive historical detail belongs in `docs/internal/archive/`.
 
+## 2026-04-12 - Re-scope Developer Guide as a maintainer landing page
+- State: Done
+- Scope: `docs/DEVELOPER.md`, `docs/internal/maintainer-quickstart.md`, `docs/internal/ai-workflow-note.md`, `docs/internal/ai-change-closure-rules.md`, `docs/internal/task-brief-template.md`, `docs/internal/README.md`, plus the repo-maintained AI trace files required by the maintainer-doc workflow gate.
+- Current Update: rewrote `docs/DEVELOPER.md` from an oversized mixed router/policy page into a shorter maintainer landing page; tightened `maintainer-quickstart` into the first-entry reading-order and source-of-truth map; moved stable closure rules into a dedicated `ai-change-closure-rules.md`; and routed both the maintainer docs and the AI workflow note to that stable closure file.
+- Result: the maintainer entrypoint is now closer to its intended role, the quickstart no longer competes with it as a second guide, and future maintainer-routing changes have both a reusable closure contract and visible router links that reduce dropped updates across maintainer docs.
+
 ## 2026-04-12 - Add machine-readable docs surface contract and verifier
 - State: Done
 - Scope: `scripts/contracts/command-surface.json`, `scripts/check_docs_surface.py`, `Makefile`, `AGENTS.md`, maintainer routing docs, generated-doc playbook/architecture docs, and the affected public docs that still advertised removed roots or stale alert paths.

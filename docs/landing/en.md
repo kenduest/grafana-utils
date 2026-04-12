@@ -1,136 +1,165 @@
 # Grafana Documentation
 
-Use this site to move quickly between the handbook, command reference, and common `grafana-util` workflows.
+Use this site as a mixed entry point. Start with the handbook when you want the reading path, or open the command reference when you already know the command family. The landing page keeps both cores visible so you can move from task, to chapter, to exact syntax without hunting.
 
-## Quick jump
+- [Start with the handbook](../user-guide/en/index.md)
+- [Open command reference](../commands/en/index.md)
 
-Type a page or command name and jump to the closest matching doc.
+## First Run
 
-## Quick Start
+If this is a new machine or a new Grafana environment, follow this order:
 
-Start with the entry points most people need on day one.
+### Confirm the binary
 
-### What this tool is for
+Start by checking `grafana-util --version` so you know the CLI is installed and on your path.
 
-Read this first if you want the product framing before you jump into commands or workflow chapters.
+- [Getting Started](../user-guide/en/getting-started.md)
+- [Command Reference](../commands/en/version.md)
 
-- [Read chapter](../user-guide/en/what-is-grafana-util.md)
+### Run the first read-only check
 
-### First connection and read-only checks
+Use `grafana-util status live` as the first live read against Grafana before attempting any broader workflow.
 
-Confirm the binary, Grafana connectivity, and your first read-only command before you worry about deeper command trees.
+- [Getting Started](../user-guide/en/getting-started.md)
+- [Status Command Reference](../commands/en/status.md)
 
-- [Read chapter](../user-guide/en/getting-started.md)
+### Save a reusable connection profile
 
-### New-user safe path
+After the first successful read, store host and credentials with `grafana-util config profile add ...`.
 
-If this is your first time with the tool, this is the fastest safe path in.
+- [New User Path](../user-guide/en/role-new-user.md)
+- [Profile Command Reference](../commands/en/profile.md)
 
-- [Read chapter](../user-guide/en/role-new-user.md)
+## Read By Role
 
-## Common Tasks
+Choose the reading path that best matches who is operating Grafana today.
 
-Start from common workflows instead of browsing the full tree first.
+### New user
 
-### Daily checks before changes
+Use the shortest safe path when this is your first time with the CLI or your first Grafana connection.
 
-Use this lane when you want live checks, staged review, and the normal operator rhythm before making changes.
+- [New User Path](../user-guide/en/role-new-user.md)
+- [Getting Started](../user-guide/en/getting-started.md)
 
-- [Read chapter](../user-guide/en/role-sre-ops.md)
+### SRE / operator
 
-### Dashboard backup, migration, and replay
+Start from day-two operations, workspace review, and pre-change inspection rather than the syntax index.
 
-Handle dashboard export, import, lane selection, dependency checks, and migration from one place.
+- [SRE / Ops Path](../user-guide/en/role-sre-ops.md)
+- [Workspace Review & Status](../user-guide/en/status-workspace.md)
 
-- [Read chapter](../user-guide/en/dashboard.md)
+### Automation / CI
 
-### Dashboard inspection and screenshots
+Go here when the CLI will run inside pipelines, release automation, or repeatable validation flows.
 
-Start here when you need variable inspection, query dependency checks, incident-ready captures, or reproducible dashboard screenshots.
+- [Automation / CI Path](../user-guide/en/role-automation-ci.md)
+- [Technical Reference](../user-guide/en/reference.md)
 
-- [Read chapter](../user-guide/en/dashboard.md)
-- [Open dashboard screenshot](../commands/en/dashboard-screenshot.md)
+### Maintainer / architect
 
-### Datasource and alert operations
+This route is for repository structure, design rules, and implementation-facing contracts.
 
-Start here when you need data source recovery, dependency checks, alert review, route changes, or notification policy work.
+- [Architecture & Design Principles](../user-guide/en/architecture.md)
+- [Developer guide](../DEVELOPER.md)
 
-- [Data source guide](../user-guide/en/datasource.md)
-- [Alert guide](../user-guide/en/alert.md)
+## Read By Task
 
-### Access and automation credentials
+Start from the thing you are trying to get done, then move into the matching chapter set.
 
-Manage org, team, service account, and token lifecycle work from one place.
+### Understand what the tool is for
 
-- [Read chapter](../user-guide/en/access.md)
+Read this before choosing a workflow if you still need the mental model for what the CLI is trying to protect and automate.
 
-### Scenarios and troubleshooting
+- [What grafana-util is for](../user-guide/en/what-is-grafana-util.md)
 
-If you are solving a real operational problem instead of looking up one flag, start with the scenario handbook and troubleshooting guide.
+### Check live or staged state
 
-- [Operator scenarios](../user-guide/en/scenarios.md)
-- [Troubleshooting](../user-guide/en/troubleshooting.md)
+Use this path for read-only inspection, staged review, or pre-change status checks.
 
-## Feature map
+- [Workspace Review & Status](../user-guide/en/status-workspace.md)
+- [Status Command Reference](../commands/en/status.md)
 
-Use this section to decide what kind of work you are doing before you jump into a handbook chapter or command page.
+### Work on dashboards
 
-### Status
+This path covers browse, export, analysis, review, patch, publish, and capture flows around dashboards.
 
-Start with `status` when you need a fast read on live or staged state.
+- [Dashboard Management](../user-guide/en/dashboard.md)
+- [Dashboard Command Reference](../commands/en/dashboard.md)
 
-- [Browse technical reference](../user-guide/en/reference.md)
-- [Browse status command](../commands/en/status.md)
+### Work on data sources or alerts
 
-### Asset operations
+Use this when you are changing Grafana integrations, alert rules, contact points, or governance checks.
 
-Start here when the work is about dashboards, data source objects, or alerts: export, import, inspection, or governance.
+- [Data source Management](../user-guide/en/datasource.md)
+- [Alerting Governance](../user-guide/en/alert.md)
 
-- [Browse dashboard chapter](../user-guide/en/dashboard.md)
-- [Browse data source chapter](../user-guide/en/datasource.md)
-- [Browse alert chapter](../user-guide/en/alert.md)
+### Manage access and credentials
 
-### Identity and credentials
+Start here for orgs, teams, service accounts, tokens, and access-oriented operational changes.
 
-Use this area when the work is about orgs, teams, service accounts, tokens, or profile-backed connection defaults.
+- [Access Management](../user-guide/en/access.md)
+- [Access Command Reference](../commands/en/access.md)
 
-- [Browse access chapter](../user-guide/en/access.md)
-- [Browse config profile command](../commands/en/profile.md)
+## Browse By Command Family
 
-### Workspace review
+Use this when you already know the root command family and want the shortest route into syntax and workflow context.
 
-Start here when you want scan, test, preview, package, and apply for local workspace inputs.
+### `status` and `workspace`
 
-- [Browse workspace and status chapter](../user-guide/en/status-workspace.md)
-- [Browse workspace command](../commands/en/workspace.md)
+These roots cover inspection, staging review, and workspace-oriented validation paths.
 
-## Reference
+- [Status / Workspace chapters](../user-guide/en/status-workspace.md)
+- [Workspace Command Reference](../commands/en/workspace.md)
 
-Go here when you already know which area you need.
+### `config profile`
 
-### Full handbook
+Use this to manage reusable connection defaults and secret storage for later commands.
 
-Narrative docs, role-based guides, architecture notes, scenarios, and troubleshooting chapters.
+- [Getting Started](../user-guide/en/getting-started.md)
+- [Profile Command Reference](../commands/en/profile.md)
 
-- [Browse handbook](../user-guide/en/index.md)
+### `dashboard`
 
-### Command reference
+This root owns browse, summary, variables, export, diff, patch, publish, and screenshot workflows.
 
-Full command docs by namespace, subcommand, and flag.
+- [Dashboard chapters](../user-guide/en/dashboard.md)
+- [Dashboard Command Reference](../commands/en/dashboard.md)
 
-- [Browse commands](../commands/en/index.md)
-- [Browse manpages](../html/man/grafana-util.html)
+### `datasource`, `alert`, and `access`
 
-### Source code and releases
+These roots cover change workflows for integrations, alerting, and Grafana identity surfaces.
 
-Go here when you want the repository, release history, or issue tracker.
+- [Datasource Command Reference](../commands/en/datasource.md)
+- [Alert Command Reference](../commands/en/alert.md)
+- [Access Command Reference](../commands/en/access.md)
 
-- [Browse GitHub repository](https://github.com/kenduest-brobridge/grafana-util)
-- [View releases](https://github.com/kenduest-brobridge/grafana-util/releases)
-- [Report an issue](https://github.com/kenduest-brobridge/grafana-util/issues)
+## Complete Reference
+
+When you need full coverage rather than a curated starting path, use the complete source surfaces here.
+
+### Read the full handbook
+
+Use the handbook when you want chapters, operating context, and recommended reading order.
+
+- [Operator Handbook](../user-guide/en/index.md)
+
+### Read the full command reference
+
+Use the command reference when you need per-command pages, subcommand routing, and stable syntax lookup.
+
+- [Command Reference](../commands/en/index.md)
+- [grafana-util(1)](../html/man/grafana-util.html)
+
+### Check source and releases
+
+Use the repository when you need change history, release notes, or issue tracking rather than operator docs.
+
+- [GitHub repository](https://github.com/kenduest-brobridge/grafana-util)
+- [GitHub releases](https://github.com/kenduest-brobridge/grafana-util/releases)
+- [Issue tracker](https://github.com/kenduest-brobridge/grafana-util/issues)
 
 ## Maintainer
 
-Internal maintainer docs stay separate from the public handbook.
+Maintainer guidance stays in the repository docs rather than the public handbook.
 
 - [Developer guide](../DEVELOPER.md)

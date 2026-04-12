@@ -204,10 +204,10 @@ def render_version_portal(
             "lang": "en",
             "hero_title": "grafana-util Versioned Docs",
             "hero_summary": "Pick the release line you need, switch into the right language, and open handbook, command, or manpage outputs from one portal.",
-            "search_heading": "Choose a docs lane",
-            "search_copy": "Use quick jump for the latest release, the dev preview, or a specific release line.",
-            "search_placeholder": "Jump to latest, dev, or a release line",
-            "search_button": "Open",
+            "hero_links_html": "".join(
+                f'<a class="landing-hero-link" href="{html.escape(href)}">{html.escape(label)}</a>'
+                for label, href in lane_links_en[:2]
+            ),
             "sections_html": "".join(
                 [
                     render_section(
@@ -256,10 +256,10 @@ def render_version_portal(
             "lang": "zh-TW",
             "hero_title": "grafana-util 版本文件入口",
             "hero_summary": "先選版本線，再進入對應語言的手冊、指令說明或 manpage HTML，不用在首頁自己猜路徑。",
-            "search_heading": "選擇文件版本線",
-            "search_copy": "可直接跳到最新版本、開發預覽，或指定的 release line。",
-            "search_placeholder": "快速跳到最新版本、開發預覽或指定版本",
-            "search_button": "開啟",
+            "hero_links_html": "".join(
+                f'<a class="landing-hero-link" href="{html.escape(href)}">{html.escape(label)}</a>'
+                for label, href in lane_links_zh[:2]
+            ),
             "sections_html": "".join(
                 [
                     render_section(
@@ -312,15 +312,8 @@ def render_version_portal(
         '<div class="landing-hero-inner">'
         f'<h1 id="landing-title" class="landing-title">{html.escape(portal_data[default_locale]["hero_title"])}</h1>'
         f'<p id="landing-summary" class="landing-summary">{html.escape(portal_data[default_locale]["hero_summary"])}</p>'
+        f'<div id="landing-hero-links">{portal_data[default_locale]["hero_links_html"]}</div>'
         '</div>'
-        '<section class="landing-search-panel">'
-        f'<h2 id="landing-search-heading">{html.escape(portal_data[default_locale]["search_heading"])}</h2>'
-        f'<p id="landing-search-copy">{html.escape(portal_data[default_locale]["search_copy"])}</p>'
-        '<form id="landing-search-form" class="landing-search-form">'
-        f'<input id="landing-search" class="landing-search-input" type="search" placeholder="{html.escape(portal_data[default_locale]["search_placeholder"])}" aria-label="{html.escape(portal_data[default_locale]["search_placeholder"])}" />'
-        f'<button id="landing-search-button" class="landing-search-button" type="submit">{html.escape(portal_data[default_locale]["search_button"])}</button>'
-        '</form>'
-        '</section>'
         '</section>'
         f'<div id="landing-sections" class="landing-sections">{portal_data[default_locale]["sections_html"]}</div>'
         f'<div id="landing-meta" class="landing-meta">{portal_data[default_locale]["meta_html"]}</div>'

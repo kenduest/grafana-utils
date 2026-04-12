@@ -76,34 +76,16 @@ behavior or compatibility rules.
 
 ## Core Workflow
 
-### 1. Ingest
+The working sequence stays:
 
-When new information enters the repo, the agent should update the right layer
-instead of only editing the first file it touched.
+1. ingest the change into the right owning layer
+2. query the repo through the current maintainer routing
+3. lint for code/help/docs/spec/generated-output drift
+4. review the actual diff and validations before accepting the change
 
-Typical ingest cases:
-
-- runtime behavior changed
-- help text or CLI examples changed
-- docs-generator behavior changed
-- a stable schema or contract changed
-- a maintainer-facing route or ownership boundary changed
-
-Expected companion updates:
-
-- runtime behavior change:
-  - code, focused tests, and the public docs or help text that describe the
-    behavior
-- contract change:
-  - code, focused tests, and the owning current contract doc in
-    `docs/internal/`
-- docs-generator change:
-  - source docs or generator code, regenerated outputs when required, the
-    generated-docs architecture or playbook if the workflow changed, and
-    `scripts/contracts/command-surface.json` when public command paths or docs
-    routing changed
-- maintainer-routing change:
-  - the owning internal maintainer docs, not just one local note
+For stable closure rules around companion updates, maintainer routing sync,
+source-of-truth boundaries, and stop-and-ask conditions, use
+`docs/internal/ai-change-closure-rules.md`.
 
 ### Architecture Consistency Pass
 
@@ -141,7 +123,7 @@ Use this pass to answer:
 If the answer is unclear, stop and resolve it against the owning docs before
 editing code or docs.
 
-### 2. Query
+## Query
 
 An agent should query the repo through the maintainer routing first.
 
@@ -155,7 +137,7 @@ Default read order:
 The goal is not to read everything. The goal is to reach the current source of
 truth quickly enough to make a safe change.
 
-### 3. Lint
+## Lint
 
 AI-assisted work should include a consistency pass before handoff.
 
@@ -175,25 +157,6 @@ The repo already has concrete lint-style checks:
 - focused parser/help tests
 - `cargo test` and Python unittest coverage
 - `git diff --check`
-
-## Source-Of-Truth Rules
-
-Use these boundaries consistently:
-
-- `rust/src/` is the maintained implementation surface
-- `python/grafana_utils/` is legacy reference unless the task is explicitly in
-  scope there
-- `docs/user-guide/{en,zh-TW}/` is the handbook source layer
-- `docs/commands/{en,zh-TW}/` is the command-reference source layer
-- `docs/man/` and `docs/html/` are generated artifacts
-- `docs/internal/*.md` should stay split by purpose:
-  - summary in `docs/DEVELOPER.md`
-  - spec in the dedicated current contract or architecture docs
-  - trace in `docs/internal/ai-status.md` and `docs/internal/ai-changes.md`
-
-If an AI agent edits a generated artifact without updating its source layer, the
-change is incomplete unless the task is explicitly about generated output
-debugging.
 
 ## Review-First Rule
 
@@ -264,18 +227,6 @@ Source-of-truth files: rust/src/dashboard/, docs/commands/en/, docs/commands/zh-
 Expected companion updates: parser/help tests, command docs, regenerated man/html if docs text changes
 Validation: cd rust && cargo test --quiet; make man-check; make html-check
 ```
-
-## When The Agent Should Stop And Ask
-
-The agent should not guess when:
-
-- two current contract docs appear to disagree
-- a change would redefine a stable field or compatibility rule
-- the task conflicts with unrelated user changes already in the worktree
-- generated docs and source docs disagree, but the intended truth source is not
-  obvious
-- the narrow validation path fails in unrelated parts of the repo and the risk
-  is no longer local
 
 ## Minimal Working Loop
 

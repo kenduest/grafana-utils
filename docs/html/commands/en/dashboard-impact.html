@@ -636,14 +636,12 @@ html[lang="zh-TW"] .sidebar { font-family: var(--font-zh); letter-spacing: 0; }
   padding: 12px 0 20px;
 }
 .landing-hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1.14fr) minmax(360px, 0.86fr);
-  gap: 34px;
+  display: block;
   align-items: start;
   padding: 8px 0 22px;
 }
 .landing-hero-inner {
-  max-width: 60rem;
+  max-width: 56rem;
 }
 .landing-eyebrow {
   margin: 0 0 10px;
@@ -665,72 +663,32 @@ html[lang="zh-TW"] .sidebar { font-family: var(--font-zh); letter-spacing: 0; }
   line-height: 1.68;
   color: var(--text);
 }
-.landing-search-panel {
-  padding: 14px 16px 16px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--panel-strong);
-}
-.landing-search-panel h2 {
-  margin: 0 0 8px;
-  font-size: 1.02rem;
-  letter-spacing: -0.02em;
-}
-.landing-search-panel p {
-  margin: 0 0 16px;
-  font-size: 0.9rem;
-  line-height: 1.62;
-  color: var(--muted);
-}
-.landing-search-form {
+.landing-hero-actions {
   display: flex;
-  flex-direction: row;
+  flex-wrap: wrap;
   gap: 12px;
   align-items: center;
-  max-width: 100%;
+  margin-top: 18px;
 }
-.landing-search-input {
-  flex: 1;
-  min-height: 48px;
-  padding: 0 16px;
-  border: 1px solid var(--input-border);
-  border-radius: 14px;
-  background: var(--input-bg);
-  color: var(--input-text);
-  font: 500 1rem var(--font-sans);
+.landing-hero-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 42px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  background: var(--panel-strong);
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
 }
-.landing-search-input::placeholder {
-  color: var(--muted);
-}
-.landing-search-input:focus {
-  outline: none;
+.landing-hero-link:hover,
+.landing-hero-link:focus-visible {
   border-color: var(--accent);
-}
-.landing-search-button {
-  min-height: 46px;
-  padding: 0 18px;
-  border: 1px solid var(--cta-border);
-  border-radius: 14px;
-  background: var(--cta-bg);
-  color: var(--cta-text);
-  font: 700 0.95rem var(--font-sans);
-  cursor: pointer;
-  flex: 0 0 auto;
-  align-self: center;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-  transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.15s;
-}
-.landing-search-button:hover {
-  background: color-mix(in srgb, var(--cta-bg) 84%, white);
-  border-color: color-mix(in srgb, var(--cta-border) 78%, white);
-}
-.landing-search-button:focus-visible {
+  color: var(--accent);
   outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-.landing-search-button:active {
-  transform: translateY(1px);
 }
 .landing-sections {
   display: grid;
@@ -785,14 +743,9 @@ html[lang="zh-TW"] .sidebar { font-family: var(--font-zh); letter-spacing: 0; }
 html[data-theme="dark"] .landing-hero {
   border-bottom: 0;
 }
-html[data-theme="dark"] .landing-search-panel {
+html[data-theme="dark"] .landing-hero-link {
   background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
-}
-html[data-theme="dark"] .landing-search-input::placeholder {
-  color: color-mix(in srgb, var(--muted) 82%, white);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
 }
 html[data-theme="dark"] .landing-sections {
   gap: 24px;
@@ -811,10 +764,6 @@ html[data-theme="dark"] .landing-meta {
   border-top-color: var(--border);
 }
 @media (max-width: 980px) {
-  .landing-hero {
-    grid-template-columns: 1fr;
-    gap: 18px;
-  }
   .landing-hero-inner {
     max-width: none;
   }
@@ -907,8 +856,6 @@ html[data-theme="dark"] .landing-meta {
     margin: 0;
   }
   .landing-hero {
-    grid-template-columns: 1fr;
-    gap: 20px;
     padding: 20px 0 24px;
   }
   .landing-hero-inner {
@@ -918,12 +865,12 @@ html[data-theme="dark"] .landing-meta {
     font-size: 1.05rem;
     white-space: normal;
   }
-  .landing-search-form {
+  .landing-hero-actions {
     align-items: stretch;
   }
-  .landing-search-button {
+  .landing-hero-link {
     width: 100%;
-    align-self: stretch;
+    justify-content: center;
   }
   .landing-panel {
     padding: 0;
@@ -1114,13 +1061,9 @@ grafana-util dashboard impact \
 
   const landingI18n = document.getElementById("landing-i18n");
   const localeSelect = document.getElementById("locale-select");
-  const landingSearchForm = document.getElementById("landing-search-form");
-  const landingSearchInput = document.getElementById("landing-search");
-  const landingSearchButton = document.getElementById("landing-search-button");
   const landingTitle = document.getElementById("landing-title");
   const landingSummary = document.getElementById("landing-summary");
-  const landingSearchHeading = document.getElementById("landing-search-heading");
-  const landingSearchCopy = document.getElementById("landing-search-copy");
+  const landingHeroLinks = document.getElementById("landing-hero-links");
   const landingSections = document.getElementById("landing-sections");
   const landingMeta = document.getElementById("landing-meta");
   if(landingI18n) {
@@ -1162,13 +1105,7 @@ grafana-util dashboard impact \
       if(localeSelect) localeSelect.value = mode;
       if(landingTitle) landingTitle.textContent = copy.hero_title;
       if(landingSummary) landingSummary.textContent = copy.hero_summary;
-      if(landingSearchHeading) landingSearchHeading.textContent = copy.search_heading;
-      if(landingSearchCopy) landingSearchCopy.textContent = copy.search_copy;
-      if(landingSearchInput) {
-        landingSearchInput.placeholder = copy.search_placeholder;
-        landingSearchInput.setAttribute("aria-label", copy.search_placeholder);
-      }
-      if(landingSearchButton) landingSearchButton.textContent = copy.search_button;
+      if(landingHeroLinks) landingHeroLinks.innerHTML = copy.hero_links_html;
       if(landingSections) landingSections.innerHTML = copy.sections_html;
       if(landingMeta) landingMeta.innerHTML = copy.meta_html;
       if(jumpSelect) jumpSelect.innerHTML = copy.jump_options_html;
@@ -1187,19 +1124,6 @@ grafana-util dashboard impact \
     window.addEventListener("hashchange", () => {
       const hashMode = readLandingModeFromHash();
       if(hashMode) applyLandingLocale(hashMode, {persist: true, syncHash: false});
-    });
-  }
-
-  if(landingSearchForm && landingSearchInput && jumpSelect) {
-    landingSearchForm.addEventListener("submit", (event) => {
-      event.preventDefault();
-      const query = landingSearchInput.value.trim().toLowerCase();
-      if(!query) return;
-      const options = [...jumpSelect.querySelectorAll("option")].filter((option) => option.value);
-      const exact = options.find((option) => option.textContent.toLowerCase().includes(query));
-      const fuzzy = options.find((option) => option.value.toLowerCase().includes(query.replace(/\s+/g, "-")));
-      const target = exact || fuzzy;
-      if(target) window.location.href = target.value;
     });
   }
 

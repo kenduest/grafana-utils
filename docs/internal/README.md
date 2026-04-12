@@ -17,6 +17,8 @@ backlogs, market analysis, and progress snapshots have been moved into
   - task-oriented maintainer recipes for common generated-docs changes
 - `ai-workflow-note.md`
   - repo-specific workflow note for AI-assisted maintenance
+- `ai-change-closure-rules.md`
+  - stable companion-update, source-of-truth, and maintainer-routing closure rules for AI-assisted changes
 - `task-brief-template.md`
   - reusable task brief shape for solo or collaborative AI-assisted work
 - `zh-tw-style-guide.md`
@@ -53,6 +55,7 @@ backlogs, market analysis, and progress snapshots have been moved into
 - `generated-docs-architecture.md` -> source/output model, generator split, and generated-docs design rules
 - `generated-docs-playbook.md` -> maintainer cookbook for adding docs pages, locales, outputs, and manpage coverage
 - `ai-workflow-note.md` -> repo-shaped AI workflow, source-of-truth boundaries, and agent task-brief expectations
+- `ai-change-closure-rules.md` -> stable closure rules for companion updates, maintainer-router sync, source-of-truth boundaries, and stop-and-ask conditions
 - `task-brief-template.md` -> minimal task handoff template for chat prompts, issues, or PR descriptions
 - `.github/ISSUE_TEMPLATE/ai-task-brief.md` -> GitHub issue form for the same task brief fields
 - `.github/PULL_REQUEST_TEMPLATE.md` -> GitHub PR template for review-time task context

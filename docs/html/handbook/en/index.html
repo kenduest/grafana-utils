@@ -636,14 +636,12 @@ html[lang="zh-TW"] .sidebar { font-family: var(--font-zh); letter-spacing: 0; }
   padding: 12px 0 20px;
 }
 .landing-hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1.14fr) minmax(360px, 0.86fr);
-  gap: 34px;
+  display: block;
   align-items: start;
   padding: 8px 0 22px;
 }
 .landing-hero-inner {
-  max-width: 60rem;
+  max-width: 56rem;
 }
 .landing-eyebrow {
   margin: 0 0 10px;
@@ -665,72 +663,32 @@ html[lang="zh-TW"] .sidebar { font-family: var(--font-zh); letter-spacing: 0; }
   line-height: 1.68;
   color: var(--text);
 }
-.landing-search-panel {
-  padding: 14px 16px 16px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--panel-strong);
-}
-.landing-search-panel h2 {
-  margin: 0 0 8px;
-  font-size: 1.02rem;
-  letter-spacing: -0.02em;
-}
-.landing-search-panel p {
-  margin: 0 0 16px;
-  font-size: 0.9rem;
-  line-height: 1.62;
-  color: var(--muted);
-}
-.landing-search-form {
+.landing-hero-actions {
   display: flex;
-  flex-direction: row;
+  flex-wrap: wrap;
   gap: 12px;
   align-items: center;
-  max-width: 100%;
+  margin-top: 18px;
 }
-.landing-search-input {
-  flex: 1;
-  min-height: 48px;
-  padding: 0 16px;
-  border: 1px solid var(--input-border);
-  border-radius: 14px;
-  background: var(--input-bg);
-  color: var(--input-text);
-  font: 500 1rem var(--font-sans);
+.landing-hero-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 42px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  background: var(--panel-strong);
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
 }
-.landing-search-input::placeholder {
-  color: var(--muted);
-}
-.landing-search-input:focus {
-  outline: none;
+.landing-hero-link:hover,
+.landing-hero-link:focus-visible {
   border-color: var(--accent);
-}
-.landing-search-button {
-  min-height: 46px;
-  padding: 0 18px;
-  border: 1px solid var(--cta-border);
-  border-radius: 14px;
-  background: var(--cta-bg);
-  color: var(--cta-text);
-  font: 700 0.95rem var(--font-sans);
-  cursor: pointer;
-  flex: 0 0 auto;
-  align-self: center;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-  transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.15s;
-}
-.landing-search-button:hover {
-  background: color-mix(in srgb, var(--cta-bg) 84%, white);
-  border-color: color-mix(in srgb, var(--cta-border) 78%, white);
-}
-.landing-search-button:focus-visible {
+  color: var(--accent);
   outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-.landing-search-button:active {
-  transform: translateY(1px);
 }
 .landing-sections {
   display: grid;
@@ -785,14 +743,9 @@ html[lang="zh-TW"] .sidebar { font-family: var(--font-zh); letter-spacing: 0; }
 html[data-theme="dark"] .landing-hero {
   border-bottom: 0;
 }
-html[data-theme="dark"] .landing-search-panel {
+html[data-theme="dark"] .landing-hero-link {
   background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
-}
-html[data-theme="dark"] .landing-search-input::placeholder {
-  color: color-mix(in srgb, var(--muted) 82%, white);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
 }
 html[data-theme="dark"] .landing-sections {
   gap: 24px;
@@ -811,10 +764,6 @@ html[data-theme="dark"] .landing-meta {
   border-top-color: var(--border);
 }
 @media (max-width: 980px) {
-  .landing-hero {
-    grid-template-columns: 1fr;
-    gap: 18px;
-  }
   .landing-hero-inner {
     max-width: none;
   }
@@ -907,8 +856,6 @@ html[data-theme="dark"] .landing-meta {
     margin: 0;
   }
   .landing-hero {
-    grid-template-columns: 1fr;
-    gap: 20px;
     padding: 20px 0 24px;
   }
   .landing-hero-inner {
@@ -918,12 +865,12 @@ html[data-theme="dark"] .landing-meta {
     font-size: 1.05rem;
     white-space: normal;
   }
-  .landing-search-form {
+  .landing-hero-actions {
     align-items: stretch;
   }
-  .landing-search-button {
+  .landing-hero-link {
     width: 100%;
-    align-self: stretch;
+    justify-content: center;
   }
   .landing-panel {
     padding: 0;
@@ -977,59 +924,30 @@ code[class*="language-"],pre[class*="language-"]{color:#ccc;background:none;font
 
 <section class="handbook-command-map"><h2 id="command-relationships">Command Relationships</h2><div class="handbook-command-map-panel"><div class="nav-group nav-command-group"><button class="nav-group-header" type="button" aria-expanded="true"><span class="nav-group-title-text">First-Run Path</span><span class="nav-group-caret" aria-hidden="true">▾</span></button><div class="nav-sub-list nav-command-sub-list"><ul class="nav-command-tree"><li class="nav-command-link"><a href="../../commands/en/version.html" class="nav-command-leaf-link">--version</a></li><li class="nav-command-link"><a href="../../commands/en/status.html" class="nav-command-leaf-link">status live</a></li><li class="nav-command-link"><a href="../../commands/en/profile.html" class="nav-command-leaf-link">config profile add</a></li></ul></div></div></div></section><h2 id="language">Language</h2>
 <ul><li>English handbook: <a href="index.html">current page</a></li><li>Traditional Chinese handbook: <a href="../zh-TW/index.html">繁體中文手冊</a></li><li>English command reference: <a href="../../commands/en/index.html">Command Reference</a></li><li>Traditional Chinese command reference: <a href="../../commands/zh-TW/index.html">指令參考</a></li></ul>
-<p>Welcome to the <code>grafana-util</code> handbook. Start here if you need a practical operator path from first connection, to repeatable profiles, to day-to-day Grafana maintenance and automation.</p>
-<p><code>grafana-util</code> is a personal long-term tool built around real Grafana maintenance pain. This handbook is written from that same angle: not &quot;how to expose every API surface&quot;, but how to move through inventory, inspection, review, migration, and safer live changes without rebuilding the workflow every time.</p>
-<p>This handbook is organized around the way operators actually work: first understand what the tool is for, then get a safe connection working, then move into <code>status</code>, <code>export</code>, <code>workspace</code>, <code>config</code>, and task-specific workflows.</p>
-<p>If you want the high-level framing first, including the pain points this tool is meant to solve and when it is the right fit, start here:</p>
-<ul><li><a href="what-is-grafana-util.html">What grafana-util is for</a></li></ul>
-<h2 id="before-after">Before / After</h2>
-<ul><li>Before: you had to guess which chapter to open when you wanted to understand the workflow.</li><li>After: start with the purpose page, then choose the handbook path that matches your role.</li></ul>
-<h2 id="what-success-looks-like">What success looks like</h2>
-<ul><li>You know which chapter to open for your current task.</li><li>You can separate the handbook from the exact command reference.</li><li>You can move from first read-only checks into the right workflow lane without guessing.</li></ul>
-<h2 id="failure-checks">Failure checks</h2>
-<ul><li>If you still do not know whether you need dashboard, alert, access, or workspace guidance, stop at the purpose page and read the role map first.</li><li>If the first live read fails, fix connection or auth before opening mutation chapters.</li><li>If you only need exact flags, switch to the command docs instead of trying to infer them from the handbook.</li></ul>
-<h2 id="30-second-quick-start">30-Second Quick Start</h2>
-<p>Get from zero to a first install check, connectivity check, and estate-level overview in three commands.</p>
-<h3 id="1-install-global-binary">1. Install (Global Binary)</h3>
-<pre><code># Downloads and installs the latest version to your local bin directory
-curl -sSL https://raw.githubusercontent.com/kenduest-brobridge/grafana-util/main/scripts/install.sh | sh</code></pre>
-<h3 id="2-confirm-the-installed-version">2. Confirm the Installed Version</h3>
-<pre><code># Purpose: 2. Confirm the Installed Version.
-grafana-util --version</code></pre>
-<h3 id="3-run-your-first-live-overview">3. Run Your First Live Overview</h3>
-<pre><code># Generates a high-level health and inventory report of your Grafana estate
-grafana-util status overview live --url http://localhost:3000 --basic-user admin --prompt-password --output-format interactive</code></pre>
-<p><strong>Why this matters:</strong> In 30 seconds, you have confirmed connectivity, checked dashboards and alerts, and found the first obvious data source problems before you make changes.</p>
-<h2 id="which-command-should-i-use">Which command should I use?</h2>
-<table><thead><tr><th>Need</th><th>Start with</th></tr></thead><tbody><tr><td>Check that Grafana is reachable</td><td><code>grafana-util status live</code></td></tr><tr><td>See the live estate as a human</td><td><code>grafana-util status overview live</code></td></tr><tr><td>Save connection defaults</td><td><code>grafana-util config profile</code></td></tr><tr><td>Export a backup</td><td><code>grafana-util export dashboard</code> / <code>export alert</code> / <code>export datasource</code></td></tr><tr><td>Review a local change package</td><td><code>grafana-util workspace scan</code> then <code>workspace preview</code></td></tr><tr><td>Inspect dashboards deeply</td><td><code>grafana-util dashboard summary</code> / <code>dashboard diff</code></td></tr><tr><td>Manage users, teams, orgs, or service accounts</td><td><code>grafana-util access ...</code></td></tr></tbody></table>
-<h2 id="navigation-map">Navigation Map</h2>
-<h3 id="phase-1-foundation">Phase 1: Foundation</h3>
-<ul><li><strong><a href="what-is-grafana-util.html">What grafana-util is for</a></strong>: Start with the problems it solves and the operator workflows it is meant to support.</li><li><strong><a href="getting-started.html">Getting Started</a></strong>: Installation, connection setup, profiles, and auth options.</li><li><strong><a href="role-new-user.html">New User Path</a></strong>: The shortest safe path from install to first successful live read.</li><li><strong><a href="role-sre-ops.html">SRE / Ops Path</a></strong>: The operator path for day-to-day governance, review-first workspace flows, and troubleshooting.</li><li><strong><a href="role-automation-ci.html">Automation / CI Path</a></strong>: The profile, output, and command-reference path for scripting and automation.</li><li><strong><a href="architecture.html">Architecture &amp; Design Principles</a></strong>: The reasoning behind the workflow and command design.</li></ul>
-<h3 id="phase-2-core-asset-management">Phase 2: Core Asset Management</h3>
-<ul><li><strong><a href="dashboard.html">Dashboard Management</a></strong>: Export, import, inspection, screenshots, and governance checks for dashboard assets.</li><li><strong><a href="datasource.html">Data source Management</a></strong>: Export, import, inspection, and live mutation guidance for Grafana data sources.</li><li><strong><a href="alert.html">Alerting Governance</a></strong>: Review, planning, and apply flow for Grafana alerts.</li></ul>
-<h3 id="phase-3-identity-access">Phase 3: Identity &amp; Access</h3>
-<ul><li><strong><a href="access.html">Access Management</a></strong>: org, user, team, and service account operations.</li></ul>
-<h3 id="phase-4-governance-readiness">Phase 4: Governance &amp; Readiness</h3>
-<ul><li><strong><a href="status-workspace.html">Workspace Review &amp; Status</a></strong>: staged workflows, project snapshots, and readiness checks.</li></ul>
-<h3 id="phase-5-deep-dive">Phase 5: Deep Dive</h3>
-<ul><li><strong><a href="scenarios.html">Practical Scenarios</a></strong>: end-to-end task recipes such as backups, DR, and audits.</li><li><strong><a href="recipes.html">Best Practices &amp; Recipes</a></strong>: recommended ways to handle common Grafana operator problems.</li><li><strong><a href="reference.html">Technical Reference</a></strong>: command map, profile behavior, auth handling, common flags, and output guidance.</li><li><strong><a href="diff-json-contract.html">Shared Diff JSON Contract</a></strong>: the common JSON envelope and row fields used by dashboard, alert, and datasource diff outputs.</li><li><strong><a href="../../commands/en/index.html">Command Reference</a></strong>: One page per command and subcommand, aligned to the current Rust CLI help.</li><li><strong><a href="troubleshooting.html">Troubleshooting &amp; Glossary</a></strong>: Diagnostic guides and terminology index.</li></ul>
-<h2 id="choose-your-role">Choose Your Role</h2>
-<p>Different readers usually need different paths through the handbook:</p>
-<p>Start with <a href="what-is-grafana-util.html">What grafana-util is for</a>, then <a href="role-new-user.html">New User Path</a>, then <a href="getting-started.html">Getting Started</a>, then open the <a href="../../commands/en/index.html">Command Reference</a> when you need exact flags.</p>
-<p>Start with <a href="role-sre-ops.html">SRE / Ops Path</a>, then <a href="status-workspace.html">Workspace Review &amp; Status</a>, <a href="dashboard.html">Dashboard Management</a>, <a href="datasource.html">Data source Management</a>, and <a href="troubleshooting.html">Troubleshooting</a>.</p>
-<p>Start with <a href="access.html">Access Management</a>, then <a href="reference.html">Technical Reference</a>, then the <a href="../../commands/en/index.html">Command Reference</a>.</p>
-<p>Start with <a href="role-automation-ci.html">Automation / CI Path</a>, then <a href="reference.html">Technical Reference</a>, then the <a href="../../commands/en/index.html">Command Reference</a>, then validate exact terminal lookup with the top-level manpage at <code>docs/man/grafana-util.1</code>.</p>
-<p>Start with <a href="../../developer.html">docs/DEVELOPER.md</a>, then <a href="../../internal/maintainer-role-map.md">maintainer-role-map.md</a>, then the internal design and playbook docs under <a href="../../internal/README.md">docs/internal/README.md</a>.</p>
-<ul><li><strong>New user</strong></li><li><strong>SRE / operator</strong></li><li><strong>Identity / access administrator</strong></li><li><strong>Automation / CI owner</strong></li><li><strong>Maintainer / architect</strong></li></ul>
-<h2 id="how-to-use-this-guide">How to use this guide</h2>
-<p>If you are new, start with <strong>What grafana-util is for</strong>, then <strong>Getting Started</strong>, then follow the <strong>Next Page</strong> links at the bottom of each chapter.</p>
-<p><strong>Next Step</strong>: <a href="what-is-grafana-util.html">What grafana-util is for</a></p>
+<p>This handbook is the reading path for <code>grafana-util</code>. Start here when you want the workflow first and the exact syntax later. If you already know the command family or flag you need, switch to the command reference instead of forcing the handbook to do that job.</p>
+<h2 id="how-to-read-this-handbook">How to read this handbook</h2>
+<ol><li>Start with what the tool is for.</li><li>Read the getting started chapter.</li><li>Choose the role or task chapter that matches your work.</li><li>Switch to the command reference when you need exact subcommands or flags.</li></ol>
+<h2 id="book-map">Book map</h2>
+<h3 id="part-1-start-here">Part 1: Start here</h3>
+<ul><li><a href="what-is-grafana-util.html">What grafana-util is for</a></li><li><a href="getting-started.html">Getting Started</a></li></ul>
+<h3 id="part-2-role-paths">Part 2: Role paths</h3>
+<ul><li><a href="role-new-user.html">New User Path</a></li><li><a href="role-sre-ops.html">SRE / Ops Path</a></li><li><a href="role-automation-ci.html">Automation / CI Path</a></li></ul>
+<h3 id="part-3-operation-surfaces">Part 3: Operation surfaces</h3>
+<ul><li><a href="status-workspace.html">Workspace Review &amp; Status</a></li><li><a href="dashboard.html">Dashboard Management</a></li><li><a href="datasource.html">Data source Management</a></li><li><a href="alert.html">Alerting Governance</a></li><li><a href="access.html">Access Management</a></li></ul>
+<h3 id="part-4-design-principles">Part 4: Design principles</h3>
+<ul><li><a href="architecture.html">Architecture &amp; Design Principles</a></li></ul>
+<h3 id="part-5-reference-and-troubleshooting">Part 5: Reference and troubleshooting</h3>
+<ul><li><a href="scenarios.html">Practical Scenarios</a></li><li><a href="recipes.html">Best Practices &amp; Recipes</a></li><li><a href="reference.html">Technical Reference</a></li><li><a href="troubleshooting.html">Troubleshooting &amp; Glossary</a></li></ul>
+<h2 id="reading-by-role">Reading by role</h2>
+<ul><li>New user: start with <a href="what-is-grafana-util.html">What grafana-util is for</a>, then <a href="role-new-user.html">New User Path</a>, then <a href="getting-started.html">Getting Started</a>.</li><li>SRE / operator: start with <a href="role-sre-ops.html">SRE / Ops Path</a>, then <a href="status-workspace.html">Workspace Review &amp; Status</a>, <a href="dashboard.html">Dashboard Management</a>, <a href="datasource.html">Data source Management</a>, and <a href="troubleshooting.html">Troubleshooting &amp; Glossary</a>.</li><li>Identity / access administrator: start with <a href="access.html">Access Management</a>, then <a href="reference.html">Technical Reference</a>, then the <a href="../../commands/en/index.html">Command Reference</a>.</li><li>Automation / CI owner: start with <a href="role-automation-ci.html">Automation / CI Path</a>, then <a href="reference.html">Technical Reference</a>, then the <a href="../../commands/en/index.html">Command Reference</a>.</li><li>Maintainer / architect: start with <a href="architecture.html">Architecture &amp; Design Principles</a>, then <a href="../../developer.html">Developer guide</a>, then the internal docs under <a href="../../internal/README.md">docs/internal/README.md</a>.</li></ul>
+<h2 id="reading-notes">Reading notes</h2>
+<ul><li>The footer <code>Next</code> and <code>Previous</code> links are the intended way to continue chapter by chapter.</li><li>Use the handbook for process and context; use the command reference for exact syntax.</li><li>When you need terminal-shaped lookup, open the command reference or the manpage instead of reconstructing flags from memory.</li></ul>
 <nav class="footer-nav"><a class="link-card" href="what-is-grafana-util.html"><span>Next Chapter</span>Chapter 2 · What grafana-util is for</a></nav>
 </article>
 <aside class="sidebar">
   <button class="sidebar-toggle sidebar-toggle-right" type="button" aria-expanded="true" aria-label="Toggle page sidebar">▶</button>
   <div class="sidebar-content">
-    <section class="sidebar-section"><h2>On This Page</h2><ul class="toc-list"><li class="toc-level-2"><a href="#command-relationships"><span class="toc-label">Command Relationships</span></a></li><li class="toc-level-2"><a href="#language"><span class="toc-label">Language</span></a></li><li class="toc-level-2"><a href="#before-after"><span class="toc-label">Before / After</span></a></li><li class="toc-level-2"><a href="#what-success-looks-like"><span class="toc-label">What success looks like</span></a></li><li class="toc-level-2"><a href="#failure-checks"><span class="toc-label">Failure checks</span></a></li><li class="toc-level-2"><a href="#30-second-quick-start"><span class="toc-label">30-Second Quick Start</span></a></li><li class="toc-level-3"><a href="#1-install-global-binary"><span class="toc-label">1. Install (Global Binary)</span></a></li><li class="toc-level-3"><a href="#2-confirm-the-installed-version"><span class="toc-label">2. Confirm the Installed Version</span></a></li><li class="toc-level-3"><a href="#3-run-your-first-live-overview"><span class="toc-label">3. Run Your First Live Overview</span></a></li><li class="toc-level-2"><a href="#which-command-should-i-use"><span class="toc-label">Which command should I use?</span></a></li><li class="toc-level-2"><a href="#navigation-map"><span class="toc-label">Navigation Map</span></a></li><li class="toc-level-3"><a href="#phase-1-foundation"><span class="toc-label">Phase 1: Foundation</span></a></li><li class="toc-level-3"><a href="#phase-2-core-asset-management"><span class="toc-label">Phase 2: Core Asset Management</span></a></li><li class="toc-level-3"><a href="#phase-3-identity-access"><span class="toc-label">Phase 3: Identity &amp; Access</span></a></li><li class="toc-level-3"><a href="#phase-4-governance-readiness"><span class="toc-label">Phase 4: Governance &amp; Readiness</span></a></li><li class="toc-level-3"><a href="#phase-5-deep-dive"><span class="toc-label">Phase 5: Deep Dive</span></a></li><li class="toc-level-2"><a href="#choose-your-role"><span class="toc-label">Choose Your Role</span></a></li><li class="toc-level-2"><a href="#how-to-use-this-guide"><span class="toc-label">How to use this guide</span></a></li></ul></section><section class="sidebar-section"><h2>Version</h2><p class="sidebar-meta-text">Current checkout</p></section><section class="sidebar-section"><h2>Language</h2><ul class="sidebar-meta-list"><li><a href="#" class="sidebar-meta-link sidebar-meta-current">Current: English</a></li><li><a href="../zh-TW/index.html" class="sidebar-meta-link">Switch to 繁體中文</a></li></ul></section>
+    <section class="sidebar-section"><h2>On This Page</h2><ul class="toc-list"><li class="toc-level-2"><a href="#command-relationships"><span class="toc-label">Command Relationships</span></a></li><li class="toc-level-2"><a href="#language"><span class="toc-label">Language</span></a></li><li class="toc-level-2"><a href="#how-to-read-this-handbook"><span class="toc-label">How to read this handbook</span></a></li><li class="toc-level-2"><a href="#book-map"><span class="toc-label">Book map</span></a></li><li class="toc-level-3"><a href="#part-1-start-here"><span class="toc-label">Part 1: Start here</span></a></li><li class="toc-level-3"><a href="#part-2-role-paths"><span class="toc-label">Part 2: Role paths</span></a></li><li class="toc-level-3"><a href="#part-3-operation-surfaces"><span class="toc-label">Part 3: Operation surfaces</span></a></li><li class="toc-level-3"><a href="#part-4-design-principles"><span class="toc-label">Part 4: Design principles</span></a></li><li class="toc-level-3"><a href="#part-5-reference-and-troubleshooting"><span class="toc-label">Part 5: Reference and troubleshooting</span></a></li><li class="toc-level-2"><a href="#reading-by-role"><span class="toc-label">Reading by role</span></a></li><li class="toc-level-2"><a href="#reading-notes"><span class="toc-label">Reading notes</span></a></li></ul></section><section class="sidebar-section"><h2>Version</h2><p class="sidebar-meta-text">Current checkout</p></section><section class="sidebar-section"><h2>Language</h2><ul class="sidebar-meta-list"><li><a href="#" class="sidebar-meta-link sidebar-meta-current">Current: English</a></li><li><a href="../zh-TW/index.html" class="sidebar-meta-link">Switch to 繁體中文</a></li></ul></section>
   </div>
 </aside>
 
@@ -1108,13 +1026,9 @@ grafana-util status overview live --url http://localhost:3000 --basic-user admin
 
   const landingI18n = document.getElementById("landing-i18n");
   const localeSelect = document.getElementById("locale-select");
-  const landingSearchForm = document.getElementById("landing-search-form");
-  const landingSearchInput = document.getElementById("landing-search");
-  const landingSearchButton = document.getElementById("landing-search-button");
   const landingTitle = document.getElementById("landing-title");
   const landingSummary = document.getElementById("landing-summary");
-  const landingSearchHeading = document.getElementById("landing-search-heading");
-  const landingSearchCopy = document.getElementById("landing-search-copy");
+  const landingHeroLinks = document.getElementById("landing-hero-links");
   const landingSections = document.getElementById("landing-sections");
   const landingMeta = document.getElementById("landing-meta");
   if(landingI18n) {
@@ -1156,13 +1070,7 @@ grafana-util status overview live --url http://localhost:3000 --basic-user admin
       if(localeSelect) localeSelect.value = mode;
       if(landingTitle) landingTitle.textContent = copy.hero_title;
       if(landingSummary) landingSummary.textContent = copy.hero_summary;
-      if(landingSearchHeading) landingSearchHeading.textContent = copy.search_heading;
-      if(landingSearchCopy) landingSearchCopy.textContent = copy.search_copy;
-      if(landingSearchInput) {
-        landingSearchInput.placeholder = copy.search_placeholder;
-        landingSearchInput.setAttribute("aria-label", copy.search_placeholder);
-      }
-      if(landingSearchButton) landingSearchButton.textContent = copy.search_button;
+      if(landingHeroLinks) landingHeroLinks.innerHTML = copy.hero_links_html;
       if(landingSections) landingSections.innerHTML = copy.sections_html;
       if(landingMeta) landingMeta.innerHTML = copy.meta_html;
       if(jumpSelect) jumpSelect.innerHTML = copy.jump_options_html;
@@ -1181,19 +1089,6 @@ grafana-util status overview live --url http://localhost:3000 --basic-user admin
     window.addEventListener("hashchange", () => {
       const hashMode = readLandingModeFromHash();
       if(hashMode) applyLandingLocale(hashMode, {persist: true, syncHash: false});
-    });
-  }
-
-  if(landingSearchForm && landingSearchInput && jumpSelect) {
-    landingSearchForm.addEventListener("submit", (event) => {
-      event.preventDefault();
-      const query = landingSearchInput.value.trim().toLowerCase();
-      if(!query) return;
-      const options = [...jumpSelect.querySelectorAll("option")].filter((option) => option.value);
-      const exact = options.find((option) => option.textContent.toLowerCase().includes(query));
-      const fuzzy = options.find((option) => option.value.toLowerCase().includes(query.replace(/\s+/g, "-")));
-      const target = exact || fuzzy;
-      if(target) window.location.href = target.value;
     });
   }
 

@@ -58,6 +58,10 @@ Docs Impact Matrix:
   - Does this task require regenerating man pages, HTML docs, or other derived output?
 - Internal docs:
   - Does this task change maintainer contracts, architecture notes, or routing?
+  - If maintainer routing changed, which of `docs/DEVELOPER.md`,
+    `docs/internal/maintainer-quickstart.md`,
+    `docs/internal/maintainer-role-map.md`, or
+    `docs/internal/contract-doc-map.md` must change together?
 - Trace docs:
   - Does this task need a concise status or change-log update?
 - If any of the above are yes, what is the source doc or generator that must change first?

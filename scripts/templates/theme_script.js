@@ -66,13 +66,9 @@
 
   const landingI18n = document.getElementById("landing-i18n");
   const localeSelect = document.getElementById("locale-select");
-  const landingSearchForm = document.getElementById("landing-search-form");
-  const landingSearchInput = document.getElementById("landing-search");
-  const landingSearchButton = document.getElementById("landing-search-button");
   const landingTitle = document.getElementById("landing-title");
   const landingSummary = document.getElementById("landing-summary");
-  const landingSearchHeading = document.getElementById("landing-search-heading");
-  const landingSearchCopy = document.getElementById("landing-search-copy");
+  const landingHeroLinks = document.getElementById("landing-hero-links");
   const landingSections = document.getElementById("landing-sections");
   const landingMeta = document.getElementById("landing-meta");
   if(landingI18n) {
@@ -114,13 +110,7 @@
       if(localeSelect) localeSelect.value = mode;
       if(landingTitle) landingTitle.textContent = copy.hero_title;
       if(landingSummary) landingSummary.textContent = copy.hero_summary;
-      if(landingSearchHeading) landingSearchHeading.textContent = copy.search_heading;
-      if(landingSearchCopy) landingSearchCopy.textContent = copy.search_copy;
-      if(landingSearchInput) {
-        landingSearchInput.placeholder = copy.search_placeholder;
-        landingSearchInput.setAttribute("aria-label", copy.search_placeholder);
-      }
-      if(landingSearchButton) landingSearchButton.textContent = copy.search_button;
+      if(landingHeroLinks) landingHeroLinks.innerHTML = copy.hero_links_html;
       if(landingSections) landingSections.innerHTML = copy.sections_html;
       if(landingMeta) landingMeta.innerHTML = copy.meta_html;
       if(jumpSelect) jumpSelect.innerHTML = copy.jump_options_html;
@@ -139,19 +129,6 @@
     window.addEventListener("hashchange", () => {
       const hashMode = readLandingModeFromHash();
       if(hashMode) applyLandingLocale(hashMode, {persist: true, syncHash: false});
-    });
-  }
-
-  if(landingSearchForm && landingSearchInput && jumpSelect) {
-    landingSearchForm.addEventListener("submit", (event) => {
-      event.preventDefault();
-      const query = landingSearchInput.value.trim().toLowerCase();
-      if(!query) return;
-      const options = [...jumpSelect.querySelectorAll("option")].filter((option) => option.value);
-      const exact = options.find((option) => option.textContent.toLowerCase().includes(query));
-      const fuzzy = options.find((option) => option.value.toLowerCase().includes(query.replace(/\s+/g, "-")));
-      const target = exact || fuzzy;
-      if(target) window.location.href = target.value;
     });
   }
 

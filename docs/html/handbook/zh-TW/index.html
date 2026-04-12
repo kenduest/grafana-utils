@@ -636,14 +636,12 @@ html[lang="zh-TW"] .sidebar { font-family: var(--font-zh); letter-spacing: 0; }
   padding: 12px 0 20px;
 }
 .landing-hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1.14fr) minmax(360px, 0.86fr);
-  gap: 34px;
+  display: block;
   align-items: start;
   padding: 8px 0 22px;
 }
 .landing-hero-inner {
-  max-width: 60rem;
+  max-width: 56rem;
 }
 .landing-eyebrow {
   margin: 0 0 10px;
@@ -665,72 +663,32 @@ html[lang="zh-TW"] .sidebar { font-family: var(--font-zh); letter-spacing: 0; }
   line-height: 1.68;
   color: var(--text);
 }
-.landing-search-panel {
-  padding: 14px 16px 16px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--panel-strong);
-}
-.landing-search-panel h2 {
-  margin: 0 0 8px;
-  font-size: 1.02rem;
-  letter-spacing: -0.02em;
-}
-.landing-search-panel p {
-  margin: 0 0 16px;
-  font-size: 0.9rem;
-  line-height: 1.62;
-  color: var(--muted);
-}
-.landing-search-form {
+.landing-hero-actions {
   display: flex;
-  flex-direction: row;
+  flex-wrap: wrap;
   gap: 12px;
   align-items: center;
-  max-width: 100%;
+  margin-top: 18px;
 }
-.landing-search-input {
-  flex: 1;
-  min-height: 48px;
-  padding: 0 16px;
-  border: 1px solid var(--input-border);
-  border-radius: 14px;
-  background: var(--input-bg);
-  color: var(--input-text);
-  font: 500 1rem var(--font-sans);
+.landing-hero-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 42px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  background: var(--panel-strong);
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
 }
-.landing-search-input::placeholder {
-  color: var(--muted);
-}
-.landing-search-input:focus {
-  outline: none;
+.landing-hero-link:hover,
+.landing-hero-link:focus-visible {
   border-color: var(--accent);
-}
-.landing-search-button {
-  min-height: 46px;
-  padding: 0 18px;
-  border: 1px solid var(--cta-border);
-  border-radius: 14px;
-  background: var(--cta-bg);
-  color: var(--cta-text);
-  font: 700 0.95rem var(--font-sans);
-  cursor: pointer;
-  flex: 0 0 auto;
-  align-self: center;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-  transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.15s;
-}
-.landing-search-button:hover {
-  background: color-mix(in srgb, var(--cta-bg) 84%, white);
-  border-color: color-mix(in srgb, var(--cta-border) 78%, white);
-}
-.landing-search-button:focus-visible {
+  color: var(--accent);
   outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-.landing-search-button:active {
-  transform: translateY(1px);
 }
 .landing-sections {
   display: grid;
@@ -785,14 +743,9 @@ html[lang="zh-TW"] .sidebar { font-family: var(--font-zh); letter-spacing: 0; }
 html[data-theme="dark"] .landing-hero {
   border-bottom: 0;
 }
-html[data-theme="dark"] .landing-search-panel {
+html[data-theme="dark"] .landing-hero-link {
   background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
-}
-html[data-theme="dark"] .landing-search-input::placeholder {
-  color: color-mix(in srgb, var(--muted) 82%, white);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
 }
 html[data-theme="dark"] .landing-sections {
   gap: 24px;
@@ -811,10 +764,6 @@ html[data-theme="dark"] .landing-meta {
   border-top-color: var(--border);
 }
 @media (max-width: 980px) {
-  .landing-hero {
-    grid-template-columns: 1fr;
-    gap: 18px;
-  }
   .landing-hero-inner {
     max-width: none;
   }
@@ -907,8 +856,6 @@ html[data-theme="dark"] .landing-meta {
     margin: 0;
   }
   .landing-hero {
-    grid-template-columns: 1fr;
-    gap: 20px;
     padding: 20px 0 24px;
   }
   .landing-hero-inner {
@@ -918,12 +865,12 @@ html[data-theme="dark"] .landing-meta {
     font-size: 1.05rem;
     white-space: normal;
   }
-  .landing-search-form {
+  .landing-hero-actions {
     align-items: stretch;
   }
-  .landing-search-button {
+  .landing-hero-link {
     width: 100%;
-    align-self: stretch;
+    justify-content: center;
   }
   .landing-panel {
     padding: 0;
@@ -977,62 +924,30 @@ code[class*="language-"],pre[class*="language-"]{color:#ccc;background:none;font
 
 <section class="handbook-command-map"><h2 id="command-relationships">指令關係</h2><div class="handbook-command-map-panel"><div class="nav-group nav-command-group"><button class="nav-group-header" type="button" aria-expanded="true"><span class="nav-group-title-text">第一次執行路線</span><span class="nav-group-caret" aria-hidden="true">▾</span></button><div class="nav-sub-list nav-command-sub-list"><ul class="nav-command-tree"><li class="nav-command-link"><a href="../../commands/zh-TW/version.html" class="nav-command-leaf-link">--version</a></li><li class="nav-command-link"><a href="../../commands/zh-TW/status.html" class="nav-command-leaf-link">status live</a></li><li class="nav-command-link"><a href="../../commands/zh-TW/profile.html" class="nav-command-leaf-link">config profile add</a></li></ul></div></div></div></section><h2 id="語言切換">語言切換</h2>
 <ul><li>繁體中文手冊：<a href="index.html">目前頁面</a></li><li>English handbook: <a href="../en/index.html">英文手冊</a></li><li>繁體中文指令參考：<a href="../../commands/zh-TW/index.html">指令參考</a></li><li>English command reference: <a href="../../commands/en/index.html">Command Reference</a></li></ul>
-<p>歡迎來到 <code>grafana-util</code> 的維運手冊。這份手冊會帶你從安裝、連線、profile 這些基本設定開始，一路看到日常維運、自動化流程，以及整體 Grafana 環境怎麼管。</p>
-<p><code>grafana-util</code> 是一個從實際 Grafana 維運痛點長出來的個人工具，這份手冊也延續同樣的視角：重點不是把每個 API 面都攤平，而是把盤點、檢查、審查、搬移與較安全的即時操作整理成一條比較清楚的路。</p>
-<p>如果你想先知道這個工具到底在解什麼問題、適合哪些工作、什麼情況不一定要先用它，建議先看：</p>
-<ul><li><a href="what-is-grafana-util.html">這個工具是做什麼的</a></li></ul>
-<h2 id="採用前後對照">採用前後對照</h2>
-<ul><li>以前：要先猜應該開哪一章，才能知道從哪裡開始讀。</li><li>現在：先看用途頁，再依照角色選路線，就不容易迷路。</li></ul>
-<h2 id="成功判準">成功判準</h2>
-<ul><li>你知道目前這個任務該看哪一章。</li><li>你能把手冊章節和精確指令說明分開。</li><li>你能從第一次唯讀檢查，順利走到對應的工作流。</li></ul>
-<h2 id="失敗時先檢查">失敗時先檢查</h2>
-<ul><li>如果還不知道自己該看 dashboard、alert、access 還是 workspace，先回到用途頁和角色路線圖。</li><li>如果第一條即時唯讀命令失敗，先修連線或驗證，不要先往變更章節走。</li><li>如果你只是在找精確旗標，請直接切到指令參考，不要硬從手冊猜。</li></ul>
-<h2 id="適用對象">適用對象</h2>
-<ul><li>想先看完章節地圖，再決定從哪裡開始的人</li><li>想先知道這份手冊涵蓋哪些工作流的人</li><li>想快速切到角色導讀、完整參考或指令索引的人</li></ul>
-<h2 id="主要目標">主要目標</h2>
-<ul><li>先讓你看懂這份手冊在解什麼問題</li><li>幫你快速找到適合自己角色的路線</li><li>讓你知道何時該看手冊、何時該直接查指令頁</li></ul>
-<h2 id="30-秒快速上手-quick-start">30 秒快速上手 (Quick Start)</h2>
-<p>只要三個指令，就能從零開始確認安裝、連線，並快速掌握目前環境狀態。</p>
-<h3 id="1-安裝-全域-binary">1. 安裝 (全域 Binary)</h3>
-<pre><code># 從原始碼儲存庫下載並安裝最新版本到本地 bin 目錄
-curl -sSL https://raw.githubusercontent.com/kenduest-brobridge/grafana-util/main/scripts/install.sh | sh</code></pre>
-<h3 id="2-確認安裝版本">2. 確認安裝版本</h3>
-<pre><code># 用途：2. 確認安裝版本。
-grafana-util --version</code></pre>
-<h3 id="3-執行第一次-live-總覽">3. 執行第一次 live 總覽</h3>
-<pre><code># 產生整個 Grafana Estate 的高階健康度與資產盤點報告
-grafana-util status overview live --url http://localhost:3000 --basic-user admin --prompt-password --output-format interactive</code></pre>
-<p><strong>為什麼這很重要？</strong> 30 秒內，你就能先確認連線正常，快速看 Dashboard、Alert 和 data source 的狀態，也能先看出哪些設定可能已經失效。</p>
-<h2 id="我該用哪個指令">我該用哪個指令？</h2>
-<table><thead><tr><th>需求</th><th>先從這裡開始</th></tr></thead><tbody><tr><td>確認 Grafana 連得到</td><td><code>grafana-util status live</code></td></tr><tr><td>用人的角度看 live 總覽</td><td><code>grafana-util status overview live</code></td></tr><tr><td>儲存連線預設值</td><td><code>grafana-util config profile</code></td></tr><tr><td>匯出備份</td><td><code>grafana-util export dashboard</code> / <code>export alert</code> / <code>export datasource</code></td></tr><tr><td>審查本地變更包</td><td><code>grafana-util workspace scan</code>，再跑 <code>workspace preview</code></td></tr><tr><td>深入檢查 dashboard</td><td><code>grafana-util dashboard summary</code> / <code>dashboard diff</code></td></tr><tr><td>管理 user、team、org 或 service account</td><td><code>grafana-util access ...</code></td></tr></tbody></table>
-<h2 id="章節導覽-navigation-map">章節導覽 (Navigation Map)</h2>
-<h3 id="第一階段奠定基礎">第一階段：奠定基礎</h3>
-<ul><li><strong><a href="what-is-grafana-util.html">這個工具是做什麼的</a></strong>：先看它在解哪些痛點、適合哪些維運工作。</li><li><strong><a href="getting-started.html">開始使用 (Getting Started)</a></strong>：先看安裝、連線、profile 與認證怎麼配合。</li><li><strong><a href="role-new-user.html">新手快速入門</a></strong>：從第一次連線到第一次成功讀到 live 狀態的最短安全路線。</li><li><strong><a href="role-sre-ops.html">SRE / 維運角色導讀</a></strong>：適合日常維運、先審查再變更的流程與排障。</li><li><strong><a href="role-automation-ci.html">自動化 / CI 角色導讀</a></strong>：適合腳本、自動化與輸出格式相關工作。</li><li><strong><a href="architecture.html">系統架構與設計原則</a></strong>：說明核心設計決策和背後取捨。</li></ul>
-<h3 id="第二階段核心資產管理">第二階段：核心資產管理</h3>
-<ul><li><strong><a href="dashboard.html">Dashboard 管理</a></strong>：看儀表板匯出、匯入與即時分析。</li><li><strong><a href="datasource.html">Data source 管理</a></strong>：看 data source 的匯出、匯入與即時異動。</li><li><strong><a href="alert.html">告警治理</a></strong>：看告警規則的 plan / apply 管理流程。</li></ul>
-<h3 id="第三階段身份與存取">第三階段：身份與存取</h3>
-<ul><li><strong><a href="access.html">Access 管理</a></strong>：看 org、使用者、team 與 service account 管理作業。</li></ul>
-<h3 id="第四階段治理與整備度">第四階段：治理與整備度</h3>
-<ul><li><strong><a href="status-workspace.html">Workspace 審查與狀態</a></strong>：看 workspace 前後的檢查、狀態確認與快照流程。</li></ul>
-<h3 id="第五階段深度探索">第五階段：深度探索</h3>
-<ul><li><strong><a href="scenarios.html">維運情境手冊</a></strong>：看備份、災難復原、稽核等端到端任務範例。</li><li><strong><a href="recipes.html">實戰錦囊與最佳實踐</a></strong>：整理 Grafana 日常常見問題與建議做法。</li><li><strong><a href="reference.html">技術參考手冊</a></strong>：集中說明常用旗標、輸出格式與操作原則。</li><li><strong><a href="diff-json-contract.html">共用 Diff JSON contract</a></strong>：dashboard、alert、datasource diff 共用的 JSON envelope、summary 與 row 欄位說明。</li><li><strong><a href="../../commands/zh-TW/index.html">指令參考</a></strong>：每個 command 和 subcommand 都有獨立頁面，適合直接查語法與旗標。</li><li><strong><a href="troubleshooting.html">疑難排解與名詞解釋</a></strong>：故障排除導引與術語索引。</li></ul>
-<h2 id="依角色選擇閱讀路徑">依角色選擇閱讀路徑</h2>
-<p>不同角色適合的閱讀順序不太一樣：</p>
-<p>先看 <a href="what-is-grafana-util.html">這個工具是做什麼的</a>，再看 <a href="role-new-user.html">新手快速入門</a> 與 <a href="getting-started.html">開始使用</a>，需要查精確旗標時再查看 <a href="../../commands/zh-TW/index.html">指令參考</a>。</p>
-<p>先看 <a href="role-sre-ops.html">SRE / 維運角色導讀</a>，再看 <a href="status-workspace.html">Workspace 審查與狀態</a>、<a href="dashboard.html">Dashboard 管理</a>、<a href="datasource.html">Data source 管理</a>、<a href="troubleshooting.html">疑難排解</a>。</p>
-<p>先看 <a href="access.html">Access 管理</a>，再看 <a href="reference.html">技術參考手冊</a>，最後搭配 <a href="../../commands/zh-TW/index.html">指令參考</a>。</p>
-<p>先看 <a href="role-automation-ci.html">自動化 / CI 角色導讀</a>，再看 <a href="reference.html">技術參考手冊</a>，需要終端機版摘要時可搭配 <code>docs/man/grafana-util.1</code>。</p>
-<p>先看 <a href="../../developer.html">DEVELOPER.md</a>，再看 <a href="../../internal/maintainer-role-map.md">maintainer-role-map.md</a> 與 <a href="../../internal/README.md">internal README</a> 裡的設計與維護文件。</p>
-<ul><li><strong>新使用者</strong></li><li><strong>SRE / 維運人員</strong></li><li><strong>身份 / 權限管理者</strong></li><li><strong>自動化 / CI 維護者</strong></li><li><strong>維護者 / 架構師</strong></li></ul>
-<h2 id="如何使用這份導航">如何使用這份導航？</h2>
-<p>如果你是第一次使用，建議先從「<strong>開始使用</strong>」進去。每頁最下方都有 <strong>「下一章」</strong> 連結，可以照順序一路讀下去。</p>
-<p><strong>下一章</strong>：<a href="what-is-grafana-util.html">🧭 這個工具是做什麼的</a></p>
+<p>這份手冊是 <code>grafana-util</code> 的閱讀路線圖。先讀脈絡，再讀流程，最後才進到精確語法。如果你已經知道要找哪個 command family 或哪個 flag，就直接切到指令參考，不要讓手冊代替語法表。</p>
+<h2 id="如何閱讀這本手冊">如何閱讀這本手冊</h2>
+<ol><li>先看工具是拿來做什麼。</li><li>再看開始使用章節。</li><li>依照自己的角色或任務選章節。</li><li>需要精確 subcommand 或 flags 時，切到指令參考。</li></ol>
+<h2 id="書本結構">書本結構</h2>
+<h3 id="第-1-部起步">第 1 部：起步</h3>
+<ul><li><a href="what-is-grafana-util.html">這個工具是做什麼的</a></li><li><a href="getting-started.html">開始使用</a></li></ul>
+<h3 id="第-2-部角色路徑">第 2 部：角色路徑</h3>
+<ul><li><a href="role-new-user.html">新手快速入門</a></li><li><a href="role-sre-ops.html">SRE / 維運角色導讀</a></li><li><a href="role-automation-ci.html">自動化 / CI 角色導讀</a></li></ul>
+<h3 id="第-3-部操作面">第 3 部：操作面</h3>
+<ul><li><a href="status-workspace.html">Workspace 審查與狀態</a></li><li><a href="dashboard.html">Dashboard 管理</a></li><li><a href="datasource.html">Data source 管理</a></li><li><a href="alert.html">告警治理</a></li><li><a href="access.html">Access 管理</a></li></ul>
+<h3 id="第-4-部設計原則">第 4 部：設計原則</h3>
+<ul><li><a href="architecture.html">系統架構與設計原則</a></li></ul>
+<h3 id="第-5-部參考與排錯">第 5 部：參考與排錯</h3>
+<ul><li><a href="scenarios.html">維運情境手冊</a></li><li><a href="recipes.html">實戰錦囊與最佳實踐</a></li><li><a href="reference.html">技術參考手冊</a></li><li><a href="troubleshooting.html">疑難排解與名詞解釋</a></li></ul>
+<h2 id="依角色閱讀">依角色閱讀</h2>
+<ul><li>新使用者：先看 <a href="what-is-grafana-util.html">這個工具是做什麼的</a>，再看 <a href="role-new-user.html">新手快速入門</a>，最後看 <a href="getting-started.html">開始使用</a>。</li><li>SRE / 維運人員：先看 <a href="role-sre-ops.html">SRE / 維運角色導讀</a>，再看 <a href="status-workspace.html">Workspace 審查與狀態</a>、<a href="dashboard.html">Dashboard 管理</a>、<a href="datasource.html">Data source 管理</a>、<a href="troubleshooting.html">疑難排解與名詞解釋</a>。</li><li>身份 / 權限管理者：先看 <a href="access.html">Access 管理</a>，再看 <a href="reference.html">技術參考手冊</a>，最後切到 <a href="../../commands/zh-TW/index.html">指令參考</a>。</li><li>自動化 / CI 維護者：先看 <a href="role-automation-ci.html">自動化 / CI 角色導讀</a>，再看 <a href="reference.html">技術參考手冊</a>，需要精確終端機語法時再看 <a href="../../commands/zh-TW/index.html">指令參考</a>。</li><li>維護者 / 架構師：先看 <a href="architecture.html">系統架構與設計原則</a>，再看 <a href="../../developer.html">開發者指南</a> 與 <a href="../../internal/README.md">docs/internal/README.md</a>。</li></ul>
+<h2 id="閱讀提示">閱讀提示</h2>
+<ul><li>頁尾的 <code>Next</code> 與 <code>Previous</code> 才是建議的連續閱讀方式。</li><li>手冊負責流程與脈絡，指令參考負責精確語法。</li><li>如果你要的是 terminal 風格的查找，直接開指令參考或 manpage，不要從記憶裡拼旗標。</li></ul>
 <nav class="footer-nav"><a class="link-card" href="what-is-grafana-util.html"><span>下一章</span>第 2 章 · 這個工具是做什麼的</a></nav>
 </article>
 <aside class="sidebar">
   <button class="sidebar-toggle sidebar-toggle-right" type="button" aria-expanded="true" aria-label="Toggle page sidebar">▶</button>
   <div class="sidebar-content">
-    <section class="sidebar-section"><h2>本頁內容</h2><ul class="toc-list"><li class="toc-level-2"><a href="#command-relationships"><span class="toc-label">指令關係</span></a></li><li class="toc-level-2"><a href="#語言切換"><span class="toc-label">語言切換</span></a></li><li class="toc-level-2"><a href="#採用前後對照"><span class="toc-label">採用前後對照</span></a></li><li class="toc-level-2"><a href="#成功判準"><span class="toc-label">成功判準</span></a></li><li class="toc-level-2"><a href="#失敗時先檢查"><span class="toc-label">失敗時先檢查</span></a></li><li class="toc-level-2"><a href="#適用對象"><span class="toc-label">適用對象</span></a></li><li class="toc-level-2"><a href="#主要目標"><span class="toc-label">主要目標</span></a></li><li class="toc-level-2"><a href="#30-秒快速上手-quick-start"><span class="toc-label">30 秒快速上手 (Quick Start)</span></a></li><li class="toc-level-3"><a href="#1-安裝-全域-binary"><span class="toc-label">1. 安裝 (全域 Binary)</span></a></li><li class="toc-level-3"><a href="#2-確認安裝版本"><span class="toc-label">2. 確認安裝版本</span></a></li><li class="toc-level-3"><a href="#3-執行第一次-live-總覽"><span class="toc-label">3. 執行第一次 live 總覽</span></a></li><li class="toc-level-2"><a href="#我該用哪個指令"><span class="toc-label">我該用哪個指令？</span></a></li><li class="toc-level-2"><a href="#章節導覽-navigation-map"><span class="toc-label">章節導覽 (Navigation Map)</span></a></li><li class="toc-level-3"><a href="#第一階段奠定基礎"><span class="toc-label">第一階段：奠定基礎</span></a></li><li class="toc-level-3"><a href="#第二階段核心資產管理"><span class="toc-label">第二階段：核心資產管理</span></a></li><li class="toc-level-3"><a href="#第三階段身份與存取"><span class="toc-label">第三階段：身份與存取</span></a></li><li class="toc-level-3"><a href="#第四階段治理與整備度"><span class="toc-label">第四階段：治理與整備度</span></a></li><li class="toc-level-3"><a href="#第五階段深度探索"><span class="toc-label">第五階段：深度探索</span></a></li><li class="toc-level-2"><a href="#依角色選擇閱讀路徑"><span class="toc-label">依角色選擇閱讀路徑</span></a></li><li class="toc-level-2"><a href="#如何使用這份導航"><span class="toc-label">如何使用這份導航？</span></a></li></ul></section><section class="sidebar-section"><h2>版本</h2><p class="sidebar-meta-text">Current checkout</p></section><section class="sidebar-section"><h2>語言</h2><ul class="sidebar-meta-list"><li><a href="#" class="sidebar-meta-link sidebar-meta-current">Current: 繁體中文</a></li><li><a href="../en/index.html" class="sidebar-meta-link">Switch to English</a></li></ul></section>
+    <section class="sidebar-section"><h2>本頁內容</h2><ul class="toc-list"><li class="toc-level-2"><a href="#command-relationships"><span class="toc-label">指令關係</span></a></li><li class="toc-level-2"><a href="#語言切換"><span class="toc-label">語言切換</span></a></li><li class="toc-level-2"><a href="#如何閱讀這本手冊"><span class="toc-label">如何閱讀這本手冊</span></a></li><li class="toc-level-2"><a href="#書本結構"><span class="toc-label">書本結構</span></a></li><li class="toc-level-3"><a href="#第-1-部起步"><span class="toc-label">第 1 部：起步</span></a></li><li class="toc-level-3"><a href="#第-2-部角色路徑"><span class="toc-label">第 2 部：角色路徑</span></a></li><li class="toc-level-3"><a href="#第-3-部操作面"><span class="toc-label">第 3 部：操作面</span></a></li><li class="toc-level-3"><a href="#第-4-部設計原則"><span class="toc-label">第 4 部：設計原則</span></a></li><li class="toc-level-3"><a href="#第-5-部參考與排錯"><span class="toc-label">第 5 部：參考與排錯</span></a></li><li class="toc-level-2"><a href="#依角色閱讀"><span class="toc-label">依角色閱讀</span></a></li><li class="toc-level-2"><a href="#閱讀提示"><span class="toc-label">閱讀提示</span></a></li></ul></section><section class="sidebar-section"><h2>版本</h2><p class="sidebar-meta-text">Current checkout</p></section><section class="sidebar-section"><h2>語言</h2><ul class="sidebar-meta-list"><li><a href="#" class="sidebar-meta-link sidebar-meta-current">Current: 繁體中文</a></li><li><a href="../en/index.html" class="sidebar-meta-link">Switch to English</a></li></ul></section>
   </div>
 </aside>
 
@@ -1111,13 +1026,9 @@ grafana-util status overview live --url http://localhost:3000 --basic-user admin
 
   const landingI18n = document.getElementById("landing-i18n");
   const localeSelect = document.getElementById("locale-select");
-  const landingSearchForm = document.getElementById("landing-search-form");
-  const landingSearchInput = document.getElementById("landing-search");
-  const landingSearchButton = document.getElementById("landing-search-button");
   const landingTitle = document.getElementById("landing-title");
   const landingSummary = document.getElementById("landing-summary");
-  const landingSearchHeading = document.getElementById("landing-search-heading");
-  const landingSearchCopy = document.getElementById("landing-search-copy");
+  const landingHeroLinks = document.getElementById("landing-hero-links");
   const landingSections = document.getElementById("landing-sections");
   const landingMeta = document.getElementById("landing-meta");
   if(landingI18n) {
@@ -1159,13 +1070,7 @@ grafana-util status overview live --url http://localhost:3000 --basic-user admin
       if(localeSelect) localeSelect.value = mode;
       if(landingTitle) landingTitle.textContent = copy.hero_title;
       if(landingSummary) landingSummary.textContent = copy.hero_summary;
-      if(landingSearchHeading) landingSearchHeading.textContent = copy.search_heading;
-      if(landingSearchCopy) landingSearchCopy.textContent = copy.search_copy;
-      if(landingSearchInput) {
-        landingSearchInput.placeholder = copy.search_placeholder;
-        landingSearchInput.setAttribute("aria-label", copy.search_placeholder);
-      }
-      if(landingSearchButton) landingSearchButton.textContent = copy.search_button;
+      if(landingHeroLinks) landingHeroLinks.innerHTML = copy.hero_links_html;
       if(landingSections) landingSections.innerHTML = copy.sections_html;
       if(landingMeta) landingMeta.innerHTML = copy.meta_html;
       if(jumpSelect) jumpSelect.innerHTML = copy.jump_options_html;
@@ -1184,19 +1089,6 @@ grafana-util status overview live --url http://localhost:3000 --basic-user admin
     window.addEventListener("hashchange", () => {
       const hashMode = readLandingModeFromHash();
       if(hashMode) applyLandingLocale(hashMode, {persist: true, syncHash: false});
-    });
-  }
-
-  if(landingSearchForm && landingSearchInput && jumpSelect) {
-    landingSearchForm.addEventListener("submit", (event) => {
-      event.preventDefault();
-      const query = landingSearchInput.value.trim().toLowerCase();
-      if(!query) return;
-      const options = [...jumpSelect.querySelectorAll("option")].filter((option) => option.value);
-      const exact = options.find((option) => option.textContent.toLowerCase().includes(query));
-      const fuzzy = options.find((option) => option.value.toLowerCase().includes(query.replace(/\s+/g, "-")));
-      const target = exact || fuzzy;
-      if(target) window.location.href = target.value;
     });
   }
 

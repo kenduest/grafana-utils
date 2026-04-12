@@ -7,247 +7,173 @@
 
 [English](./README.md) | 繁體中文
 
-**標準化 Grafana 維運流程：包含儀表板、告警、資料源、存取控制與操作審查。**
+**用 review-first 方式處理 Grafana 的 dashboard、alert、datasource、access control 與 workspace 變更。**
 
-`grafana-util` 是一款專為 Grafana 日常維運設計的 Rust CLI 工具。它把盤點、匯出/匯入、比對、workspace 打包、config profile 管理與 secret 處理整理在一起，讓 SRE 與平台工程師可以先看清楚，再決定要不要變更。
+`grafana-util` 是一個給日常 Grafana 維運使用的 Rust CLI。它把唯讀檢查、匯出/匯入、比對、workspace 審查、連線 profile 與 secret handling 收斂到同一個 command surface，讓 operator 可以先看清楚，再決定要不要變更。
 
-它的重點是先審查再動手、把儀表板匯入/匯出的不同路徑分清楚，以及用可重複的 profile 讓日常操作保持簡短、穩定。
+常見用途：
 
----
+| 你想做什麼 | 先從這裡開始 |
+| :--- | :--- |
+| 確認 Grafana 是否可連線 | `grafana-util status live` |
+| 保存可重複使用的連線設定 | `grafana-util config profile add ...` |
+| 匯出或審查 dashboards | `grafana-util export dashboard` 或 `grafana-util dashboard summary` |
+| apply 前先審查本地變更 | `grafana-util workspace scan` 再跑 `workspace preview` |
+| 處理 alerts 或 route 預覽 | `grafana-util alert plan` 或 `alert preview-route` |
+| 管理 users、teams、orgs、service accounts | `grafana-util access ...` |
 
-## 支援的工作流
-
-- **儀表板 (Dashboards)**：瀏覽、列表、匯出/匯入、比對 (diff)、審查、修補、摘要、依賴關係檢視、政策檢查與截圖。以 `dashboard` 作為平面入口，搭配 `raw` (API 直接匯入)、`prompt` (UI 匯入) 與 `provisioning` (檔案配置用) 格式。
-- **資料來源 (Datasources)**：匯出時可先遮蔽敏感資訊，匯入時再補回認證，也能對應檔案配置用的輸出。
-- **告警 (Alerts)**：匯出/匯入、比對 (diff)、計畫與套用 (`plan`/`apply`) 以及路由預覽。
-- **存取控制 (Access)**：使用者、團隊、組織、服務帳號 (Service Account) 與 Token 管理。
-- **Workspace**：先審查再變更的流程 (`scan`、`test`、`preview`、`apply`)，讓正式套用前的狀態更清楚。
-- **Status**：針對即時環境與暫存資源的唯讀就緒檢查。
-- **設定檔 / Config Profiles**：集中管理連線資訊，支援 `file`、`os` (Keyring) 與 `encrypted-file` 等秘密資訊儲存模式。
-- **快照 (Snapshot)**：資源套件的匯出與審查。
-- **資源 (Resource)**：針對 Grafana 資源的唯讀式 `inspect`/`get`/`list`/`describe` 操作。
+CLI 主要圍繞幾個穩定 root：`status`、`workspace`、`dashboard`、`datasource`、`alert`、`access`、`config profile`。workflow 脈絡請看 handbook，精確語法請看 command reference。
 
 ---
 
-## 維運模式轉變
+## 安裝
 
-| 功能項 | 傳統作法 | 使用 `grafana-util` |
-| :--- | :--- | :--- |
-| **環境盤點** | 需手動切換 UI 或自行組合 API 呼叫以暸解現況。 | 先用 `status live` 確認連線，再用 `status overview live` 看整體總覽。 |
-| **儀表板路徑** | 難以區分 API 直接匯入與 UI 匯入所需的格式。 | 提供平面化的 `dashboard` 路徑，並搭配 `raw`、`prompt` 與 `provisioning` 格式。 |
-| **資料來源** | 匯出後的憑證資訊不容易安全保存，也不容易直接對應檔案配置。 | 匯出時先遮蔽敏感資訊，匯入時再補回認證，並保留和檔案配置對應的內容。 |
-| **審查機制** | 直接套用變更，缺乏中間審查層。 | 使用 `workspace scan`、`test` 與 `preview`，在變動正式伺服器前先完成審查。 |
-| **安全性** | 認證資訊容易散落在 Shell 歷史紀錄或明文檔案中。 | 透過 `config profile` 搭配作業系統 Keyring 或加密儲存空間管理憑證。 |
-
----
-
-## 快速上手
-
-### 第一次執行路線
-
-先走這三步確認安裝、連線與 profile 都正常；需要完整流程時，再往手冊或指令參考繼續。
-
-```bash
-# 確認執行檔已安裝。
-grafana-util --version
-```
-
-```bash
-# 先跑一個唯讀 live 檢查。
-grafana-util status live --url http://my-grafana:3000 --basic-user admin --prompt-password --output-format yaml
-```
-
-```bash
-# 把同一組連線存成可重複使用的 profile。
-grafana-util config profile add dev --url http://my-grafana:3000 --basic-user admin --prompt-password
-```
-
-如果 `grafana-util --version` 還不能執行，請先安裝：
+安裝最新版本：
 
 ```bash
 curl -sSL https://raw.githubusercontent.com/kenduest-brobridge/grafana-util/main/scripts/install.sh | sh
 ```
 
-### 安裝選項
-
-固定版本安裝：
+指定安裝版本：
 
 ```bash
-# 用途：安裝固定版本。
 VERSION=0.9.1 \
   curl -sSL https://raw.githubusercontent.com/kenduest-brobridge/grafana-util/main/scripts/install.sh | sh
 ```
 
-指定安裝目錄：
+安裝到自訂目錄：
 
 ```bash
-# 用途：安裝到指定的 binary 目錄。
 BIN_DIR="$HOME/.local/bin" \
   curl -sSL https://raw.githubusercontent.com/kenduest-brobridge/grafana-util/main/scripts/install.sh | sh
 ```
 
-先看安裝腳本說明：
+查看本地 installer 說明：
 
 ```bash
 sh ./scripts/install.sh --help
 ```
 
-- **發佈頁面**：<https://github.com/kenduest-brobridge/grafana-util/releases>
-- **執行檔**：提供 `linux-amd64` 與 `macos-arm64` 標準版。若需截圖功能，請下載 `*-browser-*` 版本。
-- **預設路徑**：優先使用 `/usr/local/bin`；若無權限則退回至 `$HOME/.local/bin`。
-- **PATH 設定提醒**：如果安裝目錄還沒在 `PATH` 內，安裝腳本會印出對應 `zsh` / `bash` 可直接使用的設定方式。
+- **Releases**：<https://github.com/kenduest-brobridge/grafana-util/releases>
+- **執行檔**：標準版提供 `linux-amd64` 與 `macos-arm64`；需要截圖功能請選 `*-browser-*`
+- **預設路徑**：優先 `/usr/local/bin`，否則改用 `$HOME/.local/bin`
 
 ---
 
-## 實用範例
+## 第一次執行
 
-以下範例展示核心維運流程。連線方式可以直接帶 `--basic-password`，也可以用 `--prompt-password` 互動輸入，或改成 token、用 `bash` / `zsh` 的 `export` 設定環境變數，再搭配 `config profile` 設定檔管理。若需完整的連線設定指南，請參考 [開始使用](./docs/user-guide/zh-TW/getting-started.md)。
+用這組路線完成第一次成功執行：
 
 ```bash
-# bash / zsh
-export GRAFANA_USERNAME=admin
-export GRAFANA_PASSWORD=admin
+# 1. 先確認 CLI 已安裝。
+grafana-util --version
 ```
 
-如果你想把這些設定放進 profile，也可以直接用 `config profile add` 分開存：
+```bash
+# 2. 先跑一個唯讀 live 檢查。
+grafana-util status live \
+  --url http://grafana.example:3000 \
+  --basic-user admin \
+  --prompt-password \
+  --output-format yaml
+```
+
+```bash
+# 3. 把同一組連線存成可重複使用的 profile。
+grafana-util config profile add dev \
+  --url http://grafana.example:3000 \
+  --basic-user admin \
+  --prompt-password
+```
+
+接下來：
+
+- 看完整流程：[第一次執行 / 新手路線](./docs/user-guide/zh-TW/role-new-user.md)
+- 查精確語法：[指令參考](./docs/commands/zh-TW/index.md)
+
+---
+
+## 範例指令
+
+確認 Grafana 是否可連線：
+
+```bash
+grafana-util status live --profile prod --output-format interactive
+```
+
+保存可重複使用的連線 profile：
 
 ```bash
 grafana-util config profile add prod \
-  --url http://my-grafana:3000 \
+  --url http://grafana.example:3000 \
   --basic-user admin \
-  --prompt-password \
-  --store-secret os
-
-grafana-util config profile add ci \
-  --url http://my-grafana:3000 \
-  --token-env GRAFANA_CI_TOKEN \
-  --store-secret encrypted-file
+  --prompt-password
 ```
 
-從第二個例子開始，我們先省略連線資訊，讓畫面更簡潔。你還是可以直接帶 `--url`、`--basic-user`、`--basic-password` 或 `--token`，也可以先用 `export` 設好環境變數，或者放進 `config profile`，分別管理 username、password、token。
-
-在執行 live 指令前，也可以先確認目前選到的 config profile，或做完整驗證：
+匯出 dashboards：
 
 ```bash
-grafana-util config profile current --profile prod --output-format json
-grafana-util config profile validate --profile prod --live --output-format json
-```
-
-### 1. 檢視環境維運總覽
-```bash
-grafana-util status live \
-  --url http://my-grafana:3000 \
-  --basic-user admin \
-  --basic-password admin \
-  --output-format interactive
-```
-
-### 2. 匯出儀表板以供審查
-```bash
-# 匯出目前 profile 可見的 dashboard，建立本地審查目錄樹。
 grafana-util export dashboard --profile prod --output-dir ./backup --overwrite
 ```
 
-### 3. 用機器可讀格式比對本地 dashboard artifact
-```bash
-# 輸出共用 dashboard diff contract。
-grafana-util dashboard diff --input-dir ./backup/raw --output-format json
+列出 dashboards，不先產生匯出檔：
 
-# datasource diff 的 JSON 會包含欄位層級的 before/after 變更。
-grafana-util datasource diff --diff-dir ./datasources --input-format inventory --output-format json
+```bash
+grafana-util dashboard list --profile prod
 ```
 
-### 4. 分析儀表板相依性
+列出 datasources：
+
 ```bash
-# 在匯入前檢查資料源參照是否失效或結構是否異常。
-grafana-util dashboard summary \
-  --input-dir ./backup/raw \
-  --input-format raw \
-  --output-format tree-table
+grafana-util datasource list --profile prod
 ```
 
-### 5. 開啟儀表板互動式工作台
-```bash
-# 開啟互動式的儀表板分析工作台。
-grafana-util dashboard browse \
-  --input-dir ./backup/raw \
-  --input-format raw \
-  --interactive
-```
+查某個 command family 的精確語法：
 
-### 6. 預覽儀表板匯入變更
 ```bash
-grafana-util dashboard import \
-  --input-dir ./backup/raw \
-  --replace-existing \
-  --dry-run \
-  --table
-```
-
-### 7. 儀表板快速反覆編修
-```bash
-# 直接把本機產生的 dashboard JSON 送進 review，Grafana 不會被改到。
-cat cpu.json | grafana-util dashboard review --input - --output-format json
-```
-
-### 8. 先看告警會怎麼變
-```bash
-# 先看看這次改動會影響哪些告警。
-grafana-util alert plan --desired-dir ./alerts/desired --prune
-
-# 先預覽告警最後會送到哪裡。
-grafana-util alert preview-route \
-  --desired-dir ./alerts/desired \
-  --label team=sre --severity critical
-```
-
-### 9. 資料源匯出與還原
-```bash
-# 匯出時先遮蔽敏感資訊，匯入時再把連線資訊補回去。
-grafana-util export datasource --output-dir ./datasources
-grafana-util datasource import --input-dir ./datasources --prompt-password
+grafana-util dashboard --help
+grafana-util config profile --help
 ```
 
 ---
 
-## 文件入口
+## 文件
 
-請參考手冊瞭解維運情境，或參考指令頁面取得精確語法說明。
+handbook 用來看 workflow 脈絡。command reference 用來查精確 CLI 語法。
 
-如果您偏好瀏覽器介面，請開啟本地 HTML 文件 [docs/html/index.html](./docs/html/index.html)，或造訪官方文件站：<https://kenduest-brobridge.github.io/grafana-util/>。
+- **HTML 文件入口**：[docs/html/index.html](./docs/html/index.html)
+- **官方文件站**：<https://kenduest-brobridge.github.io/grafana-util/>
+- **開始使用**：[docs/user-guide/zh-TW/getting-started.md](./docs/user-guide/zh-TW/getting-started.md)
+- **第一次執行 / 新手路線**：[docs/user-guide/zh-TW/role-new-user.md](./docs/user-guide/zh-TW/role-new-user.md)
+- **維運導引手冊**：[docs/user-guide/zh-TW/index.md](./docs/user-guide/zh-TW/index.md)
+- **指令參考**：[docs/commands/zh-TW/index.md](./docs/commands/zh-TW/index.md)
+- **疑難排解**：[docs/user-guide/zh-TW/troubleshooting.md](./docs/user-guide/zh-TW/troubleshooting.md)
+- **Manpage**：[docs/man/grafana-util.1](./docs/man/grafana-util.1)
 
-依需求進入：
+依需求開始：
 
-*   **開始使用**：[docs/user-guide/zh-TW/getting-started.md](./docs/user-guide/zh-TW/getting-started.md)
-*   **第一次執行 / 新手路線**：[docs/user-guide/zh-TW/role-new-user.md](./docs/user-guide/zh-TW/role-new-user.md)
-*   **完整手冊**：[docs/user-guide/zh-TW/index.md](./docs/user-guide/zh-TW/index.md)
-*   **指令參考**：[docs/commands/zh-TW/index.md](./docs/commands/zh-TW/index.md)
-*   **疑難排解**：[docs/user-guide/zh-TW/troubleshooting.md](./docs/user-guide/zh-TW/troubleshooting.md)
-*   **Man Page**：[docs/man/grafana-util.1](./docs/man/grafana-util.1)
+- **第一次設定**：[開始使用](./docs/user-guide/zh-TW/getting-started.md) 與 [第一次執行 / 新手路線](./docs/user-guide/zh-TW/role-new-user.md)
+- **日常維運流程**：[維運導引手冊](./docs/user-guide/zh-TW/index.md) 與 [SRE / 維運人員](./docs/user-guide/zh-TW/role-sre-ops.md)
+- **查精確指令語法**：[指令參考](./docs/commands/zh-TW/index.md) 與 [docs/man/grafana-util.1](./docs/man/grafana-util.1)
+- **排錯**：[疑難排解](./docs/user-guide/zh-TW/troubleshooting.md)
 
-我該用哪個指令？
+依角色開始：
 
-| 需求 | 先從這裡開始 |
-| :--- | :--- |
-| 確認 Grafana 連得到 | `grafana-util status live` |
-| 用人的角度看 live 總覽 | `grafana-util status overview live` |
-| 儲存連線預設值 | `grafana-util config profile` |
-| 匯出備份 | `grafana-util export dashboard` / `export alert` / `export datasource` |
-| 審查本地變更包 | `grafana-util workspace scan`，再跑 `workspace preview` |
-| 深入檢查 dashboard | `grafana-util dashboard summary` / `dashboard diff` |
-| 管理 user、team、org 或 service account | `grafana-util access ...` |
-
-依角色進入：
-
-*   **新使用者**：[新手快速入門](./docs/user-guide/zh-TW/role-new-user.md)
-*   **SRE / 維運人員**：[SRE / 維運角色導讀](./docs/user-guide/zh-TW/role-sre-ops.md)
-*   **自動化 / CI 維護者**：[自動化 / CI 角色導讀](./docs/user-guide/zh-TW/role-automation-ci.md)
-*   **維護者 / 開發者**：[docs/DEVELOPER.md](./docs/DEVELOPER.md) 與 [docs/internal/maintainer-quickstart.md](./docs/internal/maintainer-quickstart.md)
+- **新使用者**：[docs/user-guide/zh-TW/role-new-user.md](./docs/user-guide/zh-TW/role-new-user.md)
+- **SRE / 維運人員**：[docs/user-guide/zh-TW/role-sre-ops.md](./docs/user-guide/zh-TW/role-sre-ops.md)
+- **自動化 / CI 維護者**：[docs/user-guide/zh-TW/role-automation-ci.md](./docs/user-guide/zh-TW/role-automation-ci.md)
+- **維護者 / 開發者**：[docs/DEVELOPER.md](./docs/DEVELOPER.md)
 
 ---
 
-## 持續開發中
-本專案目前由社群持續維護。指令介面與文件仍會持續演進，精確語法請以指令說明頁面為準。
+## 專案狀態
 
-## 參與貢獻
-我們歡迎任何形式的貢獻！請參閱 [開發者指南](./docs/DEVELOPER.md) 瞭解設定步驟。
+這個專案目前仍在積極開發中。CLI 路徑、help 輸出、範例寫法與文件結構，都可能在不同版本之間出現明顯調整。
+
+若要確認目前版本的指令介面，請優先以指令參考與 `--help` 輸出為準，不要直接依賴舊 issue、舊片段或先前版本的範例。
+
+---
+
+## 貢獻
+
+若要看開發環境設定與 maintainer 指南，請直接使用 [docs/DEVELOPER.md](./docs/DEVELOPER.md)。

@@ -24,13 +24,9 @@ LANDING_LOCALES = ("en", "zh-TW")
 LANDING_UI_LABELS = {
     "en": {
         "eyebrow": "Documentation Portal",
-        "search_placeholder": "Jump to a command or handbook page",
-        "search_button": "Jump",
     },
     "zh-TW": {
         "eyebrow": "文件入口",
-        "search_placeholder": "快速跳到指令或手冊頁面",
-        "search_button": "跳轉",
     },
 }
 
@@ -62,7 +58,7 @@ class LandingPage:
     source_path: Path
     title: str
     summary: str
-    search: LandingSection
+    hero_links: tuple[LandingLink, ...]
     sections: tuple[LandingSection, ...]
     maintainer: LandingSection
 
@@ -150,21 +146,18 @@ def parse_landing_text(text: str, *, locale: str, source_path: Path) -> LandingP
     if not title:
         raise ValueError(f"Landing page is missing a top-level title: {source_path}")
     if len(sections) < 2:
-        raise ValueError(f"Landing page must have at least Search and Maintainer sections: {source_path}")
+        raise ValueError(f"Landing page must have at least one content section and one Maintainer section: {source_path}")
 
     hero_summary = _extract_first_paragraph(hero_lines)
+    hero_links = _extract_links(hero_lines, source_path)
     if not hero_summary:
         raise ValueError(f"Landing page is missing hero summary text: {source_path}")
 
     parsed_sections = tuple(_build_section(section, source_path) for section in sections)
-    search = parsed_sections[0]
     maintainer = parsed_sections[-1]
-    body_sections = parsed_sections[1:-1]
+    body_sections = parsed_sections[:-1]
     if not body_sections:
-        raise ValueError(f"Landing page must define at least one body section between Search and Maintainer: {source_path}")
-
-    if search.tasks:
-        raise ValueError(f"Search section cannot contain tasks: {source_path}")
+        raise ValueError(f"Landing page must define at least one body section before Maintainer: {source_path}")
     if maintainer.tasks:
         raise ValueError(f"Maintainer section cannot contain tasks: {source_path}")
 
@@ -173,7 +166,7 @@ def parse_landing_text(text: str, *, locale: str, source_path: Path) -> LandingP
         source_path=source_path,
         title=title,
         summary=hero_summary,
-        search=search,
+        hero_links=hero_links,
         sections=body_sections,
         maintainer=maintainer,
     )
@@ -222,6 +215,6 @@ def _extract_links(lines: list[str], source_path: Path) -> tuple[LandingLink, ..
             continue
         match = LINK_LINE_RE.fullmatch(stripped)
         if match is None:
-            raise ValueError(f"Landing link bullets must use standard Markdown link syntax: {source_path} -> {stripped}")
+            continue
         links.append(LandingLink(label=clean_markdown(match.group(1).strip()), target=match.group(2).strip()))
     return tuple(links)
