@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "description": [
+    "Router copy for the root grafana-util(1) manpage.",
+    "Keep these summaries short. Detailed workflow explanation belongs in namespace and subcommand manpages."
+  ],
+  "top_level_intro": [
+    "Use this page as a router: pick the namespace first, then open the namespace or subcommand manpage for detailed options and examples.",
+    "Each entry below is a command family, not the full workflow reference."
+  ],
+  "top_level_commands": [
+    {
+      "command": "dashboard",
+      "summary": "Dashboard workflows: browse, export, import, review, diff, edit, publish, and capture."
+    },
+    {
+      "command": "alert",
+      "summary": "Alerting workflows: export, import, diff, plan, apply, delete, list, and author alert resources."
+    },
+    {
+      "command": "datasource",
+      "summary": "Datasource workflows: list, browse, export, import, diff, create, modify, delete, and inspect supported types."
+    },
+    {
+      "command": "access",
+      "summary": "Access workflows: manage users, orgs, teams, service accounts, and service-account tokens."
+    },
+    {
+      "command": "config",
+      "summary": "Configuration workflows: create, inspect, validate, and reuse repo-local connection profiles."
+    },
+    {
+      "command": "status",
+      "summary": "Read-only status workflows: live readiness, staged checks, overviews, snapshots, and generic resource reads."
+    },
+    {
+      "command": "workspace",
+      "summary": "Workspace workflows: scan, test, preview, package, and apply one local Grafana workspace."
+    },
+    {
+      "command": "status snapshot",
+      "summary": "Snapshot workflows: export and review local dashboard and datasource inventory bundles."
+    }
+  ]
+}

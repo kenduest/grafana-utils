@@ -168,7 +168,8 @@ def assemble_site(output_dir: Path, *, include_dev: bool = False) -> None:
                 continue
             supported_release_tags.append(tag)
 
-        version_lanes = [tag.minor_label for tag in supported_release_tags]
+        latest_lane = supported_release_tags[0].minor_label if supported_release_tags else None
+        version_lanes = [tag.minor_label for tag in supported_release_tags if tag.minor_label != latest_lane]
         version_links = build_version_links(version_lanes, include_dev=dev_ref is not None)
 
         for tag in supported_release_tags:
@@ -217,7 +218,7 @@ def assemble_site(output_dir: Path, *, include_dev: bool = False) -> None:
                     print(f"Skipping dev preview: {exc}")
 
     outputs["index.html"] = render_version_portal(
-        latest_lane=supported_release_tags[0].minor_label if supported_release_tags else None,
+        latest_lane=latest_lane,
         version_lanes=version_lanes,
         has_dev=dev_ref is not None and "dev/index.html" in outputs,
     )

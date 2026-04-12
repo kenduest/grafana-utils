@@ -2,8 +2,11 @@ from __future__ import annotations
 
 import html
 import re
+from collections.abc import Callable
 
 ROFF_FONT_TOKEN_RE = re.compile(r"\\f[BRI]|\\fR")
+MANPAGE_REF_RE = re.compile(r"(?<![A-Za-z0-9-])(grafana-util(?:-[A-Za-z0-9]+)*)\(1\)")
+STRONG_MANPAGE_REF_RE = re.compile(r"<strong>(grafana-util(?:-[A-Za-z0-9]+)*)</strong>\(1\)")
 
 
 def normalize_roff_text(text: str) -> str:
@@ -42,7 +45,18 @@ def render_roff_macro_text(line: str) -> str:
     return render_roff_inline(line)
 
 
-def render_roff_manpage_html(roff_text_body: str) -> str:
+def is_cli_command_line(line: str) -> bool:
+    """Return true when a roff paragraph line is really a CLI example."""
+    normalized = normalize_roff_text(line).strip()
+    return normalized.startswith("grafana-util ")
+
+
+def man_section_id(heading: str) -> str:
+    slug = re.sub(r"[^a-z0-9]+", "-", heading.lower()).strip("-")
+    return slug or "section"
+
+
+def render_roff_manpage_html(roff_text_body: str, manpage_href: Callable[[str], str | None] | None = None) -> str:
     body_parts = []
     section_parts = []
     paragraph_lines = []
@@ -59,6 +73,12 @@ def render_roff_manpage_html(roff_text_body: str) -> str:
     def flush_paragraph():
         nonlocal paragraph_lines
         if paragraph_lines:
+            if len(paragraph_lines) == 1 and is_cli_command_line(paragraph_lines[0]):
+                section_parts.append(
+                    f'<pre class="man-example"><code>{html.escape(normalize_roff_text(paragraph_lines[0]).strip())}</code></pre>'
+                )
+                paragraph_lines = []
+                return
             section_parts.append("<p>" + " ".join(render_roff_macro_text(line) if line.startswith((".B ", ".I ")) else render_roff_inline(line) for line in paragraph_lines) + "</p>")
             paragraph_lines = []
 
@@ -94,11 +114,42 @@ def render_roff_manpage_html(roff_text_body: str) -> str:
         flush_definitions()
         flush_code()
 
+    def render_section() -> str:
+        content = "".join(section_parts)
+        if current_heading == "SUBCOMMAND MANPAGES":
+            content = re.sub(
+                r'<h3 class="man-subsection">([^<]+)</h3>(<dl class="man-definitions">.*?</dl>)',
+                r'<details class="man-subcommand-group"><summary>\1</summary>\2</details>',
+                content,
+            )
+            return f'<section class="man-section man-section-subcommand-index"><h2 id="{html.escape(man_section_id(current_heading), quote=True)}">{html.escape(current_heading)}</h2>{content}</section>'
+        return f'<section class="man-section"><h2 id="{html.escape(man_section_id(current_heading), quote=True)}">{html.escape(current_heading)}</h2>{content}</section>'
+
+    def link_manpage_refs(rendered: str) -> str:
+        if manpage_href is None:
+            return rendered
+
+        def replace_strong(match: re.Match[str]) -> str:
+            stem = match.group(1)
+            href = manpage_href(stem)
+            if not href:
+                return match.group(0)
+            return f'<strong><a class="manpage-ref" href="{html.escape(href, quote=True)}">{stem}(1)</a></strong>'
+
+        def replace(match: re.Match[str]) -> str:
+            stem = match.group(1)
+            href = manpage_href(stem)
+            if not href:
+                return match.group(0)
+            return f'<a class="manpage-ref" href="{html.escape(href, quote=True)}">{match.group(0)}</a>'
+
+        return STRONG_MANPAGE_REF_RE.sub(replace_strong, MANPAGE_REF_RE.sub(replace, rendered))
+
     def emit_section():
         nonlocal section_parts
         flush_section_content()
         if current_heading is not None:
-            body_parts.append(f'<section class="man-section"><h2>{html.escape(current_heading)}</h2>{"".join(section_parts)}</section>')
+            body_parts.append(render_section())
             section_parts = []
 
     for raw_line in roff_text_body.splitlines():
@@ -124,6 +175,13 @@ def render_roff_manpage_html(roff_text_body: str) -> str:
         if line.startswith(".SH "):
             emit_section()
             current_heading = normalize_roff_text(line[4:])
+            continue
+        if line.startswith(".SS "):
+            flush_paragraph()
+            flush_bullets()
+            flush_definitions()
+            flush_code()
+            section_parts.append(f'<h3 class="man-subsection">{html.escape(normalize_roff_text(line[4:]))}</h3>')
             continue
         if line == ".PP":
             flush_paragraph()
@@ -156,4 +214,4 @@ def render_roff_manpage_html(roff_text_body: str) -> str:
     emit_section()
     if not body_parts and section_parts:
         body_parts.extend(section_parts)
-    return '<div class="manpage-rendered">' + "".join(body_parts) + "</div>"
+    return '<div class="manpage-rendered">' + link_manpage_refs("".join(body_parts)) + "</div>"

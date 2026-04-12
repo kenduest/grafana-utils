@@ -76,8 +76,42 @@ def _portal_copy(locale: str, *, latest_lane: str | None, version_lanes: list[st
         lane_links.append((lane_labels["latest_release"].format(latest_lane=latest_lane), "latest/index.html"))
     if has_dev:
         lane_links.append((lane_labels["dev_preview"], "dev/index.html"))
-    lane_links.extend((label, f"{label}/index.html") for label in version_lanes)
+    lane_links.extend((label, f"{label}/index.html") for label in version_lanes if label != latest_lane)
     return copy, lane_links
+
+
+def _lane_output_href(lane_href: str, output: str, locale: str) -> str:
+    base = lane_href.removesuffix("index.html")
+    if output == "handbook":
+        return f"{base}handbook/{locale}/index.html"
+    if output == "commands":
+        return f"{base}commands/{locale}/index.html"
+    if output == "man":
+        return f"{base}man/index.html"
+    raise ValueError(f"Unsupported portal output: {output}")
+
+
+def _lane_output_links(lane_links: list[tuple[str, str]], *, output: str, locale: str) -> list[tuple[str, str]]:
+    return [
+        (label, _lane_output_href(href, output, locale))
+        for label, href in lane_links
+    ]
+
+
+def _older_lane_links(lane_links: list[tuple[str, str]], *, latest_lane: str | None) -> list[tuple[str, str]]:
+    hidden_hrefs = {"latest/index.html", "dev/index.html"}
+    if latest_lane:
+        hidden_hrefs.add(f"{latest_lane}/index.html")
+    return [(label, href) for label, href in lane_links if href not in hidden_hrefs]
+
+
+def _primary_lane_links(lane_links: list[tuple[str, str]], *, latest_lane: str | None, has_dev: bool) -> list[tuple[str, str]]:
+    primary_hrefs = {"latest/index.html"}
+    if has_dev:
+        primary_hrefs.add("dev/index.html")
+    if not latest_lane:
+        primary_hrefs.discard("latest/index.html")
+    return [(label, href) for label, href in lane_links if href in primary_hrefs]
 
 
 def render_version_portal(*, latest_lane: str | None, version_lanes: list[str], has_dev: bool) -> str:
@@ -89,7 +123,7 @@ def render_version_portal(*, latest_lane: str | None, version_lanes: list[str], 
         release_section = copy["sections"]["release_lanes"]
         outputs_section = copy["sections"]["available_outputs"]
         outputs_tasks = outputs_section["tasks"]
-        latest_target = "latest/index.html" if latest_lane else "dev/index.html"
+        primary_lane_links = _primary_lane_links(lane_links, latest_lane=latest_lane, has_dev=has_dev)
         release_tasks = [
             (
                 release_section["tasks"]["latest_release"]["title"],
@@ -109,7 +143,7 @@ def render_version_portal(*, latest_lane: str | None, version_lanes: list[str], 
             (
                 release_section["tasks"]["older_release_lines"]["title"],
                 release_section["tasks"]["older_release_lines"]["summary"],
-                [(label, href) for label, href in lane_links if href not in {"latest/index.html", "dev/index.html"}],
+                _older_lane_links(lane_links, latest_lane=latest_lane),
             )
         )
         portal_data[locale] = {
@@ -134,17 +168,17 @@ def render_version_portal(*, latest_lane: str | None, version_lanes: list[str], 
                             (
                                 outputs_tasks["handbook_html"]["title"],
                                 outputs_tasks["handbook_html"]["summary"],
-                                [(outputs_section["open_lane_label"], latest_target)],
+                                _lane_output_links(primary_lane_links, output="handbook", locale=locale),
                             ),
                             (
                                 outputs_tasks["command_reference_html"]["title"],
                                 outputs_tasks["command_reference_html"]["summary"],
-                                [(outputs_section["open_lane_label"], latest_target)],
+                                _lane_output_links(primary_lane_links, output="commands", locale=locale),
                             ),
                             (
                                 outputs_tasks["manpage_html"]["title"],
                                 outputs_tasks["manpage_html"]["summary"],
-                                [(outputs_section["open_lane_label"], latest_target)],
+                                _lane_output_links(primary_lane_links, output="man", locale=locale),
                             ),
                         ],
                     ),
@@ -160,7 +194,11 @@ def render_version_portal(*, latest_lane: str | None, version_lanes: list[str], 
                     _render_panel(
                         copy["meta"]["formats"]["title"],
                         copy["meta"]["formats"]["summary"],
-                        [(label, "#outputs") for label in copy["meta"]["formats"]["links"]],
+                        [
+                            (copy["meta"]["formats"]["links"][0], _lane_output_href(primary_lane_links[0][1], "handbook", locale)),
+                            (copy["meta"]["formats"]["links"][1], _lane_output_href(primary_lane_links[0][1], "commands", locale)),
+                            (copy["meta"]["formats"]["links"][2], _lane_output_href(primary_lane_links[0][1], "man", locale)),
+                        ] if primary_lane_links else [],
                     ),
                 ]
             ),

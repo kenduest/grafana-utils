@@ -55,11 +55,12 @@ def generate_outputs(config=HtmlBuildConfig()):
         outputs[prefixed_output_rel(config, "developer.html")] = developer_html
 
     manpage_outputs = generate_manpages(command_docs_dir=config.command_docs_root / "en", version=config.version)
+    manpage_names = sorted(manpage_outputs)
     man_index_rel = prefixed_output_rel(config, "man/index.html")
-    outputs[man_index_rel] = render_manpage_index_page(man_index_rel, sorted(manpage_outputs), config)
+    outputs[man_index_rel] = render_manpage_index_page(man_index_rel, manpage_names, config)
     for name, roff in sorted(manpage_outputs.items()):
         html_rel = prefixed_output_rel(config, f"man/{Path(name).stem}.html")
-        outputs[html_rel] = render_manpage_page(html_rel, name, roff, config)
+        outputs[html_rel] = render_manpage_page(html_rel, name, roff, config, manpage_names=manpage_names)
         if config.include_raw_manpages:
             outputs[prefixed_output_rel(config, f"man/{name}")] = roff
 

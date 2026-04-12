@@ -31,7 +31,7 @@ class GenerateManpagesTests(unittest.TestCase):
         self.assertIn("grafana-util-status.1", generated)
         self.assertIn("grafana-util-workspace.1", generated)
         self.assertNotIn("grafana-util-overview.1", generated)
-        self.assertIn("grafana-util-profile.1", generated)
+        self.assertIn("grafana-util-config-profile.1", generated)
 
     def test_subcommand_manpage_contains_command_sections(self):
         module = load_module()
@@ -87,16 +87,19 @@ class GenerateManpagesTests(unittest.TestCase):
         self.assertIn(".SH SUCCESS CRITERIA", dashboard_manpage)
         self.assertIn(".SH FAILURE CHECKS", dashboard_manpage)
 
-    def test_top_level_manpage_commands_include_use_case_summary(self):
+    def test_top_level_manpage_commands_use_compact_router_summaries(self):
         module = load_module()
 
         generated = module.generate_manpages()
         top_level_manpage = generated["grafana-util.1"]
 
         self.assertIn(
-            ".B access\nRun the access\\-management command surface for users, orgs, teams, and service accounts. Use when:",
+            ".B access\nAccess workflows: manage users, orgs, teams, service accounts, and service\\-account tokens. See grafana\\-util\\-access(1).",
             top_level_manpage,
         )
+        self.assertIn("Each entry below is a command family, not the full workflow reference.", top_level_manpage)
+        self.assertNotIn("Run the access\\-management command surface for users, orgs, teams, and service accounts. Use when:", top_level_manpage)
+        self.assertNotIn("Export local alert bundles from Grafana.; Import or diff alert bundles", top_level_manpage)
 
     def test_top_level_manpage_lists_subcommand_manpages(self):
         module = load_module()
@@ -107,6 +110,8 @@ class GenerateManpagesTests(unittest.TestCase):
         self.assertIn(".SH SUBCOMMAND MANPAGES", top_level_manpage)
         self.assertIn(".SS dashboard", top_level_manpage)
         self.assertIn(".B grafana\\-util\\-dashboard\\-screenshot(1)", top_level_manpage)
+        self.assertIn("Open one dashboard in a headless browser and capture image or PDF output.", top_level_manpage)
+        self.assertNotIn("especially for docs, incident notes, or visual debugging", top_level_manpage)
         self.assertIn(".SS access", top_level_manpage)
         self.assertIn(".B grafana\\-util\\-access\\-service\\-account\\-token(1)", top_level_manpage)
 
@@ -139,7 +144,8 @@ class GenerateManpagesTests(unittest.TestCase):
         self.assertNotIn("grafana-util-change.1", generated)
         self.assertNotIn("grafana-util-observe.1", generated)
         self.assertNotIn("grafana-util-overview.1", generated)
-        self.assertIn("grafana-util-profile.1", generated)
+        self.assertNotIn("grafana-util-profile.1", generated)
+        self.assertIn("grafana-util-config-profile.1", generated)
         self.assertIn("grafana-util-status-live.1", generated)
         self.assertIn("grafana-util-workspace-scan.1", generated)
         self.assertNotIn("grafana-util-overview-live.1", generated)

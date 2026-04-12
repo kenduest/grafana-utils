@@ -30,8 +30,8 @@
           }
         },
         "available_outputs": {
-          "title": "Available outputs",
-          "summary": "Each lane exposes the same three generated surfaces so operators and maintainers can switch format without leaving the version context.",
+          "title": "Open docs directly",
+          "summary": "Use these shortcuts after choosing the release context. Each link opens a specific output instead of dropping you at a lane index.",
           "tasks": {
             "handbook_html": {
               "title": "Handbook HTML",
@@ -46,7 +46,7 @@
               "summary": "Browser-readable mirrors of the generated manpages."
             }
           },
-          "open_lane_label": "Open a docs lane first"
+          "open_lane_label": "Open"
         }
       },
       "meta": {
@@ -94,8 +94,8 @@
           }
         },
         "available_outputs": {
-          "title": "可用輸出",
-          "summary": "每條版本線都提供同一組生成文件，方便依工作情境切換閱讀形式。",
+          "title": "直接開啟文件",
+          "summary": "選好版本情境後，可直接進入手冊、指令說明或 manpage，不必先進版本首頁再找入口。",
           "tasks": {
             "handbook_html": {
               "title": "手冊 HTML",
@@ -110,7 +110,7 @@
               "summary": "可在瀏覽器閱讀的 manpage 鏡像。"
             }
           },
-          "open_lane_label": "先開啟任一版本線"
+          "open_lane_label": "開啟"
         }
       },
       "meta": {

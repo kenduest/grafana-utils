@@ -89,21 +89,46 @@ class BuildPagesSiteTests(unittest.TestCase):
         self.assertIn(zh["jump_prompt"], rendered)
         self.assertIn(en["lane_labels"]["latest_release"].format(latest_lane="v0.7"), rendered)
         self.assertIn(zh["lane_labels"]["dev_preview"], rendered)
+        self.assertNotIn('value="v0.7/index.html"', rendered)
+        self.assertIn('value="v0.6/index.html"', rendered)
 
     def test_render_version_portal_omits_dev_preview_when_not_included(self):
         module = load_module()
 
         rendered = module.render_version_portal(
             latest_lane="v0.7",
-            version_lanes=["v0.7"],
+            version_lanes=["v0.7", "v0.6"],
             has_dev=False,
         )
 
         self.assertIn("latest/index.html", rendered)
-        self.assertIn("v0.7/index.html", rendered)
+        self.assertNotIn("v0.7/index.html", rendered)
+        self.assertIn("v0.6/index.html", rendered)
         self.assertNotIn("dev/index.html", rendered)
         self.assertNotIn("Dev preview", rendered)
         self.assertNotIn("開發預覽", rendered)
+
+    def test_render_version_portal_deep_links_outputs_by_lane_and_locale(self):
+        module = load_module()
+
+        rendered = module.render_version_portal(
+            latest_lane="v0.7",
+            version_lanes=["v0.7", "v0.6"],
+            has_dev=True,
+        )
+
+        self.assertIn('href="latest/handbook/en/index.html"', rendered)
+        self.assertIn('href="latest/commands/en/index.html"', rendered)
+        self.assertIn('href="latest/man/index.html"', rendered)
+        self.assertIn('href="dev/handbook/en/index.html"', rendered)
+        self.assertIn('href="dev/commands/en/index.html"', rendered)
+        self.assertIn('href="dev/man/index.html"', rendered)
+        self.assertIn('latest/handbook/zh-TW/index.html', rendered)
+        self.assertIn('latest/commands/zh-TW/index.html', rendered)
+        self.assertIn('dev/handbook/zh-TW/index.html', rendered)
+        self.assertNotIn('href="#outputs"', rendered)
+        self.assertNotIn('Open a docs lane first', rendered)
+        self.assertNotIn('先開啟任一版本線', rendered)
 
 
 if __name__ == "__main__":

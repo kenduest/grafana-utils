@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import re
 from dataclasses import dataclass
 from pathlib import Path
@@ -19,6 +20,7 @@ from docgen_common import REPO_ROOT, VERSION, check_outputs, print_written_outpu
 
 
 MAN_DIR = REPO_ROOT / "docs" / "man"
+MANPAGE_ROUTER_CONTRACT = REPO_ROOT / "scripts" / "contracts" / "manpage-router.json"
 DATE = "2026-04-03"
 LEGACY_ROOT_SOURCE_PAGES = {"overview.md"}
 
@@ -337,6 +339,38 @@ def render_listing_summary(page: CommandDocPage) -> str:
     return " ".join(part for part in parts if part)
 
 
+def render_router_listing_summary(page: CommandDocPage) -> str:
+    """Return the short summary used by root manpage indexes."""
+    return page.purpose.strip()
+
+
+def load_manpage_router_contract(path: Path = MANPAGE_ROUTER_CONTRACT) -> dict:
+    """Load root manpage router copy from a data contract."""
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def manpage_router_entries(contract: dict) -> dict[str, str]:
+    """Return validated root command summaries keyed by command family."""
+    entries = contract.get("top_level_commands", [])
+    summaries = {entry["command"]: entry["summary"] for entry in entries}
+    expected = {spec.cli_path.removeprefix("grafana-util ") for spec in NAMESPACE_SPECS}
+    missing = sorted(expected - set(summaries))
+    extra = sorted(set(summaries) - expected)
+    if missing or extra:
+        raise ValueError(
+            "manpage-router.json top_level_commands mismatch: "
+            f"missing={missing or 'none'} extra={extra or 'none'}"
+        )
+    return summaries
+
+
+def render_top_level_summary(spec: NamespaceSpec, summaries: dict[str, str]) -> str:
+    """Return a short router summary for the root grafana-util(1) page."""
+    command = spec.cli_path.removeprefix("grafana-util ")
+    summary = summaries[command]
+    return f"{summary} See {spec.stem}(1)."
+
+
 def build_namespace_example_entries(
     cli_path: str, root_page: CommandDocPage, subcommands: list[CommandDocPage]
 ) -> list[tuple[str, str]]:
@@ -473,6 +507,11 @@ def iter_standalone_command_pages(command_docs_dir: Path) -> list[tuple[str, Com
 
 def generate_top_level_manpage(*, command_docs_dir: Path, version: str = VERSION) -> str:
     """Build the top-level grafana-util(1) page from namespace metadata."""
+    router_contract = load_manpage_router_contract()
+    router_intro = router_contract.get("top_level_intro", [])
+    if len(router_intro) != 2:
+        raise ValueError("manpage-router.json top_level_intro must contain two strings")
+    top_level_summaries = manpage_router_entries(router_contract)
     lines: list[str] = []
     emit_header(
         lines,
@@ -495,52 +534,53 @@ def generate_top_level_manpage(*, command_docs_dir: Path, version: str = VERSION
             ".SH DESCRIPTION",
             "grafana-util is a unified command-line interface for operating Grafana estates with one executable and one namespaced command shape.",
             ".PP",
-            "The checked-in English command reference pages under docs/commands/en/ are the higher-level maintainer source for the generated manpage family under docs/man/.",
+            router_intro[0],
             ".SH TOP-LEVEL COMMANDS",
+            router_intro[1],
         ]
     )
     for spec in NAMESPACE_SPECS:
-        root_page = parse_command_page(command_docs_dir / spec.root_doc, spec.cli_path)
         lines.extend(
             [
                 ".TP",
                 rf".B {spec.cli_path.removeprefix('grafana-util ')}",
-                roff_text(render_listing_summary(root_page)),
+                roff_text(render_top_level_summary(spec, top_level_summaries)),
             ]
         )
     lines.append(".SH SUBCOMMAND MANPAGES")
+    subcommand_sections: dict[str, list[tuple[str, CommandDocPage]]] = {}
     listed_stems: set[str] = set()
     for spec in NAMESPACE_SPECS:
         subcommands = load_subcommands(spec, command_docs_dir)
-        lines.extend([".SS " + roff_text(spec.cli_path.removeprefix("grafana-util "))])
+        if not subcommands:
+            continue
+        namespace = spec.cli_path.removeprefix("grafana-util ")
+        section_entries = subcommand_sections.setdefault(namespace, [])
         for page in subcommands:
             full_cli_path = f"{spec.cli_path} {page.title}".strip()
             stem = man_stem_for_cli_path(full_cli_path)
             listed_stems.add(stem)
-            lines.extend(
-                [
-                    ".TP",
-                    rf".B {roff_text(stem)}(1)",
-                    roff_text(render_listing_summary(page)),
-                ]
-            )
+            section_entries.append((stem, page))
     for cli_path, page in iter_standalone_command_pages(command_docs_dir):
         stem = man_stem_for_cli_path(cli_path)
         if stem in listed_stems:
             continue
         namespace = cli_path.split()[1]
-        lines.extend([".SS " + roff_text(namespace)])
-        lines.extend(
-            [
-                ".TP",
-                rf".B {roff_text(stem)}(1)",
-                roff_text(render_listing_summary(page)),
-            ]
-        )
+        subcommand_sections.setdefault(namespace, []).append((stem, page))
         listed_stems.add(stem)
+    for namespace, pages in subcommand_sections.items():
+        lines.extend([".SS " + roff_text(namespace)])
+        for stem, page in pages:
+            lines.extend(
+                [
+                    ".TP",
+                    rf".B {roff_text(stem)}(1)",
+                    roff_text(render_router_listing_summary(page)),
+                ]
+            )
     lines.extend(
         [
-            ".TP",
+            ".SH WORKSPACE ROUTING",
             ".B workspace",
             "Workspace review and apply workflows for local Grafana artifacts. The public CLI surface and generated manpages live under grafana-util workspace and the grafana-util-workspace*(1) pages.",
             ".SH COMMON CONNECTION AND AUTH PATTERN",

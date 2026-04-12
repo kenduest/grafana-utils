@@ -202,7 +202,16 @@ When doing layout work:
    - one command page in `zh-TW`
 4. verify `Auto`, `Light`, and `Dark` theme modes
 
-Do not add a second HTML renderer for Pages only. Pages must publish the same `docs/html/` tree used locally.
+Local `docs/html/index.html` comes from `docs/landing/{en,zh-TW}.md`.
+The published Pages root `index.html` is different: it is the version portal
+assembled from `scripts/contracts/versioned-docs-portal.json` by
+`scripts/docsite_version_portal.py`. The release, latest, and dev lanes still
+use the same generated HTML shape as local `docs/html/`; only the Pages root is
+a wrapper around those lanes.
+
+Do not add Pages-only transforms inside a lane. If the root portal changes,
+edit the portal contract or `scripts/docsite_version_portal.py`, then validate
+through `scripts/build_pages_site.py`.
 
 ## Task: Review Or Edit zh-TW Copy
 
@@ -292,17 +301,21 @@ Safe changes:
 
 - trigger rules
 - deployment permissions
-- publishing `docs/html/`
+- versioned lane assembly in `scripts/build_pages_site.py`
+- root portal copy in `scripts/contracts/versioned-docs-portal.json`
+- root portal rendering in `scripts/docsite_version_portal.py`
 
 Unsafe changes unless intentional:
 
-- changing Pages to build a different HTML tree than `make html`
-- adding Pages-only transforms that are not reflected in checked-in outputs
+- adding a custom renderer for release, latest, or dev lane pages
+- changing lane pages to diverge from the local `make html` output shape
+- adding Pages-only transforms inside generated handbook, command, or manpage pages
 
 Rule:
 
-- `make html` is the only supported HTML build path
-- Pages must publish that exact tree
+- `make html` is the supported local HTML build path
+- Pages lanes must use the same generator path and output shape
+- Pages root may use the dedicated version portal generator
 
 ## Review Checklist Before Merging
 

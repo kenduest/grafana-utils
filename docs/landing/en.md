@@ -1,158 +1,85 @@
 # Start Here
 
-Start with the handbook for the reading path, or open the command reference for exact syntax.
+Choose the job you need to do now. This page only keeps the most common entry points; use the jump menu for the full handbook and command index.
 
 - [Start with the handbook](../user-guide/en/index.md)
 - [Open command reference](../commands/en/index.md)
+- [Troubleshooting](../user-guide/en/troubleshooting.md)
 
-## First Run
+## Recommended Starts
 
-If this is a new machine or a new Grafana environment, follow this order:
+If you are not sure which document to read first, choose one of these paths.
 
-### Confirm the binary
+### First time using the CLI
 
-Start by checking `grafana-util --version` so you know the CLI is installed and on your path.
-
-- [Getting Started](../user-guide/en/getting-started.md)
-- [Command Reference](../commands/en/version.md)
-
-### Run the first read-only check
-
-Use `grafana-util status live` as the first live read against Grafana before attempting any broader workflow.
+Confirm `grafana-util --version`, run `grafana-util status live` as the first read-only check, then save a reusable connection profile after the connection works.
 
 - [Getting Started](../user-guide/en/getting-started.md)
-- [Status Command Reference](../commands/en/status.md)
-
-### Save a reusable connection profile
-
-After the first successful read, store host and credentials with `grafana-util config profile add ...`.
-
 - [New User Path](../user-guide/en/role-new-user.md)
 - [Profile Command Reference](../commands/en/profile.md)
 
-## Read By Role
+### Daily operations
 
-Choose the reading path that best matches who is operating Grafana today.
-
-### New user
-
-Use the shortest safe path when this is your first time with the CLI or your first Grafana connection.
-
-- [New User Path](../user-guide/en/role-new-user.md)
-- [Getting Started](../user-guide/en/getting-started.md)
-
-### SRE / operator
-
-Start from day-two operations, workspace review, and pre-change inspection rather than the syntax index.
+Check live or staged state first, then decide whether to export, compare, review, or apply a change.
 
 - [SRE / Ops Path](../user-guide/en/role-sre-ops.md)
 - [Workspace Review & Status](../user-guide/en/status-workspace.md)
+- [Status Command Reference](../commands/en/status.md)
 
-### Automation / CI
+### Automation and CI
 
-Go here when the CLI will run inside pipelines, release automation, or repeatable validation flows.
+Use this path for pipelines, release automation, and repeatable validation flows. It focuses on inputs, outputs, failure handling, and stable syntax.
 
 - [Automation / CI Path](../user-guide/en/role-automation-ci.md)
 - [Technical Reference](../user-guide/en/reference.md)
+- [Command Reference](../commands/en/index.md)
 
-### Maintainer / architect
+## Common Jobs
 
-This route is for repository structure, design rules, and implementation-facing contracts.
+If you already know the work you need to finish, start here.
 
-- [Architecture & Design Principles](../user-guide/en/architecture.md)
-- [Developer guide](../DEVELOPER.md)
+### Dashboard
 
-## Read By Task
-
-Start from the thing you are trying to get done, then move into the matching chapter set.
-
-### Understand what the tool is for
-
-Read this before choosing a workflow if you still need the mental model for what the CLI is trying to protect and automate.
-
-- [What grafana-util is for](../user-guide/en/what-is-grafana-util.md)
-
-### Check live or staged state
-
-Use this path for read-only inspection, staged review, or pre-change status checks.
-
-- [Workspace Review & Status](../user-guide/en/status-workspace.md)
-- [Status Command Reference](../commands/en/status.md)
-
-### Work on dashboards
-
-This path covers browse, export, analysis, review, patch, publish, and capture flows around dashboards.
+Browse, export, summarize, review, patch, publish, and capture dashboards.
 
 - [Dashboard Management](../user-guide/en/dashboard.md)
 - [Dashboard Command Reference](../commands/en/dashboard.md)
 
-### Work on data sources or alerts
+### Data source and alerting
 
-Use this when you are changing Grafana integrations, alert rules, contact points, or governance checks.
+Manage Grafana integrations, alert rules, contact points, and governance checks.
 
 - [Data source Management](../user-guide/en/datasource.md)
 - [Alerting Governance](../user-guide/en/alert.md)
+- [Alert Command Reference](../commands/en/alert.md)
 
-### Manage access and credentials
+### Access and credentials
 
-Start here for orgs, teams, service accounts, tokens, and access-oriented operational changes.
+Manage orgs, teams, service accounts, tokens, and permission-oriented changes.
 
 - [Access Management](../user-guide/en/access.md)
 - [Access Command Reference](../commands/en/access.md)
 
-## Browse By Command Family
-
-Use this when you already know the root command family and want the shortest route into syntax and workflow context.
-
-### `status` and `workspace`
-
-These roots cover inspection, staging review, and workspace-oriented validation paths.
-
-- [Status / Workspace chapters](../user-guide/en/status-workspace.md)
-- [Workspace Command Reference](../commands/en/workspace.md)
-
-### `config profile`
-
-Use this to manage reusable connection defaults and secret storage for later commands.
-
-- [Getting Started](../user-guide/en/getting-started.md)
-- [Profile Command Reference](../commands/en/profile.md)
-
-### `dashboard`
-
-This root owns browse, summary, variables, export, diff, patch, publish, and screenshot workflows.
-
-- [Dashboard chapters](../user-guide/en/dashboard.md)
-- [Dashboard Command Reference](../commands/en/dashboard.md)
-
-### `datasource`, `alert`, and `access`
-
-These roots cover change workflows for integrations, alerting, and Grafana identity surfaces.
-
-- [Datasource Command Reference](../commands/en/datasource.md)
-- [Alert Command Reference](../commands/en/alert.md)
-- [Access Command Reference](../commands/en/access.md)
-
 ## Complete Reference
 
-When you need full coverage rather than a curated starting path, use the complete source surfaces here.
+Use these when you need full coverage instead of a curated starting path.
 
-### Read the full handbook
+### Full handbook
 
-Use the handbook when you want chapters, operating context, and recommended reading order.
+Use the handbook for workflow context, operating order, and recommended reading paths.
 
 - [Operator Handbook](../user-guide/en/index.md)
 
-### Read the full command reference
+### Full command reference
 
-Use the command reference when you need per-command pages, subcommand routing, and stable syntax lookup.
+Use the command reference for command pages, subcommand routing, options, and examples.
 
 - [Command Reference](../commands/en/index.md)
-- [grafana-util(1)](../html/man/grafana-util.html)
+- [grafana-util(1)](../man/grafana-util.html)
 
-### Check source and releases
+### Source and releases
 
-Use the repository when you need change history, release notes, or issue tracking rather than operator docs.
+Use the repository for change history, release notes, and issue tracking.
 
 - [GitHub repository](https://github.com/kenduest-brobridge/grafana-util)
 - [GitHub releases](https://github.com/kenduest-brobridge/grafana-util/releases)
@@ -160,6 +87,6 @@ Use the repository when you need change history, release notes, or issue trackin
 
 ## Maintainer
 
-Maintainer guidance stays in the repository docs rather than the public handbook.
+Maintainer docs stay in the repository docs rather than the public handbook.
 
 - [Developer guide](../DEVELOPER.md)

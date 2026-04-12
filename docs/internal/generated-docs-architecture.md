@@ -414,11 +414,20 @@ Published HTML docs are deployed by:
 Current behavior:
 
 - runs on pushes to `main`
-- runs `make html`
-- uploads `docs/html/`
-- deploys that tree to GitHub Pages
+- runs `scripts/build_pages_site.py`
+- assembles `.nojekyll`, release lanes, the `latest/` lane, and the root `index.html` version portal
+- includes the optional `dev/` lane when the workflow requests a preview build
+- deploys the assembled Pages tree to GitHub Pages
 
-The checked-in HTML tree and the published Pages site should always come from the same generator path. Do not introduce a second HTML build pipeline for Pages only.
+The release, latest, and dev lane pages still come from
+`generate_command_html.generate_outputs()` and the same Markdown/contracts used
+by local `make html`. The root Pages portal is generated separately by
+`scripts/docsite_version_portal.py` from
+`scripts/contracts/versioned-docs-portal.json`; it is a version selector and
+direct-output shortcut page, not the local landing page.
+
+Do not introduce a custom renderer for Pages lane pages. Pages-only behavior
+should stay limited to the root version portal and the lane assembly script.
 
 ## Common Maintenance Rules
 
@@ -432,6 +441,9 @@ The checked-in HTML tree and the published Pages site should always come from th
 - Keep command examples and local links passing `make quality-docs-surface`.
 - Update `scripts/contracts/command-surface.json` when public command paths,
   legacy replacements, command-doc routing, or `--help-full` / `--help-flat` support change.
+- Update `scripts/contracts/versioned-docs-portal.json` and
+  `scripts/docsite_version_portal.py` when changing the root GitHub Pages
+  version portal copy, lane selection, or direct output links.
 
 ## Common Failure Modes
 
@@ -475,7 +487,8 @@ Action:
 - Do not add a second Markdown parser just for one output.
 - Do not make chapter order depend on filesystem sorting.
 - Do not let English and `zh-TW` handbook filenames drift apart unless you also change the language-switch model.
-- Do not add Pages-only HTML transforms that bypass the checked-in `docs/html/` outputs.
+- Do not add Pages-only HTML transforms inside generated handbook, command,
+  or manpage lane pages.
 
 ## Short Decision Guide
 

@@ -113,16 +113,17 @@ class GenerateCommandHtmlTests(unittest.TestCase):
         self.assertIn('id="locale-select"', rendered)
         self.assertIn('<option value="auto" selected>Auto</option>', rendered)
         self.assertIn('id="landing-i18n"', rendered)
-        self.assertIn("First Run", rendered)
-        self.assertIn("Read By Role", rendered)
-        self.assertIn("Browse By Command Family", rendered)
+        self.assertIn("Recommended Starts", rendered)
+        self.assertIn("Common Jobs", rendered)
         self.assertIn("Complete Reference", rendered)
         self.assertIn("Start with the handbook", rendered)
         self.assertIn("Open command reference", rendered)
-        self.assertIn("第一次執行", rendered)
+        self.assertIn("建議起點", rendered)
         self.assertIn("從手冊開始", rendered)
         self.assertIn("繁體中文", rendered)
         self.assertIn("Developer guide", rendered)
+        self.assertIn("man/grafana-util.html", rendered)
+        self.assertNotIn("html/man/grafana-util.html", rendered)
         self.assertIn("latest/index.html", rendered)
         self.assertIn(">Version<", rendered)
         self.assertIn("Version switching is secondary here.", rendered)
@@ -156,12 +157,26 @@ class GenerateCommandHtmlTests(unittest.TestCase):
                 ".SH NAME",
                 r"grafana\-util\-test \- sample command",
                 ".SH DESCRIPTION",
-                r"Run \fBgrafana-util test\fR with readable HTML output.",
+                r"Run \fBgrafana-util test\fR with readable HTML output. See grafana\-util\-dashboard(1).",
                 r".IP \(bu 2",
                 "First bullet",
                 ".TP",
                 ".B --flag",
                 "Flag description",
+                ".SS More Commands",
+                ".TP",
+                ".B subcommand",
+                "Subcommand description",
+                ".SH SUBCOMMAND MANPAGES",
+                ".SS Dashboard",
+                ".TP",
+                ".B grafana-util-dashboard-list(1)",
+                "List dashboards.",
+                ".SH SEE ALSO",
+                r"\fBgrafana-util-dashboard\fR(1), \fBgrafana-util-alert\fR(1), \fBman\fR(1)",
+                ".SH INLINE COMMAND",
+                ".PP",
+                r"grafana\-util status snapshot review \-\-input\-dir ./snapshot \-\-output\-format json",
                 ".SH EXAMPLES",
                 ".EX",
                 "grafana-util test --flag",
@@ -169,15 +184,42 @@ class GenerateCommandHtmlTests(unittest.TestCase):
             )
         )
 
-        rendered = module.render_manpage_page("man/test.html", "grafana-util-test.1", roff, config)
+        rendered = module.render_manpage_page(
+            "man/test.html",
+            "grafana-util-test.1",
+            roff,
+            config,
+            manpage_names=("grafana-util.1", "grafana-util-dashboard-list.1", "grafana-util-test.1"),
+        )
 
         self.assertIn('<div class="manpage-rendered">', rendered)
-        self.assertIn("<h2>DESCRIPTION</h2>", rendered)
+        self.assertIn('<h2 id="description">DESCRIPTION</h2>', rendered)
         self.assertIn("<strong>grafana-util test</strong>", rendered)
         self.assertIn('<ul class="man-bullets">', rendered)
         self.assertIn('<dl class="man-definitions">', rendered)
+        self.assertIn('<h3 class="man-subsection">More Commands</h3>', rendered)
+        self.assertNotIn(".SS More Commands", rendered)
+        self.assertIn('<section class="man-section man-section-subcommand-index"><h2 id="subcommand-manpages">SUBCOMMAND MANPAGES</h2>', rendered)
+        self.assertIn('<details class="man-subcommand-group"><summary>Dashboard</summary>', rendered)
+        self.assertIn('class="manpage-ref" href="grafana-util-dashboard.html"', rendered)
+        self.assertIn('class="manpage-ref" href="grafana-util-dashboard-list.html"', rendered)
+        self.assertIn('<strong><a class="manpage-ref" href="grafana-util-alert.html">grafana-util-alert(1)</a></strong>', rendered)
+        self.assertIn("<strong>man</strong>(1)", rendered)
+        self.assertNotIn('<h3 class="man-subsection">Dashboard</h3><dl class="man-definitions">', rendered)
+        self.assertIn('<pre class="man-example"><code>grafana-util status snapshot review --input-dir ./snapshot --output-format json</code></pre>', rendered)
         self.assertIn('<pre class="man-example"><code>grafana-util test --flag</code></pre>', rendered)
         self.assertNotIn('<pre class="manpage">', rendered)
+        self.assertIn(">Manual Pages<", rendered)
+        self.assertIn(">Documentation<", rendered)
+        self.assertIn(">Overview<", rendered)
+        self.assertIn('>dashboard <span class="nav-manpage-count">1</span>', rendered)
+        self.assertIn('>test <span class="nav-manpage-count">1</span>', rendered)
+        self.assertIn('class="nav-command-entry nav-manpage-current active"', rendered)
+        self.assertIn(">grafana-util-test(1)<", rendered)
+        self.assertIn('class="nav-item nav-manpage-item">list(1)</a>', rendered)
+        self.assertIn('href="#description"', rendered)
+        self.assertNotIn(">Guide Map<", rendered)
+        self.assertNotIn(">Current manpage<", rendered)
 
     def test_strip_leading_h1_removes_duplicate_document_title(self):
         module = load_module()
@@ -459,8 +501,8 @@ class GenerateCommandHtmlTests(unittest.TestCase):
     def test_render_command_reference_index_uses_removed_roots_section_from_contract(self):
         module = load_module()
         command_index = self.command_index["locales"]["en"]
-        removed_roots_title = next(section["title"] for section in command_index["sections"] if section["title"] == "Removed roots")
         selector_title = next(section["title"] for section in command_index["sections"] if section["title"] == "Which command should I use?")
+        output_title = next(section["title"] for section in command_index["sections"] if section["title"] == "Output Selector Conventions")
 
         config = module.HtmlBuildConfig(
             source_root=REPO_ROOT,
@@ -476,9 +518,10 @@ class GenerateCommandHtmlTests(unittest.TestCase):
             config,
         )
 
-        self.assertIn(removed_roots_title, rendered)
         self.assertIn("grafana-util config profile", rendered)
         self.assertIn(selector_title, rendered)
+        self.assertIn(output_title, rendered)
+        self.assertNotIn("Removed roots", rendered)
 
     def test_render_handbook_page_includes_topbar_language_switch(self):
         module = load_module()
@@ -502,7 +545,7 @@ class GenerateCommandHtmlTests(unittest.TestCase):
         self.assertIn('class="sidebar-toggle sidebar-toggle-left"', rendered)
         self.assertIn('class="sidebar-toggle sidebar-toggle-right"', rendered)
         self.assertIn(start_label, rendered)
-        self.assertIn("第 1 章 / 共", rendered)
+        self.assertIn("第 1 部 · 起步", rendered)
 
     def test_render_handbook_page_uses_continuous_reading_footer_labels(self):
         module = load_module()
@@ -520,8 +563,8 @@ class GenerateCommandHtmlTests(unittest.TestCase):
 
         self.assertIn(f'>{locale_strings["previous_chapter"]}<', rendered)
         self.assertIn(f'>{locale_strings["next_chapter"]}<', rendered)
-        self.assertIn("第 7 章", rendered)
-        self.assertIn("第 9 章", rendered)
+        self.assertIn("系統架構與設計原則", rendered)
+        self.assertIn("Data source 維運手冊", rendered)
 
     def test_render_handbook_page_uses_short_nav_title_with_full_title_subtitle(self):
         module = load_module()
@@ -561,7 +604,7 @@ class GenerateCommandHtmlTests(unittest.TestCase):
         self.assertIn(f'>{locale_strings["section_index_title"]}<', rendered)
         self.assertIn(locale_strings["section_index_summary"], rendered)
         self.assertIn('class="section-index-list layout-list"', rendered)
-        self.assertIn('href="#command-relationships"', rendered)
+        self.assertIn('href="#適用對象"', rendered)
         self.assertIn('href="#', rendered)
 
     def test_render_command_map_nav_renders_as_handbook_section(self):
@@ -576,9 +619,9 @@ class GenerateCommandHtmlTests(unittest.TestCase):
 
         rendered = module.render_command_map_nav("handbook/zh-TW/architecture.html", "zh-TW", "architecture", config, compact=False)
 
-        self.assertIn('class="handbook-command-map"', rendered)
-        self.assertIn('id="command-relationships"', rendered)
-        self.assertIn('class="handbook-command-map-panel"', rendered)
+        self.assertIn('class="nav-section nav-command-section collapsed"', rendered)
+        self.assertIn('class="nav-command-root-link"', rendered)
+        self.assertIn('class="nav-command-leaf-link"', rendered)
         self.assertNotIn('<section class="nav-section"><h2>', rendered)
 
     def test_render_command_page_includes_intro_panel_from_command_doc_metadata(self):
