@@ -32,9 +32,13 @@ DATASOURCE_EXPORT_FILENAME = "datasources.json"
 EXPORT_METADATA_FILENAME = "export-metadata.json"
 ROOT_INDEX_KIND = "grafana-utils-datasource-export-index"
 TOOL_SCHEMA_VERSION = 1
-LIST_OUTPUT_FORMAT_CHOICES = ("table", "csv", "json")
+DATASOURCE_PROVISIONING_SUBDIR = "provisioning"
+DATASOURCE_PROVISIONING_FILENAME = "datasources.yaml"
+LIST_OUTPUT_FORMAT_CHOICES = ("text", "table", "csv", "json", "yaml")
 IMPORT_DRY_RUN_OUTPUT_FORMAT_CHOICES = ("text", "table", "json")
 LIVE_MUTATION_DRY_RUN_OUTPUT_FORMAT_CHOICES = ("text", "table", "json")
+DIFF_OUTPUT_FORMAT_CHOICES = ("text", "json")
+DATASOURCE_IMPORT_FORMAT_CHOICES = ("inventory", "provisioning")
 IMPORT_DRY_RUN_COLUMN_HEADERS = OrderedDict(
     [
         ("uid", "UID"),
@@ -57,6 +61,58 @@ IMPORT_DRY_RUN_COLUMN_ALIASES = {
     "file": "file",
     "secret_summary": "secretSummary",
 }
+LIST_OUTPUT_COLUMN_HEADERS = OrderedDict(
+    [
+        ("uid", "UID"),
+        ("name", "NAME"),
+        ("type", "TYPE"),
+        ("access", "ACCESS"),
+        ("url", "URL"),
+        ("isDefault", "IS_DEFAULT"),
+        ("org", "ORG"),
+        ("orgId", "ORG_ID"),
+    ]
+)
+LIST_OUTPUT_COLUMN_ALIASES = {
+    "uid": "uid",
+    "name": "name",
+    "type": "type",
+    "access": "access",
+    "url": "url",
+    "isDefault": "isDefault",
+    "is_default": "isDefault",
+    "org": "org",
+    "orgId": "orgId",
+    "org_id": "orgId",
+    "all": "all",
+}
+LIST_HELP_EXAMPLES = (
+    "Examples:\n\n"
+    "  grafana-util datasource list --url http://localhost:3000 --json\n"
+    "  grafana-util datasource list --url http://localhost:3000 --table --no-header\n"
+    "  grafana-util datasource list --url http://localhost:3000 --output-format csv\n"
+    "  grafana-util datasource list --input-dir ./datasources --json\n"
+)
+EXPORT_HELP_EXAMPLES = (
+    "Examples:\n\n"
+    "  grafana-util datasource export --url http://localhost:3000 "
+    "--basic-user admin --basic-password admin --output-dir ./datasources --overwrite\n"
+    "  grafana-util datasource export --url http://localhost:3000 "
+    "--basic-user admin --basic-password admin --all-orgs --output-dir ./datasources"
+)
+IMPORT_HELP_EXAMPLES = (
+    "Examples:\n\n"
+    "  grafana-util datasource import --url http://localhost:3000 "
+    '--token "$GRAFANA_API_TOKEN" --input-dir ./datasources --dry-run --table\n'
+    "  grafana-util datasource import --url http://localhost:3000 "
+    "--basic-user admin --basic-password admin --input-dir ./datasources --secret-values '{}' "
+    "--use-export-org --only-org-id 2 --create-missing-orgs --dry-run --json"
+)
+DIFF_HELP_EXAMPLES = (
+    "Examples:\n\n"
+    "  grafana-util datasource diff --url http://localhost:3000 "
+    '--token "$GRAFANA_API_TOKEN" --diff-dir ./datasources --output-format text'
+)
 
 HELP_FULL_EXAMPLES = (
     "Extended Examples:\n\n"
@@ -168,23 +224,64 @@ def add_types_cli_args(parser):
     """Add datasource-types cli args implementation."""
     output_group = parser.add_mutually_exclusive_group()
     output_group.add_argument(
+        "--table",
+        action="store_true",
+        help="Render the supported datasource catalog as a table.",
+    )
+    output_group.add_argument(
+        "--csv",
+        action="store_true",
+        help="Render the supported datasource catalog as CSV.",
+    )
+    output_group.add_argument(
         "--json",
         action="store_true",
         help="Render the supported datasource catalog as JSON.",
     )
+    output_group.add_argument(
+        "--yaml",
+        action="store_true",
+        help="Render the supported datasource catalog as YAML.",
+    )
     parser.add_argument(
         "--output-format",
-        choices=("text", "json"),
+        choices=LIST_OUTPUT_FORMAT_CHOICES,
         default=None,
         help=(
             "Alternative single-flag output selector for datasource types output. "
-            "Use text or json. This cannot be combined with --json."
+            "Use text, table, csv, json, or yaml. This cannot be combined with "
+            "--table, --csv, --json, or --yaml."
         ),
     )
 
 
 def add_list_cli_args(parser):
     """Add list cli args implementation."""
+    parser.add_argument(
+        "--input-dir",
+        default=None,
+        help=(
+            "Read datasource inventory from this local export root instead of Grafana. "
+            "Use the datasource export directory that contains datasources.json and export-metadata.json."
+        ),
+    )
+    parser.add_argument(
+        "--input-format",
+        choices=DATASOURCE_IMPORT_FORMAT_CHOICES,
+        default=None,
+        help=(
+            "Select the local datasource input format when --input-dir is used. "
+            "Use inventory for export bundles or provisioning for Grafana provisioning files."
+        ),
+    )
+    parser.add_argument(
+        "--interactive",
+        action="store_true",
+        help=(
+            "Open the local datasource inventory workbench when --input-dir is used. "
+            "This is only meaningful for local inventory inspection."
+        ),
+    )
     parser.add_argument(
         "--org-id",
         default=None,
@@ -205,6 +302,11 @@ def add_list_cli_args(parser):
     )
     output_group = parser.add_mutually_exclusive_group()
     output_group.add_argument(
+        "--text",
+        action="store_true",
+        help="Render datasource summaries as plain text.",
+    )
+    output_group.add_argument(
         "--table",
         action="store_true",
         help="Render datasource summaries as a table.",
@@ -219,6 +321,24 @@ def add_list_cli_args(parser):
         action="store_true",
         help="Render datasource summaries as JSON.",
     )
+    output_group.add_argument(
+        "--yaml",
+        action="store_true",
+        help="Render datasource summaries as YAML.",
+    )
+    parser.add_argument(
+        "--output-columns",
+        default=None,
+        help=(
+            "Render only these comma-separated datasource fields when listing local inventory. "
+            "Supported values are uid, name, type, access, url, is_default, org, org_id, and all."
+        ),
+    )
+    parser.add_argument(
+        "--list-columns",
+        action="store_true",
+        help="Print the supported --output-columns values and exit.",
+    )
     parser.add_argument(
         "--no-header",
         action="store_true",
@@ -230,8 +350,8 @@ def add_list_cli_args(parser):
         default=None,
         help=(
             "Alternative single-flag output selector for datasource list output. "
-            "Use table, csv, or json. This cannot be combined with --table, "
-            "--csv, or --json."
+            "Use text, table, csv, json, or yaml. This cannot be combined with "
+            "--text, --table, --csv, --json, or --yaml."
         ),
     )
 
@@ -240,6 +360,7 @@ def add_export_cli_args(parser):
     """Add export cli args implementation."""
     parser.add_argument(
         "--export-dir",
+        "--output-dir",
         default=DEFAULT_EXPORT_DIR,
         help=(
             "Directory to write exported datasource inventory into. Export writes "
@@ -270,6 +391,11 @@ def add_export_cli_args(parser):
         help="Replace existing export files in the target directory instead of failing.",
     )
     parser.add_argument(
+        "--without-datasource-provisioning",
+        action="store_true",
+        help="Skip the provisioning/datasources.yaml export variant.",
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Preview the datasource export files that would be written without changing disk.",
@@ -280,10 +406,21 @@ def add_import_cli_args(parser):
     """Add import cli args implementation."""
     parser.add_argument(
         "--import-dir",
+        "--input-dir",
         required=True,
         help=(
             "Import datasource inventory from this directory. Point this to the "
             "datasource export root that contains datasources.json and export-metadata.json."
+        ),
+    )
+    parser.add_argument(
+        "--input-format",
+        choices=DATASOURCE_IMPORT_FORMAT_CHOICES,
+        default="inventory",
+        help=(
+            "Select the datasource import input format. Use inventory for the existing "
+            "datasources.json export contract, or provisioning for Grafana datasource "
+            "provisioning files."
         ),
     )
     parser.add_argument(
@@ -331,6 +468,19 @@ def add_import_cli_args(parser):
             "Require the datasource export's recorded orgId to match the target "
             "Grafana org before dry-run or live import."
         ),
+    )
+    parser.add_argument(
+        "--secret-values",
+        default=None,
+        help=(
+            "Inline JSON object mapping secret placeholder names to resolved secret values "
+            "for import when the export records include secureJsonDataPlaceholders."
+        ),
+    )
+    parser.add_argument(
+        "--secret-values-file",
+        default=None,
+        help="Path to a JSON file containing the datasource secret placeholder map for import.",
     )
     parser.add_argument(
         "--replace-existing",
@@ -381,6 +531,11 @@ def add_import_cli_args(parser):
         ),
     )
     parser.add_argument(
+        "--list-columns",
+        action="store_true",
+        help="Print the supported --output-columns values and exit.",
+    )
+    parser.add_argument(
         "--progress",
         action="store_true",
         help="Show concise per-datasource import progress in <current>/<total> form while processing records.",
@@ -403,6 +558,22 @@ def add_diff_cli_args(parser):
             "Point this to the datasource export root that contains datasources.json "
             "and export-metadata.json."
         ),
+    )
+    parser.add_argument(
+        "--input-format",
+        choices=DATASOURCE_IMPORT_FORMAT_CHOICES,
+        default="inventory",
+        help=(
+            "Select the local datasource diff input format. Use inventory for the existing "
+            "datasources.json export contract, or provisioning for Grafana datasource "
+            "provisioning files."
+        ),
+    )
+    parser.add_argument(
+        "--output-format",
+        choices=DIFF_OUTPUT_FORMAT_CHOICES,
+        default="text",
+        help="Render diff output as text or JSON.",
     )
 
 
@@ -535,6 +706,18 @@ def add_add_cli_args(parser):
         help="Inline JSON object string for datasource secureJsonData.",
     )
     parser.add_argument(
+        "--secure-json-data-placeholders",
+        default=None,
+        help=(
+            "Inline JSON object string mapping secureJsonData field names to ${secret:...} placeholders."
+        ),
+    )
+    parser.add_argument(
+        "--secret-values",
+        default=None,
+        help="Inline JSON object string mapping secret placeholder names to resolved secret values for add.",
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Preview what datasource add would do without changing Grafana.",
@@ -654,6 +837,18 @@ def add_modify_cli_args(parser):
         help="Inline JSON object string to merge into datasource secureJsonData.",
     )
     parser.add_argument(
+        "--secure-json-data-placeholders",
+        default=None,
+        help=(
+            "Inline JSON object string mapping secureJsonData field names to ${secret:...} placeholders."
+        ),
+    )
+    parser.add_argument(
+        "--secret-values",
+        default=None,
+        help="Inline JSON object string mapping secret placeholder names to resolved secret values for modify.",
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Preview what datasource modify would do without changing Grafana.",
@@ -697,6 +892,11 @@ def add_delete_cli_args(parser):
         "--name",
         default=None,
         help="Datasource name to delete when UID is not available.",
+    )
+    parser.add_argument(
+        "--yes",
+        action="store_true",
+        help="Acknowledge the live datasource delete. Required unless --dry-run is set.",
     )
     parser.add_argument(
         "--dry-run",

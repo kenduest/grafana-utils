@@ -27,8 +27,12 @@ from .dashboard_cli import (
 )
 from .datasource.parser import (
     DATASOURCE_EXPORT_FILENAME,
+    DATASOURCE_PROVISIONING_FILENAME,
+    DATASOURCE_PROVISIONING_SUBDIR,
     DEFAULT_EXPORT_DIR,
     EXPORT_METADATA_FILENAME,
+    DIFF_OUTPUT_FORMAT_CHOICES,
+    DATASOURCE_IMPORT_FORMAT_CHOICES,
     LIVE_MUTATION_DRY_RUN_OUTPUT_FORMAT_CHOICES,
     ROOT_INDEX_KIND,
     TOOL_SCHEMA_VERSION,
@@ -73,6 +77,8 @@ from .datasource_diff import (
 
 __all__ = [
     "DATASOURCE_EXPORT_FILENAME",
+    "DATASOURCE_PROVISIONING_FILENAME",
+    "DATASOURCE_PROVISIONING_SUBDIR",
     "DEFAULT_EXPORT_DIR",
     "EXPORT_METADATA_FILENAME",
     "GrafanaError",
@@ -119,24 +125,43 @@ def _normalize_output_format_args(args, parser):
     if output_format is None:
         return
     if getattr(args, "command", None) == "types":
-        if bool(getattr(args, "json", False)):
-            parser.error(
-                "--output-format cannot be combined with --json for datasource types."
-            )
-        args.json = output_format == "json"
-        return
-    if getattr(args, "command", None) == "list":
         if (
             bool(getattr(args, "table", False))
             or bool(getattr(args, "csv", False))
             or bool(getattr(args, "json", False))
+            or bool(getattr(args, "yaml", False))
         ):
             parser.error(
-                "--output-format cannot be combined with --table, --csv, or --json for datasource list."
+                "--output-format cannot be combined with --table, --csv, --json, or --yaml for datasource types."
             )
         args.table = output_format == "table"
         args.csv = output_format == "csv"
         args.json = output_format == "json"
+        args.yaml = output_format == "yaml"
+        return
+    if getattr(args, "command", None) == "list":
+        if (
+            bool(getattr(args, "text", False))
+            or bool(getattr(args, "table", False))
+            or bool(getattr(args, "csv", False))
+            or bool(getattr(args, "json", False))
+            or bool(getattr(args, "yaml", False))
+        ):
+            parser.error(
+                "--output-format cannot be combined with --text, --table, --csv, --json, or --yaml for datasource list."
+            )
+        args.text = output_format == "text"
+        args.table = output_format == "table"
+        args.csv = output_format == "csv"
+        args.json = output_format == "json"
+        args.yaml = output_format == "yaml"
+        return
+    if getattr(args, "command", None) == "diff":
+        if bool(getattr(args, "json", False)):
+            parser.error(
+                "--output-format cannot be combined with --json for datasource diff."
+            )
+        args.output_format = output_format
         return
     if getattr(args, "command", None) == "import":
         # Import mode intentionally only supports table/json output mode.
@@ -172,6 +197,17 @@ def _parse_import_output_columns(args, parser):
         args.output_columns = parse_import_dry_run_columns(value)
     except GrafanaError as exc:
         parser.error(str(exc))
+
+
+def _normalize_datasource_aliases(args):
+    """Normalize command aliases to the Python facade's canonical attribute names."""
+    if getattr(args, "command", None) == "export" and hasattr(args, "output_dir"):
+        args.export_dir = args.output_dir
+    if getattr(args, "command", None) in ("import", "diff") and hasattr(
+        args, "input_dir"
+    ):
+        args.import_dir = getattr(args, "input_dir", getattr(args, "import_dir", None))
+        args.diff_dir = getattr(args, "input_dir", getattr(args, "diff_dir", None))
 
 
 def _validate_datasource_org_routing_args(args, parser):
@@ -222,6 +258,7 @@ def parse_args(argv=None):
 
     parser = build_parser()
     args = parser.parse_args(argv)
+    _normalize_datasource_aliases(args)
     _normalize_output_format_args(args, parser)
     _parse_import_output_columns(args, parser)
     _validate_datasource_org_routing_args(args, parser)
