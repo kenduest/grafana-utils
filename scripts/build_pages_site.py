@@ -158,12 +158,12 @@ def render_redirect_page(target_href: str) -> str:
     )
 
 
-def add_legacy_html_manpage_redirects(outputs: dict[str, str]) -> None:
-    """Keep stale release-lane links such as latest/html/man/name.html working."""
+def add_legacy_root_manpage_redirects(outputs: dict[str, str]) -> None:
+    """Keep stale release-lane grafana-util(1) links working."""
     for path in sorted(tuple(outputs)):
         path_obj = Path(path)
         parts = path_obj.parts
-        if len(parts) < 3 or parts[-2] != "man" or path_obj.suffix != ".html":
+        if len(parts) < 3 or parts[-2] != "man" or parts[-1] != "grafana-util.html":
             continue
         legacy_path = Path(*parts[:-2], "html", "man", parts[-1]).as_posix()
         if legacy_path == path or legacy_path in outputs:
@@ -253,7 +253,7 @@ def assemble_site(output_dir: Path, *, include_dev: bool = False) -> None:
         version_lanes=version_lanes,
         has_dev=dev_ref is not None and "dev/index.html" in outputs,
     )
-    add_legacy_html_manpage_redirects(outputs)
+    add_legacy_root_manpage_redirects(outputs)
     if output_dir.exists():
         shutil.rmtree(output_dir)
     write_outputs(output_dir, outputs)

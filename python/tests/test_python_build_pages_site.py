@@ -130,17 +130,17 @@ class BuildPagesSiteTests(unittest.TestCase):
         self.assertNotIn('Open a docs lane first', rendered)
         self.assertNotIn('先開啟任一版本線', rendered)
 
-    def test_add_legacy_html_manpage_redirects_keeps_stale_lane_links_working(self):
+    def test_add_legacy_root_manpage_redirects_keeps_stale_lane_link_working(self):
         module = load_module()
         outputs = {
             "latest/man/grafana-util.html": "<html>manpage</html>",
             "latest/man/grafana-util-dashboard.html": "<html>dashboard manpage</html>",
         }
 
-        module.add_legacy_html_manpage_redirects(outputs)
+        module.add_legacy_root_manpage_redirects(outputs)
 
         self.assertIn("latest/html/man/grafana-util.html", outputs)
-        self.assertIn("latest/html/man/grafana-util-dashboard.html", outputs)
+        self.assertNotIn("latest/html/man/grafana-util-dashboard.html", outputs)
         self.assertIn('url=../../man/grafana-util.html', outputs["latest/html/man/grafana-util.html"])
         self.assertIn('href="../../man/grafana-util.html"', outputs["latest/html/man/grafana-util.html"])
         self.assertEqual("<html>manpage</html>", outputs["latest/man/grafana-util.html"])
