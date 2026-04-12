@@ -955,7 +955,7 @@ run_access_smoke() {
     --basic-user "${GRAFANA_USER}" \
     --basic-password "${GRAFANA_PASSWORD}" \
     --scope global \
-    --export-dir "${ACCESS_USER_REPLAY_EXPORT_DIR}" \
+    --output-dir "${ACCESS_USER_REPLAY_EXPORT_DIR}" \
     --overwrite >/dev/null
 
   check_access_export_metadata_contract \
@@ -1108,7 +1108,7 @@ run_access_smoke() {
     --basic-password "${GRAFANA_PASSWORD}" \
     --scope org \
     --with-teams \
-    --export-dir "${ACCESS_USER_ORG_REPLAY_EXPORT_DIR}" \
+    --output-dir "${ACCESS_USER_ORG_REPLAY_EXPORT_DIR}" \
     --overwrite >/dev/null
 
   check_access_export_metadata_contract \
@@ -1292,7 +1292,7 @@ run_access_smoke() {
     --url "${GRAFANA_URL}" \
     --basic-user "${GRAFANA_USER}" \
     --basic-password "${GRAFANA_PASSWORD}" \
-    --export-dir "${ACCESS_TEAM_REPLAY_EXPORT_DIR}" \
+    --output-dir "${ACCESS_TEAM_REPLAY_EXPORT_DIR}" \
     --overwrite \
     --with-members >/dev/null
 
@@ -1437,7 +1437,7 @@ run_access_smoke() {
     --url "${GRAFANA_URL}" \
     --basic-user "${GRAFANA_USER}" \
     --basic-password "${GRAFANA_PASSWORD}" \
-    --export-dir "${ACCESS_ORG_EXPORT_DIR}" \
+    --output-dir "${ACCESS_ORG_EXPORT_DIR}" \
     --with-users \
     --overwrite >/dev/null
 
@@ -1585,7 +1585,7 @@ run_access_smoke() {
   "$(access_bin)" access service-account export \
     --url "${GRAFANA_URL}" \
     --token "${GRAFANA_API_TOKEN}" \
-    --export-dir "${ACCESS_SERVICE_ACCOUNT_EXPORT_DIR}" \
+    --output-dir "${ACCESS_SERVICE_ACCOUNT_EXPORT_DIR}" \
     --overwrite >/dev/null
 
   check_access_export_metadata_contract \
@@ -1833,7 +1833,7 @@ run_datasource_smoke() {
   "$(datasource_bin)" datasource export \
     --url "${GRAFANA_URL}" \
     --token "${GRAFANA_API_TOKEN}" \
-    --export-dir "${DATASOURCE_EXPORT_DIR}" \
+    --output-dir "${DATASOURCE_EXPORT_DIR}" \
     --overwrite >/dev/null
 
   [[ -f "${DATASOURCE_EXPORT_DIR}/datasources.json" ]] || fail "datasource export did not write datasources.json"
@@ -1859,7 +1859,7 @@ run_datasource_smoke() {
     --url "${GRAFANA_URL}" \
     --basic-user "${GRAFANA_USER}" \
     --basic-password "${GRAFANA_PASSWORD}" \
-    --export-dir "${DATASOURCE_MULTI_ORG_EXPORT_DIR}" \
+    --output-dir "${DATASOURCE_MULTI_ORG_EXPORT_DIR}" \
     --overwrite \
     --all-orgs >/dev/null
 
@@ -1990,7 +1990,7 @@ run_dashboard_smoke() {
   "$(dashboard_bin)" dashboard export \
     --url "${GRAFANA_URL}" \
     --token "${GRAFANA_API_TOKEN}" \
-    --export-dir "${DASHBOARD_EXPORT_DIR}" \
+    --output-dir "${DASHBOARD_EXPORT_DIR}" \
     --overwrite
 
   [[ -f "${DASHBOARD_EXPORT_DIR}/raw/index.json" ]] || fail "dashboard raw index was not written"
@@ -2019,7 +2019,7 @@ run_dashboard_smoke() {
   "$(dashboard_bin)" dashboard export \
     --url "${GRAFANA_URL}" \
     --token "${GRAFANA_API_TOKEN}" \
-    --export-dir "${DASHBOARD_DRY_RUN_DIR}" \
+    --output-dir "${DASHBOARD_DRY_RUN_DIR}" \
     --overwrite \
     --dry-run
 
@@ -2061,7 +2061,7 @@ run_dashboard_smoke() {
     --url "${GRAFANA_URL}" \
     --basic-user "${GRAFANA_USER}" \
     --basic-password "${GRAFANA_PASSWORD}" \
-    --export-dir "${MULTI_ORG_EXPORT_DIR}" \
+    --output-dir "${MULTI_ORG_EXPORT_DIR}" \
     --overwrite \
     --all-orgs \
     --without-dashboard-prompt >/dev/null
@@ -2292,7 +2292,7 @@ run_dashboard_inspection_smoke() {
   "$(dashboard_bin)" dashboard export \
     --url "${GRAFANA_URL}" \
     --token "${GRAFANA_API_TOKEN}" \
-    --export-dir "${DASHBOARD_INSPECTION_EXPORT_DIR}" \
+    --output-dir "${DASHBOARD_INSPECTION_EXPORT_DIR}" \
     --overwrite \
     --without-dashboard-prompt >/dev/null
 
@@ -2649,7 +2649,7 @@ prepare_sync_smoke_fixture() {
     "$(dashboard_bin)" dashboard export \
       --url "${GRAFANA_URL}" \
       --token "${GRAFANA_API_TOKEN}" \
-      --export-dir "${DASHBOARD_EXPORT_DIR}" \
+      --output-dir "${DASHBOARD_EXPORT_DIR}" \
       --overwrite \
       --without-dashboard-prompt >/dev/null
   fi
