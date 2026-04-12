@@ -13,6 +13,12 @@
 
 如果你要的是每個指令或子指令一頁的穩定說明，請看這裡；如果你想先理解操作流程與場景，請先看手冊。
 
+如果你只想在終端機快速看完整公開指令清單與用途，請跑：
+
+```bash
+grafana-util --help-flat
+```
+
 ## 先怎麼讀這份指令參考
 
 1. 先在這頁判斷你是要走 `status`、`workspace`、`dashboard`、`alert`、`datasource` 還是 `access`。

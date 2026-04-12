@@ -12,8 +12,8 @@ use crate::access::{
 };
 use crate::alert::{AlertExportArgs, AlertGroupCommand};
 pub use crate::cli_help::{
-    maybe_render_unified_help_from_os_args, render_unified_help_full_text,
-    render_unified_help_text, render_unified_version_text,
+    maybe_render_unified_help_from_os_args, render_unified_help_flat_text,
+    render_unified_help_full_text, render_unified_help_text, render_unified_version_text,
 };
 use crate::cli_help::{
     UNIFIED_ACCESS_HELP_TEXT, UNIFIED_ALERT_HELP_TEXT, UNIFIED_DATASOURCE_HELP_TEXT,
@@ -322,7 +322,7 @@ pub enum UnifiedCommand {
         command: AlertGroupCommand,
     },
     #[command(
-        about = "Manage Grafana users, teams, and service accounts.",
+        about = "Manage Grafana users, orgs, teams, and service accounts.",
         after_help = UNIFIED_ACCESS_HELP_TEXT
     )]
     Access(AccessCliArgs),

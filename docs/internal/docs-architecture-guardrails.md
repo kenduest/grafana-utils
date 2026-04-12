@@ -16,7 +16,7 @@ Keep each docs layer doing one job:
   - does not become a second handbook
 - `command surface contract`
   - owns machine-readable public command paths, legacy replacements,
-    command-doc routing, and `--help-full` support
+    command-doc routing, and `--help-full` / `--help-flat` support
   - lives in `scripts/contracts/command-surface.json`
 - `generated docs`
   - owns derived man pages and HTML output
@@ -36,7 +36,7 @@ Keep each docs layer doing one job:
 - do not put CLI topology or namespace wiring in the manual
 - do not repeat long flag tables in both manual and command docs
 - when CLI behavior changes, update command reference and source snippets first
-- when public command paths, legacy replacements, or `--help-full` support
+- when public command paths, legacy replacements, or `--help-full` / `--help-flat` support
   change, update `scripts/contracts/command-surface.json` and run
   `make quality-docs-surface`
 - keep manual updates limited to user journeys, decision tables, and stable

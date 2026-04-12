@@ -420,20 +420,44 @@ pub struct UserDiffArgs {
 /// User inventory and lifecycle workflows.
 #[derive(Debug, Clone, Subcommand)]
 pub enum UserCommand {
-    #[command(after_help = ACCESS_USER_LIST_HELP_TEXT)]
+    #[command(
+        about = "List live or local Grafana users.",
+        after_help = ACCESS_USER_LIST_HELP_TEXT
+    )]
     List(UserListArgs),
-    #[command(after_help = ACCESS_USER_BROWSE_HELP_TEXT)]
+    #[command(
+        about = "Browse live or local Grafana users interactively.",
+        after_help = ACCESS_USER_BROWSE_HELP_TEXT
+    )]
     Browse(UserBrowseArgs),
-    #[command(after_help = ACCESS_USER_ADD_HELP_TEXT)]
+    #[command(
+        about = "Create one Grafana user with optional initial org and admin state.",
+        after_help = ACCESS_USER_ADD_HELP_TEXT
+    )]
     Add(UserAddArgs),
-    #[command(after_help = ACCESS_USER_MODIFY_HELP_TEXT)]
+    #[command(
+        about = "Modify one Grafana user identity, password, org role, or admin state.",
+        after_help = ACCESS_USER_MODIFY_HELP_TEXT
+    )]
     Modify(UserModifyArgs),
-    #[command(after_help = ACCESS_USER_EXPORT_HELP_TEXT)]
+    #[command(
+        about = "Export Grafana users into a local reviewable bundle.",
+        after_help = ACCESS_USER_EXPORT_HELP_TEXT
+    )]
     Export(UserExportArgs),
-    #[command(after_help = ACCESS_USER_IMPORT_HELP_TEXT)]
+    #[command(
+        about = "Import Grafana users from a local bundle.",
+        after_help = ACCESS_USER_IMPORT_HELP_TEXT
+    )]
     Import(UserImportArgs),
-    #[command(after_help = ACCESS_USER_DIFF_HELP_TEXT)]
+    #[command(
+        about = "Compare a local user bundle against live Grafana users.",
+        after_help = ACCESS_USER_DIFF_HELP_TEXT
+    )]
     Diff(UserDiffArgs),
-    #[command(after_help = ACCESS_USER_DELETE_HELP_TEXT)]
+    #[command(
+        about = "Delete or remove one Grafana user from the selected scope.",
+        after_help = ACCESS_USER_DELETE_HELP_TEXT
+    )]
     Delete(UserDeleteArgs),
 }

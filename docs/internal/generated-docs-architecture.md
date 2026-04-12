@@ -44,7 +44,7 @@ The only exception is that the current `man` family is generated from `docs/comm
 
 - `scripts/contracts/command-surface.json`
   - machine-readable public command-path and docs-routing contract
-  - records legacy replacements and `--help-full` support
+  - records legacy replacements and `--help-full` / `--help-flat` support
   - is the sync point for docs examples, maintainer routing, and command-page
     follow-up when public names change
 - `scripts/contracts/docs-entrypoints.json`
@@ -431,7 +431,7 @@ The checked-in HTML tree and the published Pages site should always come from th
 - Keep examples profile-first where possible, then direct Basic auth, then token with caveat where token behavior is intentionally documented.
 - Keep command examples and local links passing `make quality-docs-surface`.
 - Update `scripts/contracts/command-surface.json` when public command paths,
-  legacy replacements, command-doc routing, or `--help-full` support change.
+  legacy replacements, command-doc routing, or `--help-full` / `--help-flat` support change.
 
 ## Common Failure Modes
 

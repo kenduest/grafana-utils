@@ -27,7 +27,7 @@ backlogs, market analysis, and progress snapshots have been moved into
   - first-entry route for new maintainers and AI agents
 - `../scripts/contracts/command-surface.json`
   - machine-readable CLI/docs synchronization contract for public paths,
-    legacy replacements, command-doc routing, and `--help-full` support
+    legacy replacements, command-doc routing, and `--help-full` / `--help-flat` support
 - `profile-secret-storage-architecture.md`
   - profile secret backend model, platform support, and maintainer rules
 - `rust-architecture-guardrails.md`
@@ -61,7 +61,7 @@ backlogs, market analysis, and progress snapshots have been moved into
 - `.github/PULL_REQUEST_TEMPLATE.md` -> GitHub PR template for review-time task context
 - `zh-tw-style-guide.md` -> review rules for Taiwan-facing Traditional Chinese docs and product-object naming
 - `maintainer-quickstart.md` -> first-entry reading order, source-of-truth map, task routing, and safe validation commands
-- `../scripts/contracts/command-surface.json` -> machine-readable CLI/docs synchronization contract for public paths, legacy replacements, routing, and `--help-full` support
+- `../scripts/contracts/command-surface.json` -> machine-readable CLI/docs synchronization contract for public paths, legacy replacements, routing, and `--help-full` / `--help-flat` support
 - `../scripts/contracts/docs-entrypoints.json` -> machine-readable docs-entry/navigation contract for landing quick commands, jump-select entries, and handbook command-relationship maps
 - `profile-secret-storage-architecture.md` -> profile secret modes, macOS/Linux backend behavior, and secret-resolution design rules
 - `rust-architecture-guardrails.md` -> Rust layer boundaries, split thresholds, hotspot order, and lint expectations

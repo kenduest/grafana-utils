@@ -524,40 +524,85 @@ pub struct OrgDiffArgs {
 /// Organization inventory and lifecycle workflows.
 #[derive(Debug, Clone, Subcommand)]
 pub enum OrgCommand {
-    #[command(after_help = ACCESS_ORG_LIST_HELP_TEXT)]
+    #[command(
+        about = "List live or local Grafana organizations.",
+        after_help = ACCESS_ORG_LIST_HELP_TEXT
+    )]
     List(OrgListArgs),
-    #[command(after_help = ACCESS_ORG_ADD_HELP_TEXT)]
+    #[command(
+        about = "Create one Grafana organization.",
+        after_help = ACCESS_ORG_ADD_HELP_TEXT
+    )]
     Add(OrgAddArgs),
-    #[command(after_help = ACCESS_ORG_MODIFY_HELP_TEXT)]
+    #[command(
+        about = "Rename one Grafana organization.",
+        after_help = ACCESS_ORG_MODIFY_HELP_TEXT
+    )]
     Modify(OrgModifyArgs),
-    #[command(after_help = ACCESS_ORG_EXPORT_HELP_TEXT)]
+    #[command(
+        about = "Export Grafana organizations into a local reviewable bundle.",
+        after_help = ACCESS_ORG_EXPORT_HELP_TEXT
+    )]
     Export(OrgExportArgs),
-    #[command(after_help = ACCESS_ORG_IMPORT_HELP_TEXT)]
+    #[command(
+        about = "Import Grafana organizations from a local bundle.",
+        after_help = ACCESS_ORG_IMPORT_HELP_TEXT
+    )]
     Import(OrgImportArgs),
-    #[command(after_help = ACCESS_ORG_DIFF_HELP_TEXT)]
+    #[command(
+        about = "Compare a local organization bundle against live Grafana organizations.",
+        after_help = ACCESS_ORG_DIFF_HELP_TEXT
+    )]
     Diff(OrgDiffArgs),
-    #[command(after_help = ACCESS_ORG_DELETE_HELP_TEXT)]
+    #[command(
+        about = "Delete one Grafana organization.",
+        after_help = ACCESS_ORG_DELETE_HELP_TEXT
+    )]
     Delete(OrgDeleteArgs),
 }
 
 /// Team inventory and membership workflows.
 #[derive(Debug, Clone, Subcommand)]
 pub enum TeamCommand {
-    #[command(after_help = ACCESS_TEAM_LIST_HELP_TEXT)]
+    #[command(
+        about = "List live or local Grafana teams.",
+        after_help = ACCESS_TEAM_LIST_HELP_TEXT
+    )]
     List(TeamListArgs),
-    #[command(after_help = ACCESS_TEAM_BROWSE_HELP_TEXT)]
+    #[command(
+        about = "Browse live or local Grafana teams interactively.",
+        after_help = ACCESS_TEAM_BROWSE_HELP_TEXT
+    )]
     Browse(TeamBrowseArgs),
-    #[command(after_help = ACCESS_TEAM_ADD_HELP_TEXT)]
+    #[command(
+        about = "Create one Grafana team with optional contact and membership data.",
+        after_help = ACCESS_TEAM_ADD_HELP_TEXT
+    )]
     Add(TeamAddArgs),
-    #[command(after_help = ACCESS_TEAM_MODIFY_HELP_TEXT)]
+    #[command(
+        about = "Modify one Grafana team and its membership.",
+        after_help = ACCESS_TEAM_MODIFY_HELP_TEXT
+    )]
     Modify(TeamModifyArgs),
-    #[command(after_help = ACCESS_TEAM_EXPORT_HELP_TEXT)]
+    #[command(
+        about = "Export Grafana teams into a local reviewable bundle.",
+        after_help = ACCESS_TEAM_EXPORT_HELP_TEXT
+    )]
     Export(TeamExportArgs),
-    #[command(after_help = ACCESS_TEAM_IMPORT_HELP_TEXT)]
+    #[command(
+        about = "Import Grafana teams from a local bundle.",
+        after_help = ACCESS_TEAM_IMPORT_HELP_TEXT
+    )]
     Import(TeamImportArgs),
-    #[command(after_help = ACCESS_TEAM_DIFF_HELP_TEXT)]
+    #[command(
+        about = "Compare a local team bundle against live Grafana teams.",
+        after_help = ACCESS_TEAM_DIFF_HELP_TEXT
+    )]
     Diff(TeamDiffArgs),
-    #[command(after_help = ACCESS_TEAM_DELETE_HELP_TEXT)]
+    #[command(
+        about = "Delete one Grafana team.",
+        after_help = ACCESS_TEAM_DELETE_HELP_TEXT
+    )]
     Delete(TeamDeleteArgs),
 }
 

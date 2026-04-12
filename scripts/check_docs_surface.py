@@ -348,11 +348,22 @@ def resolve_cli_path(path_tokens: list[str]) -> tuple[str, ...] | None:
 
 def validate_commands(path: Path, text: str, surface: dict[str, object]) -> list[Finding]:
     findings: list[Finding] = []
+    help_flat_supported = bool(surface.get("help_flat_supported", False))
     help_full_supported = set(surface.get("help_full_supported", []))
     candidates = joined_command_lines(text)
     for line_number, raw in candidates:
         tokens = tokenize_command(raw)
         if tokens is None:
+            continue
+        if "--help-flat" in tokens:
+            if not help_flat_supported:
+                findings.append(
+                    Finding(
+                        path,
+                        line_number,
+                        "`--help-flat` is not documented as supported in command-surface.json",
+                    )
+                )
             continue
         path_tokens = command_tokens_before_flags(tokens)
         if not path_tokens:

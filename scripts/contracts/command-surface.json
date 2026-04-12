@@ -4,6 +4,7 @@
     "en",
     "zh-TW"
   ],
+  "help_flat_supported": true,
   "help_full_supported": [
     "",
     "dashboard",

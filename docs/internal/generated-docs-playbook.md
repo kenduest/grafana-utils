@@ -18,7 +18,7 @@ If you need to:
 - change landing quick commands, jump-select command entries, or handbook
   command-relationship maps: edit `scripts/contracts/docs-entrypoints.json`
 - change public command paths, legacy replacements, command-doc routing, or
-  `--help-full` support: edit `scripts/contracts/command-surface.json`
+  `--help-full` / `--help-flat` support: edit `scripts/contracts/command-surface.json`
 - change command-to-handbook back-links in HTML: edit `scripts/generate_command_html.py`
 - add or remove a namespace manpage: edit `scripts/generate_manpages.py`
 - change supported Markdown behavior: edit `scripts/docgen_command_docs.py`

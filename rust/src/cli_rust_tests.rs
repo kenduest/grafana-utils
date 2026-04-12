@@ -1,6 +1,7 @@
 use super::{
     dispatch_with_handlers, maybe_render_unified_help_from_os_args, parse_cli_from,
-    render_unified_help_text, CliArgs, DashboardRootCommand, UnifiedCommand,
+    render_unified_help_flat_text, render_unified_help_text, CliArgs, DashboardRootCommand,
+    UnifiedCommand,
 };
 use crate::alert::AlertGroupCommand;
 use crate::cli_help::grouped_specs::GROUPED_HELP_ENTRYPOINTS;
@@ -91,6 +92,45 @@ fn unified_help_mentions_common_surfaces_without_legacy_dashboard_paths() {
     assert!(!help.contains("dashboard analyze"));
     assert!(!help.contains("dashboard capture"));
     assert!(!help.contains("alert migrate export"));
+}
+
+#[test]
+fn unified_help_flat_lists_public_commands_with_purpose() {
+    let help = render_unified_help_flat_text(false);
+    assert!(help.contains("Flat command inventory"));
+    assert!(help.contains("COMMAND"));
+    assert!(help.contains("KIND"));
+    assert!(help.contains("PURPOSE"));
+    assert!(help.contains("grafana-util status"));
+    assert!(help.contains("group"));
+    assert!(help.contains("grafana-util status live"));
+    assert!(help.contains("Render shared project-wide live status."));
+    assert!(help.contains("grafana-util dashboard export"));
+    assert!(help.contains("Export dashboards into a local artifact tree"));
+    assert!(help.contains("grafana-util access user list"));
+    assert!(help.contains("List live or local Grafana users"));
+    assert!(!help.contains("Struct definition"));
+    assert!(!help.contains("Arguments for"));
+    assert!(!help.contains("grafana-util observe"));
+    assert!(!help.contains("grafana-util dashboard live"));
+}
+
+#[test]
+fn unified_help_flat_renders_from_preparse_args() {
+    let help = maybe_render_unified_help_from_os_args(["grafana-util", "--help-flat"], false)
+        .expect("expected flat command inventory");
+    assert!(help.contains("grafana-util datasource list"));
+    assert!(help.contains("grafana-util alert list-rules"));
+    assert!(help.contains("grafana-util workspace scan"));
+
+    let colored = maybe_render_unified_help_from_os_args(
+        ["grafana-util", "--color", "always", "--help-flat"],
+        false,
+    )
+    .expect("expected colored flat command inventory");
+    let stripped = strip_ansi_codes(&colored);
+    assert!(stripped.contains("grafana-util access org list"));
+    assert!(colored.contains(HELP_PALETTE.command));
 }
 
 #[test]

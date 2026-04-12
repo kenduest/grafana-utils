@@ -105,7 +105,7 @@ Read in this order when relevant:
 6. `docs/internal/docs-architecture-guardrails.md` for handbook/manual,
    command-doc, generated-doc, internal-doc, and trace-doc boundaries
 7. `scripts/contracts/command-surface.json` for public command-path, legacy
-   replacement, routing, and `--help-full` changes
+   replacement, routing, and `--help-full` / `--help-flat` changes
 
 Use this pass to answer:
 

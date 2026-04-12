@@ -34,4 +34,4 @@ Use three layers:
   restate full specs there.
 - Archive older trace entries once they stop helping with current navigation.
 - Keep `scripts/contracts/command-surface.json` current when public command paths, legacy
-  replacements, docs routing, or `--help-full` support change.
+  replacements, docs routing, or `--help-full` / `--help-flat` support change.

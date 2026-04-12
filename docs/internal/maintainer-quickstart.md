@@ -37,7 +37,7 @@ Open these in order:
    - supported validation and generation entrypoints
 7. `scripts/contracts/command-surface.json`
    - machine-readable CLI/docs synchronization contract for public command
-     paths, legacy replacements, docs routing, and `--help-full` support
+     paths, legacy replacements, docs routing, and `--help-full` / `--help-flat` support
 
 Then branch by task:
 

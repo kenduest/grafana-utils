@@ -239,28 +239,55 @@ pub struct ServiceAccountTokenAddArgs {
 /// Service-account token workflows.
 #[derive(Debug, Clone, Subcommand)]
 pub enum ServiceAccountTokenCommand {
-    #[command(after_help = ACCESS_SERVICE_ACCOUNT_TOKEN_ADD_HELP_TEXT)]
+    #[command(
+        about = "Create one token for a Grafana service account.",
+        after_help = ACCESS_SERVICE_ACCOUNT_TOKEN_ADD_HELP_TEXT
+    )]
     Add(ServiceAccountTokenAddArgs),
-    #[command(after_help = ACCESS_SERVICE_ACCOUNT_TOKEN_DELETE_HELP_TEXT)]
+    #[command(
+        about = "Delete one token from a Grafana service account.",
+        after_help = ACCESS_SERVICE_ACCOUNT_TOKEN_DELETE_HELP_TEXT
+    )]
     Delete(ServiceAccountTokenDeleteArgs),
 }
 
 /// Service-account inventory and lifecycle workflows.
 #[derive(Debug, Clone, Subcommand)]
 pub enum ServiceAccountCommand {
-    #[command(after_help = ACCESS_SERVICE_ACCOUNT_LIST_HELP_TEXT)]
+    #[command(
+        about = "List live or local Grafana service accounts.",
+        after_help = ACCESS_SERVICE_ACCOUNT_LIST_HELP_TEXT
+    )]
     List(ServiceAccountListArgs),
-    #[command(after_help = ACCESS_SERVICE_ACCOUNT_ADD_HELP_TEXT)]
+    #[command(
+        about = "Create one Grafana service account with an initial org role.",
+        after_help = ACCESS_SERVICE_ACCOUNT_ADD_HELP_TEXT
+    )]
     Add(ServiceAccountAddArgs),
-    #[command(after_help = ACCESS_SERVICE_ACCOUNT_EXPORT_HELP_TEXT)]
+    #[command(
+        about = "Export Grafana service accounts into a local reviewable bundle.",
+        after_help = ACCESS_SERVICE_ACCOUNT_EXPORT_HELP_TEXT
+    )]
     Export(ServiceAccountExportArgs),
-    #[command(after_help = ACCESS_SERVICE_ACCOUNT_IMPORT_HELP_TEXT)]
+    #[command(
+        about = "Import Grafana service accounts from a local bundle.",
+        after_help = ACCESS_SERVICE_ACCOUNT_IMPORT_HELP_TEXT
+    )]
     Import(ServiceAccountImportArgs),
-    #[command(after_help = ACCESS_SERVICE_ACCOUNT_DIFF_HELP_TEXT)]
+    #[command(
+        about = "Compare a local service-account bundle against live Grafana service accounts.",
+        after_help = ACCESS_SERVICE_ACCOUNT_DIFF_HELP_TEXT
+    )]
     Diff(ServiceAccountDiffArgs),
-    #[command(after_help = ACCESS_SERVICE_ACCOUNT_DELETE_HELP_TEXT)]
+    #[command(
+        about = "Delete one Grafana service account.",
+        after_help = ACCESS_SERVICE_ACCOUNT_DELETE_HELP_TEXT
+    )]
     Delete(ServiceAccountDeleteArgs),
-    #[command(after_help = ACCESS_SERVICE_ACCOUNT_TOKEN_HELP_TEXT)]
+    #[command(
+        about = "Manage Grafana service-account tokens.",
+        after_help = ACCESS_SERVICE_ACCOUNT_TOKEN_HELP_TEXT
+    )]
     Token {
         #[command(subcommand)]
         command: ServiceAccountTokenCommand,

@@ -13,6 +13,12 @@ These pages track the current Rust CLI help for the command tree exposed by `gra
 
 Use these pages when you want one stable page per command or subcommand instead of a handbook chapter. The handbook explains workflow and intent; the command pages explain the concrete CLI surface.
 
+For a quick terminal inventory of every public command path and its purpose, run:
+
+```bash
+grafana-util --help-flat
+```
+
 ## Start Here
 
 The public first-run CLI is organized around a small task-first surface:

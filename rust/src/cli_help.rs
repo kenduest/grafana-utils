@@ -14,6 +14,6 @@ pub(crate) use routing::{
     UNIFIED_DATASOURCE_HELP_TEXT, UNIFIED_SYNC_HELP_TEXT,
 };
 pub use routing::{
-    maybe_render_unified_help_from_os_args, render_unified_help_full_text,
-    render_unified_help_text, render_unified_version_text,
+    maybe_render_unified_help_from_os_args, render_unified_help_flat_text,
+    render_unified_help_full_text, render_unified_help_text, render_unified_version_text,
 };
