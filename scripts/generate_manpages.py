@@ -8,7 +8,13 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
-from docgen_command_docs import CommandDocPage, get_command_docs_dir, parse_command_page, parse_inline_subcommands
+from docgen_command_docs import (
+    CommandDocPage,
+    command_doc_cli_path,
+    get_command_docs_dir,
+    parse_command_page,
+    parse_inline_subcommands,
+)
 from docgen_common import REPO_ROOT, VERSION, check_outputs, print_written_outputs, write_outputs
 
 
@@ -65,7 +71,7 @@ NAMESPACE_SPECS: tuple[NamespaceSpec, ...] = (
             "grafana-util",
             "grafana-util-datasource",
             "grafana-util-status",
-            "grafana-util-snapshot",
+            "grafana-util-status-snapshot",
         ),
         workflow_notes=(
             "Dashboard export intentionally separates output lanes for different workflows. Treat the raw export tree as the canonical replay or import source unless a command explicitly asks for another lane.",
@@ -128,7 +134,7 @@ NAMESPACE_SPECS: tuple[NamespaceSpec, ...] = (
             "grafana-util",
             "grafana-util-dashboard",
             "grafana-util-status",
-            "grafana-util-snapshot",
+            "grafana-util-status-snapshot",
         ),
         workflow_notes=(
             "Datasource export follows a masked recovery contract. Treat the canonical export JSON as the replay source. Treat provisioning output as a derived projection for Grafana provisioning workflows.",
@@ -176,7 +182,7 @@ NAMESPACE_SPECS: tuple[NamespaceSpec, ...] = (
             "grafana-util-alert",
             "grafana-util-datasource",
             "grafana-util-access",
-            "grafana-util-snapshot",
+            "grafana-util-status-snapshot",
         ),
     ),
     NamespaceSpec(
@@ -188,12 +194,12 @@ NAMESPACE_SPECS: tuple[NamespaceSpec, ...] = (
             "grafana-util",
             "grafana-util-status",
             "grafana-util-alert",
-            "grafana-util-snapshot",
+            "grafana-util-status-snapshot",
         ),
     ),
     NamespaceSpec(
-        stem="grafana-util-snapshot",
-        cli_path="grafana-util snapshot",
+        stem="grafana-util-status-snapshot",
+        cli_path="grafana-util status snapshot",
         title="export and review Grafana snapshot inventory bundles",
         root_doc="snapshot.md",
         related_manpages=(
@@ -454,7 +460,9 @@ def iter_standalone_command_pages(command_docs_dir: Path) -> list[tuple[str, Com
     for source in sorted(command_docs_dir.glob("*.md")):
         if source.stem in root_docs or source.name in LEGACY_ROOT_SOURCE_PAGES:
             continue
-        cli_path = "grafana-util " + source.stem.replace("-", " ")
+        cli_path = command_doc_cli_path(source, "grafana-util " + source.stem.replace("-", " "))
+        if cli_path is None:
+            continue
         try:
             page = parse_command_page(source, cli_path)
         except ValueError:
@@ -628,8 +636,8 @@ def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     outputs = generate_manpages()
     if args.check:
-        return check_outputs(MAN_DIR, outputs, "manpages", "python3 scripts/generate_manpages.py --write")
-    write_outputs(MAN_DIR, outputs)
+        return check_outputs(MAN_DIR, outputs, "manpages", "python3 scripts/generate_manpages.py --write", prune=True)
+    write_outputs(MAN_DIR, outputs, prune=True)
     print_written_outputs(
         MAN_DIR,
         outputs,

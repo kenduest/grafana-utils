@@ -93,10 +93,10 @@ grafana-util status overview live --profile ci --output-format yaml
 
 - [config profile](../../commands/zh-TW/config.md)
 - [workspace](../../commands/zh-TW/workspace.md)
-- [指令詳細說明總索引](../../commands/zh-TW/index.md)
+- [指令參考](../../commands/zh-TW/index.md)
 - [access service-account](../../commands/zh-TW/access-service-account.md)
 - [access service-account token](../../commands/zh-TW/access-service-account-token.md)
-- [指令詳細說明總索引](../../commands/zh-TW/index.md)
+- [指令參考](../../commands/zh-TW/index.md)
 
 ## 常見錯誤與限制
 
@@ -120,11 +120,11 @@ grafana-util status overview live --profile ci --output-format yaml
 - output format、exit code、profile secret 規則，切到 [技術參考手冊](reference.md)
 - staged gate、input test、promotion review，切到 [Workspace 審查與狀態](status-workspace.md)
 - 需要處理 service account 憑證輪替或管理時，切到 [Access 管理](access.md)
-- 只差精確旗標或 command 細節時，切到 [指令詳細說明總索引](../../commands/zh-TW/index.md)
+- 只差精確旗標或 command 細節時，切到 [指令參考](../../commands/zh-TW/index.md)
 
 ## 下一步
 
 - [回到手冊首頁](index.md)
 - [先看開始使用](getting-started.md)
 - [再看技術參考手冊](reference.md)
-- [需要精確旗標時查看指令詳細說明總索引](../../commands/zh-TW/index.md)
+- [需要精確旗標時查看指令參考](../../commands/zh-TW/index.md)

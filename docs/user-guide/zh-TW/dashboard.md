@@ -113,7 +113,7 @@ grafana-util dashboard edit-live --profile prod --dashboard-uid cpu-main --outpu
 - [dashboard policy](../../commands/zh-TW/dashboard-policy.md)
 - [dashboard dependencies](../../commands/zh-TW/dashboard-dependencies.md)
 - [dashboard screenshot](../../commands/zh-TW/dashboard-screenshot.md)
-- [指令詳細說明總索引](../../commands/zh-TW/index.md)
+- [指令參考](../../commands/zh-TW/index.md)
 
 ---
 

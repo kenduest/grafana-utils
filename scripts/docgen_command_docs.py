@@ -103,6 +103,10 @@ COMMAND_SUBSECTION_LABELS = frozenset(
     }
 )
 
+REMOVED_ROOT_TITLE_RE = re.compile(
+    r"^(?:Removed root path|已移除的 root path)[:：]\s*(grafana-util(?: [^`]+)?)$"
+)
+
 NON_COMMAND_SECTION_TITLES = frozenset(
     {
         "Before / After",
@@ -199,6 +203,20 @@ def clean_command_name(title: str, cli_path: str) -> str:
     if cleaned.startswith(prefix + " "):
         return cleaned[len(prefix) + 1 :]
     return cleaned
+
+
+def command_doc_cli_path(path: Path, fallback_cli_path: str | None = None) -> str | None:
+    """Resolve the canonical CLI path for one command-doc Markdown page."""
+    title, _ = split_markdown_sections(path.read_text(encoding="utf-8"))
+    cleaned = clean_markdown(title)
+    if cleaned.startswith("grafana-util "):
+        return cleaned
+    removed_match = REMOVED_ROOT_TITLE_RE.match(cleaned)
+    if removed_match is not None:
+        return removed_match.group(1)
+    if re.fullmatch(r"[a-z0-9][a-z0-9 -]*", cleaned):
+        return f"grafana-util {cleaned}"
+    return fallback_cli_path
 
 
 def extract_paragraph(lines: list[str]) -> str:

@@ -13,7 +13,7 @@ Run the alerting command surface for listing, exporting, importing, diffing, pla
 - List live alert rules, contact points, mute timings, and templates.
 
 ## Description
-Open this page when the work is about Grafana alerting as a full workflow, not just one command. The `alert` namespace keeps the public CLI flat, but the help is grouped by task so you can move from inventory to backup, authoring, review, and apply without switching command roots.
+Open this page when the work is about Grafana alerting as a full workflow, not just one command. The `alert` namespace keeps the path shallow, and the help groups commands by task so you can move from inventory to backup, authoring, and review without switching command roots.
 
 This is the right entrypoint for SREs, platform operators, and anyone who wants to understand how alert rules, notification routing, contact points, and desired-state review fit together before diving into one exact subcommand.
 
@@ -21,10 +21,10 @@ This is the right entrypoint for SREs, platform operators, and anyone who wants 
 
 - Inventory: `list-rules`, `list-contact-points`, `list-mute-timings`, `list-templates`, `delete`
 - Backup: `export`, `import`, `diff`
-- Authoring: `add-rule`, `clone-rule`, `add-contact-point`, `set-route`, `preview-route`, `new-rule`, `new-contact-point`, `new-template`
+- Authoring: `init`, `add-rule`, `clone-rule`, `add-contact-point`, `set-route`, `preview-route`, `new-rule`, `new-contact-point`, `new-template`
 - Review: `plan`, `apply`
 
-Choose this page when alert work spans rules, routes, contact points, or templates and you want the workflow before the flags.
+Choose this page when alert work spans rules, routes, contact points, templates, or the initial desired-state scaffold and you want the workflow before the flags.
 
 ## Before / After
 
@@ -60,6 +60,11 @@ Choose this page when alert work spans rules, routes, contact points, or templat
 ```bash
 # Purpose: Inspect the grouped alert help before choosing a lane.
 grafana-util alert --help
+```
+
+```bash
+# Purpose: Initialize a staged alert desired-state tree.
+grafana-util alert init --desired-dir ./alerts/desired
 ```
 
 ```bash

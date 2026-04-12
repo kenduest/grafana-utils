@@ -48,7 +48,7 @@
 - [datasource add](../../commands/zh-TW/datasource-add.md)
 - [datasource modify](../../commands/zh-TW/datasource-modify.md)
 - [datasource delete](../../commands/zh-TW/datasource-delete.md)
-- [指令詳細說明總索引](../../commands/zh-TW/index.md)
+- [指令參考](../../commands/zh-TW/index.md)
 
 ---
 

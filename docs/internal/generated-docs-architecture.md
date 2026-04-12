@@ -40,6 +40,18 @@ Generated artifacts are not the long-term truth source:
 
 The only exception is that the current `man` family is generated from `docs/commands/en/*.md` only. There is no separate Traditional Chinese manpage lane.
 
+### Command Surface Contract
+
+- `scripts/contracts/command-surface.json`
+  - machine-readable public command-path and docs-routing contract
+  - records legacy replacements and `--help-full` support
+  - is the sync point for docs examples, maintainer routing, and command-page
+    follow-up when public names change
+- `scripts/contracts/docs-entrypoints.json`
+  - machine-readable docs-entry taxonomy for landing quick commands, jump-select
+    command entries, and handbook command-relationship maps
+  - lets maintainers change navigation content without editing Python logic
+
 ## Output Model
 
 ### Manpages
@@ -55,10 +67,8 @@ Output:
 - `docs/man/grafana-util-alert.1`
 - `docs/man/grafana-util-datasource.1`
 - `docs/man/grafana-util-access.1`
-- `docs/man/grafana-util-profile.1`
+- `docs/man/grafana-util-config.1`
 - `docs/man/grafana-util-status.1`
-- `docs/man/grafana-util-overview.1`
-- `docs/man/grafana-util-change.1`
 - `docs/man/grafana-util-snapshot.1`
 - `docs/man/grafana-util-*.1` for every generated subcommand manpage
 
@@ -112,6 +122,14 @@ If a change is about "how generated files are written or checked", it belongs he
 Shared parser and Markdown subset renderer:
 
 - splits command docs by `##` sections
+
+### `scripts/docgen_entrypoints.py`
+
+Shared docs-entry loader and validator:
+
+- loads `scripts/contracts/docs-entrypoints.json`
+- validates quick-command, jump-select, and handbook command-map structure
+- keeps docs-entry content in data files while generators stay focused on rendering
 - extracts `Purpose`, `When to use`, `Key flags`, and `Examples`
 - handles inline-subcommand pages such as `profile.md`
 - renders the limited HTML subset used by both handbook and command pages
@@ -411,6 +429,9 @@ The checked-in HTML tree and the published Pages site should always come from th
 - Keep locale symmetry explicit.
 - Keep `make html` and `make man` output short and maintainer-readable.
 - Keep examples profile-first where possible, then direct Basic auth, then token with caveat where token behavior is intentionally documented.
+- Keep command examples and local links passing `make quality-docs-surface`.
+- Update `scripts/contracts/command-surface.json` when public command paths,
+  legacy replacements, command-doc routing, or `--help-full` support change.
 
 ## Common Failure Modes
 

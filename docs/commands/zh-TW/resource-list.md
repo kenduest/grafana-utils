@@ -1,4 +1,4 @@
-# resource list
+# `grafana-util status resource list`
 
 ## 用途
 列出某一種目前支援的 live Grafana resource kind。
@@ -14,17 +14,17 @@
 ## 範例
 ```bash
 # 用途：從本機 Grafana 以表格列出 dashboards。
-grafana-util resource list dashboards --url http://localhost:3000 --basic-user admin --basic-password admin
+grafana-util status resource list dashboards --url http://localhost:3000 --basic-user admin --basic-password admin
 ```
 
 ```bash
 # 用途：以 YAML 列出 folders。
-grafana-util resource list folders --profile prod --output-format yaml
+grafana-util status resource list folders --profile prod --output-format yaml
 ```
 
 ```bash
 # 用途：以 JSON 列出 alert rules。
-grafana-util resource list alert-rules --profile prod --output-format json
+grafana-util status resource list alert-rules --profile prod --output-format json
 ```
 
 ## 相關指令

@@ -123,7 +123,6 @@ You are in a good operator posture when:
 - [config profile](../../commands/en/profile.md)
 - [status](../../commands/en/status.md)
 - [export dashboard](../../commands/en/export.md)
-- [advanced](../../commands/en/advanced.md)
 - [workspace](../../commands/en/workspace.md)
 - [full command index](../../commands/en/index.md)
 
@@ -140,11 +139,11 @@ You are in a good operator posture when:
 - Switch to [Dashboard Management](dashboard.md) when the issue is inventory, export/import, inspection, or screenshot workflow.
 - Switch to [Alerting Governance](alert.md) when the problem is rule ownership, contact points, routes, or plan/apply flow.
 - Switch to [Access Management](access.md) when org, user, team, or service-account scope becomes part of the incident or maintenance task.
-- Switch to the [Command Docs](../../commands/en/index.md) when you already know the workflow and just need the exact flags.
+- Switch to the [Command Reference](../../commands/en/index.md) when you already know the workflow and just need the exact flags.
 
 ## Next steps
 
 - [Home](index.md)
 - [Workspace Review & Status](status-workspace.md)
 - [Dashboard Management](dashboard.md)
-- [Command Docs](../../commands/en/index.md)
+- [Command Reference](../../commands/en/index.md)

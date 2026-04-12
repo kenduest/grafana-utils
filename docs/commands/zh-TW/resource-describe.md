@@ -1,4 +1,4 @@
-# resource describe
+# `grafana-util status resource describe`
 
 ## 用途
 說明目前支援的 live Grafana resource kinds 與 selector 格式。
@@ -17,17 +17,17 @@
 ## 範例
 ```bash
 # 用途：說明所有支援的 live resource kinds。
-grafana-util resource describe
+grafana-util status resource describe
 ```
 
 ```bash
 # 用途：以 JSON 說明單一 resource kind。
-grafana-util resource describe dashboards --output-format json
+grafana-util status resource describe dashboards --output-format json
 ```
 
 ```bash
 # 用途：以表格說明單一 resource kind。
-grafana-util resource describe orgs --output-format table
+grafana-util status resource describe orgs --output-format table
 ```
 
 ## 相關指令

@@ -9,6 +9,18 @@ Current AI-maintained status only.
 - Detailed 2026-04-01 through 2026-04-12 entries moved to [`archive/ai-status-archive-2026-04-12.md`](/Users/kendlee/work/grafana-utils/docs/internal/archive/ai-status-archive-2026-04-12.md).
 - Keep this file short and current. Additive historical detail belongs in `docs/internal/archive/`.
 
+## 2026-04-12 - Add machine-readable docs surface contract and verifier
+- State: Done
+- Scope: `scripts/contracts/command-surface.json`, `scripts/check_docs_surface.py`, `Makefile`, `AGENTS.md`, maintainer routing docs, generated-doc playbook/architecture docs, and the affected public docs that still advertised removed roots or stale alert paths.
+- Current Update: added a machine-readable command/docs synchronization contract, a docs surface verifier that checks shell fenced examples and local links against the Rust CLI, and wired that check into the repo Make targets; updated AI-facing routing so future agents know this contract is mandatory when public command paths or help support change.
+- Result: public docs now have an enforceable sync point with the CLI surface, and future docs drift should fail fast through `make quality-docs-surface` instead of waiting for manual review.
+
+## 2026-04-12 - Externalize docs entry taxonomy and handbook command maps
+- State: Done
+- Scope: `scripts/contracts/docs-entrypoints.json`, `scripts/docgen_entrypoints.py`, `scripts/generate_command_html.py`, handbook HTML navigation, and landing/jump navigation output.
+- Current Update: moved landing quick commands, jump-select command entries, and handbook command-relationship maps into a machine-readable definition file, then updated the HTML generator to load and validate that data instead of carrying the navigation content in Python constants.
+- Result: docs-entry content can now evolve by editing a data file while Python stays responsible for validation and rendering, and handbook pages such as dashboard now expose the command family and subcommand relationships directly in the left nav and page intro.
+
 ## 2026-04-12 - Split production Rust modules and clean root artifacts
 - State: Done
 - Scope: `rust/src/sync/{mod.rs,cli_args.rs,dispatch.rs,output.rs,cli.rs}`, `rust/src/alert_cli_*`, `rust/src/alert_support_*`, `rust/src/dashboard/{browse_input*,history*}`, `rust/src/datasource_{export,import}_*`, `rust/audit-home.edited.json`, `rust/smoke-prom-only.edited.json`, and `rust/x`.

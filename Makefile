@@ -1,8 +1,8 @@
 VERSIONING_TARGETS := help print-version sync-version set-release-version set-dev-version
 PYTHON_TARGETS := poetry-install poetry-lock poetry-test poetry-quality-python build-python
-DOC_TARGETS := man man-check html html-check pages-site schema schema-check
+DOC_TARGETS := man man-check html html-check pages-site schema schema-check quality-docs-surface
 RUST_BUILD_TARGETS := build-rust build-rust-browser build-rust-native build-rust-native-browser build-rust-host build-rust-host-browser build-rust-macos-arm64 build-rust-macos-arm64-browser build-rust-linux-amd64 build-rust-linux-amd64-browser build-rust-linux-amd64-docker build-rust-linux-amd64-browser-docker build-rust-linux-amd64-zig validate-rust-linux-amd64-artifact validate-rust-linux-amd64-browser-artifact
-QUALITY_TARGETS := test test-python test-rust fmt-rust-check lint-rust quality quality-python quality-rust quality-ai-workflow quality-architecture quality-alert-rust quality-sync-rust quality-workspace-noise
+QUALITY_TARGETS := test test-python test-rust fmt-rust-check lint-rust quality quality-python quality-rust quality-ai-workflow quality-architecture quality-docs-surface quality-alert-rust quality-sync-rust quality-workspace-noise
 LIVE_TARGETS := seed-grafana-sample-data destroy-grafana-sample-data reset-grafana-all-data test-rust-live test-sync-live test-alert-live test-alert-live-artifact test-alert-live-replay test-access-live test-python-datasource-live test-datasource-live
 META_TARGETS := build
 
@@ -63,6 +63,7 @@ $(BLUE)$(BOLD)Docs$(RESET)
   $(GREEN)make html$(RESET)  Regenerate the HTML docs site: handbook + command reference, with docs/html/index.html as the entrypoint
   $(GREEN)make html-check$(RESET)  Fail if checked-in docs/html/**/*.html is out of date
   $(GREEN)make pages-site$(RESET)  Assemble the multi-version GitHub Pages docs artifact into build/docs-pages/
+  $(GREEN)make quality-docs-surface$(RESET)  Fail when Markdown command examples, locale parity, links, or help-full paths drift from the Rust CLI
 
 endef
 
@@ -101,6 +102,7 @@ $(BLUE)$(BOLD)Quality and tests$(RESET)
   $(GREEN)make quality-rust$(RESET)  Run the Rust quality gate script
   $(GREEN)make quality-ai-workflow$(RESET)  Run lightweight AI workflow drift checks for the current change set
   $(GREEN)make quality-architecture$(RESET)  Run Rust architecture guardrail checks for root noise, file size, render risk, and help-test brittleness
+  $(GREEN)make quality-docs-surface$(RESET)  Run command-surface, locale parity, and local-link drift checks for Markdown docs
   $(GREEN)make quality-alert-rust$(RESET)  Run focused Rust alert contract checks
   $(GREEN)make quality-sync-rust$(RESET)  Run focused Rust sync contract checks
   $(GREEN)make quality-workspace-noise$(RESET)  Fail when scratch/noise files currently show up in git status
@@ -182,6 +184,9 @@ html-check:
 
 pages-site:
 	$(PYTHON) ./scripts/build_pages_site.py --output-dir ./build/docs-pages
+
+quality-docs-surface:
+	$(PYTHON) ./scripts/check_docs_surface.py
 
 build: build-python build-rust
 	@printf '%s\n' 'Build outputs:'

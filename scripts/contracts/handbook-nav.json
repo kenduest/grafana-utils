@@ -1,0 +1,112 @@
+{
+  "schema": 1,
+  "order": [
+    "index.md",
+    "what-is-grafana-util.md",
+    "getting-started.md",
+    "role-new-user.md",
+    "role-sre-ops.md",
+    "role-automation-ci.md",
+    "architecture.md",
+    "dashboard.md",
+    "datasource.md",
+    "alert.md",
+    "access.md",
+    "status-workspace.md",
+    "scenarios.md",
+    "recipes.md",
+    "reference.md",
+    "troubleshooting.md"
+  ],
+  "nav_groups": [
+    {
+      "key": "start",
+      "label_en": "Part 1 · Start Here",
+      "label_zh_tw": "第 1 部 · 起步",
+      "files": [
+        "index.md",
+        "what-is-grafana-util.md",
+        "getting-started.md"
+      ]
+    },
+    {
+      "key": "role-paths",
+      "label_en": "Part 2 · Role Paths",
+      "label_zh_tw": "第 2 部 · 角色路徑",
+      "files": [
+        "role-new-user.md",
+        "role-sre-ops.md",
+        "role-automation-ci.md"
+      ]
+    },
+    {
+      "key": "operation-surfaces",
+      "label_en": "Part 3 · Operation Surfaces",
+      "label_zh_tw": "第 3 部 · 操作面",
+      "files": [
+        "status-workspace.md",
+        "dashboard.md",
+        "datasource.md",
+        "alert.md",
+        "access.md"
+      ]
+    },
+    {
+      "key": "design-principles",
+      "label_en": "Part 4 · Design Principles",
+      "label_zh_tw": "第 4 部 · 設計原則",
+      "files": [
+        "architecture.md"
+      ]
+    },
+    {
+      "key": "reference-troubleshooting",
+      "label_en": "Part 5 · Reference & Troubleshooting",
+      "label_zh_tw": "第 5 部 · 參考與排錯",
+      "files": [
+        "scenarios.md",
+        "recipes.md",
+        "reference.md",
+        "troubleshooting.md"
+      ]
+    }
+  ],
+  "nav_titles": {
+    "en": {
+      "index": "Overview",
+      "what-is-grafana-util": "What grafana-util is for",
+      "getting-started": "Getting Started",
+      "role-new-user": "First Run / Beginner Path",
+      "role-sre-ops": "SRE / Operator",
+      "role-automation-ci": "Automation / CI",
+      "status-workspace": "Status & Workspace",
+      "dashboard": "Dashboard",
+      "datasource": "Datasource",
+      "alert": "Alert",
+      "access": "Access",
+      "architecture": "Design Principles",
+      "scenarios": "Scenarios",
+      "recipes": "Recipes",
+      "reference": "Reference",
+      "troubleshooting": "Troubleshooting"
+    },
+    "zh-TW": {
+      "index": "概觀",
+      "what-is-grafana-util": "這個工具是做什麼的",
+      "getting-started": "開始使用",
+      "role-new-user": "第一次執行 / 新手路線",
+      "role-sre-ops": "SRE / 維運",
+      "role-automation-ci": "自動化 / CI",
+      "status-workspace": "Status / Workspace",
+      "dashboard": "Dashboard",
+      "datasource": "Datasource",
+      "alert": "Alert",
+      "access": "Access",
+      "architecture": "設計原則",
+      "scenarios": "情境手冊",
+      "recipes": "實戰錦囊",
+      "reference": "技術參考",
+      "troubleshooting": "疑難排解"
+    }
+  }
+}

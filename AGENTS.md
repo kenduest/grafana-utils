@@ -14,6 +14,8 @@
 - If Python context is required, start in `python/grafana_utils/`, `python/tests/`, and `python/pyproject.toml`.
 - First-entry maintainer routing lives in `docs/internal/maintainer-quickstart.md`.
 - Repo-specific AI workflow and task brief guidance live in `docs/internal/ai-workflow-note.md` and `docs/internal/task-brief-template.md`.
+- Machine-readable CLI/docs synchronization contract lives in `scripts/contracts/command-surface.json`; update it when public command paths, legacy replacements, command-doc routing, or `--help-full` support change.
+- Machine-readable docs-entry/navigation contract lives in `scripts/contracts/docs-entrypoints.json`; update it when landing quick commands, jump-select entries, or handbook command-relationship maps change.
 - Put external/operator usage in `README.md`, `README.zh-TW.md`, `docs/user-guide/`, and `docs/commands/`.
 - Put maintainer behavior, internal mappings, and implementation tradeoffs in `docs/DEVELOPER.md`.
 - Treat `docs/user-guide/{en,zh-TW}/` as the handbook source layer.
@@ -28,6 +30,7 @@
 - Target Python 3.9+ in touched Python code and prefer modern built-in generics.
 - Use 4-space indentation and descriptive `snake_case` names.
 - Keep CLI help and docs concrete and operator-focused.
+- When changing public CLI paths, help text, README snippets, handbook examples, or command docs, verify examples against `scripts/contracts/command-surface.json` and run `make quality-docs-surface`.
 - Use high-dimensional project thinking before local UX or CLI changes: identify the shared user journey, command family, docs layer, generated artifacts, tests, and future extension path before patching one visible symptom.
 - For public CLI and documentation surfaces, prefer one shared taxonomy or renderer over per-command special cases. If one command needs grouped help, color rules, terminology, or onboarding treatment, check sibling entrypoints for the same class of problem.
 - Treat inconsistency across command roots as an architecture issue, not a cosmetic issue. Fix the common layer when possible, then add regression coverage that spans multiple entrypoints.
@@ -35,6 +38,8 @@
   - `grafana-util dashboard ...`
   - `grafana-util alert ...`
   - `grafana-util access ...`
+  - `grafana-util status ...`
+  - `grafana-util config profile ...`
 - Rust profile credentials now support `file`, `os`, and `encrypted-file` secret modes.
 - OS-backed profile secret storage is supported on macOS and Linux only.
 - Default Rust builds stay lean and do not include the `browser` feature unless the task explicitly targets the browser-enabled artifact lane.
@@ -48,6 +53,7 @@
 - Canonical Python test command: `cd python && PYTHONPATH=. poetry run python -m unittest -v tests`
 - Combined validation entry point: `make test`
 - AI workflow drift check entry point: `make quality-ai-workflow`
+- CLI/docs surface drift check entry point: `make quality-docs-surface`
 - Generated-doc validation entry points: `make man-check` and `make html-check`
 - When changing handbook, command-reference, or docs-generator behavior, regenerate with `make man` and `make html` instead of editing generated output only.
 - Add or update tests for every user-visible behavior change.

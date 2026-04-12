@@ -1,4 +1,4 @@
-# resource
+# `grafana-util status resource`
 
 ## 用途
 透過通用、唯讀的查詢介面讀取少數幾種 live Grafana 資源。
@@ -9,13 +9,15 @@
 ## 說明
 這個命名空間刻意比主要維運工作流更通用、更窄。它的目的不是取代既有的高階操作，而是提供一條唯讀資源查詢路徑，讓你能先檢查少數支援的 live Grafana resource kinds。
 
+舊的 top-level `grafana-util resource ...` 已不是公開入口；請改用 `grafana-util status resource ...`。
+
 把它當成通用查詢工具，不是日常 mutation 的主入口。
 
 ## 使用方式
-- 先用 `resource describe` 看各 kind 的 selector 格式與 endpoint 形狀。
-- 先用 `resource kinds` 看目前支援哪些 live resource kinds。
-- 需要盤點某一類資源時，用 `resource list <kind>`。
-- 需要抓某一筆完整 live payload 時，用 `resource get <kind>/<identity>`。
+- 先用 `status resource describe` 看各 kind 的 selector 格式與 endpoint 形狀。
+- 先用 `status resource kinds` 看目前支援哪些 live resource kinds。
+- 需要盤點某一類資源時，用 `status resource list <kind>`。
+- 需要抓某一筆完整 live payload 時，用 `status resource get <kind>/<identity>`。
 
 ## 目前支援的 kinds
 - `dashboards`
@@ -32,22 +34,22 @@
 ## 範例
 ```bash
 # 用途：說明目前支援的 live resource kinds 與 selector 格式。
-grafana-util resource describe
+grafana-util status resource describe
 ```
 
 ```bash
 # 用途：顯示目前支援的 resource kinds。
-grafana-util resource kinds
+grafana-util status resource kinds
 ```
 
 ```bash
 # 用途：從本機 Grafana 列出 live dashboards。
-grafana-util resource list dashboards --url http://localhost:3000 --basic-user admin --basic-password admin
+grafana-util status resource list dashboards --url http://localhost:3000 --basic-user admin --basic-password admin
 ```
 
 ```bash
 # 用途：以 YAML 取得單一 datasource payload。
-grafana-util resource get datasources/prom-main --profile prod --output-format yaml
+grafana-util status resource get datasources/prom-main --profile prod --output-format yaml
 ```
 
 ## 相關指令

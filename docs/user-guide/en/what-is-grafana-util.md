@@ -168,7 +168,7 @@ If you are starting now, read these next:
 
 - [Getting Started](getting-started.md)
 - [New User Path](role-new-user.md)
-- [Command Docs](../../commands/en/index.md)
+- [Command Reference](../../commands/en/index.md)
 
 ---
 [⬅️ Back to handbook home](index.md) | [➡️ Next: Getting Started](getting-started.md)

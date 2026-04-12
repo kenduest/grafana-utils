@@ -4,8 +4,8 @@
 
 - 繁體中文手冊：[目前頁面](./index.md)
 - English handbook: [英文手冊](../en/index.md)
-- 繁體中文指令詳細說明：[指令詳細說明](../../commands/zh-TW/index.md)
-- English command reference: [Command Docs](../../commands/en/index.md)
+- 繁體中文指令參考：[指令參考](../../commands/zh-TW/index.md)
+- English command reference: [Command Reference](../../commands/en/index.md)
 
 ---
 
@@ -32,7 +32,7 @@
 
 - 如果還不知道自己該看 dashboard、alert、access 還是 workspace，先回到用途頁和角色路線圖。
 - 如果第一條即時唯讀命令失敗，先修連線或驗證，不要先往變更章節走。
-- 如果你只是在找精確旗標，請直接切到指令詳細說明，不要硬從手冊猜。
+- 如果你只是在找精確旗標，請直接切到指令參考，不要硬從手冊猜。
 
 ---
 
@@ -116,7 +116,7 @@ grafana-util status overview live --url http://localhost:3000 --basic-user admin
 *   **[實戰錦囊與最佳實踐](recipes.md)**：整理 Grafana 日常常見問題與建議做法。
 *   **[技術參考手冊](reference.md)**：集中說明常用旗標、輸出格式與操作原則。
 *   **[共用 Diff JSON contract](diff-json-contract.md)**：dashboard、alert、datasource diff 共用的 JSON envelope、summary 與 row 欄位說明。
-*   **[指令詳細說明](../../commands/zh-TW/index.md)**：每個 command 和 subcommand 都有獨立頁面，適合直接查語法與旗標。
+*   **[指令參考](../../commands/zh-TW/index.md)**：每個 command 和 subcommand 都有獨立頁面，適合直接查語法與旗標。
 *   **[疑難排解與名詞解釋](troubleshooting.md)**：故障排除導引與術語索引。
 
 ---
@@ -126,15 +126,15 @@ grafana-util status overview live --url http://localhost:3000 --basic-user admin
 不同角色適合的閱讀順序不太一樣：
 
 *   **新使用者**
-  先看 [這個工具是做什麼的](what-is-grafana-util.md)，再看 [新手快速入門](role-new-user.md) 與 [開始使用](getting-started.md)，需要查精確旗標時再查看 [指令詳細說明](../../commands/zh-TW/index.md)。
+  先看 [這個工具是做什麼的](what-is-grafana-util.md)，再看 [新手快速入門](role-new-user.md) 與 [開始使用](getting-started.md)，需要查精確旗標時再查看 [指令參考](../../commands/zh-TW/index.md)。
 *   **SRE / 維運人員**
   先看 [SRE / 維運角色導讀](role-sre-ops.md)，再看 [Workspace 審查與狀態](status-workspace.md)、[Dashboard 管理](dashboard.md)、[Data source 管理](datasource.md)、[疑難排解](troubleshooting.md)。
 *   **身份 / 權限管理者**
-  先看 [Access 管理](access.md)，再看 [技術參考手冊](reference.md)，最後搭配 [指令詳細說明](../../commands/zh-TW/index.md)。
+  先看 [Access 管理](access.md)，再看 [技術參考手冊](reference.md)，最後搭配 [指令參考](../../commands/zh-TW/index.md)。
 *   **自動化 / CI 維護者**
   先看 [自動化 / CI 角色導讀](role-automation-ci.md)，再看 [技術參考手冊](reference.md)，需要終端機版摘要時可搭配 `docs/man/grafana-util.1`。
 *   **維護者 / 架構師**
-  先看 [DEVELOPER.md](../DEVELOPER.md)，再看 [maintainer-role-map.md](../internal/maintainer-role-map.md) 與 [internal README](../internal/README.md) 裡的設計與維護文件。
+  先看 [DEVELOPER.md](../../DEVELOPER.md)，再看 [maintainer-role-map.md](../../internal/maintainer-role-map.md) 與 [internal README](../../internal/README.md) 裡的設計與維護文件。
 
 ---
 

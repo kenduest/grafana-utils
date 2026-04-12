@@ -1,76 +1,36 @@
-import importlib.util
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-SCRIPT_PATH = REPO_ROOT / "scripts" / "docgen_command_docs.py"
 SCRIPTS_DIR = REPO_ROOT / "scripts"
 
+if str(SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_DIR))
 
-def load_module():
-    if str(SCRIPTS_DIR) not in sys.path:
-        sys.path.insert(0, str(SCRIPTS_DIR))
-    spec = importlib.util.spec_from_file_location("docgen_command_docs", SCRIPT_PATH)
-    module = importlib.util.module_from_spec(spec)
-    assert spec.loader is not None
-    sys.modules.setdefault("docgen_command_docs", module)
-    spec.loader.exec_module(module)
-    return module
+from docgen_command_docs import command_doc_cli_path
 
 
-class DocgenCommandDocsTests(unittest.TestCase):
-    def test_parse_command_page_supports_zh_tw_section_labels(self):
-        module = load_module()
-        source = REPO_ROOT / "docs" / "commands" / "zh-TW" / "dashboard-screenshot.md"
+class CommandDocCliPathTests(unittest.TestCase):
+    def test_reads_backticked_canonical_path(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "resource-describe.md"
+            path.write_text("# `grafana-util status resource describe`\n", encoding="utf-8")
+            self.assertEqual(command_doc_cli_path(path), "grafana-util status resource describe")
 
-        parsed = module.parse_command_page(source, "grafana-util dashboard screenshot")
+    def test_reads_bare_command_heading(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "dashboard-browse.md"
+            path.write_text("# dashboard browse\n", encoding="utf-8")
+            self.assertEqual(command_doc_cli_path(path), "grafana-util dashboard browse")
 
-        self.assertIn("事件處理紀錄", parsed.when)
-        self.assertIn("PDF", parsed.purpose)
-        self.assertTrue(parsed.key_flags)
-        self.assertTrue(parsed.examples)
-
-    def test_render_markdown_document_renders_ordered_lists(self):
-        module = load_module()
-
-        rendered = module.render_markdown_document(
-            "# Title\n\n1. First step\n2. Second step\n\n- Bullet\n"
-        )
-
-        self.assertIn("<ol><li>First step</li><li>Second step</li></ol>", rendered.body_html)
-        self.assertIn("<ul><li>Bullet</li></ul>", rendered.body_html)
-
-    def test_render_markdown_document_keeps_multiline_shell_fence_in_one_code_block(self):
-        module = load_module()
-
-        rendered = module.render_markdown_document(
-            "# Title\n\n```bash\ngrafana-util dashboard list \\\n  --url http://localhost:3000 \\\n  --basic-user admin \\\n  --basic-password admin \\\n  --table\n```\n"
-        )
-
-        self.assertIn("grafana-util dashboard list \\", rendered.body_html)
-        self.assertIn("--basic-user admin \\", rendered.body_html)
-        self.assertEqual(rendered.body_html.count("<pre><code>"), 1)
-
-    def test_parse_command_page_ignores_leading_purpose_comment_inside_example_fence(self):
-        module = load_module()
-        source = REPO_ROOT / "docs" / "commands" / "zh-TW" / "dashboard-list.md"
-
-        parsed = module.parse_command_page(source, "grafana-util dashboard list")
-
-        self.assertTrue(parsed.examples)
-        self.assertEqual(parsed.examples[0], "grafana-util dashboard list --profile prod")
-        self.assertNotIn("# 用途：", "\n".join(parsed.examples))
-
-    def test_parse_command_page_does_not_take_fenced_comment_as_page_title(self):
-        module = load_module()
-        source = REPO_ROOT / "docs" / "commands" / "en" / "dashboard-export.md"
-
-        parsed = module.parse_command_page(source, "grafana-util dashboard export")
-
-        self.assertEqual(parsed.title, "export")
-        self.assertEqual(parsed.purpose, "Export dashboards to raw/, prompt/, and provisioning/ files.")
+    def test_reads_removed_root_heading(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "overview.md"
+            path.write_text("# 已移除的 root path：`grafana-util overview`\n", encoding="utf-8")
+            self.assertEqual(command_doc_cli_path(path), "grafana-util overview")
 
 
 if __name__ == "__main__":

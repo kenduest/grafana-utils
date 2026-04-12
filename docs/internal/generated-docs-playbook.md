@@ -15,6 +15,10 @@ If you need to:
 - change landing-page source parsing: edit `scripts/docgen_landing.py`
 - change handbook ordering or prev/next navigation: edit `scripts/docgen_handbook.py`
 - change handbook sidebar grouping: edit `scripts/docgen_handbook.py`
+- change landing quick commands, jump-select command entries, or handbook
+  command-relationship maps: edit `scripts/contracts/docs-entrypoints.json`
+- change public command paths, legacy replacements, command-doc routing, or
+  `--help-full` support: edit `scripts/contracts/command-surface.json`
 - change command-to-handbook back-links in HTML: edit `scripts/generate_command_html.py`
 - add or remove a namespace manpage: edit `scripts/generate_manpages.py`
 - change supported Markdown behavior: edit `scripts/docgen_command_docs.py`
@@ -28,9 +32,11 @@ After any docs-generator change:
 # Purpose: After any docs-generator change.
 make man
 make html
+make quality-docs-surface
 make man-check
 make html-check
 python3 -m unittest -v \
+  python.tests.test_python_docgen_entrypoints \
   python.tests.test_python_docgen_landing \
   python.tests.test_python_generate_manpages \
   python.tests.test_python_generate_command_html
@@ -75,6 +81,8 @@ When it also needs manpage coverage:
 
 - update the matching `NamespaceSpec` in [generate_manpages.py](/Users/kendlee/work/grafana-utils/scripts/generate_manpages.py)
 - add the new Markdown filename to `sub_docs`
+- update `scripts/contracts/command-surface.json` so docs examples and legacy
+  replacements are checked against the new public path
 
 If the new command should link back to a handbook chapter in HTML:
 
@@ -133,10 +141,12 @@ Checklist:
 1. rename or remove the Markdown file in both locales
 2. update locale command indexes
 3. update any `sub_docs` references in `NAMESPACE_SPECS`
-4. update `HANDBOOK_CONTEXT_BY_COMMAND` if the stem changed
-5. update handbook pages that deep-link to the old filename
-6. regenerate HTML and manpages
-7. review for broken navigation or missing generated pages
+4. update `scripts/contracts/command-surface.json` if the public path, legacy
+   replacement, or docs routing changed
+5. update `HANDBOOK_CONTEXT_BY_COMMAND` if the stem changed
+6. update handbook pages that deep-link to the old filename
+7. regenerate HTML and manpages
+8. review for broken navigation or missing generated pages
 
 ## Task: Change HTML Layout Or Theme
 

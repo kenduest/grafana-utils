@@ -1,11 +1,12 @@
 """Shared handbook metadata for generated HTML manual pages.
 
-This file keeps the handbook chapter order and locale paths explicit so the
-HTML generator can stay focused on rendering.
+This module loads handbook order and navigation structure from a machine-
+readable contract so renderer code stays focused on layout behavior.
 """
 
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -18,50 +19,83 @@ def get_handbook_root(repo_root: Path = REPO_ROOT) -> Path:
 
 HANDBOOK_ROOT = get_handbook_root()
 HANDBOOK_LOCALES = ("en", "zh-TW")
-HANDBOOK_ORDER = (
-    "index.md",
-    "what-is-grafana-util.md",
-    "getting-started.md",
-    "role-new-user.md",
-    "role-sre-ops.md",
-    "role-automation-ci.md",
-    "architecture.md",
-    "dashboard.md",
-    "datasource.md",
-    "alert.md",
-    "access.md",
-    "status-workspace.md",
-    "scenarios.md",
-    "recipes.md",
-    "reference.md",
-    "troubleshooting.md",
-)
-HANDBOOK_NAV_GROUPS = (
-    ("start", ("index.md", "what-is-grafana-util.md", "getting-started.md")),
-    ("role-paths", ("role-new-user.md", "role-sre-ops.md", "role-automation-ci.md")),
-    ("core-operations", ("dashboard.md", "datasource.md", "alert.md", "access.md")),
-    ("governance", ("architecture.md", "status-workspace.md")),
-    ("scenarios-reference", ("scenarios.md", "recipes.md", "reference.md", "troubleshooting.md")),
-)
-HANDBOOK_NAV_GROUP_LABELS = {
-    "en": {
-        "start": "Start",
-        "role-paths": "Role Paths",
-        "core-operations": "Core Operations",
-        "governance": "Governance",
-        "scenarios-reference": "Scenarios & Reference",
-    },
-    "zh-TW": {
-        "start": "開始",
-        "role-paths": "角色路徑",
-        "core-operations": "核心操作",
-        "governance": "治理",
-        "scenarios-reference": "實戰與參考",
-    },
-}
+HANDBOOK_NAV_PATH = REPO_ROOT / "scripts" / "contracts" / "handbook-nav.json"
 LOCALE_LABELS = {
     "en": "English",
     "zh-TW": "繁體中文",
+}
+
+
+@dataclass(frozen=True)
+class HandbookNavGroup:
+    key: str
+    files: tuple[str, ...]
+    labels: dict[str, str]
+
+    def label_for(self, locale: str) -> str:
+        return self.labels[locale]
+
+
+def _expect_str(value: object, field: str) -> str:
+    if not isinstance(value, str) or not value:
+        raise TypeError(f"{field} must be a non-empty string")
+    return value
+
+
+def _expect_list(value: object, field: str) -> list[object]:
+    if not isinstance(value, list):
+        raise TypeError(f"{field} must be a list")
+    return value
+
+
+def _expect_dict(value: object, field: str) -> dict[str, object]:
+    if not isinstance(value, dict):
+        raise TypeError(f"{field} must be an object")
+    return value
+
+
+def _load_handbook_nav_contract() -> tuple[tuple[str, ...], tuple[HandbookNavGroup, ...], dict[str, dict[str, str]]]:
+    raw = json.loads(HANDBOOK_NAV_PATH.read_text(encoding="utf-8"))
+    if raw.get("schema") != 1:
+        raise ValueError(f"Unsupported handbook nav schema in {HANDBOOK_NAV_PATH}")
+
+    order = tuple(
+        _expect_str(item, f"order[{index}]")
+        for index, item in enumerate(_expect_list(raw.get("order"), "order"))
+    )
+
+    groups: list[HandbookNavGroup] = []
+    for index, group in enumerate(_expect_list(raw.get("nav_groups"), "nav_groups")):
+        group_dict = _expect_dict(group, f"nav_groups[{index}]")
+        groups.append(
+            HandbookNavGroup(
+                key=_expect_str(group_dict.get("key"), f"nav_groups[{index}].key"),
+                labels={
+                    "en": _expect_str(group_dict.get("label_en"), f"nav_groups[{index}].label_en"),
+                    "zh-TW": _expect_str(group_dict.get("label_zh_tw"), f"nav_groups[{index}].label_zh_tw"),
+                },
+                files=tuple(
+                    _expect_str(item, f"nav_groups[{index}].files[{file_index}]")
+                    for file_index, item in enumerate(_expect_list(group_dict.get("files"), f"nav_groups[{index}].files"))
+                ),
+            )
+        )
+
+    nav_titles: dict[str, dict[str, str]] = {}
+    for locale, titles in _expect_dict(raw.get("nav_titles"), "nav_titles").items():
+        title_map = _expect_dict(titles, f"nav_titles.{locale}")
+        nav_titles[locale] = {
+            stem: _expect_str(value, f"nav_titles.{locale}.{stem}")
+            for stem, value in title_map.items()
+        }
+
+    return order, tuple(groups), nav_titles
+
+
+HANDBOOK_ORDER, HANDBOOK_NAV_GROUPS, HANDBOOK_NAV_TITLES = _load_handbook_nav_contract()
+HANDBOOK_NAV_GROUP_LABELS = {
+    locale: {group.key: group.label_for(locale) for group in HANDBOOK_NAV_GROUPS}
+    for locale in HANDBOOK_LOCALES
 }
 
 
@@ -77,10 +111,14 @@ class HandbookPage:
     next_output_rel: str | None
     next_title: str | None
     language_switch_rel: str | None
+    chapter_number: int
+    total_chapters: int
+    part_key: str
+    part_number: int
 
 
 def _validate_handbook_nav_groups() -> None:
-    nav_files = [filename for _, filenames in HANDBOOK_NAV_GROUPS for filename in filenames]
+    nav_files = [filename for group in HANDBOOK_NAV_GROUPS for filename in group.files]
     if len(nav_files) != len(set(nav_files)):
         raise ValueError("HANDBOOK_NAV_GROUPS must not contain duplicate handbook files")
     if set(nav_files) != set(HANDBOOK_ORDER):
@@ -109,10 +147,12 @@ def build_handbook_pages(locale: str, handbook_root: Path = HANDBOOK_ROOT) -> li
     filenames = existing_handbook_files(locale, handbook_root)
     output_rels = [f"handbook/{locale}/{Path(name).with_suffix('.html').as_posix()}" for name in filenames]
     titles = [parse_title(locale_dir / filename) for filename in filenames]
+    part_numbers = {group.key: index + 1 for index, group in enumerate(HANDBOOK_NAV_GROUPS)}
     pages: list[HandbookPage] = []
     for index, filename in enumerate(filenames):
         source_path = locale_dir / filename
         output_rel = output_rels[index]
+        part_key = next(group.key for group in HANDBOOK_NAV_GROUPS if filename in group.files)
         other_locale = next((candidate for candidate in HANDBOOK_LOCALES if candidate != locale), None)
         other_output_rel = None
         if other_locale is not None:
@@ -131,6 +171,10 @@ def build_handbook_pages(locale: str, handbook_root: Path = HANDBOOK_ROOT) -> li
                 next_output_rel=output_rels[index + 1] if index + 1 < len(output_rels) else None,
                 next_title=titles[index + 1] if index + 1 < len(output_rels) else None,
                 language_switch_rel=other_output_rel,
+                chapter_number=index + 1,
+                total_chapters=len(filenames),
+                part_key=part_key,
+                part_number=part_numbers[part_key],
             )
         )
     return pages

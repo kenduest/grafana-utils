@@ -21,11 +21,6 @@ Create a low-level staged alert rule scaffold.
 grafana-util alert new-rule --desired-dir ./alerts/desired --name cpu-main
 ```
 
-```bash
-# Purpose: Create a low-level staged alert rule scaffold.
-grafana-util alert add-rule --desired-dir ./alerts/desired --name cpu-main --folder platform-alerts --rule-group cpu --receiver pagerduty-primary
-```
-
 ## Related commands
 
 - [alert](./alert.md)

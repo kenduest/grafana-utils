@@ -37,6 +37,9 @@ Open these in order:
    - supported validation and generation entrypoints
 7. `docs/internal/README.md`
    - current internal-doc inventory
+8. `scripts/contracts/command-surface.json`
+   - machine-readable CLI/docs synchronization contract for public command
+     paths, legacy replacements, doc routing, and `--help-full` support
 
 Then branch by task:
 
@@ -88,6 +91,10 @@ Treat these as authoritative:
   - `docs/internal/generated-docs-architecture.md`
   - `docs/internal/generated-docs-playbook.md`
   - `docs/internal/zh-tw-style-guide.md`
+- CLI/docs synchronization:
+  - `scripts/contracts/command-surface.json`
+  - `scripts/check_docs_surface.py`
+  - `make quality-docs-surface`
 
 Treat these as generated output, not source:
 
@@ -114,7 +121,8 @@ If the task is:
 - change/status/overview behavior:
   - start with `rust/src/sync/` and the related internal architecture docs
 - handbook or command docs:
-  - start with `docs/user-guide/` or `docs/commands/`
+  - start with `docs/user-guide/` or `docs/commands/`, then validate command
+    examples against `scripts/contracts/command-surface.json`
 - generated HTML or manpages:
   - start with the generated-docs architecture/playbook and the generator
     scripts under `scripts/`
@@ -133,6 +141,7 @@ When you are still orienting, prefer the narrowest non-destructive checks:
 ```bash
 # Purpose: When you are still orienting, prefer the narrowest non-destructive checks.
 make help
+make quality-docs-surface
 make man-check
 make html-check
 cd rust && cargo test --quiet

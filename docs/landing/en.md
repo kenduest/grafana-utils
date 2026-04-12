@@ -119,7 +119,7 @@ Narrative docs, role-based guides, architecture notes, scenarios, and troublesho
 Full command docs by namespace, subcommand, and flag.
 
 - [Browse commands](../commands/en/index.md)
-- [Browse manpages](../man/index.html)
+- [Browse manpages](../html/man/grafana-util.html)
 
 ### Source code and releases
 

@@ -9,6 +9,16 @@ Current AI change log only.
 - Detailed 2026-04-01 through 2026-04-12 entries moved to [`archive/ai-changes-archive-2026-04-12.md`](/Users/kendlee/work/grafana-utils/docs/internal/archive/ai-changes-archive-2026-04-12.md).
 - Keep this file limited to the latest active architecture and maintenance changes.
 
+## 2026-04-12 - Externalize docs entry taxonomy and add handbook command maps
+- Summary: added `scripts/contracts/docs-entrypoints.json` as the shared definition file for landing quick commands, jump-select command entries, and handbook command-relationship maps; replaced the hard-coded Python metadata with a validating loader in `scripts/docgen_entrypoints.py`.
+- User impact: the generated docs homepage now exposes a stable "First 3 Commands" panel, jump navigation includes `version` and `config profile`, and handbook pages such as dashboard show grouped subcommand relationships in both the left nav and an in-page command map.
+- Validation: `make html`; `make html-check`; `make quality-docs-surface`; `python3 -m unittest -v python.tests.test_python_docgen_entrypoints python.tests.test_python_docgen_command_docs python.tests.test_python_check_docs_surface`
+
+## 2026-04-12 - Add docs surface contract and verifier
+- Summary: introduced `scripts/contracts/command-surface.json` plus `scripts/check_docs_surface.py`, added `make quality-docs-surface`, routed AGENTS/maintainer docs to that contract, and corrected stale public docs that still taught removed roots or old alert command shapes.
+- Test Run: `python3 scripts/check_docs_surface.py`; `make man`; `make html`; `make man-check`; `make html-check`; `make quality-docs-surface`; `git diff --check`.
+- Follow-up: when public command paths, legacy replacements, command-doc routing, or `--help-full` support change, update the command surface contract first and keep shell fenced examples as the only verifier-owned executable doc examples.
+
 ## 2026-04-12 - Split production Rust modules and clean root artifacts
 - Summary: split the sync, alert CLI, alert support, dashboard history, dashboard browse, and datasource import/export Rust surfaces into smaller owning modules, then removed the stale tracked root artifacts left in `rust/`.
 - Test Run: `cargo fmt --manifest-path rust/Cargo.toml --all --check`; `cargo check --manifest-path rust/Cargo.toml --lib --quiet`; `cargo clippy --manifest-path rust/Cargo.toml --all-targets -- -D warnings`; `cargo test --manifest-path rust/Cargo.toml --quiet -- --test-threads=1`; `make man-check`; `make html-check`; `make quality-ai-workflow`; `make quality-architecture`; `make quality-workspace-noise`; `git diff --check`.

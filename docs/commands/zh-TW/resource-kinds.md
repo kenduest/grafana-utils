@@ -1,4 +1,4 @@
-# resource kinds
+# `grafana-util status resource kinds`
 
 ## 用途
 列出 `resource` 命名空間目前支援的 live resource kinds。
@@ -12,12 +12,12 @@
 ## 範例
 ```bash
 # 用途：用表格列出支援的 resource kinds。
-grafana-util resource kinds
+grafana-util status resource kinds
 ```
 
 ```bash
 # 用途：以 JSON 輸出相同的支援清單。
-grafana-util resource kinds --output-format json
+grafana-util status resource kinds --output-format json
 ```
 
 ## 相關指令

@@ -1,24 +1,26 @@
 # Overview Architecture
 
-Maintainer note for `grafana-util overview`.
+Maintainer note for `grafana-util status overview` and the legacy `overview`
+root.
 
 This file is the source of truth for the Rust `overview` design intent:
 - which module owns which responsibility
 - how data moves from staged artifacts to output
 - how to extend the system without turning it into AI-shaped sprawl
 
-`overview` is the current shipped owner of staged-artifact aggregation and
-document projection. The broader shared `status` contract is described in the
-internal `project-status` architecture notes and should be treated as shared
-architecture, not as a second overview-owned product surface.
+`status overview` is the current shipped owner of staged-artifact aggregation
+and document projection. The legacy `overview` root is now just a compatibility
+and migration reference. The broader shared `status` contract is described in
+the internal `project-status` architecture notes and should be treated as
+shared architecture, not as a second overview-owned product surface.
 
 It is not an operator guide. Keep command examples and user-facing behavior in
 `README.md` and the user guides.
 
 ## Purpose
 
-`grafana-util overview` is a staged-artifact aggregator with one thin live
-entrypoint.
+`grafana-util status overview` is a staged-artifact aggregator with one thin
+live entrypoint.
 
 It does not fetch live state by default, and it should not invent a second
 parallel analysis pipeline. Its job is to:

@@ -1,33 +1,27 @@
-# alert
+# `grafana-util alert`
 
 ## 這一頁對應的工作流
 
 | 工作流 | 常用子命令 |
 | --- | --- |
-| 盤點現況 | `list-rules`、`list-contact-points`、`list-mute-timings`、`list-templates` |
+| 盤點現況 | `list-rules`、`list-contact-points`、`list-mute-timings`、`list-templates`、`delete` |
 | 匯出 / 匯入 / 比對 | `export`、`import`、`diff` |
-| 變更規劃與套用 | `plan`、`apply`、`delete` |
-| 規則 / 聯絡點 / 路由撰寫 | `new-rule`、`add-rule`、`clone-rule`、`new-contact-point`、`add-contact-point`、`new-template`、`set-route`、`preview-route` |
+| 變更規劃與套用 | `plan`、`apply` |
+| 規則 / 聯絡點 / 路由撰寫 | `init`、`new-rule`、`add-rule`、`clone-rule`、`new-contact-point`、`add-contact-point`、`new-template`、`set-route`、`preview-route` |
 
 ## 從這裡開始
 
 - 先盤點：`alert list-rules`、`alert list-contact-points`
 - 先看現況再改：`alert export`、`alert diff`
 - 先規劃再套用：`alert plan`、`alert apply`
-- 先建草稿：`alert new-rule`、`alert new-contact-point`、`alert new-template`
+- 先建草稿：`alert init`、`alert new-rule`、`alert new-contact-point`、`alert new-template`
 - 先調路由：`alert set-route`、`alert preview-route`
 
 ## 說明
 
-`grafana-util alert` 把告警工作流收在同一個入口：從盤點、匯出、比對，到路由設計、草稿撰寫，再到 plan / apply。這頁適合先搞懂規則、通知路由與 contact point 的關係，再決定要往哪個子命令深入。
+`grafana-util alert` 把告警工作流收在同一個較淺的入口，並依任務把 help 分成盤點、搬移、撰寫與審查幾個區塊：從盤點、匯出、比對，到路由設計、草稿撰寫，再到 plan / apply。這頁適合先搞懂規則、通知路由與 contact point 的關係，再決定要往哪個子命令深入。
 
-新的 canonical 分組方式是：
-
-- `alert live ...`
-- `alert migrate ...`
-- `alert author ...`
-- `alert scaffold ...`
-- `alert plan/apply ...`
+目前公開命令不使用舊的 `alert live ...`、`alert migrate ...`、`alert author ...` 分層；請直接使用 `grafana-util alert list-rules`、`grafana-util alert export`、`grafana-util alert init`、`grafana-util alert preview-route` 這類 current path。
 
 ## 採用前後對照
 
@@ -50,18 +44,23 @@
 
 - `--profile`、`--url`、`--token`、`--basic-user`、`--basic-password`
 - `--prompt-password`、`--prompt-token`、`--timeout`、`--verify-ssl`
-- 巢狀子命令主要分成 `live`、`export`、`import`、`diff`、`plan`、`apply`、`author`、`scaffold`
+- root `alert` 是 namespace；操作旗標都在 leaf subcommand，例如 `list-rules`、`export`、`preview-route`、`plan`、`apply`
 
 ## 範例
 
 ```bash
 # 先盤點目前有哪些 alert 規則。
-grafana-util alert live list-rules --profile prod --json
+grafana-util alert list-rules --profile prod --json
+```
+
+```bash
+# 先建立一個暫存中的 alert desired-state 樹。
+grafana-util alert init --desired-dir ./alerts/desired
 ```
 
 ```bash
 # 先把現況匯出，再拿去做 diff 或 review。
-grafana-util alert migrate export --url http://localhost:3000 --basic-user admin --basic-password admin --output-dir ./alerts --overwrite
+grafana-util alert export --url http://localhost:3000 --basic-user admin --basic-password admin --output-dir ./alerts --overwrite
 ```
 
 ```bash

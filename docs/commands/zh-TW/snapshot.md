@@ -1,4 +1,4 @@
-# `grafana-util snapshot`
+# `grafana-util status snapshot`
 
 ## Root
 
@@ -6,7 +6,7 @@
 
 適用時機：當你想建立一個本機 snapshot root，收錄 dashboard、datasource 與 access inventory，供後續檢視時。
 
-說明：如果你需要一份離線 snapshot，之後不用重新連到 Grafana 也能繼續檢視，先看這一頁最合適。`snapshot` 指令群組適合交接、備份、事件回顧，或任何想先留下本機 artifact 再往下分析的工作流。snapshot export 現在會把 dashboard、datasource、access 幾條 lane 收斂到同一個 root，並寫出 `snapshot-metadata.json`，讓後續工具不用靠猜路徑就能找出 lane。
+說明：如果你需要一份離線 snapshot，之後不用重新連到 Grafana 也能繼續檢視，先看這一頁最合適。目前公開入口是 `grafana-util status snapshot`，不是已移除的 top-level `grafana-util snapshot` root。這個指令群組適合交接、備份、事件回顧，或任何想先留下本機 artifact 再往下分析的工作流。snapshot export 現在會把 dashboard、datasource、access 幾條 lane 收斂到同一個 root，並寫出 `snapshot-metadata.json`，讓後續工具不用靠猜路徑就能找出 lane。
 
 ## 採用前後對照
 
@@ -32,17 +32,17 @@
 
 ```bash
 # 用途：從 live Grafana 匯出本機 snapshot bundle。
-grafana-util snapshot export --profile prod --output-dir ./snapshot
+grafana-util status snapshot export --profile prod --output-dir ./snapshot
 ```
 
 ```bash
 # 用途：用 JSON 檢視已匯出的 snapshot bundle。
-grafana-util snapshot review --input-dir ./snapshot --output-format json
+grafana-util status snapshot review --input-dir ./snapshot --output-format json
 ```
 
 ```bash
 # 用途：用 token 認證從 live Grafana 匯出 snapshot bundle。
-grafana-util snapshot export --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-dir ./snapshot
+grafana-util status snapshot export --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-dir ./snapshot
 ```
 
 相關指令：`grafana-util status overview`、`grafana-util status staged`、`grafana-util workspace package`。
@@ -69,22 +69,22 @@ grafana-util snapshot export --url http://localhost:3000 --token "$GRAFANA_API_T
 
 ```bash
 # 用途：export。
-grafana-util snapshot export --profile prod --output-dir ./snapshot
+grafana-util status snapshot export --profile prod --output-dir ./snapshot
 ```
 
 ```bash
 # 用途：export。
-grafana-util snapshot export --url http://localhost:3000 --basic-user admin --basic-password admin --output-dir ./snapshot --overwrite
+grafana-util status snapshot export --url http://localhost:3000 --basic-user admin --basic-password admin --output-dir ./snapshot --overwrite
 ```
 
 ```bash
 # 用途：export。
-grafana-util snapshot export --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-dir ./snapshot
+grafana-util status snapshot export --url http://localhost:3000 --token "$GRAFANA_API_TOKEN" --output-dir ./snapshot
 ```
 
 ```bash
 # 用途：先用 terminal prompt 勾選要匯出的 snapshot lane。
-grafana-util snapshot export --profile prod --prompt --output-dir ./snapshot
+grafana-util status snapshot export --profile prod --prompt --output-dir ./snapshot
 ```
 
 相關指令：`snapshot review`、`workspace package`、`status overview`。
@@ -103,12 +103,12 @@ review summary 現在也會一起顯示 users、teams、orgs、service accounts 
 
 ```bash
 # 用途：在不接觸 Grafana 的情況下檢視本機 snapshot inventory。
-grafana-util snapshot review --input-dir ./snapshot --output-format table
+grafana-util status snapshot review --input-dir ./snapshot --output-format table
 ```
 
 ```bash
 # 用途：在不接觸 Grafana 的情況下檢視本機 snapshot inventory。
-grafana-util snapshot review --input-dir ./snapshot --interactive
+grafana-util status snapshot review --input-dir ./snapshot --interactive
 ```
 
 相關指令：`snapshot export`、`status overview`、`status staged`。

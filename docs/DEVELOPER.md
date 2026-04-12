@@ -51,10 +51,13 @@ Current maintained public namespaces:
 - `grafana-util alert`
 - `grafana-util access`
 - `grafana-util status`
+  - `grafana-util status live`
+  - `grafana-util status overview`
+  - `grafana-util status resource`
+  - `grafana-util status snapshot`
 - `grafana-util workspace`
 - `grafana-util export`
 - `grafana-util config`
-- `grafana-util snapshot`
 
 Treat `rust/src/cli.rs` as the command-topology entrypoint and the domain facade modules as the runtime dispatch layer.
 
@@ -115,6 +118,8 @@ Use these as the source layer for per-command reference content. They are also t
   - design, source-of-truth model, output tree, generator responsibilities
 - `docs/internal/generated-docs-playbook.md`
   - step-by-step maintenance recipes for common docs-generator tasks
+- `scripts/contracts/command-surface.json`
+  - machine-readable CLI/docs sync contract for public paths, legacy replacements, routing, and `--help-full` support
 
 Generated artifact ownership:
 
@@ -213,6 +218,7 @@ Dashboard watch implementation policy:
 - Keep handbook/manual workflow and intent in `README.md`, `README.zh-TW.md`,
   and `docs/user-guide/`; do not make them a second command reference.
 - Keep generated docs logic narrow and documented through the generated-docs architecture and playbook.
+- Keep CLI/docs routing in sync with `scripts/contracts/command-surface.json` and `make quality-docs-surface`.
 - Keep typed contracts in the dedicated internal policy/spec docs.
 - Treat the shared diff JSON contract as one family: bump `schemaVersion` only for breaking changes to the envelope or required field semantics, keep it stable for additive backward-compatible fields, and update `dashboard diff`, `alert diff`, and `datasource diff` together.
 - Treat `schemas/manifests/**/{contracts,routes}.json` as the source of truth for machine-readable CLI contracts that now participate in the schema system.

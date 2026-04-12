@@ -193,7 +193,7 @@ cat cpu.json | grafana-util dashboard review --input - --output-format json
 grafana-util alert plan --desired-dir ./alerts/desired --prune
 
 # Preview where an alert would go.
-grafana-util alert author route preview \
+grafana-util alert preview-route \
   --desired-dir ./alerts/desired \
   --label team=sre --severity critical
 ```

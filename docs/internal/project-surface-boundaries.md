@@ -10,7 +10,7 @@ near-term ownership targets in one place. Keep operator examples in
 
 The maintained operator model is:
 
-- `overview`
+- `status overview`
   - human-first project entrypoint
   - reads staged artifacts by default
   - may hand live reads through to the shared `status live` path
@@ -39,23 +39,23 @@ The maintained operator model is:
 
 | Area | Current state | Target state |
 | --- | --- | --- |
-| `overview` staged path | owns staged artifact loading plus overview document projection | keep overview-specific projection separate from shared status aggregation |
+| `status overview` staged path | owns staged artifact loading plus overview document projection | keep overview-specific projection separate from shared status aggregation |
 | `status` staged path | owns shared staged status assembly directly and reuses overview artifact loading | keep shared staged aggregation under `status` ownership |
-| `status` live path | shared live runtime already feeds `status live` and `overview live` | keep shared live runtime ownership in `status` |
+| `status` live path | shared live runtime already feeds `status live` and `status overview live` | keep shared live runtime ownership in `status` |
 | `change` surface | public command name is `change`, but internal runtime and JSON kinds still use `sync` naming | keep public/internal split explicit until or unless a future contract migration is planned |
 
 ## Current Maintainer Rule
 
 - Add new project-wide signals as domain-owned producers first.
 - Feed those signals into shared `status` aggregation second.
-- Let `overview` consume the shared status result plus its own project snapshot
-  views.
+- Let `status overview` consume the shared status result plus its own project
+  snapshot views.
 - Do not make `overview` the long-term owner of staged status semantics.
 - Do not make `change` a generic inventory or status surface.
 
 ## Immediate Follow-Up
 
-- Keep public docs on `overview` / `status` / `change` vocabulary only.
+- Keep public docs on `status overview` / `status` / `change` vocabulary only.
 - Make any remaining `sync` or `project-status` mentions in current docs
   clearly internal or historical.
 - Keep `project_status_command.rs` focused on args, dispatch, shared rendering,

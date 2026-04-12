@@ -22,6 +22,8 @@ Use three layers:
   [`datasource-masked-recovery-contract.md`](/Users/kendlee/work/grafana-utils/docs/internal/datasource-masked-recovery-contract.md)
 - Alert/access boundary policy:
   [`alert-access-contract-policy.md`](/Users/kendlee/work/grafana-utils/docs/internal/alert-access-contract-policy.md)
+- CLI/docs surface contract:
+  [`scripts/contracts/command-surface.json`](/Users/kendlee/work/grafana-utils/scripts/contracts/command-surface.json)
 
 ## Maintainer Rules
 
@@ -31,3 +33,5 @@ Use three layers:
 - Keep `ai-status.md` and `ai-changes.md` current and trace-oriented; do not
   restate full specs there.
 - Archive older trace entries once they stop helping with current navigation.
+- Keep `scripts/contracts/command-surface.json` current when public command paths, legacy
+  replacements, docs routing, or `--help-full` support change.

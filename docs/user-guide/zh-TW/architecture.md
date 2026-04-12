@@ -22,7 +22,7 @@
 ## 成功判準
 
 - 你能說明為什麼 runtime 和文件要分成現在這種形狀。
-- 你能判斷某個工作流應該放在手冊、指令詳細說明，還是內部維護文件。
+- 你能判斷某個工作流應該放在手冊、指令參考，還是內部維護文件。
 - 你在實作新功能前，就能先選對對應的操作面。
 
 ## 失敗時先檢查
@@ -31,7 +31,7 @@
 - 如果 runtime 的形狀和文件的形狀開始分岔，要把它當成架構問題，而不只是文件問題。
 - 如果你還不確定這個切分為什麼存在，先回去重讀 surface 與 lane 的段落，再往下加工作。
 
-如果想對照這些概念實際對應到哪些指令，請搭配 [workspace](../../commands/zh-TW/workspace.md)、[dashboard](../../commands/zh-TW/dashboard.md)、[指令詳細說明總索引](../../commands/zh-TW/index.md) 一起看。
+如果想對照這些概念實際對應到哪些指令，請搭配 [workspace](../../commands/zh-TW/workspace.md)、[dashboard](../../commands/zh-TW/dashboard.md)、[指令參考](../../commands/zh-TW/index.md) 一起看。
 
 ---
 

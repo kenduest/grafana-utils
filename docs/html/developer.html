@@ -195,24 +195,138 @@ html[lang="zh-TW"] .nav-sidebar { font-family: var(--font-zh); letter-spacing: 0
 .nav-tree-node + .nav-tree-node { margin-top: 2px; }
 .nav-tree-node::before { display: none; }
 .nav-group { margin: 0; position: relative; }
-.nav-group + .nav-group { margin-top: 2px; }
-.nav-group-header { display: flex; justify-content: space-between; align-items: center; gap: 6px; padding: 1px 0; cursor: pointer; border-radius: 0; font-weight: 620; color: var(--heading); transition: color 0.15s; font-size: 0.9rem; }
+.nav-group + .nav-group { margin-top: 8px; }
+.nav-group-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 0;
+  color: var(--heading);
+  transition: color 0.15s;
+  font: inherit;
+  text-align: left;
+}
 .nav-group-header:hover { color: var(--heading); }
-.nav-group-link { flex: 1; display: block; padding: 4px 8px; border-radius: 8px; color: var(--heading); text-decoration: none !important; font-weight: 600; line-height: 1.4; }
-.nav-group-link:hover { background: var(--panel-strong); }
+.nav-group-title-text {
+  flex: 1;
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--heading);
+  letter-spacing: 0.01em;
+}
+.nav-group-caret {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-size: 0.72rem;
+  line-height: 1;
+  transform: rotate(0deg);
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+.nav-group.collapsed .nav-group-caret { transform: rotate(-90deg); }
+.nav-group.collapsed .nav-sub-list { display: none; }
 .nav-item { display: block; padding: 4px 8px; border-radius: 8px; color: var(--text); text-decoration: none !important; transition: 0.15s; font-weight: 530; font-size: 0.84rem; line-height: 1.4; }
-.nav-group-link,
 .nav-item,
 .nav-command-entry { white-space: nowrap; }
 .nav-item:hover { background: var(--panel-strong); color: var(--heading); }
-.nav-item.active,
-.nav-group-link.active { background: color-mix(in srgb, var(--accent-soft) 70%, white); color: var(--heading); font-weight: 600; box-shadow: inset 2px 0 0 var(--accent); }
-.nav-sub-list { margin-top: 4px; margin-left: 10px; }
+.nav-item.active {
+  background: color-mix(in srgb, var(--accent-soft) 70%, white);
+  color: var(--heading);
+  font-weight: 600;
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+.nav-sub-list {
+  margin-top: 4px;
+  margin-left: 8px;
+  padding-left: 10px;
+  border-left: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+}
 .nav-sub-list .nav-item { color: var(--muted); font-weight: 520; }
 .nav-sub-list .nav-item.active { color: var(--heading); font-weight: 590; }
 .nav-command-entry { display: block; padding: 4px 8px; border-radius: 8px; color: var(--muted); text-decoration: none !important; font-size: 0.82rem; font-weight: 540; line-height: 1.38; transition: 0.15s; }
 .nav-command-entry:hover { color: var(--heading); background: var(--panel-strong); }
 .nav-command-entry.active { color: var(--heading); font-weight: 620; background: color-mix(in srgb, var(--accent-soft) 60%, white); box-shadow: inset 2px 0 0 var(--accent); }
+.nav-command-section .nav-section-toggle {
+  padding: 0;
+}
+.nav-command-section .nav-group-title-text {
+  font-size: 0.74rem;
+  font-weight: 650;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+}
+.nav-command-section .nav-section-body {
+  margin-top: 10px;
+}
+.nav-command-section.collapsed .nav-section-body { display: none; }
+.nav-command-group + .nav-command-group { margin-top: 10px; }
+.nav-command-tree,
+.nav-command-branch-list { list-style: none; margin: 0; padding: 0; }
+.nav-command-tree li,
+.nav-command-branch-list li { margin-bottom: 0; }
+.nav-command-sub-list {
+  margin-top: 2px;
+  margin-left: 8px;
+  padding-left: 10px;
+  border-left: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+}
+.nav-command-link + .nav-command-link { margin-top: 4px; }
+.nav-command-link a,
+.nav-command-leaf-link {
+  display: block;
+  padding: 4px 0;
+  border-radius: 0;
+  color: var(--text);
+  text-decoration: none !important;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  font-family: var(--font-sans);
+  font-weight: 520;
+  white-space: normal;
+}
+.nav-command-link a:hover,
+.nav-command-leaf-link:hover { color: var(--heading); }
+html[lang="zh-TW"] .nav-command-link a,
+html[lang="zh-TW"] .nav-command-leaf-link,
+html[lang="zh-TW"] .nav-command-root-link { font-family: var(--font-zh); }
+.nav-command-branch { display: flex; flex-direction: column; gap: 4px; }
+.nav-command-root { padding: 1px 0; }
+.nav-command-root-link {
+  display: inline-block;
+  color: var(--heading);
+  text-decoration: none !important;
+  font-size: 0.86rem;
+  font-weight: 680;
+  line-height: 1.35;
+}
+.nav-command-root-link:hover { color: var(--accent); }
+.nav-command-root-static { cursor: default; }
+.nav-command-branch-list {
+  margin-left: 10px;
+  padding-left: 10px;
+  border-left: 1px solid color-mix(in srgb, var(--border) 82%, transparent);
+}
+.nav-command-branch-item + .nav-command-branch-item { margin-top: 2px; }
+.nav-command-branch-item .nav-command-leaf-link {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+.nav-command-branch-item .nav-command-leaf-link:hover { color: var(--heading); }
+.handbook-command-map .nav-command-root-link {
+  font-size: 0.95rem;
+}
+.handbook-command-map .nav-command-branch-item .nav-command-leaf-link,
+.handbook-command-map .nav-command-link a {
+  font-size: 0.9rem;
+}
 
 .sidebar-toggle {
   position: absolute;
@@ -258,6 +372,77 @@ html[lang="zh-TW"] .nav-sidebar { font-family: var(--font-zh); letter-spacing: 0
 }
 
 .article { min-width: 0; padding: 10px 0 24px; }
+.handbook-command-map {
+  margin-bottom: 24px;
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--panel) 96%, white);
+}
+.handbook-command-map .nav-section + .nav-section { margin-top: 14px; }
+.handbook-command-map h2 {
+  margin: 0 0 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+.handbook-command-map .nav-group-title {
+  font-size: 0.95rem;
+}
+.handbook-command-map .nav-command-group {
+  padding-top: 10px;
+}
+.handbook-command-map .nav-command-group + .nav-command-group {
+  margin-top: 12px;
+  border-top: 1px solid color-mix(in srgb, var(--border) 75%, transparent);
+}
+.handbook-command-map .nav-command-sub-list {
+  margin-top: 8px;
+  margin-left: 0;
+  padding-left: 0;
+  border-left: 0;
+}
+.handbook-command-map .nav-command-branch {
+  display: grid;
+  grid-template-columns: minmax(130px, 0.22fr) minmax(0, 1fr);
+  gap: 12px 18px;
+  align-items: start;
+}
+.handbook-command-map .nav-command-branch-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-left: 0;
+  padding-left: 14px;
+}
+.handbook-command-map .nav-command-branch-item + .nav-command-branch-item { margin-top: 0; }
+.handbook-command-map .nav-command-branch-item .nav-command-leaf-link,
+.handbook-command-map .nav-command-link a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 4px 8px;
+  border: 1px solid color-mix(in srgb, var(--border) 85%, transparent);
+  border-radius: 6px;
+  background: var(--panel);
+  color: var(--text);
+  line-height: 1.25;
+}
+.handbook-command-map .nav-command-branch-item .nav-command-leaf-link:hover,
+.handbook-command-map .nav-command-link a:hover {
+  border-color: color-mix(in srgb, var(--border) 45%, var(--accent));
+  background: var(--panel-strong);
+}
+@media (max-width: 720px) {
+  .handbook-command-map .nav-command-branch {
+    grid-template-columns: 1fr;
+  }
+  .handbook-command-map .nav-command-branch-list {
+    padding-left: 0;
+    border-left: 0;
+  }
+}
 .article p,
 .article li { color: var(--text); font-weight: 460; }
 .article ul li::marker,
@@ -314,6 +499,7 @@ html[lang="zh-TW"] .nav-sidebar { font-family: var(--font-zh); letter-spacing: 0
 .article h3 { margin-top: 24px; font-size: 1.2rem; margin-bottom: 12px; letter-spacing: -0.01em; font-weight: 610; }
 .hero-title-main { display: block; }
 .hero-title-secondary { display: block; margin-top: 6px; font-size: 0.68em; line-height: 1.2; color: var(--muted); font-weight: 560; letter-spacing: -0.012em; }
+.hero-subtitle { margin: -4px 0 14px; color: var(--muted); font-size: 1rem; line-height: 1.6; font-weight: 520; }
 .hero-summary { margin: 0 0 18px; max-width: 68ch; color: var(--text); font-size: 1rem; line-height: 1.72; font-weight: 450; }
 .section-index {
   margin: 0 0 1.75rem;
@@ -736,7 +922,7 @@ code[class*="language-"],pre[class*="language-"]{color:#ccc;background:none;font
       <div class="topbar">
   <a class="brand" href="index.html">grafana-util docs</a>
   <div class="themebar">
-    <select id="page-locale-select" aria-label="Language switch"><option value="" selected>Language: English</option></select><select id="jump-select" aria-label="Jump"><option value="" selected>Jump to...</option><optgroup label="Handbook"><option value="handbook/en/index.html">Overview</option><option value="handbook/en/what-is-grafana-util.html">What grafana-util is for</option><option value="handbook/en/getting-started.html">Getting Started</option><option value="handbook/en/role-new-user.html">First Run / Beginner Path</option><option value="handbook/en/role-sre-ops.html">SRE / Operator Handbook</option><option value="handbook/en/role-automation-ci.html">Automation / CI Handbook</option><option value="handbook/en/architecture.html">Architecture &amp; Design Principles</option><option value="handbook/en/dashboard.html">Dashboard Operator Handbook</option><option value="handbook/en/datasource.html">Datasource Operator Handbook</option><option value="handbook/en/alert.html">Alert Operator Handbook</option><option value="handbook/en/access.html">Access Management (Identity &amp; Access)</option><option value="handbook/en/status-workspace.html">Workspace Review &amp; Status</option><option value="handbook/en/scenarios.html">Operator Scenarios</option><option value="handbook/en/recipes.html">Best Practices &amp; Real-World Recipes</option><option value="handbook/en/reference.html">Technical Reference</option><option value="handbook/en/troubleshooting.html">Troubleshooting &amp; Glossary</option></optgroup><optgroup label="Commands"><option value="commands/en/dashboard.html">Dashboard</option><option value="commands/en/alert.html">Alert</option><option value="commands/en/datasource.html">Datasource</option><option value="commands/en/access.html">Access</option><option value="commands/en/config.html">Config</option><option value="commands/en/status.html">Status</option><option value="commands/en/workspace.html">Workspace</option><option value="commands/en/snapshot.html">Snapshot</option></optgroup></select>
+    <select id="page-locale-select" aria-label="Language switch"><option value="" selected>Language: English</option></select><select id="jump-select" aria-label="Jump"><option value="" selected>Jump to...</option><optgroup label="Handbook"><option value="handbook/en/index.html">Overview</option><option value="handbook/en/what-is-grafana-util.html">What grafana-util is for</option><option value="handbook/en/getting-started.html">Getting Started</option><option value="handbook/en/role-new-user.html">First Run / Beginner Path</option><option value="handbook/en/role-sre-ops.html">SRE / Operator</option><option value="handbook/en/role-automation-ci.html">Automation / CI</option><option value="handbook/en/architecture.html">Design Principles</option><option value="handbook/en/dashboard.html">Dashboard</option><option value="handbook/en/datasource.html">Datasource</option><option value="handbook/en/alert.html">Alert</option><option value="handbook/en/access.html">Access</option><option value="handbook/en/status-workspace.html">Status &amp; Workspace</option><option value="handbook/en/scenarios.html">Scenarios</option><option value="handbook/en/recipes.html">Recipes</option><option value="handbook/en/reference.html">Reference</option><option value="handbook/en/troubleshooting.html">Troubleshooting</option></optgroup><optgroup label="Command Reference"><option value="commands/en/version.html">Version</option><option value="commands/en/dashboard.html">Dashboard</option><option value="commands/en/alert.html">Alert</option><option value="commands/en/datasource.html">Datasource</option><option value="commands/en/access.html">Access</option><option value="commands/en/config.html">Config</option><option value="commands/en/profile.html">Config Profile</option><option value="commands/en/status.html">Status</option><option value="commands/en/resource.html">Status Resource</option><option value="commands/en/snapshot.html">Snapshot</option><option value="commands/en/workspace.html">Workspace</option></optgroup></select>
     <select id="font-select" aria-label="Font Size">
       <option value="0.9">Font: Compact</option>
       <option value="1">Font: Default</option>
@@ -752,14 +938,13 @@ code[class*="language-"],pre[class*="language-"]{color:#ccc;background:none;font
 </div>
 
       <div class="layout layout-no-nav">
-  
-  <article class="article">
-    <div class="breadcrumbs"><a href="index.html">Home</a> / Developer Guide</div>
 
-    <h1><span class="hero-title-main">Developer Guide</span></h1>
-<p class="hero-summary">Maintainer routing for runtime, docs, contracts, and release work.</p>
+<article class="article">
+<div class="breadcrumbs"><a href="index.html">Home</a> / Developer Guide</div>
 
-    <section class="section-index"><h2>Guide Map</h2><p class="section-index-summary">Jump straight to the repo concern you are touching instead of scanning the whole maintainer guide.</p><ul class="section-index-list"><li><a href="#start-here">Start Here</a></li><li><a href="#repo-priorities">Repo Priorities</a></li><li><a href="#user-facing-cli-surface">User-Facing CLI Surface</a></li><li><a href="#code-architecture-map">Code Architecture Map</a></li><li><a href="#documentation-map">Documentation Map</a></li><li><a href="#validation-and-build-guide">Validation And Build Guide</a></li><li><a href="#high-signal-project-rules">High-Signal Project Rules</a></li><li><a href="#maintainer-personas">Maintainer Personas</a></li><li><a href="#quick-routing-table">Quick Routing Table</a></li><li><a href="#maintenance-standard">Maintenance Standard</a></li></ul></section><p>This page is the maintainer entrypoint for the repo.</p>
+<h1><span class="hero-title-main">Developer Guide</span></h1><p class="hero-summary">Maintainer routing for runtime, docs, contracts, and release work.</p>
+
+<section class="section-index"><h2>Guide Map</h2><p class="section-index-summary">Jump straight to the repo concern you are touching instead of scanning the whole maintainer guide.</p><ul class="section-index-list"><li><a href="#start-here">Start Here</a></li><li><a href="#repo-priorities">Repo Priorities</a></li><li><a href="#user-facing-cli-surface">User-Facing CLI Surface</a></li><li><a href="#code-architecture-map">Code Architecture Map</a></li><li><a href="#documentation-map">Documentation Map</a></li><li><a href="#validation-and-build-guide">Validation And Build Guide</a></li><li><a href="#high-signal-project-rules">High-Signal Project Rules</a></li><li><a href="#maintainer-personas">Maintainer Personas</a></li><li><a href="#quick-routing-table">Quick Routing Table</a></li><li><a href="#maintenance-standard">Maintenance Standard</a></li></ul></section><p>This page is the maintainer entrypoint for the repo.</p>
 <p>Use it to orient quickly, then jump to the narrower document that matches the kind of change you are making. Keep this file short, indexed by concern, and free of long contract detail that belongs in the dedicated internal docs.</p>
 <h2 id="start-here">Start Here</h2>
 <p>If this is your first time entering the repo, open <code>docs/internal/maintainer-quickstart.md</code> first.</p>
@@ -780,7 +965,7 @@ code[class*="language-"],pre[class*="language-"]{color:#ccc;background:none;font
 <p>Treat the Rust runtime as the supported product surface. Keep the Python package as legacy maintainer reference material unless a task explicitly targets the Python lane.</p>
 <h2 id="user-facing-cli-surface">User-Facing CLI Surface</h2>
 <p>Current maintained public namespaces:</p>
-<ul><li><code>grafana-util dashboard</code></li><li><code>grafana-util alert</code></li><li><code>grafana-util access</code></li><li><code>grafana-util status</code></li><li><code>grafana-util workspace</code></li><li><code>grafana-util export</code></li><li><code>grafana-util config</code></li><li><code>grafana-util snapshot</code></li></ul>
+<ul><li><code>grafana-util dashboard</code></li><li><code>grafana-util alert</code></li><li><code>grafana-util access</code></li><li><code>grafana-util status</code></li><li><code>grafana-util status live</code></li><li><code>grafana-util status overview</code></li><li><code>grafana-util status resource</code></li><li><code>grafana-util status snapshot</code></li><li><code>grafana-util workspace</code></li><li><code>grafana-util export</code></li><li><code>grafana-util config</code></li></ul>
 <p>Treat <code>rust/src/cli.rs</code> as the command-topology entrypoint and the domain facade modules as the runtime dispatch layer.</p>
 <h2 id="code-architecture-map">Code Architecture Map</h2>
 <p>Primary code paths:</p>
@@ -796,7 +981,7 @@ code[class*="language-"],pre[class*="language-"]{color:#ccc;background:none;font
 <ul><li><code>docs/commands/en/</code></li><li><code>docs/commands/zh-TW/</code></li></ul>
 <p>Use these as the source layer for per-command reference content. They are also the source for generated manpages and command-reference HTML.</p>
 <h3 id="generated-docs-design-and-maintenance">Generated Docs Design And Maintenance</h3>
-<ul><li><code>docs/internal/generated-docs-architecture.md</code></li><li>design, source-of-truth model, output tree, generator responsibilities</li><li><code>docs/internal/generated-docs-playbook.md</code></li><li>step-by-step maintenance recipes for common docs-generator tasks</li></ul>
+<ul><li><code>docs/internal/generated-docs-architecture.md</code></li><li>design, source-of-truth model, output tree, generator responsibilities</li><li><code>docs/internal/generated-docs-playbook.md</code></li><li>step-by-step maintenance recipes for common docs-generator tasks</li><li><code>scripts/contracts/command-surface.json</code></li><li>machine-readable CLI/docs sync contract for public paths, legacy replacements, routing, and <code>--help-full</code> support</li></ul>
 <p>Generated artifact ownership:</p>
 <ul><li><code>scripts/generate_manpages.py</code></li><li>owns <code>docs/man/*.1</code></li><li><code>scripts/generate_command_html.py</code></li><li>owns the HTML docs site rooted at <code>docs/html/index.html</code></li></ul>
 <p>Regeneration commands:</p>
@@ -835,7 +1020,7 @@ make html-check</code></pre>
 <h2 id="high-signal-project-rules">High-Signal Project Rules</h2>
 <p>and <code>docs/user-guide/</code>; do not make them a second command reference.</p>
 <p>internal docs, and trace docs each own one job. Use <code>docs/internal/docs-architecture-guardrails.md</code> when a change starts crossing those lines.</p>
-<ul><li>Prefer updating Rust behavior and help text first; treat Python as legacy reference unless the task explicitly requires parity work there.</li><li>Keep public usage guidance in <code>README.md</code>, <code>README.zh-TW.md</code>, and the user guides.</li><li>Keep command-reference detail in <code>docs/commands/</code>.</li><li>Keep handbook/manual workflow and intent in <code>README.md</code>, <code>README.zh-TW.md</code>,</li><li>Keep generated docs logic narrow and documented through the generated-docs architecture and playbook.</li><li>Keep typed contracts in the dedicated internal policy/spec docs.</li><li>Treat the shared diff JSON contract as one family: bump <code>schemaVersion</code> only for breaking changes to the envelope or required field semantics, keep it stable for additive backward-compatible fields, and update <code>dashboard diff</code>, <code>alert diff</code>, and <code>datasource diff</code> together.</li><li>Treat <code>schemas/manifests/**/{contracts,routes}.json</code> as the source of truth for machine-readable CLI contracts that now participate in the schema system.</li><li>Treat <code>schemas/jsonschema/*<em>/</em>.schema.json</code> and <code>schemas/help/*<em>/</em>.txt</code> as generated artifacts derived from those manifests via <code>make schema</code>; do not hand-edit them as the primary source.</li><li>Treat golden payload fixtures such as <code>fixtures/shared_diff_golden_cases.json</code> and <code>fixtures/machine_schema_golden_cases.json</code> as validation artifacts, not as the canonical field inventory.</li><li>Prefer repo-owned typed envelopes over ad hoc maps when a workflow already owns the shape.</li><li>Keep facades thin: <code>cli.rs</code> and domain <code>mod.rs</code> files should route, normalize, and re-export, not absorb downstream contract logic.</li><li>Keep Rust layer boundaries explicit: CLI topology, dispatch spine, domain runtime, workflow/service, contract/model, render, and fixtures each own one job. Use <code>docs/internal/rust-architecture-guardrails.md</code> when a change starts crossing those lines.</li><li>Keep docs layer boundaries explicit: manual, command docs, generated docs,</li><li>Keep comments high-signal: explain ownership, invariants, and non-obvious behavior; do not narrate obvious control flow.</li><li>Keep trace/history notes in <code>docs/internal/ai-status.md</code> and <code>docs/internal/ai-changes.md</code>.</li><li>For new live workflow code, prefer adding one workflow-level helper under <code>rust/src/grafana_api/</code> and keep raw <code>&quot;/api/...&quot;</code> contract ownership there instead of reintroducing those paths inside command runtimes. Keep <code>with_request</code> style seams for tests and adapters, not as a second production main path.</li></ul>
+<ul><li>Prefer updating Rust behavior and help text first; treat Python as legacy reference unless the task explicitly requires parity work there.</li><li>Keep public usage guidance in <code>README.md</code>, <code>README.zh-TW.md</code>, and the user guides.</li><li>Keep command-reference detail in <code>docs/commands/</code>.</li><li>Keep handbook/manual workflow and intent in <code>README.md</code>, <code>README.zh-TW.md</code>,</li><li>Keep generated docs logic narrow and documented through the generated-docs architecture and playbook.</li><li>Keep CLI/docs routing in sync with <code>scripts/contracts/command-surface.json</code> and <code>make quality-docs-surface</code>.</li><li>Keep typed contracts in the dedicated internal policy/spec docs.</li><li>Treat the shared diff JSON contract as one family: bump <code>schemaVersion</code> only for breaking changes to the envelope or required field semantics, keep it stable for additive backward-compatible fields, and update <code>dashboard diff</code>, <code>alert diff</code>, and <code>datasource diff</code> together.</li><li>Treat <code>schemas/manifests/**/{contracts,routes}.json</code> as the source of truth for machine-readable CLI contracts that now participate in the schema system.</li><li>Treat <code>schemas/jsonschema/*<em>/</em>.schema.json</code> and <code>schemas/help/*<em>/</em>.txt</code> as generated artifacts derived from those manifests via <code>make schema</code>; do not hand-edit them as the primary source.</li><li>Treat golden payload fixtures such as <code>fixtures/shared_diff_golden_cases.json</code> and <code>fixtures/machine_schema_golden_cases.json</code> as validation artifacts, not as the canonical field inventory.</li><li>Prefer repo-owned typed envelopes over ad hoc maps when a workflow already owns the shape.</li><li>Keep facades thin: <code>cli.rs</code> and domain <code>mod.rs</code> files should route, normalize, and re-export, not absorb downstream contract logic.</li><li>Keep Rust layer boundaries explicit: CLI topology, dispatch spine, domain runtime, workflow/service, contract/model, render, and fixtures each own one job. Use <code>docs/internal/rust-architecture-guardrails.md</code> when a change starts crossing those lines.</li><li>Keep docs layer boundaries explicit: manual, command docs, generated docs,</li><li>Keep comments high-signal: explain ownership, invariants, and non-obvious behavior; do not narrate obvious control flow.</li><li>Keep trace/history notes in <code>docs/internal/ai-status.md</code> and <code>docs/internal/ai-changes.md</code>.</li><li>For new live workflow code, prefer adding one workflow-level helper under <code>rust/src/grafana_api/</code> and keep raw <code>&quot;/api/...&quot;</code> contract ownership there instead of reintroducing those paths inside command runtimes. Keep <code>with_request</code> style seams for tests and adapters, not as a second production main path.</li></ul>
 <h2 id="maintainer-personas">Maintainer Personas</h2>
 <p>start with <code>rust/src/cli.rs</code>, the domain modules under <code>rust/src/</code>, and <code>docs/internal/maintainer-role-map.md</code>.</p>
 <p>start with <code>docs/internal/maintainer-quickstart.md</code>, <code>docs/internal/generated-docs-architecture.md</code>, <code>docs/internal/generated-docs-playbook.md</code>, and <code>scripts/generate_command_html.py</code>.</p>
@@ -858,9 +1043,9 @@ make html-check</code></pre>
 <p>When you make a meaningful architecture, contract, or generated-docs workflow change:</p>
 <ul><li>update the narrow spec/design doc first</li><li>update this maintainer map only if the entrypoint or routing changed</li><li>update <code>docs/internal/ai-status.md</code> and <code>docs/internal/ai-changes.md</code> when the repo policy says the change is meaningful enough to trace</li><li>for docs-only updates, validate with <code>git diff --check</code> and the narrow docs checks that match the touched files</li></ul>
 <p>For the current summary/spec/trace split, start with <a href="/Users/kendlee/work/grafana-utils/docs/internal/contract-doc-map.md"><code>docs/internal/contract-doc-map.md</code></a>.</p>
-    
-  </article>
-  <aside class="sidebar">
+
+</article>
+<aside class="sidebar">
   <button class="sidebar-toggle sidebar-toggle-right" type="button" aria-expanded="true" aria-label="Toggle page sidebar">▶</button>
   <div class="sidebar-content">
     <section class="sidebar-section"><h2>On This Page</h2><ul class="toc-list"><li class="toc-level-2"><a href="#start-here"><span class="toc-label">Start Here</span></a></li><li class="toc-level-2"><a href="#repo-priorities"><span class="toc-label">Repo Priorities</span></a></li><li class="toc-level-2"><a href="#user-facing-cli-surface"><span class="toc-label">User-Facing CLI Surface</span></a></li><li class="toc-level-2"><a href="#code-architecture-map"><span class="toc-label">Code Architecture Map</span></a></li><li class="toc-level-2"><a href="#documentation-map"><span class="toc-label">Documentation Map</span></a></li><li class="toc-level-3"><a href="#public-operator-docs"><span class="toc-label">Public Operator Docs</span></a></li><li class="toc-level-3"><a href="#command-reference-source"><span class="toc-label">Command Reference Source</span></a></li><li class="toc-level-3"><a href="#generated-docs-design-and-maintenance"><span class="toc-label">Generated Docs Design And Maintenance</span></a></li><li class="toc-level-3"><a href="#contract-and-policy-docs"><span class="toc-label">Contract And Policy Docs</span></a></li><li class="toc-level-3"><a href="#trace-and-change-history"><span class="toc-label">Trace And Change History</span></a></li><li class="toc-level-2"><a href="#validation-and-build-guide"><span class="toc-label">Validation And Build Guide</span></a></li><li class="toc-level-2"><a href="#high-signal-project-rules"><span class="toc-label">High-Signal Project Rules</span></a></li><li class="toc-level-2"><a href="#maintainer-personas"><span class="toc-label">Maintainer Personas</span></a></li><li class="toc-level-2"><a href="#quick-routing-table"><span class="toc-label">Quick Routing Table</span></a></li><li class="toc-level-2"><a href="#maintenance-standard"><span class="toc-label">Maintenance Standard</span></a></li></ul></section>

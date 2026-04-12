@@ -51,13 +51,17 @@ Typical triggers:
   - [`docs/internal/generated-docs-playbook.md`](generated-docs-playbook.md)
   - [`docs/internal/contract-doc-map.md`](contract-doc-map.md) when the change
     touches a current contract doc
+  - [`scripts/contracts/command-surface.json`](/Users/kendlee/work/grafana-utils/scripts/contracts/command-surface.json) when public
+    command paths, legacy replacements, or docs routing change
 - Do not change casually:
   - generator output inventory, locale routing, or command/handbook linking
-    rules without checking the generator code and validation path
+    rules without checking the generator code, command-surface contract, and
+    validation path
   - trace files as a place to restate full specs
 - Validation commands:
   - `make man`
   - `make html`
+  - `make quality-docs-surface`
   - `make man-check`
   - `make html-check`
   - `python3 -m unittest -v python.tests.test_python_generate_manpages python.tests.test_python_generate_command_html`

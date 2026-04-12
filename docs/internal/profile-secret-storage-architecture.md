@@ -6,7 +6,7 @@ This document explains how `grafana-util` stores and resolves repo-local profile
 
 This note covers profile-backed connection secrets used by:
 
-- `grafana-util profile`
+- `grafana-util config profile`
 - live commands that resolve `--profile`
 - profile fields such as:
   - `password`

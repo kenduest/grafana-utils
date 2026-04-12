@@ -29,9 +29,9 @@
 
 - 如果情境一開始就走錯 lane，先停下來切到真正符合工作流的章節。
 - 如果預期輸出跟目前階段對不上，先修正差異再繼續。
-- 如果你其實更需要精確旗標，請改看指令詳細說明，不要硬靠情境頁猜。
+- 如果你其實更需要精確旗標，請改看指令參考，不要硬靠情境頁猜。
 
-如果要對照每個工作流對應的精確旗標，請搭配 [dashboard](../../commands/zh-TW/dashboard.md)、[access](../../commands/zh-TW/access.md)、[alert](../../commands/zh-TW/alert.md)、[workspace](../../commands/zh-TW/workspace.md)、[config profile](../../commands/zh-TW/config.md) 與 [指令詳細說明總索引](../../commands/zh-TW/index.md) 一起看。
+如果要對照每個工作流對應的精確旗標，請搭配 [dashboard](../../commands/zh-TW/dashboard.md)、[access](../../commands/zh-TW/access.md)、[alert](../../commands/zh-TW/alert.md)、[workspace](../../commands/zh-TW/workspace.md)、[config profile](../../commands/zh-TW/config.md) 與 [指令參考](../../commands/zh-TW/index.md) 一起看。
 
 ---
 

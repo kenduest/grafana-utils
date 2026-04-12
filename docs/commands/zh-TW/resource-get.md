@@ -1,4 +1,4 @@
-# resource get
+# `grafana-util status resource get`
 
 ## 用途
 透過 selector 取得單一目前支援的 live Grafana 資源。
@@ -18,17 +18,17 @@
 ## 範例
 ```bash
 # 用途：依 UID 取得單一 live dashboard。
-grafana-util resource get dashboards/cpu-main --url http://localhost:3000 --basic-user admin --basic-password admin
+grafana-util status resource get dashboards/cpu-main --url http://localhost:3000 --basic-user admin --basic-password admin
 ```
 
 ```bash
 # 用途：以 YAML 取得單一 datasource payload。
-grafana-util resource get datasources/prom-main --profile prod --output-format yaml
+grafana-util status resource get datasources/prom-main --profile prod --output-format yaml
 ```
 
 ```bash
 # 用途：依數字 ID 取得單一 org payload。
-grafana-util resource get orgs/1 --profile prod --output-format json
+grafana-util status resource get orgs/1 --profile prod --output-format json
 ```
 
 ## 相關指令

@@ -1,10 +1,10 @@
-# 指令文件
+# 指令參考
 
 ## 語言
 
-- 英文指令說明：[目前頁面](./index.md)
-- 繁體中文指令說明：[繁體中文逐指令說明](../zh-TW/index.md)
-- 英文手冊：[Operator Handbook](../../user-guide/en/index.md)
+- 英文指令說明：[English command reference](../en/index.md)
+- 繁體中文指令說明：[目前頁面](./index.md)
+- 英文手冊：[英文手冊](../../user-guide/en/index.md)
 - 繁體中文手冊：[繁體中文手冊](../../user-guide/zh-TW/index.md)
 
 ---
@@ -18,6 +18,7 @@
 現在建議的新手入口是比較小的 task-first surface：
 
 - [status](./status.md)：唯讀狀態、overview、snapshot、resource 查詢
+- [version](./version.md)：確認目前安裝的 binary 與版本資訊
 - [config](./config.md)：repo-local 連線與 secret 管理，主要是 `config profile`
 - [export](./export.md)：常見備份與本地 inventory 擷取
 - [workspace](./workspace.md)：scan、test、preview、package、apply 的本機 workspace workflow
@@ -26,23 +27,31 @@
 - [datasource](./datasource.md)：datasource inventory 與生命週期 workflow
 - [access](./access.md)：user、team、org、service-account workflow
 
-如果舊筆記提到已移除的 root，請直接改用目前的 task name：`status ...`、`workspace ...` 與 `config profile ...`。
-如果舊資料提到 legacy overview root，請改看 `status overview ...`。
+如果舊筆記提到已移除的 root，請直接改用目前的 task name：
+
+- `profile ...` -> `grafana-util config profile ...`
+- `resource ...` -> `grafana-util status resource ...`
+- `snapshot ...` -> `grafana-util status snapshot ...`
+- legacy overview root -> `grafana-util status overview ...`
 
 ## 我該用哪個指令？
 
 | 需求 | 先從這裡開始 |
 | :--- | :--- |
+| 確認目前安裝的 binary 或 scriptable version | `grafana-util version` |
 | 確認 Grafana 連得到 | `grafana-util status live` |
 | 用人的角度看 live 總覽 | `grafana-util status overview live` |
 | 儲存連線預設值 | `grafana-util config profile` |
 | 匯出備份 | `grafana-util export dashboard` / `export alert` / `export datasource` |
 | 審查本地變更包 | `grafana-util workspace scan`，再跑 `workspace preview` |
 | 深入檢查 dashboard | `grafana-util dashboard summary` / `dashboard diff` |
+| 通用查詢單一 live resource | `grafana-util status resource describe`、`list` 或 `get` |
+| 匯出或檢視 snapshot bundle | `grafana-util status snapshot export` 或 `review` |
 | 管理 user、team、org 或 service account | `grafana-util access ...` |
 
 ## 常用工作
 
+- [version](./version.md)
 - [workspace](./workspace.md)
 - [workspace scan](./workspace-scan.md)
 - [workspace test](./workspace-test.md)
@@ -50,6 +59,8 @@
 - [workspace apply](./workspace-apply.md)
 - [export](./export.md)
 - [status](./status.md)
+- [resource queries](./resource.md)
+- [snapshot bundles](./snapshot.md)
 - [dashboard convert raw-to-prompt](./dashboard-convert-raw-to-prompt.md)
 - `export dashboard`
 - `export alert`
@@ -58,7 +69,7 @@
 - `status live`
 - `status staged`
 - `status overview`
-- `status snapshot`
+- `status snapshot export|review`
 - `status resource describe|kinds|list|get`
 - `config profile`
 

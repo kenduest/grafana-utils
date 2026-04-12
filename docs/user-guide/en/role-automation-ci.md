@@ -138,11 +138,11 @@ Your automation path is in good shape when:
 - Switch to [Technical Reference](reference.md) for output formats, exit codes, and profile-backed secret guidance.
 - Switch to [Workspace & Status](status-workspace.md) when the pipeline needs staged gates, input test, or promotion review.
 - Switch to [Access Management](access.md) when automation starts rotating or managing service-account credentials.
-- Switch to the [Command Docs](../../commands/en/index.md) when you need the exact supported flags for one namespace.
+- Switch to the [Command Reference](../../commands/en/index.md) when you need the exact supported flags for one namespace.
 
 ## Next steps
 
 - [Home](index.md)
 - [Getting Started](getting-started.md)
 - [Technical Reference](reference.md)
-- [Command Docs](../../commands/en/index.md)
+- [Command Reference](../../commands/en/index.md)

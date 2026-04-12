@@ -4,8 +4,8 @@
 
 - English handbook: [current page](./index.md)
 - Traditional Chinese handbook: [繁體中文手冊](../zh-TW/index.md)
-- English command reference: [Command Docs](../../commands/en/index.md)
-- Traditional Chinese command reference: [繁體中文逐指令說明](../../commands/zh-TW/index.md)
+- English command reference: [Command Reference](../../commands/en/index.md)
+- Traditional Chinese command reference: [指令參考](../../commands/zh-TW/index.md)
 
 ---
 
@@ -102,7 +102,7 @@ grafana-util status overview live --url http://localhost:3000 --basic-user admin
 *   **[Best Practices & Recipes](recipes.md)**: recommended ways to handle common Grafana operator problems.
 *   **[Technical Reference](reference.md)**: command map, profile behavior, auth handling, common flags, and output guidance.
 *   **[Shared Diff JSON Contract](diff-json-contract.md)**: the common JSON envelope and row fields used by dashboard, alert, and datasource diff outputs.
-*   **[Command Docs](../../commands/en/index.md)**: One page per command and subcommand, aligned to the current Rust CLI help.
+*   **[Command Reference](../../commands/en/index.md)**: One page per command and subcommand, aligned to the current Rust CLI help.
 *   **[Troubleshooting & Glossary](troubleshooting.md)**: Diagnostic guides and terminology index.
 
 ---
@@ -112,15 +112,15 @@ grafana-util status overview live --url http://localhost:3000 --basic-user admin
 Different readers usually need different paths through the handbook:
 
 *   **New user**
-  Start with [What grafana-util is for](what-is-grafana-util.md), then [New User Path](role-new-user.md), then [Getting Started](getting-started.md), then open [Command Docs](../../commands/en/index.md) when you need exact flags.
+  Start with [What grafana-util is for](what-is-grafana-util.md), then [New User Path](role-new-user.md), then [Getting Started](getting-started.md), then open the [Command Reference](../../commands/en/index.md) when you need exact flags.
 *   **SRE / operator**
   Start with [SRE / Ops Path](role-sre-ops.md), then [Workspace Review & Status](status-workspace.md), [Dashboard Management](dashboard.md), [Data source Management](datasource.md), and [Troubleshooting](troubleshooting.md).
 *   **Identity / access administrator**
-  Start with [Access Management](access.md), then [Technical Reference](reference.md), then the [Command Docs](../../commands/en/index.md).
+  Start with [Access Management](access.md), then [Technical Reference](reference.md), then the [Command Reference](../../commands/en/index.md).
 *   **Automation / CI owner**
-  Start with [Automation / CI Path](role-automation-ci.md), then [Technical Reference](reference.md), then the [Command Docs](../../commands/en/index.md), then validate exact terminal lookup with the top-level manpage at `docs/man/grafana-util.1`.
+  Start with [Automation / CI Path](role-automation-ci.md), then [Technical Reference](reference.md), then the [Command Reference](../../commands/en/index.md), then validate exact terminal lookup with the top-level manpage at `docs/man/grafana-util.1`.
 *   **Maintainer / architect**
-  Start with [docs/DEVELOPER.md](/Users/kendlee/work/grafana-utils/docs/DEVELOPER.md), then [maintainer-role-map.md](/Users/kendlee/work/grafana-utils/docs/internal/maintainer-role-map.md), then the internal design and playbook docs under [docs/internal/README.md](/Users/kendlee/work/grafana-utils/docs/internal/README.md).
+  Start with [docs/DEVELOPER.md](../../DEVELOPER.md), then [maintainer-role-map.md](../../internal/maintainer-role-map.md), then the internal design and playbook docs under [docs/internal/README.md](../../internal/README.md).
 
 ---
 

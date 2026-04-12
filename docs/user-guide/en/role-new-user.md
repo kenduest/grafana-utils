@@ -155,7 +155,7 @@ You are ready to leave the new-user path when:
 
 ## Keep Open
 
-- [Command Docs](../../commands/en/index.md)
+- [Command Reference](../../commands/en/index.md)
 - [config](../../commands/en/config.md)
 - [config profile](../../commands/en/profile.md)
 - [status](../../commands/en/status.md)
@@ -179,4 +179,4 @@ You are ready to leave the new-user path when:
 
 - [Practical Scenarios](scenarios.md)
 - [Best Practices & Recipes](recipes.md)
-- [Command Docs](../../commands/en/index.md)
+- [Command Reference](../../commands/en/index.md)

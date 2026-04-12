@@ -23,6 +23,9 @@ backlogs, market analysis, and progress snapshots have been moved into
   - zh-TW terminology, tone, and product-name translation rules for docs review
 - `maintainer-quickstart.md`
   - first-entry route for new maintainers and AI agents
+- `../scripts/contracts/command-surface.json`
+  - machine-readable CLI/docs synchronization contract for public paths,
+    legacy replacements, command-doc routing, and `--help-full` support
 - `profile-secret-storage-architecture.md`
   - profile secret backend model, platform support, and maintainer rules
 - `rust-architecture-guardrails.md`
@@ -32,7 +35,7 @@ backlogs, market analysis, and progress snapshots have been moved into
 - `maintainer-role-map.md`
   - maintainer routing by concern: runtime, docs, contracts, and release flow
 - `overview-architecture.md`
-  - source-of-truth maintainer map for `grafana-util overview`
+  - legacy overview maintainer map behind the public `grafana-util status overview` surface
 - `project-status-architecture.md`
   - project-wide status-model architecture behind the public `status` surface
 - `project-surface-boundaries.md`
@@ -55,11 +58,13 @@ backlogs, market analysis, and progress snapshots have been moved into
 - `.github/PULL_REQUEST_TEMPLATE.md` -> GitHub PR template for review-time task context
 - `zh-tw-style-guide.md` -> review rules for Taiwan-facing Traditional Chinese docs and product-object naming
 - `maintainer-quickstart.md` -> first-entry reading order, source-of-truth map, task routing, and safe validation commands
+- `../scripts/contracts/command-surface.json` -> machine-readable CLI/docs synchronization contract for public paths, legacy replacements, routing, and `--help-full` support
+- `../scripts/contracts/docs-entrypoints.json` -> machine-readable docs-entry/navigation contract for landing quick commands, jump-select entries, and handbook command-relationship maps
 - `profile-secret-storage-architecture.md` -> profile secret modes, macOS/Linux backend behavior, and secret-resolution design rules
 - `rust-architecture-guardrails.md` -> Rust layer boundaries, split thresholds, hotspot order, and lint expectations
 - `docs-architecture-guardrails.md` -> handbook/manual, command docs, generated docs, internal docs, and trace docs boundaries
 - `maintainer-role-map.md` -> maintainer persona entrypoint and validation map by concern
-- `overview-architecture.md` -> `grafana-util overview` map and extension rules
+- `overview-architecture.md` -> legacy overview map behind `grafana-util status overview` and extension rules
 - `project-status-architecture.md` -> cross-domain status model behind the public `status` surface
 - `project-surface-boundaries.md` -> public-name and internal-name bridge plus current-vs-target ownership
 - `docs/DEVELOPER.md` -> maintainer policy, routing, and validation guidance

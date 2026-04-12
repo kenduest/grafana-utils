@@ -38,7 +38,8 @@ Source-Of-Truth Files:
 
 Contract Impact:
 - Does this change alter a stable shape, compatibility rule, or generated artifact contract?
-- If yes, which current contract doc owns the rule?
+- If yes, which current contract doc owns the rule, including
+  `scripts/contracts/command-surface.json` for CLI/docs routing changes?
 
 Expected Companion Updates:
 - Which docs, tests, generated outputs, spec docs, or trace docs should change too?

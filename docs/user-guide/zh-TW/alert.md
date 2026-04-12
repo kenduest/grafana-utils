@@ -38,6 +38,7 @@
 如果你現在要查的是指令細節，而不是工作流程章節，可以直接看下面這些指令頁：
 
 - [alert 指令總覽](../../commands/zh-TW/alert.md)
+- [alert 指令總覽](../../commands/zh-TW/alert.md)
 - [alert export](../../commands/zh-TW/alert-export.md)
 - [alert import](../../commands/zh-TW/alert-import.md)
 - [alert diff](../../commands/zh-TW/alert-diff.md)
@@ -56,7 +57,7 @@
 - [alert list-contact-points](../../commands/zh-TW/alert-list-contact-points.md)
 - [alert list-mute-timings](../../commands/zh-TW/alert-list-mute-timings.md)
 - [alert list-templates](../../commands/zh-TW/alert-list-templates.md)
-- [指令詳細說明總索引](../../commands/zh-TW/index.md)
+- [指令參考](../../commands/zh-TW/index.md)
 
 ---
 
@@ -72,12 +73,14 @@
 
 ## 🚧 工作流程邊界（兩條資料路徑）
 
-告警管理拆成兩條獨立的維運流程。**請不要混用這兩條路徑。**
+告警管理拆成四條獨立的維運流程。**請不要混用這些路徑。**
 
 | 路徑 (Lane) | 用途 | 常用指令 |
 | :--- | :--- | :--- |
-| **編寫路徑 (Authoring)** | 供審查 / 套用的 Desired-State 檔案。 | `init`, `add-rule`, `add-contact-point`, `plan`, `apply` |
-| **遷移路徑 (Migration)** | 資產快照與原始回放。 | `export`, `import`, `diff`, `list-rules` |
+| **盤點 (Inventory)** | 先看 live alert 現況，再決定後續要不要變更。 | `list-rules`, `list-contact-points`, `list-mute-timings`, `list-templates`, `delete` |
+| **搬移 (Backup)** | 匯出、匯入或比對 alert 資產與 bundle。 | `export`, `import`, `diff` |
+| **編寫 (Authoring)** | 建立與編輯供審查 / 套用的 Desired-State 檔案。 | `init`, `add-rule`, `clone-rule`, `add-contact-point`, `set-route`, `preview-route`, `new-rule`, `new-contact-point`, `new-template` |
+| **審查 (Review)** | 先產生並套用已審查過的 plan。 | `plan`, `apply` |
 
 ---
 
@@ -131,6 +134,7 @@ grafana-util alert apply \
 | 指令 | 帶有參數的完整範例 |
 | :--- | :--- |
 | **列出規則 (List)** | `grafana-util alert list-rules --all-orgs --table` |
+| **初始化 (Init)** | `grafana-util alert init --desired-dir ./alerts/desired` |
 | **匯出 (Export)** | `grafana-util alert export --output-dir ./alerts --overwrite` |
 | **計畫 (Plan)** | `grafana-util alert plan --desired-dir ./alerts/desired --prune --output-format json` |
 | **套用 (Apply)** | `grafana-util alert apply --plan-file ./plan.json --approve` |

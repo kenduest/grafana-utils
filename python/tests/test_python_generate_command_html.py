@@ -223,15 +223,15 @@ class GenerateCommandHtmlTests(unittest.TestCase):
 
         rendered = module.render_global_nav("handbook/zh-TW/index.html", "zh-TW", config)
 
-        self.assertIn("開始", rendered)
-        self.assertIn("角色路徑", rendered)
-        self.assertIn("核心操作", rendered)
-        self.assertIn("實戰與參考", rendered)
+        self.assertIn("第 1 部 · 起步", rendered)
+        self.assertIn("第 2 部 · 角色路徑", rendered)
+        self.assertIn("第 3 部 · 操作面", rendered)
+        self.assertIn("第 5 部 · 參考與排錯", rendered)
         self.assertIn("開始使用", rendered)
-        self.assertIn("新手快速入門", rendered)
-        self.assertIn("Dashboard 維運人員手冊", rendered)
-        self.assertIn('class="nav-group-block"', rendered)
-        self.assertIn('class="nav-group-title"', rendered)
+        self.assertIn("第一次執行 / 新手路線", rendered)
+        self.assertIn(">Dashboard<", rendered)
+        self.assertIn('class="nav-group-header"', rendered)
+        self.assertIn('class="nav-group-title-text"', rendered)
         self.assertNotIn(">Getting Started<", rendered)
         self.assertNotIn(">Role New User<", rendered)
 
@@ -248,10 +248,47 @@ class GenerateCommandHtmlTests(unittest.TestCase):
         rendered = module.render_global_nav("commands/zh-TW/datasource.html", "zh-TW", config)
 
         self.assertIn(">開啟指令參考<", rendered)
+        self.assertIn(">指令參考<", rendered)
         self.assertIn('class="nav-command-entry active"', rendered)
-        self.assertNotIn(">Datasource<", rendered)
-        self.assertNotIn(">Dashboard<", rendered)
+        self.assertEqual(rendered.count('class="nav-command-entry active"'), 1)
+        self.assertIn(">Datasource<", rendered)
+        self.assertIn(">Dashboard<", rendered)
         self.assertNotIn("Grafana-util-datasource", rendered)
+
+    def test_render_command_map_nav_compacts_dashboard_commands_without_cli_prefix(self):
+        module = load_module()
+
+        config = module.HtmlBuildConfig(
+            source_root=REPO_ROOT,
+            command_docs_root=REPO_ROOT / "docs" / "commands",
+            handbook_root=REPO_ROOT / "docs" / "user-guide",
+            version="9.9.0",
+        )
+
+        rendered = module.render_command_map_nav("handbook/zh-TW/dashboard.html", "zh-TW", "dashboard", config)
+
+        self.assertIn(">dashboard<", rendered)
+        self.assertIn(">browse<", rendered)
+        self.assertIn(">list<", rendered)
+        self.assertNotIn(">grafana-util dashboard browse<", rendered)
+        self.assertNotIn("grafana-util", rendered)
+
+    def test_render_command_map_nav_uses_alias_map_for_architecture_page(self):
+        module = load_module()
+
+        config = module.HtmlBuildConfig(
+            source_root=REPO_ROOT,
+            command_docs_root=REPO_ROOT / "docs" / "commands",
+            handbook_root=REPO_ROOT / "docs" / "user-guide",
+            version="9.9.0",
+        )
+
+        rendered = module.render_command_map_nav("handbook/zh-TW/architecture.html", "zh-TW", "architecture", config)
+
+        self.assertIn("唯讀檢查", rendered)
+        self.assertIn(">status<", rendered)
+        self.assertIn(">resource<", rendered)
+        self.assertIn(">snapshot<", rendered)
 
     def test_render_handbook_page_includes_topbar_language_switch(self):
         module = load_module()
@@ -272,6 +309,44 @@ class GenerateCommandHtmlTests(unittest.TestCase):
         self.assertNotIn('id="locale-select"', rendered)
         self.assertIn('class="sidebar-toggle sidebar-toggle-left"', rendered)
         self.assertIn('class="sidebar-toggle sidebar-toggle-right"', rendered)
+        self.assertIn("第 1 部 · 起步", rendered)
+        self.assertIn("第 1 章 / 共", rendered)
+
+    def test_render_handbook_page_uses_continuous_reading_footer_labels(self):
+        module = load_module()
+
+        config = module.HtmlBuildConfig(
+            source_root=REPO_ROOT,
+            command_docs_root=REPO_ROOT / "docs" / "commands",
+            handbook_root=REPO_ROOT / "docs" / "user-guide",
+            version="9.9.0",
+        )
+        page = next(p for p in module.build_handbook_pages("zh-TW", handbook_root=config.handbook_root) if p.stem == "dashboard")
+
+        rendered = module.render_handbook_page(page, config)
+
+        self.assertIn(">上一章<", rendered)
+        self.assertIn(">下一章<", rendered)
+        self.assertIn("第 7 章", rendered)
+        self.assertIn("第 9 章", rendered)
+
+    def test_render_handbook_page_uses_short_nav_title_with_full_title_subtitle(self):
+        module = load_module()
+
+        config = module.HtmlBuildConfig(
+            source_root=REPO_ROOT,
+            command_docs_root=REPO_ROOT / "docs" / "commands",
+            handbook_root=REPO_ROOT / "docs" / "user-guide",
+            version="9.9.0",
+        )
+        page = next(p for p in module.build_handbook_pages("zh-TW", handbook_root=config.handbook_root) if p.stem == "role-automation-ci")
+
+        rendered = module.render_handbook_page(page, config)
+
+        self.assertIn("/ 手冊 /", rendered)
+        self.assertIn(">自動化 / CI<", rendered)
+        self.assertIn('class="hero-subtitle">自動化 / CI 角色導讀</p>', rendered)
+        self.assertIn("第 2 部 · 角色路徑", rendered)
 
     def test_render_command_page_includes_intro_panel_from_command_doc_metadata(self):
         module = load_module()

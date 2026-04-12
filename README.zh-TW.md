@@ -194,7 +194,7 @@ cat cpu.json | grafana-util dashboard review --input - --output-format json
 grafana-util alert plan --desired-dir ./alerts/desired --prune
 
 # 先預覽告警最後會送到哪裡。
-grafana-util alert author route preview \
+grafana-util alert preview-route \
   --desired-dir ./alerts/desired \
   --label team=sre --severity critical
 ```
@@ -219,7 +219,7 @@ grafana-util datasource import --input-dir ./datasources --prompt-password
 *   **開始使用**：[docs/user-guide/zh-TW/getting-started.md](./docs/user-guide/zh-TW/getting-started.md)
 *   **第一次執行 / 新手路線**：[docs/user-guide/zh-TW/role-new-user.md](./docs/user-guide/zh-TW/role-new-user.md)
 *   **完整手冊**：[docs/user-guide/zh-TW/index.md](./docs/user-guide/zh-TW/index.md)
-*   **指令詳細說明**：[docs/commands/zh-TW/index.md](./docs/commands/zh-TW/index.md)
+*   **指令參考**：[docs/commands/zh-TW/index.md](./docs/commands/zh-TW/index.md)
 *   **疑難排解**：[docs/user-guide/zh-TW/troubleshooting.md](./docs/user-guide/zh-TW/troubleshooting.md)
 *   **Man Page**：[docs/man/grafana-util.1](./docs/man/grafana-util.1)
 

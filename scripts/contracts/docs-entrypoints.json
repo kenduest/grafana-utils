@@ -1,0 +1,280 @@
+{
+  "schema": 1,
+  "quick_commands": {
+    "en": [
+      {
+        "label": "Check the installed version",
+        "command": "grafana-util --version",
+        "target": "commands/en/version.html"
+      },
+      {
+        "label": "Run the first read-only check",
+        "command": "grafana-util status live --profile prod",
+        "target": "commands/en/status.html"
+      },
+      {
+        "label": "Save connection defaults",
+        "command": "grafana-util config profile add --name prod",
+        "target": "commands/en/profile.html"
+      }
+    ],
+    "zh-TW": [
+      {
+        "label": "確認目前版本",
+        "command": "grafana-util --version",
+        "target": "commands/zh-TW/version.html"
+      },
+      {
+        "label": "跑第一次唯讀檢查",
+        "command": "grafana-util status live --profile prod",
+        "target": "commands/zh-TW/status.html"
+      },
+      {
+        "label": "建立連線預設值",
+        "command": "grafana-util config profile add --name prod",
+        "target": "commands/zh-TW/profile.html"
+      }
+    ]
+  },
+  "jump_command_entries": {
+    "en": [
+      { "label": "Version", "target": "commands/en/version.html" },
+      { "label": "Dashboard", "target": "commands/en/dashboard.html" },
+      { "label": "Alert", "target": "commands/en/alert.html" },
+      { "label": "Datasource", "target": "commands/en/datasource.html" },
+      { "label": "Access", "target": "commands/en/access.html" },
+      { "label": "Config", "target": "commands/en/config.html" },
+      { "label": "Config Profile", "target": "commands/en/profile.html" },
+      { "label": "Status", "target": "commands/en/status.html" },
+      { "label": "Status Resource", "target": "commands/en/resource.html" },
+      { "label": "Snapshot", "target": "commands/en/snapshot.html" },
+      { "label": "Workspace", "target": "commands/en/workspace.html" }
+    ],
+    "zh-TW": [
+      { "label": "Version", "target": "commands/zh-TW/version.html" },
+      { "label": "Dashboard", "target": "commands/zh-TW/dashboard.html" },
+      { "label": "Alert", "target": "commands/zh-TW/alert.html" },
+      { "label": "Datasource", "target": "commands/zh-TW/datasource.html" },
+      { "label": "Access", "target": "commands/zh-TW/access.html" },
+      { "label": "Config", "target": "commands/zh-TW/config.html" },
+      { "label": "Config Profile", "target": "commands/zh-TW/profile.html" },
+      { "label": "Status", "target": "commands/zh-TW/status.html" },
+      { "label": "Status Resource", "target": "commands/zh-TW/resource.html" },
+      { "label": "Snapshot", "target": "commands/zh-TW/snapshot.html" },
+      { "label": "Workspace", "target": "commands/zh-TW/workspace.html" }
+    ]
+  },
+  "handbook_command_maps": {
+    "dashboard": [
+      {
+        "title_en": "Start Here",
+        "title_zh_tw": "先從這裡開始",
+        "links": [
+          { "command": "grafana-util dashboard", "target": "dashboard.html" },
+          { "command": "grafana-util dashboard browse", "target": "dashboard-browse.html" },
+          { "command": "grafana-util dashboard list", "target": "dashboard-list.html" },
+          { "command": "grafana-util dashboard get", "target": "dashboard-get.html" }
+        ]
+      },
+      {
+        "title_en": "Draft, Publish, and Delete",
+        "title_zh_tw": "草稿、發布與刪除",
+        "links": [
+          { "command": "grafana-util dashboard clone", "target": "dashboard-clone.html" },
+          { "command": "grafana-util dashboard patch", "target": "dashboard-patch.html" },
+          { "command": "grafana-util dashboard serve", "target": "dashboard-serve.html" },
+          { "command": "grafana-util dashboard edit-live", "target": "dashboard-edit-live.html" },
+          { "command": "grafana-util dashboard publish", "target": "dashboard-publish.html" },
+          { "command": "grafana-util dashboard delete", "target": "dashboard-delete.html" }
+        ]
+      },
+      {
+        "title_en": "Compare and Analyze",
+        "title_zh_tw": "比對與分析",
+        "links": [
+          { "command": "grafana-util dashboard export", "target": "dashboard-export.html" },
+          { "command": "grafana-util dashboard import", "target": "dashboard-import.html" },
+          { "command": "grafana-util dashboard diff", "target": "dashboard-diff.html" },
+          { "command": "grafana-util dashboard summary", "target": "dashboard-summary.html" },
+          { "command": "grafana-util dashboard dependencies", "target": "dashboard-dependencies.html" },
+          { "command": "grafana-util dashboard impact", "target": "dashboard-impact.html" },
+          { "command": "grafana-util dashboard policy", "target": "dashboard-policy.html" },
+          { "command": "grafana-util dashboard variables", "target": "dashboard-variables.html" },
+          { "command": "grafana-util dashboard history", "target": "dashboard-history.html" },
+          { "command": "grafana-util dashboard convert raw-to-prompt", "target": "dashboard-convert-raw-to-prompt.html" }
+        ]
+      },
+      {
+        "title_en": "Capture",
+        "title_zh_tw": "截圖與證據",
+        "links": [
+          { "command": "grafana-util dashboard screenshot", "target": "dashboard-screenshot.html" }
+        ]
+      }
+    ],
+    "datasource": [
+      {
+        "title_en": "Inspect",
+        "title_zh_tw": "檢查與盤點",
+        "links": [
+          { "command": "grafana-util datasource", "target": "datasource.html" },
+          { "command": "grafana-util datasource types", "target": "datasource-types.html" },
+          { "command": "grafana-util datasource list", "target": "datasource-list.html" },
+          { "command": "grafana-util datasource browse", "target": "datasource-browse.html" },
+          { "command": "grafana-util datasource diff", "target": "datasource-diff.html" }
+        ]
+      },
+      {
+        "title_en": "Move State",
+        "title_zh_tw": "搬運與同步",
+        "links": [
+          { "command": "grafana-util datasource export", "target": "datasource-export.html" },
+          { "command": "grafana-util datasource import", "target": "datasource-import.html" }
+        ]
+      },
+      {
+        "title_en": "Change Live",
+        "title_zh_tw": "變更 live",
+        "links": [
+          { "command": "grafana-util datasource add", "target": "datasource-add.html" },
+          { "command": "grafana-util datasource modify", "target": "datasource-modify.html" },
+          { "command": "grafana-util datasource delete", "target": "datasource-delete.html" }
+        ]
+      }
+    ],
+    "alert": [
+      {
+        "title_en": "Review",
+        "title_zh_tw": "檢查與審查",
+        "links": [
+          { "command": "grafana-util alert", "target": "alert.html" },
+          { "command": "grafana-util alert list-rules", "target": "alert-list-rules.html" },
+          { "command": "grafana-util alert list-contact-points", "target": "alert-list-contact-points.html" },
+          { "command": "grafana-util alert list-mute-timings", "target": "alert-list-mute-timings.html" },
+          { "command": "grafana-util alert list-templates", "target": "alert-list-templates.html" },
+          { "command": "grafana-util alert diff", "target": "alert-diff.html" },
+          { "command": "grafana-util alert plan", "target": "alert-plan.html" },
+          { "command": "grafana-util alert preview-route", "target": "alert-preview-route.html" }
+        ]
+      },
+      {
+        "title_en": "Author",
+        "title_zh_tw": "建立與編寫",
+        "links": [
+          { "command": "grafana-util alert new-rule", "target": "alert-new-rule.html" },
+          { "command": "grafana-util alert add-rule", "target": "alert-add-rule.html" },
+          { "command": "grafana-util alert clone-rule", "target": "alert-clone-rule.html" },
+          { "command": "grafana-util alert new-contact-point", "target": "alert-new-contact-point.html" },
+          { "command": "grafana-util alert add-contact-point", "target": "alert-add-contact-point.html" },
+          { "command": "grafana-util alert new-template", "target": "alert-new-template.html" },
+          { "command": "grafana-util alert set-route", "target": "alert-set-route.html" }
+        ]
+      },
+      {
+        "title_en": "Move and Apply",
+        "title_zh_tw": "匯入、匯出與套用",
+        "links": [
+          { "command": "grafana-util alert export", "target": "alert-export.html" },
+          { "command": "grafana-util alert import", "target": "alert-import.html" },
+          { "command": "grafana-util alert apply", "target": "alert-apply.html" },
+          { "command": "grafana-util alert delete", "target": "alert-delete.html" }
+        ]
+      }
+    ],
+    "access": [
+      {
+        "title_en": "Choose the Surface",
+        "title_zh_tw": "選擇操作面",
+        "links": [
+          { "command": "grafana-util access", "target": "access.html" },
+          { "command": "grafana-util access user", "target": "access-user.html" },
+          { "command": "grafana-util access org", "target": "access-org.html" },
+          { "command": "grafana-util access team", "target": "access-team.html" },
+          { "command": "grafana-util access service-account", "target": "access-service-account.html" },
+          { "command": "grafana-util access service-account token", "target": "access-service-account-token.html" }
+        ]
+      }
+    ],
+    "status-workspace": [
+      {
+        "title_en": "Read-Only Checks",
+        "title_zh_tw": "唯讀檢查",
+        "links": [
+          { "command": "grafana-util status", "target": "status.html" },
+          { "command": "grafana-util status resource", "target": "resource.html" },
+          { "command": "grafana-util status snapshot", "target": "snapshot.html" }
+        ]
+      },
+      {
+        "title_en": "Workspace Review",
+        "title_zh_tw": "Workspace 審查",
+        "links": [
+          { "command": "grafana-util workspace", "target": "workspace.html" },
+          { "command": "grafana-util workspace scan", "target": "workspace-scan.html" },
+          { "command": "grafana-util workspace test", "target": "workspace-test.html" },
+          { "command": "grafana-util workspace preview", "target": "workspace-preview.html" },
+          { "command": "grafana-util workspace apply", "target": "workspace-apply.html" }
+        ]
+      }
+    ],
+    "getting-started": [
+      {
+        "title_en": "First 3 Commands",
+        "title_zh_tw": "前 3 個指令",
+        "links": [
+          { "command": "grafana-util --version", "target": "version.html" },
+          { "command": "grafana-util status live", "target": "status.html" },
+          { "command": "grafana-util config profile add", "target": "profile.html" }
+        ]
+      }
+    ],
+    "role-new-user": [
+      {
+        "title_en": "First 3 Commands",
+        "title_zh_tw": "前 3 個指令",
+        "links": [
+          { "command": "grafana-util --version", "target": "version.html" },
+          { "command": "grafana-util status live", "target": "status.html" },
+          { "command": "grafana-util config profile add", "target": "profile.html" }
+        ]
+      }
+    ],
+    "role-sre-ops": [
+      {
+        "title_en": "Operator Lanes",
+        "title_zh_tw": "維運路線",
+        "links": [
+          { "command": "grafana-util status", "target": "status.html" },
+          { "command": "grafana-util workspace", "target": "workspace.html" },
+          { "command": "grafana-util dashboard", "target": "dashboard.html" },
+          { "command": "grafana-util datasource", "target": "datasource.html" },
+          { "command": "grafana-util alert", "target": "alert.html" },
+          { "command": "grafana-util access", "target": "access.html" }
+        ]
+      }
+    ],
+    "role-automation-ci": [
+      {
+        "title_en": "Automation Lanes",
+        "title_zh_tw": "自動化路線",
+        "links": [
+          { "command": "grafana-util version", "target": "version.html" },
+          { "command": "grafana-util config profile", "target": "profile.html" },
+          { "command": "grafana-util workspace test", "target": "workspace-test.html" },
+          { "command": "grafana-util workspace preview", "target": "workspace-preview.html" },
+          { "command": "grafana-util status", "target": "status.html" },
+          { "command": "grafana-util export", "target": "export.html" }
+        ]
+      }
+    ]
+  },
+  "handbook_command_map_aliases": {
+    "index": "role-new-user",
+    "what-is-grafana-util": "role-new-user",
+    "architecture": "status-workspace",
+    "scenarios": "role-sre-ops",
+    "recipes": "role-sre-ops",
+    "reference": "status-workspace",
+    "troubleshooting": "status-workspace"
+  }
+}

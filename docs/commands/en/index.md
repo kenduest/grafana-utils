@@ -1,10 +1,10 @@
-# Command Docs
+# Command Reference
 
 ## Language
 
 - English command reference: [current page](./index.md)
-- Traditional Chinese command reference: [繁體中文逐指令說明](../zh-TW/index.md)
-- English handbook: [Operator Handbook](../../user-guide/en/index.md)
+- Traditional Chinese command reference: [指令參考](../zh-TW/index.md)
+- English handbook: [current handbook](../../user-guide/en/index.md)
 - Traditional Chinese handbook: [繁體中文手冊](../../user-guide/zh-TW/index.md)
 
 ---
@@ -45,8 +45,8 @@ If older notes mention removed roots, use the current task names instead:
 | Export a backup | `grafana-util export dashboard` / `export alert` / `export datasource` |
 | Review a local change package | `grafana-util workspace scan` then `workspace preview` |
 | Inspect dashboards deeply | `grafana-util dashboard summary` / `dashboard diff` |
-| Query one resource generically | `grafana-util status resource describe|list|get` |
-| Export or review a snapshot bundle | `grafana-util status snapshot export|review` |
+| Query one resource generically | `grafana-util status resource describe`, `list`, or `get` |
+| Export or review a snapshot bundle | `grafana-util status snapshot export` or `review` |
 | Manage users, teams, orgs, or service accounts | `grafana-util access ...` |
 
 ## Common Tasks

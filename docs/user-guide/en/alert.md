@@ -39,12 +39,13 @@ This guide covers `grafana-util alert` as an operator workflow for alert desired
 
 Need the command-by-command surface instead of the workflow guide?
 
+- [alert](../../commands/en/alert.md)
 - [alert plan](../../commands/en/alert-plan.md)
 - [alert apply](../../commands/en/alert-apply.md)
-- [alert live list-rules](../../commands/en/alert.md)
-- [alert live list-contact-points](../../commands/en/alert.md)
-- [alert live list-mute-timings](../../commands/en/alert.md)
-- [alert live list-templates](../../commands/en/alert.md)
+- [alert list-rules](../../commands/en/alert-list-rules.md)
+- [alert list-contact-points](../../commands/en/alert-list-contact-points.md)
+- [alert list-mute-timings](../../commands/en/alert-list-mute-timings.md)
+- [alert list-templates](../../commands/en/alert-list-templates.md)
 - [full command index](../../commands/en/index.md)
 
 ---
@@ -52,21 +53,23 @@ Need the command-by-command surface instead of the workflow guide?
 ## 🛠️ What This Area Is For
 
 Use the alert area when the work is about Grafana alerting resources:
-- **Desired State**: Build new alert configurations locally without touching live Grafana.
-- **Review delta**: Compare your desired state against the live estate before approving changes.
-- **Controlled Apply**: Execute only reviewed plans.
-- **Replay**: Use the legacy `raw/` lane for inventory snapshots and environment-wide moves.
+- **Inventory**: Inspect live rules, contact points, mute timings, and templates before you change anything.
+- **Backup**: Export, import, or diff alert resources and bundles.
+- **Authoring**: Build new alert configurations locally without touching live Grafana.
+- **Review**: Compare your desired state against the live estate before approving changes, then apply only what you reviewed.
 
 ---
 
-## 🚧 Workflow Boundaries (Two Lanes)
+## 🚧 Workflow Boundaries (Four Lanes)
 
-Alerting is split into two distinct operational lanes. **Do not mix these lanes.**
+Alerting is split into four distinct operational lanes. **Do not mix these lanes.**
 
 | Lane | Purpose | Common Commands |
 | :--- | :--- | :--- |
-| **Authoring Lane** | Desired-state files for review/apply. | `init`, `add-rule`, `add-contact-point`, `plan`, `apply` |
-| **Replay Lane** | Inventory snapshots and raw replay. | `export`, `import`, `diff`, `list-rules` |
+| **Inventory** | Inspect the live alert estate before you change anything. | `list-rules`, `list-contact-points`, `list-mute-timings`, `list-templates`, `delete` |
+| **Backup** | Export, import, or diff alert resources and bundles. | `export`, `import`, `diff` |
+| **Authoring** | Scaffold and edit desired-state files for review/apply. | `init`, `add-rule`, `clone-rule`, `add-contact-point`, `set-route`, `preview-route`, `new-rule`, `new-contact-point`, `new-template` |
+| **Review** | Build and apply a reviewed plan. | `plan`, `apply` |
 
 ---
 
@@ -119,14 +122,15 @@ grafana-util alert apply \
 
 | Command | Full Example with Arguments |
 | :--- | :--- |
-| **List Rules** | `grafana-util alert live list-rules --all-orgs --table` |
+| **List Rules** | `grafana-util alert list-rules --all-orgs --table` |
+| **Init** | `grafana-util alert init --desired-dir ./alerts/desired` |
 | **Export** | `grafana-util alert export --output-dir ./alerts --overwrite` |
 | **Import** | `grafana-util alert import --input-dir ./alerts/raw --replace-existing --dry-run --json` |
 | **Diff** | `grafana-util alert diff --diff-dir ./alerts/raw --output-format json` |
 | **Plan** | `grafana-util alert plan --desired-dir ./alerts/desired --prune --output-format json` |
 | **Apply** | `grafana-util alert apply --plan-file ./plan.json --approve` |
-| **Set Route** | `grafana-util alert author route set --desired-dir ./alerts/desired --receiver pagerduty` |
-| **Preview Route** | `grafana-util alert author route preview --desired-dir ./alerts/desired --label team=platform --severity critical` |
+| **Set Route** | `grafana-util alert set-route --desired-dir ./alerts/desired --receiver pagerduty` |
+| **Preview Route** | `grafana-util alert preview-route --desired-dir ./alerts/desired --label team=platform --severity critical` |
 
 ---
 
@@ -154,7 +158,7 @@ grafana-util alert plan --desired-dir ./alerts/desired --prune --output-format j
 Verify your routing logic locally before applying.
 ```bash
 # Purpose: Verify your routing logic locally before applying.
-grafana-util alert author route preview --desired-dir ./alerts/desired --label team=platform --severity critical
+grafana-util alert preview-route --desired-dir ./alerts/desired --label team=platform --severity critical
 ```
 **Output Excerpt:**
 ```json

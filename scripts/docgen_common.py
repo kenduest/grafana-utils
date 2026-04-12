@@ -19,9 +19,23 @@ def relative_href(from_rel: str, to_rel: str) -> str:
     return relpath(to_rel, start=str(Path(from_rel).parent)).replace("\\", "/")
 
 
-def write_outputs(output_root: Path, outputs: dict[str, str]) -> None:
+def existing_output_files(output_root: Path) -> set[str]:
+    if not output_root.exists():
+        return set()
+    return {
+        path.relative_to(output_root).as_posix()
+        for path in output_root.rglob("*")
+        if path.is_file()
+    }
+
+
+def write_outputs(output_root: Path, outputs: dict[str, str], *, prune: bool = False) -> None:
     """Write repo-relative generated files under one output root."""
     output_root.mkdir(parents=True, exist_ok=True)
+    if prune:
+        stale_outputs = existing_output_files(output_root) - set(outputs)
+        for relative_path in sorted(stale_outputs):
+            (output_root / relative_path).unlink()
     for relative_path, content in outputs.items():
         output_path = output_root / relative_path
         output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -33,6 +47,8 @@ def check_outputs(
     outputs: dict[str, str],
     label: str,
     regenerate_command: str,
+    *,
+    prune: bool = False,
 ) -> int:
     """Return non-zero when checked-in generated outputs are stale."""
     stale: list[str] = []
@@ -40,6 +56,8 @@ def check_outputs(
         output_path = output_root / relative_path
         if not output_path.exists() or output_path.read_text(encoding="utf-8") != content:
             stale.append(relative_path)
+    if prune:
+        stale.extend(sorted(existing_output_files(output_root) - set(outputs)))
     if stale:
         print(f"Generated {label} are out of date:")
         for relative_path in stale:

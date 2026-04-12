@@ -34,6 +34,7 @@ Treat the repo in three layers:
   - `docs/internal/maintainer-quickstart.md`
   - `docs/internal/maintainer-role-map.md`
   - `docs/internal/contract-doc-map.md`
+  - `scripts/contracts/command-surface.json`
   - current internal architecture and policy docs under `docs/internal/`
 - Workflow schema:
   - repo rules in `AGENTS.md`
@@ -97,8 +98,10 @@ Expected companion updates:
   - code, focused tests, and the owning current contract doc in
     `docs/internal/`
 - docs-generator change:
-  - source docs or generator code, regenerated outputs when required, and the
-    generated-docs architecture or playbook if the workflow changed
+  - source docs or generator code, regenerated outputs when required, the
+    generated-docs architecture or playbook if the workflow changed, and
+    `scripts/contracts/command-surface.json` when public command paths or docs
+    routing changed
 - maintainer-routing change:
   - the owning internal maintainer docs, not just one local note
 
@@ -119,6 +122,8 @@ Read in this order when relevant:
    right ownership and validation fields
 6. `docs/internal/docs-architecture-guardrails.md` for handbook/manual,
    command-doc, generated-doc, internal-doc, and trace-doc boundaries
+7. `scripts/contracts/command-surface.json` for public command-path, legacy
+   replacement, routing, and `--help-full` changes
 
 Use this pass to answer:
 

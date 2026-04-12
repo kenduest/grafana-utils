@@ -14,6 +14,10 @@ Keep each docs layer doing one job:
 - `command docs`
   - owns command names, flags, examples, and per-command reference detail
   - does not become a second handbook
+- `command surface contract`
+  - owns machine-readable public command paths, legacy replacements,
+    command-doc routing, and `--help-full` support
+  - lives in `scripts/contracts/command-surface.json`
 - `generated docs`
   - owns derived man pages and HTML output
   - does not replace the source Markdown
@@ -32,6 +36,9 @@ Keep each docs layer doing one job:
 - do not put CLI topology or namespace wiring in the manual
 - do not repeat long flag tables in both manual and command docs
 - when CLI behavior changes, update command reference and source snippets first
+- when public command paths, legacy replacements, or `--help-full` support
+  change, update `scripts/contracts/command-surface.json` and run
+  `make quality-docs-surface`
 - keep manual updates limited to user journeys, decision tables, and stable
   narrative examples
 - prefer semantic examples and task-based routing over large copy-heavy
@@ -45,9 +52,10 @@ When a CLI or workflow change lands, update in this order:
 
 1. source code and focused tests
 2. command-reference source snippets
-3. handbook/manual user journeys or decision tables
-4. generated docs, if the source layer changed
-5. internal routing or trace docs, if the maintainer contract changed
+3. command-surface contract, if command paths or help support changed
+4. handbook/manual user journeys or decision tables
+5. generated docs, if the source layer changed
+6. internal routing or trace docs, if the maintainer contract changed
 
 ## Anti-Patterns
 
@@ -59,6 +67,8 @@ Treat these as signs the docs boundary is drifting:
 - generated pages edited as the primary source
 - internal docs that repeat operator walkthroughs instead of maintainer rules
 - trace docs that grow into design notes or implementation plans
+- command examples that bypass the command-surface contract or mention removed
+  roots without a replacement
 
 ## Maintenance Rule
 
@@ -68,4 +78,3 @@ If a code change forces the manual to change too often, tighten the doc split:
 - keep the manual at the level of stable intent and workflow
 - add a decision table when users need help choosing a command path
 - add semantic examples when users need a concrete first success path
-

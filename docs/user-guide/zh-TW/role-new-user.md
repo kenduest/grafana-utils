@@ -152,7 +152,7 @@ grafana-util status live --url http://localhost:3000 --output-format yaml
 
 - [指令詳細總索引](../../commands/zh-TW/index.md)
 - [config profile](../../commands/zh-TW/config.md)
-- [指令詳細說明總索引](../../commands/zh-TW/index.md)
+- [指令參考](../../commands/zh-TW/index.md)
 
 ## 常見錯誤與限制
 
@@ -165,7 +165,7 @@ grafana-util status live --url http://localhost:3000 --output-format yaml
 ## 何時切換至深度文件
 
 - **流程理解**：需要理解完整操作脈絡時，請參閱維運指南 (Handbook) 章節。
-- **精確查閱**：已知操作流程僅需確認特定旗標時，請參閱指令詳細說明頁。
+- **精確查閱**：已知操作流程僅需確認特定旗標時，請參閱指令參考。
 - **故障排除**：語法正確但結果不符預期時，請參閱疑難排解章節。
 
 ## 下一步

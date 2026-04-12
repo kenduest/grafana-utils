@@ -36,11 +36,6 @@
 grafana-util alert new-contact-point --desired-dir ./alerts/desired --name pagerduty-primary
 ```
 
-```bash
-# 用途：建立一個較低階的暫存 alert 聯絡點骨架。
-grafana-util alert add-contact-point --desired-dir ./alerts/desired --name pagerduty-primary
-```
-
 ## 相關命令
 
 - [alert](./alert.md)

@@ -5,12 +5,13 @@ Rust mainline.
 
 This file defines the architecture above any single command or TUI surface. It
 exists so the project can support a real "whole-project overview" without
-turning `grafana-util overview` into the accidental owner of every status rule.
+turning the legacy `grafana-util overview` root into the accidental owner of
+every status rule.
 
 This is the shared-status architecture note behind the public `status`
-surface. `overview` remains the human-facing staged project entrypoint, but the
-shared staged status assembly now lives outside the overview document path so
-other surfaces can reuse it directly.
+surface. `status overview` remains the human-facing staged project entrypoint,
+but the shared staged status assembly now lives outside the overview document
+path so other surfaces can reuse it directly.
 
 Treat `project-status` as the current internal contract and file name behind
 the public `grafana-util status` surface.
@@ -41,11 +42,11 @@ That model must be reusable by:
 
 ## Design Rule
 
-Do not treat `overview` as the project-status architecture.
+Do not treat `status overview` as the project-status architecture.
 
-`overview` is one consumer and one entrypoint. The architecture must stay
-broader than that so other surfaces can reuse the same status producers and
-contracts.
+`status overview` is one consumer and one entrypoint. The architecture must
+stay broader than that so other surfaces can reuse the same status producers
+and contracts.
 
 Do not treat `project-status` as a current public command name. It is the
 internal contract/file name for the broader shared status model.
@@ -200,9 +201,9 @@ derivation rules.
 
 Current consumer:
 
-- `overview` text output
-- `overview` JSON output
-- `overview` interactive workbench
+- `status overview` text output
+- `status overview` JSON output
+- `status overview` interactive workbench
 - `status staged`
 - `status live`
 

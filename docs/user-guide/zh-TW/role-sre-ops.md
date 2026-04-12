@@ -97,12 +97,12 @@ grafana-util access org list --table
 ## 建議同時開著哪些指令頁
 
 - [config profile](../../commands/zh-TW/config.md)
-- [指令詳細說明總索引](../../commands/zh-TW/index.md)
+- [指令參考](../../commands/zh-TW/index.md)
 - [workspace](../../commands/zh-TW/workspace.md)
 - [dashboard](../../commands/zh-TW/dashboard.md)
 - [alert](../../commands/zh-TW/alert.md)
 - [access](../../commands/zh-TW/access.md)
-- [指令詳細說明總索引](../../commands/zh-TW/index.md)
+- [指令參考](../../commands/zh-TW/index.md)
 
 ## 常見錯誤與限制
 
@@ -124,11 +124,11 @@ grafana-util access org list --table
 - inventory、export/import、inspect、screenshot 類問題，切到 [Dashboard 管理](dashboard.md)
 - rule、route、contact point、plan/apply 類問題，切到 [告警治理](alert.md)
 - org、user、team、service account 類問題，切到 [Access 管理](access.md)
-- 已經知道要跑哪個流程，只差精確旗標時，切到 [指令詳細說明總索引](../../commands/zh-TW/index.md)
+- 已經知道要跑哪個流程，只差精確旗標時，切到 [指令參考](../../commands/zh-TW/index.md)
 
 ## 下一步
 
 - [回到手冊首頁](index.md)
 - [先看 Workspace 審查與狀態](status-workspace.md)
 - [再看 Dashboard 管理](dashboard.md)
-- [需要指令細節時查看指令詳細說明總索引](../../commands/zh-TW/index.md)
+- [需要指令細節時查看指令參考](../../commands/zh-TW/index.md)

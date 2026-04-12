@@ -42,7 +42,7 @@
 - [access team](../../commands/zh-TW/access-team.md)
 - [access service-account](../../commands/zh-TW/access-service-account.md)
 - [access service-account token](../../commands/zh-TW/access-service-account-token.md)
-- [指令詳細說明總索引](../../commands/zh-TW/index.md)
+- [指令參考](../../commands/zh-TW/index.md)
 
 ---
 

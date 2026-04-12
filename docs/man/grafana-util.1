@@ -21,7 +21,7 @@ grafana\-util \- unified CLI for Grafana dashboards, alerts, datasources, access
 .PP
 .B grafana-util workspace [\fISUBCOMMAND\fR] [\fIOPTIONS\fR]
 .PP
-.B grafana-util snapshot [\fISUBCOMMAND\fR] [\fIOPTIONS\fR]
+.B grafana-util status snapshot [\fISUBCOMMAND\fR] [\fIOPTIONS\fR]
 .SH DESCRIPTION
 grafana-util is a unified command-line interface for operating Grafana estates with one executable and one namespaced command shape.
 .PP
@@ -49,7 +49,7 @@ read live and staged Grafana state through one canonical status surface. Use whe
 .B workspace
 scan, test, preview, package, and apply one local Grafana workspace. Use when: Already have a local repo root or staged package and want to understand it, validate it, preview the impact, package it for handoff, or apply a reviewed result.
 .TP
-.B snapshot
+.B status snapshot
 export and review Grafana snapshot inventory bundles. Use when: Want a local snapshot root that captures dashboard, datasource, and access inventory for later inspection.
 .SH SUBCOMMAND MANPAGES
 .SS dashboard
@@ -251,41 +251,41 @@ package dashboards, alerts, datasources, and metadata into one local handoff art
 .TP
 .B grafana\-util\-workspace\-ci(1)
 expose lower\-level contract checks for CI and automation.
-.SS snapshot
+.SS status snapshot
 .TP
-.B grafana\-util\-snapshot\-export(1)
+.B grafana\-util\-status\-snapshot\-export(1)
 export dashboard, datasource, and access inventory into a local snapshot bundle. Use when: Need a local snapshot root that can be reviewed without Grafana access.
 .TP
-.B grafana\-util\-snapshot\-review(1)
+.B grafana\-util\-status\-snapshot\-review(1)
 review a local snapshot inventory without touching Grafana. Use when: Want to inspect an exported snapshot root as table, csv, text, json, yaml, or interactive output.
 .SS export
 .TP
 .B grafana\-util\-export(1)
 grafana\-util export is the task\-first surface for common backup and local inventory capture jobs. Use when: The job is straightforward export or backup and you do not want to start from a domain\-heavy tree.
-.SS profile
+.SS config
 .TP
-.B grafana\-util\-profile(1)
+.B grafana\-util\-config\-profile(1)
 list, inspect, validate, add, and initialize repo\-local grafana\-util profiles through the current config profile entrypoint. Use when: Want to keep Grafana connection defaults in the current checkout and reuse them with \-\-profile.
-.SS resource
+.SS status
 .TP
-.B grafana\-util\-resource\-describe(1)
+.B grafana\-util\-status\-resource\-describe(1)
 Describe the supported live Grafana resource kinds and selector patterns. Use when: You want to know how the generic read\-only resource surface is shaped before you pick status resource list or status resource get.
-.SS resource
+.SS status
 .TP
-.B grafana\-util\-resource\-get(1)
+.B grafana\-util\-status\-resource\-get(1)
 Fetch one supported live Grafana resource by selector. Use when: You need the live payload for one supported resource item and want a simpler generic query than building a full export or inspect workflow.
-.SS resource
+.SS status
 .TP
-.B grafana\-util\-resource\-kinds(1)
+.B grafana\-util\-status\-resource\-kinds(1)
 List the live resource kinds supported by the generic read\-only status resource query surface. Use when: You need to confirm whether the generic resource query surface already supports the live Grafana resource kind you want to inspect. If you need the selector pattern or endpoint shape, use status resource describe instead.
-.SS resource
+.SS status
 .TP
-.B grafana\-util\-resource\-list(1)
+.B grafana\-util\-status\-resource\-list(1)
 List one supported live Grafana resource kind. Use when: You need a read\-only live inventory for one supported resource kind but do not yet need a higher\-level domain workflow.
-.SS resource
+.SS version
 .TP
-.B grafana\-util\-resource(1)
-Run generic read\-only Grafana resource queries through the status namespace. Use when: You need a read\-only live lookup before a richer workflow exists in dashboard, alert, datasource, access, or workspace.
+.B grafana\-util\-version(1)
+Print the current grafana\-util version. Use when: You need to confirm the installed binary or capture machine\-readable version details for automation.
 .TP
 .B workspace
 Workspace review and apply workflows for local Grafana artifacts. The public CLI surface and generated manpages live under grafana-util workspace and the grafana-util-workspace*(1) pages.
@@ -390,5 +390,5 @@ grafana-util datasource export --url http://localhost:3000 --export-dir ./dataso
 \fBgrafana-util-config\fR(1),
 \fBgrafana-util-status\fR(1),
 \fBgrafana-util-workspace\fR(1),
-\fBgrafana-util-snapshot\fR(1),
+\fBgrafana-util-status-snapshot\fR(1),
 \fBman\fR(1)

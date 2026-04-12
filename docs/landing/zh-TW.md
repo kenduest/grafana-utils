@@ -119,7 +119,7 @@
 依指令群組整理的完整指令說明，含子指令與旗標。
 
 - [瀏覽指令](../commands/zh-TW/index.md)
-- [瀏覽 manpages](../man/index.html)
+- [瀏覽 manpages](../html/man/grafana-util.html)
 
 ### 原始碼與版本庫
 
