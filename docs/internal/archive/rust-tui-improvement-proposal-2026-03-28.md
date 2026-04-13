@@ -48,10 +48,10 @@ The inspect workbench is now the strongest TUI subsystem and the biggest structu
 
 Relevant files:
 
-- `rust/src/dashboard/inspect_workbench_state.rs`
-- `rust/src/dashboard/inspect_workbench_render.rs`
-- `rust/src/dashboard/inspect_workbench_support.rs`
-- `rust/src/dashboard/inspect_workbench_content.rs`
+- `rust/src/commands/dashboard/inspect_workbench_state.rs`
+- `rust/src/commands/dashboard/inspect_workbench_render.rs`
+- `rust/src/commands/dashboard/inspect_workbench_support.rs`
+- `rust/src/commands/dashboard/inspect_workbench_content.rs`
 
 Current strengths:
 
@@ -76,8 +76,8 @@ Recommendation:
 
 Relevant files:
 
-- `rust/src/sync/review_tui.rs`
-- `rust/src/sync/review_tui_helpers.rs`
+- `rust/src/commands/sync/review_tui.rs`
+- `rust/src/commands/sync/review_tui_helpers.rs`
 
 Current strengths:
 
@@ -101,8 +101,8 @@ Recommendation:
 
 Relevant files:
 
-- `rust/src/datasource_browse_render.rs`
-- `rust/src/datasource_browse_tui.rs`
+- `rust/src/commands/datasource/browse/render.rs`
+- `rust/src/commands/datasource/browse/tui.rs`
 
 Current strengths:
 

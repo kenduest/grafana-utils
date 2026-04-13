@@ -180,13 +180,13 @@ route requests without re-owning the domain semantics.
 
 Current internal runtime/support modules:
 
-- `rust/src/project_status_staged.rs`
+- `rust/src/commands/status/staged.rs`
   - owns shared staged status assembly
-- `rust/src/project_status_live_runtime.rs`
+- `rust/src/commands/status/live.rs`
   - owns shared live status assembly and per-domain fan-out
-- `rust/src/project_status_support.rs`
+- `rust/src/commands/status/support.rs`
   - owns shared live client/header construction
-- `rust/src/project_status_command.rs`
+- `rust/src/commands/status/mod.rs`
   - owns command args, dispatch, and shared rendering
 
 Design rule:

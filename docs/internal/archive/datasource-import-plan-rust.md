@@ -263,17 +263,17 @@ If a standalone Rust datasource CLI is added, prefer the same module split style
 
 Suggested files:
 
-- `rust/src/datasource.rs`
+- `rust/src/commands/datasource/mod.rs`
   - top-level datasource dispatch
-- `rust/src/datasource_cli_defs.rs`
+- `rust/src/commands/datasource/cli/defs.rs`
   - clap args and auth/client helpers
-- `rust/src/datasource_export.rs`
+- `rust/src/commands/datasource/export/`
   - export helpers if Rust gains first-class datasource export parity
-- `rust/src/datasource_import.rs`
+- `rust/src/commands/datasource/import/`
   - import workflow, dry-run rendering, matching, validation
-- `rust/src/datasource_files.rs`
+- `rust/src/commands/datasource/import/support_io.rs`
   - export file load/validate helpers
-- `rust/src/datasource_rust_tests.rs`
+- `rust/src/commands/datasource/tests/mod.rs`
   - focused unit tests
 
 If the repo intentionally keeps datasource support Python-only for now, still isolate Rust planning this way rather than mixing datasource import into dashboard modules.

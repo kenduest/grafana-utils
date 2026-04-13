@@ -2,13 +2,20 @@
 
 Current AI-maintained status only.
 
-- Older trace history moved to [`archive/ai-status-archive-2026-03-24.md`](/Users/kendlee/work/grafana-utils/docs/internal/archive/ai-status-archive-2026-03-24.md).
-- Detailed 2026-03-27 entries moved to [`archive/ai-status-archive-2026-03-27.md`](/Users/kendlee/work/grafana-utils/docs/internal/archive/ai-status-archive-2026-03-27.md).
-- Detailed 2026-03-28 task notes were condensed into [`archive/ai-status-archive-2026-03-28.md`](/Users/kendlee/work/grafana-utils/docs/internal/archive/ai-status-archive-2026-03-28.md).
-- Detailed 2026-03-29 through 2026-03-31 entries moved to [`archive/ai-status-archive-2026-03-31.md`](/Users/kendlee/work/grafana-utils/docs/internal/archive/ai-status-archive-2026-03-31.md).
-- Detailed 2026-04-01 through 2026-04-12 entries moved to [`archive/ai-status-archive-2026-04-12.md`](/Users/kendlee/work/grafana-utils/docs/internal/archive/ai-status-archive-2026-04-12.md).
+- Older trace history moved to [`archive/ai-status-archive-2026-03-24.md`](docs/internal/archive/ai-status-archive-2026-03-24.md).
+- Detailed 2026-03-27 entries moved to [`archive/ai-status-archive-2026-03-27.md`](docs/internal/archive/ai-status-archive-2026-03-27.md).
+- Detailed 2026-03-28 task notes were condensed into [`archive/ai-status-archive-2026-03-28.md`](docs/internal/archive/ai-status-archive-2026-03-28.md).
+- Detailed 2026-03-29 through 2026-03-31 entries moved to [`archive/ai-status-archive-2026-03-31.md`](docs/internal/archive/ai-status-archive-2026-03-31.md).
+- Detailed 2026-04-01 through 2026-04-12 entries moved to [`archive/ai-status-archive-2026-04-12.md`](docs/internal/archive/ai-status-archive-2026-04-12.md).
 - Keep this file short and current. Additive historical detail belongs in `docs/internal/archive/`.
-- Older entries moved to [`ai-status-archive-2026-04-13.md`](/Users/kendlee/work/grafana-utils/docs/internal/archive/ai-status-archive-2026-04-13.md).
+- Older entries moved to [`ai-status-archive-2026-04-13.md`](docs/internal/archive/ai-status-archive-2026-04-13.md).
+
+## 2026-04-13 - Reorganize Rust command modules
+- State: Done
+- Scope: Rust source module layout for command/subcommand directories, layered shared infrastructure, crate module wiring, maintainer docs, and Rust validation.
+- Baseline: several command families still lived as root-level prefixed files under `rust/src/`, while shared transport/output/TUI helpers also lived as root singletons.
+- Current Update: moved command families under `rust/src/commands/`, moved unified CLI internals under `rust/src/cli/`, split command-agnostic helpers under `rust/src/common/`, and moved Grafana transport/API integration under `rust/src/grafana/`. `lib.rs` keeps the public crate module names stable through explicit `#[path]` declarations.
+- Result: Rust tests and formatting pass; public CLI behavior and docs contracts were not intentionally changed.
 
 ## 2026-04-13 - Add user browse membership removal
 - State: Done
@@ -44,10 +51,3 @@ Current AI-maintained status only.
 - Baseline: `sync/bundle_preflight.rs`, `sync/promotion_preflight.rs`, `sync/workspace_discovery.rs`, and `sync/bundle_inputs.rs` mixed document assembly, mapping/discovery rules, rendering, file loading, and normalization helpers in large files; the maintainability reporter listed only file-level findings, so domain-level sync growth was harder to see.
 - Current Update: split bundle preflight assessments, promotion preflight checks/mapping/rendering, workspace discovery path rules, and source-bundle input loading into focused modules; converted alert artifact, promotion remap, alert export section, and alert sync-kind differences into small rule/spec structures instead of scattered per-case branches; added a shared source-bundle input pipeline and directory summaries in the maintainability reporter.
 - Result: public CLI and JSON/text contracts are unchanged; focused sync tests, reporter tests, formatting, and static checks pass locally. The remaining sync hotspots are now other production/test domains rather than the preflight/discovery/bundle-input facades.
-
-## 2026-04-13 - Add GitHub installer completion option
-- State: Done
-- Scope: GitHub install script, install README snippets, getting-started docs, completion command docs, generated HTML output, and installer coverage.
-- Baseline: the GitHub install path installed only the binary; shell completion had to be installed manually in a separate README section after installation.
-- Current Update: added `INSTALL_COMPLETION=auto|bash|zsh`, `COMPLETION_DIR`, and `--interactive` support to the installer; refactored the installer into maintainable helper stages; added `make test-installer-local` for GitHub-free local archive smoke testing; documented the correct GitHub pipe usage; and refreshed generated HTML docs.
-- Result: users can opt in to installing Bash/Zsh completion from the just-installed binary, or run `sh -s -- --interactive` after the pipe to answer install-directory and completion prompts from the terminal. Maintainers can verify the release-style install path locally without downloading from GitHub.

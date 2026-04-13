@@ -38,7 +38,7 @@ live Grafana datasources before CLI wiring landed.
 
 - Python CLI wiring now exists through `grafana_utils/datasource/parser.py`,
   `grafana_utils/datasource_cli.py`, and `grafana_utils/datasource/workflows.py`.
-- Rust CLI parity now exists in `rust/src/datasource.rs`.
+- Rust CLI parity now exists in `rust/src/commands/datasource/mod.rs`.
 - User-facing usage belongs in `docs/user-guide.md` and `docs/user-guide-TW.md`,
   not in this historical scaffold note.
 

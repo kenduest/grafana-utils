@@ -27,7 +27,7 @@ Open these in order:
    - public product shape and operator-facing entrypoints
 2. `docs/DEVELOPER.md`
    - short maintainer landing page by concern
-3. `rust/src/cli.rs`
+3. `rust/src/cli/mod.rs`
    - public CLI topology and namespace wiring
 4. `docs/internal/maintainer-role-map.md`
    - routing by maintainer persona
@@ -114,17 +114,17 @@ debugging generated output in place.
 If the task is mostly:
 
 - CLI flags, parsing, help, or dispatch:
-  - start with `rust/src/cli.rs`
+  - start with `rust/src/cli/mod.rs`
 - dashboard behavior:
-  - start with `rust/src/dashboard/`
+  - start with `rust/src/commands/dashboard/`
 - datasource behavior:
-  - start with `rust/src/datasource.rs`
+  - start with `rust/src/commands/datasource/mod.rs`
 - alert behavior:
-  - start with `rust/src/alert.rs`
+  - start with `rust/src/commands/alert/mod.rs`
 - access behavior:
-  - start with `rust/src/access/`
+  - start with `rust/src/commands/access/`
 - status, snapshot, resource, or workspace/change behavior:
-  - start with `rust/src/sync/`
+  - start with `rust/src/commands/sync/`
 - handbook or command docs:
   - start with `docs/user-guide/` or `docs/commands/`, then validate command
     examples against `scripts/contracts/command-surface.json`

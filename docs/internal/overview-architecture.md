@@ -39,28 +39,28 @@ That single path should stay easy to trace in code.
 
 ## Module Boundaries
 
-- `rust/src/overview.rs`
+- `rust/src/commands/status/overview/mod.rs`
   - Owns CLI args, stable top-level types, thin wrappers, and output-mode dispatch.
   - This is the entrypoint and orchestration layer.
   - It should stay readable from top to bottom.
 
-- `rust/src/overview_artifacts.rs`
+- `rust/src/commands/status/overview/artifacts.rs`
   - Owns staged input loading, validation, and `OverviewArtifact` construction.
   - This is where new artifact kinds or new input sources should be added first.
 
-- `rust/src/overview_document.rs`
+- `rust/src/commands/status/overview/document.rs`
   - Owns `OverviewDocument` assembly and text rendering.
   - It consumes the shared staged project-status builder rather than owning status derivation itself.
 
-- `rust/src/overview_sections.rs`
+- `rust/src/commands/status/overview/sections.rs`
   - Owns section, view, and item projection for JSON/TUI consumers.
   - This is a presentation-model layer, not an input-loading layer.
 
-- `rust/src/overview_support.rs`
+- `rust/src/commands/status/overview/support.rs`
   - Owns shared JSON/file helpers and common normalization helpers used by sibling modules.
   - Keep this low-level and boring.
 
-- `rust/src/overview_tui.rs`
+- `rust/src/commands/status/overview/tui.rs`
   - Owns interactive browsing only.
   - It must not become the owner of contract logic, staged interpretation, or document mutation.
 
@@ -111,7 +111,7 @@ When adding a new domain or artifact:
 1. add the artifact loader
 2. add document-level summary or status derivation
 3. add section/view projection if the domain needs workbench support
-4. update focused tests in `rust/src/overview_rust_tests.rs`
+4. update focused tests in `rust/src/commands/status/overview/tests.rs`
 
 ## Anti-Patterns To Avoid
 

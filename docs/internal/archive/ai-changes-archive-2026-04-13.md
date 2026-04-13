@@ -14,7 +14,7 @@
 - Tests: updated CLI tests to assert removed roots and old alert grouped forms are rejected through the normal Clap path, are not intercepted by custom help preflight, and colored contextual help highlights option entries, inline flags, and example captions across dashboard, alert, datasource, and profile help.
 - Test Run: `cargo fmt --manifest-path rust/Cargo.toml --all`; `cargo test --manifest-path rust/Cargo.toml --quiet cli_rust_tests -- --test-threads=1`; `cargo fmt --manifest-path rust/Cargo.toml --all --check`; `make man`; `make html`; `make man-check`; `make html-check`; `make quality-docs-surface`; `make quality-ai-workflow`; `python3 -m json.tool scripts/contracts/command-surface.json`; `python3 -m json.tool scripts/contracts/command-reference-index.json`.
 - Validation: manually checked `grafana-util --color always das ex --help` through `cargo run --manifest-path rust/Cargo.toml --quiet --bin grafana-util -- ... | cat -v` and confirmed option entries, aliases, and inline flags emit highlight ANSI.
-- Impact: `rust/src/bin/grafana-util.rs`, `rust/src/cli.rs`, `rust/src/cli_help.rs`, `rust/src/cli_help_examples.rs`, `rust/src/cli_help/grouped_specs.rs`, `rust/src/cli_rust_tests.rs`, `scripts/check_docs_surface.py`, `scripts/contracts/command-surface.json`, `scripts/contracts/command-reference-index.json`, `docs/commands/{en,zh-TW}/`, `docs/internal/ai-status.md`.
+- Impact: `rust/src/bin/grafana-util.rs`, `rust/src/cli/mod.rs`, `rust/src/cli/help/mod.rs`, `rust/src/cli/help_examples.rs`, `rust/src/cli/help/grouped_specs.rs`, `rust/src/cli/rust_tests.rs`, `scripts/check_docs_surface.py`, `scripts/contracts/command-surface.json`, `scripts/contracts/command-reference-index.json`, `docs/commands/{en,zh-TW}/`, `docs/internal/ai-status.md`.
 - Rollback/Risk: old commands now receive standard parser errors with no compatibility mapping; rollback would restore the deleted legacy hint module and contract field.
 - Follow-up: none.
 
@@ -23,7 +23,7 @@
 - Tests: added parser coverage for successful unique long option inference and for rejected ambiguous/invalid prefixes in both unified CLI and access parser paths.
 - Test Run: `cargo fmt --manifest-path rust/Cargo.toml --all`; `cargo test --manifest-path rust/Cargo.toml --quiet long_option -- --test-threads=1`; `cargo test --manifest-path rust/Cargo.toml --quiet access_cli_rust_tests -- --test-threads=1`; `cargo test --manifest-path rust/Cargo.toml --quiet cli_rust_tests -- --test-threads=1`; `cargo fmt --manifest-path rust/Cargo.toml --all --check`; `git diff --check`; `cargo build --manifest-path rust/Cargo.toml --quiet --bin grafana-util`; `make quality-ai-workflow`.
 - Validation: `./rust/target/debug/grafana-util access user list --all-o --list-col` prints the user list columns without calling Grafana; `./rust/target/debug/grafana-util access user list --output json` remains rejected with a suggestion for `--output-format`.
-- Impact: `rust/src/cli.rs`, `rust/src/access/cli_defs.rs`, `rust/src/access/access_cli_rust_tests.rs`, `rust/src/cli_rust_tests.rs`, `docs/internal/ai-status.md`, `docs/internal/ai-changes.md`, `docs/internal/ai-learnings.md`.
+- Impact: `rust/src/cli/mod.rs`, `rust/src/commands/access/cli_defs.rs`, `rust/src/commands/access/access_cli_rust_tests.rs`, `rust/src/cli/rust_tests.rs`, `docs/internal/ai-status.md`, `docs/internal/ai-changes.md`, `docs/internal/ai-learnings.md`.
 - Rollback/Risk: command-line abbreviations now work for unique long option prefixes; ambiguous or invalid prefixes still fail, so scripts should continue to prefer full canonical flag names for clarity.
 - Follow-up: none.
 
@@ -31,7 +31,7 @@
 - Summary: fixed `grafana-util access org list --with-users` human-readable output so table, CSV, and text modes include user summaries when user details are requested; default org list output remains the original `id/name/userCount` shape.
 - Tests: added formatter tests for org list headers, table rows, CSV headers, and text summary lines with and without `--with-users`.
 - Test Run: `cargo fmt --manifest-path rust/Cargo.toml --all`; `cargo test --manifest-path rust/Cargo.toml --quiet org_ -- --test-threads=1`; `cargo fmt --manifest-path rust/Cargo.toml --all --check`; `git diff --check`.
-- Impact: `rust/src/access/org.rs`, `rust/src/access/org_workflows.rs`, `rust/src/access/rust_tests.rs`, `docs/internal/ai-status.md`, `docs/internal/ai-changes.md`.
+- Impact: `rust/src/commands/access/org.rs`, `rust/src/commands/access/org_workflows.rs`, `rust/src/commands/access/rust_tests.rs`, `docs/internal/ai-status.md`, `docs/internal/ai-changes.md`.
 - Rollback/Risk: only `--with-users` table/CSV/text rendering gains a user-summary column or suffix; scripts parsing fixed three-column table output with `--with-users` should switch to JSON or omit `--with-users`.
 - Follow-up: none.
 
@@ -40,7 +40,7 @@
 - Tests: added CLI help coverage for root pre-parse routing, colorized output, public command inclusion, hidden command exclusion, and rejection of leaked internal `Struct definition` / `Arguments for` wording.
 - Test Run: `cargo fmt --manifest-path rust/Cargo.toml --all`; `cargo test --manifest-path rust/Cargo.toml --quiet cli_rust_tests -- --test-threads=1`; `cargo fmt --manifest-path rust/Cargo.toml --all --check`; `git diff --check`; `python3 -m json.tool scripts/contracts/command-surface.json`.
 - Validation: manually checked `cargo run --manifest-path rust/Cargo.toml --quiet --bin grafana-util -- --help-flat` and confirmed all public roots render with purpose text and access leaf commands use operator-facing descriptions.
-- Impact: `rust/src/cli.rs`, `rust/src/cli_help.rs`, `rust/src/cli_help/routing.rs`, access CLI command definitions, CLI help tests, command-surface contract/checker, command-reference index docs, and maintainer workflow docs that reference root help inventory support.
+- Impact: `rust/src/cli/mod.rs`, `rust/src/cli/help/mod.rs`, `rust/src/cli/help/routing.rs`, access CLI command definitions, CLI help tests, command-surface contract/checker, command-reference index docs, and maintainer workflow docs that reference root help inventory support.
 - Rollback/Risk: root pre-parse now reserves `--help-flat`; command purposes depend on command-level Clap `about` metadata, so new commands should provide product-facing `about` text instead of relying on Args struct comments.
 - Follow-up: none.
 
@@ -56,7 +56,7 @@
 - Summary: split unified CLI help routing into a thinner orchestration layer plus focused `contextual` and `flat` helper modules, keeping the existing public help entrypoints and inferred-subcommand behavior unchanged.
 - Tests: re-ran focused unified help, dashboard help parser, and dashboard inspect/help-full Rust suites after the module split.
 - Test Run: `cargo test --manifest-path rust/Cargo.toml --quiet cli_rust_tests`; `cargo test --manifest-path rust/Cargo.toml --quiet dashboard_cli_parser_help_rust_tests`; `cargo test --manifest-path rust/Cargo.toml --quiet dashboard_cli_inspect_help_rust_tests`.
-- Impact: `rust/src/cli_help.rs`, `rust/src/cli_help/routing.rs`, `rust/src/cli_help/contextual.rs`, `rust/src/cli_help/flat.rs`, and AI trace docs.
+- Impact: `rust/src/cli/help/mod.rs`, `rust/src/cli/help/routing.rs`, `rust/src/cli/help/contextual.rs`, `rust/src/cli/help/flat.rs`, and AI trace docs.
 - Rollback/Risk: low to moderate. The refactor is behavior-preserving and covered by focused help tests, but future help work should extend the focused helper modules instead of re-growing `routing.rs` into another mixed-responsibility file.
 - Follow-up: none.
 
@@ -64,7 +64,7 @@
 - Summary: split snapshot review into shared validation, text rendering, tabular/output shaping, and browser-specific helper modules, keeping the public snapshot review entrypoints unchanged while making `snapshot_review.rs` a thin module hub.
 - Tests: relied on the existing snapshot review Rust coverage for behavior; reran the focused snapshot review Rust target after the split.
 - Test Run: `cargo fmt --manifest-path rust/Cargo.toml --all`; `cargo test --manifest-path rust/Cargo.toml --quiet snapshot_rust_tests -- --test-threads=1`.
-- Impact: `rust/src/snapshot_review.rs`, `rust/src/snapshot_review_common.rs`, `rust/src/snapshot_review_render.rs`, `rust/src/snapshot_review_browser.rs`, `rust/src/snapshot_review_output.rs`.
+- Impact: `rust/src/commands/snapshot/review/mod.rs`, `rust/src/commands/snapshot/review/common.rs`, `rust/src/commands/snapshot/review/render.rs`, `rust/src/commands/snapshot/review/browser.rs`, `rust/src/commands/snapshot/review/output.rs`.
 - Rollback/Risk: low. The refactor is behavior-preserving and only changes module boundaries, but the full crate still has unrelated `access` / `alert` compile failures in the current worktree, so broader verification remains blocked until those existing edits are resolved.
 - Follow-up: none.
 
@@ -72,7 +72,7 @@
 - Summary: split unified help routing, snapshot review, access rendering, alert CLI runtime/output, and the largest Rust test suites into focused helper modules with thin aggregators.
 - Tests: no behavior changes; preserved existing coverage and re-ran focused Rust targets for CLI, dashboard help, access CLI, overview, alert, and snapshot review.
 - Test Run: `cargo test --manifest-path rust/Cargo.toml --quiet cli_rust_tests -- --test-threads=1`; `cargo test --manifest-path rust/Cargo.toml --quiet dashboard_cli_parser_help_rust_tests -- --test-threads=1`; `cargo test --manifest-path rust/Cargo.toml --quiet access_cli_rust_tests -- --test-threads=1`; `cargo test --manifest-path rust/Cargo.toml --quiet overview_rust_tests -- --test-threads=1`; `cargo test --manifest-path rust/Cargo.toml --quiet alert_rust_tests -- --test-threads=1`; `cargo test --manifest-path rust/Cargo.toml --quiet snapshot_rust_tests -- --test-threads=1`; `make quality-architecture`; `make quality-ai-workflow`; `git diff --check`.
-- Impact: `rust/src/cli_help.rs`, `rust/src/cli_help/routing.rs`, `rust/src/cli_help/contextual.rs`, `rust/src/cli_help/flat.rs`, `rust/src/snapshot_review*.rs`, `rust/src/access/render*.rs`, `rust/src/alert*.rs`, `rust/src/*_rust_tests.rs`, `rust/src/access/*_rust_tests.rs`, and dashboard/overview test children.
+- Impact: `rust/src/cli/help/mod.rs`, `rust/src/cli/help/routing.rs`, `rust/src/cli/help/contextual.rs`, `rust/src/cli/help/flat.rs`, `rust/src/commands/snapshot/review/*.rs`, `rust/src/commands/access/render*.rs`, `rust/src/commands/alert/*.rs`, `rust/src/commands/**/*_rust_tests.rs`, `rust/src/commands/access/*_rust_tests.rs`, and dashboard/overview test children.
 - Rollback/Risk: behavior-preserving module-boundary refactor; rollback would collapse the helper modules back into the original large files. Remaining architecture warnings are pre-existing hotspots outside this pass.
 - Follow-up: consider a later pass for remaining warnings in access live status/tests, dashboard import/browse/inspect surfaces, datasource status/import-export, `snapshot.rs`, and the remaining brittle help tests in dashboard inspect and sync.
 
@@ -96,6 +96,14 @@
 - Summary: split several Rust maintainability hotspots into focused modules while keeping command paths, flags, output contracts, and public runner behavior unchanged; added a read-only maintainability reporter for oversized Rust files and re-export-heavy module roots.
 - Tests: preserved existing Rust coverage and added Python coverage for the new reporter.
 - Test Run: `cargo fmt --manifest-path rust/Cargo.toml --all`; `cargo fmt --manifest-path rust/Cargo.toml --all --check`; `cd rust && cargo test --quiet --lib`; `python -m unittest -q python.tests.test_python_rust_maintainability_report`; `python3 scripts/rust_maintainability_report.py --root rust/src --source-line-limit 2000 --test-line-limit 3000 --reexport-line-limit 100`.
-- Impact: `rust/src/dashboard/command_runner.rs`, new `rust/src/dashboard/run_{list,inspect}.rs`, `rust/src/access/mod.rs`, new `rust/src/access/{dispatch,auth_materialize}.rs`, `rust/src/datasource.rs`, new datasource helper modules, split `rust/src/sync/cli_args*.rs`, `scripts/rust_maintainability_report.py`, Python reporter tests, `docs/overview-rust.md`, and AI trace docs.
+- Impact: `rust/src/commands/dashboard/command_runner.rs`, new `rust/src/commands/dashboard/run_{list,inspect}.rs`, `rust/src/commands/access/mod.rs`, new `rust/src/commands/access/{dispatch,auth_materialize}.rs`, `rust/src/commands/datasource/mod.rs`, new datasource helper modules, split `rust/src/commands/sync/cli_args*.rs`, `scripts/rust_maintainability_report.py`, Python reporter tests, `docs/overview-rust.md`, and AI trace docs.
 - Rollback/Risk: behavior-preserving module-boundary refactor; rollback would collapse helper modules back into the original large facades. Future feature work should extend the new focused modules instead of re-growing root facades.
 - Follow-up: run the maintainability reporter periodically and decide later whether to wire it into a quality target with project-specific thresholds.
+
+## 2026-04-13 - Ignore credentials in Grafana base URLs
+- Summary: added a Rust connection-resolution sanitizer that strips username/password userinfo from Grafana base URLs supplied through `--url`, `GRAFANA_URL`, or profile `url`, emits a warning, and keeps authentication on the existing explicit flag/env/profile credential path.
+- Tests: added focused profile-config regressions for `GRAFANA_URL` and profile URLs containing credentials, asserting the resolved URL is sanitized and URL credentials are not copied into resolved Basic auth fields.
+- Test Run: `rustfmt --check rust/src/commands/config/profile/config.rs`; `git diff --check -- rust/src/commands/config/profile/config.rs docs/internal/ai-status.md docs/internal/ai-changes.md`; `cargo test --manifest-path rust/Cargo.toml --quiet profile_config::tests::resolve_connection_settings_ignores_credentials -- --test-threads=1`.
+- Impact: `rust/src/commands/config/profile/config.rs`, `docs/internal/ai-status.md`, and `docs/internal/ai-changes.md`.
+- Rollback/Risk: low CLI behavior change; URL userinfo no longer reaches request URLs and no longer acts as authentication, so users must move credentials to `--basic-user` plus `--basic-password` / `--prompt-password`, `GRAFANA_USERNAME` / `GRAFANA_PASSWORD`, or a profile secret.
+- Follow-up: consider documenting the ignored URL-userinfo form in troubleshooting if operators hit it often.

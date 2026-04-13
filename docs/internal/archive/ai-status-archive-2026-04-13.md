@@ -2,7 +2,7 @@
 
 ## 2026-04-12 - Infer unique long option prefixes
 - State: Done
-- Scope: `rust/src/cli.rs`, `rust/src/access/cli_defs.rs`, CLI parser tests, and AI trace docs.
+- Scope: `rust/src/cli/mod.rs`, `rust/src/commands/access/cli_defs.rs`, CLI parser tests, and AI trace docs.
 - Baseline: unique-prefix matching worked for subcommands, but long options such as `--all-o` only produced a suggestion for `--all-orgs` instead of resolving the unique match.
 - Current Update: enabled Clap unique long-argument inference on the unified root parser and access parser, with tests for inferred unique prefixes and rejected ambiguous prefixes.
 - Result: `grafana-util access user list --all-o --tab` now parses as `--all-orgs --table`; ambiguous or invalid long prefixes still stay on Clap's error path.
@@ -23,21 +23,21 @@
 
 ## 2026-04-12 - Split snapshot review shaping and browser behavior
 - State: Done
-- Scope: `rust/src/snapshot_review.rs`, new `rust/src/snapshot_review_common.rs`, `rust/src/snapshot_review_render.rs`, `rust/src/snapshot_review_browser.rs`, `rust/src/snapshot_review_output.rs`, and snapshot review coverage in `rust/src/snapshot_rust_tests.rs`.
+- Scope: `rust/src/commands/snapshot/review/mod.rs`, new `rust/src/commands/snapshot/review/common.rs`, `rust/src/commands/snapshot/review/render.rs`, `rust/src/commands/snapshot/review/browser.rs`, `rust/src/commands/snapshot/review/output.rs`, and snapshot review coverage in `rust/src/commands/snapshot/tests.rs`.
 - Baseline: `snapshot_review.rs` still mixed text rendering, tabular shaping, browser item shaping, and interactive browser dispatch in one file.
 - Current Update: split shared validation, text rendering, table/output shaping, and browser-specific behavior into separate helper modules; kept the public snapshot review entrypoints unchanged.
 - Result: snapshot review responsibilities are now thinner and easier to extend; targeted Rust verification hit unrelated pre-existing `access` / `alert` compile errors in the current worktree, but no new `snapshot_review` errors remained.
 
 ## 2026-04-12 - Split unified CLI help routing helpers
 - State: Done
-- Scope: `rust/src/cli_help.rs`, `rust/src/cli_help/routing.rs`, new `rust/src/cli_help/*` helper modules, Rust CLI help tests, and AI trace docs.
-- Baseline: `rust/src/cli_help/routing.rs` still mixes orchestration, flat help inventory rendering, contextual clap help shaping, option-heading inference, ANSI stripping, and inferred-subcommand normalization in one large file.
+- Scope: `rust/src/cli/help/mod.rs`, `rust/src/cli/help/routing.rs`, new `rust/src/cli/help/*` helper modules, Rust CLI help tests, and AI trace docs.
+- Baseline: `rust/src/cli/help/routing.rs` still mixes orchestration, flat help inventory rendering, contextual clap help shaping, option-heading inference, ANSI stripping, and inferred-subcommand normalization in one large file.
 - Current Update: kept `routing.rs` as the orchestration layer, moved contextual clap help shaping plus inferred-heading logic into `cli_help/contextual.rs`, and moved flat inventory rendering into `cli_help/flat.rs` without changing unified help entrypoints.
 - Result: unified help routing now has clearer seams between routing, contextual rendering, and flat inventory rendering; focused Rust help tests and `dashboard` help-full coverage still pass after the split.
 
 ## 2026-04-12 - Split Rust architecture hotspots and test modules
 - State: Done
-- Scope: `rust/src/alert.rs`, `rust/src/access/render.rs`, `rust/src/cli_help/routing.rs`, `rust/src/snapshot_review.rs`, and split Rust test modules for CLI, access, alert, dashboard help, and overview coverage.
+- Scope: `rust/src/commands/alert/mod.rs`, `rust/src/commands/access/render.rs`, `rust/src/cli/help/routing.rs`, `rust/src/commands/snapshot/review/mod.rs`, and split Rust test modules for CLI, access, alert, dashboard help, and overview coverage.
 - Current Update: Split large orchestration/render/test surfaces into focused helper modules and thin aggregators while preserving public command behavior and test contracts.
 - Result: Focused Rust tests pass; `make quality-architecture` now reports 17 warnings, down from the pre-refactor 23, with remaining warnings limited to untouched hotspots and two existing brittle help-test files.
 
@@ -87,3 +87,10 @@
 - Baseline: the CLI had no shell completion generator, and any future completion support would need a clear source of truth to avoid drifting from Clap command definitions.
 - Current Update: added `grafana-util completion bash|zsh`, backed by `clap_complete` and generated from `CliArgs::command()` only; documented install snippets for Bash and Zsh.
 - Result: Bash and Zsh completion scripts can be generated from the current binary without connecting to Grafana or reading profile/auth state.
+
+## 2026-04-13 - Add GitHub installer completion option
+- State: Done
+- Scope: GitHub install script, install README snippets, getting-started docs, completion command docs, generated HTML output, and installer coverage.
+- Baseline: the GitHub install path installed only the binary; shell completion had to be installed manually in a separate README section after installation.
+- Current Update: added `INSTALL_COMPLETION=auto|bash|zsh`, `COMPLETION_DIR`, and `--interactive` support to the installer; refactored the installer into maintainable helper stages; added `make test-installer-local` for GitHub-free local archive smoke testing; documented the correct GitHub pipe usage; and refreshed generated HTML docs.
+- Result: users can opt in to installing Bash/Zsh completion from the just-installed binary, or run `sh -s -- --interactive` after the pipe to answer install-directory and completion prompts from the terminal. Maintainers can verify the release-style install path locally without downloading from GitHub.

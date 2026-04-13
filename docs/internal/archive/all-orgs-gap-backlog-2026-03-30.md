@@ -12,16 +12,16 @@ This backlog separates three cases:
 ### `grafana-util project-status live`
 - Priority: `P0`
 - Current state: `ProjectStatusLiveArgs` exposes both `--all-orgs` and `--org-id`.
-- Evidence: [project_status_command.rs](/Users/kendlee/work/grafana-utils/rust/src/project_status_command.rs#L124)
+- Evidence: [project_status_command.rs](rust/src/commands/status/mod.rs#L124)
 - Gap: execution ignores both fields for the main live reads. The current client builder only creates one base client and never fans out per org or injects `X-Grafana-Org-Id`.
-- Evidence: [project_status_command.rs](/Users/kendlee/work/grafana-utils/rust/src/project_status_command.rs#L819)
-- Evidence: [project_status_command.rs](/Users/kendlee/work/grafana-utils/rust/src/project_status_command.rs#L711)
+- Evidence: [project_status_command.rs](rust/src/commands/status/mod.rs#L819)
+- Evidence: [project_status_command.rs](rust/src/commands/status/mod.rs#L711)
 - Resulting bug: help text promises cross-org live status, but runtime still behaves as one-context current-org live read.
 
 ### `grafana-util overview live`
 - Priority: `P0`
 - Current state: `overview live` delegates to `project-status live`.
-- Evidence: [overview.rs](/Users/kendlee/work/grafana-utils/rust/src/overview.rs#L188)
+- Evidence: [overview.rs](rust/src/commands/status/overview/mod.rs#L188)
 - Gap: inherits the same unwired `--all-orgs` behavior from `project-status live`.
 
 ## 2. High-Confidence Read/Export/Diff Gaps
@@ -33,15 +33,15 @@ These commands are inventory-style live reads or artifact generation paths. They
 #### `grafana-util alert export`
 - Priority: `P1`
 - Current state: `alert list-rules`, `list-contact-points`, `list-mute-timings`, and `list-templates` already support `--all-orgs`.
-- Evidence: [alert_cli_defs.rs](/Users/kendlee/work/grafana-utils/rust/src/alert_cli_defs.rs#L13)
+- Evidence: [alert_cli_defs.rs](rust/src/commands/alert/cli/mod.rs#L13)
 - Gap: `AlertExportArgs` has no `org_id` or `all_orgs`.
-- Evidence: [alert_cli_defs.rs](/Users/kendlee/work/grafana-utils/rust/src/alert_cli_defs.rs#L132)
+- Evidence: [alert_cli_defs.rs](rust/src/commands/alert/cli/mod.rs#L132)
 - Why it should support it: export is the natural multi-org inventory capture path for alerting, analogous to `dashboard export` and `datasource export`.
 
 #### `grafana-util alert diff`
 - Priority: `P1`
 - Current state: `AlertDiffArgs` has no `org_id` or `all_orgs`.
-- Evidence: [alert_cli_defs.rs](/Users/kendlee/work/grafana-utils/rust/src/alert_cli_defs.rs#L197)
+- Evidence: [alert_cli_defs.rs](rust/src/commands/alert/cli/mod.rs#L197)
 - Why it should support it: once multi-org alert export exists, diff should be able to compare the same multi-org artifact root against live Grafana.
 
 ### Access Teams
@@ -49,28 +49,28 @@ These commands are inventory-style live reads or artifact generation paths. They
 #### `grafana-util access team list`
 - Priority: `P1`
 - Current state: list is scoped only through `CommonCliArgs`, which means one current org or one explicit `--org-id`.
-- Evidence: [cli_defs.rs](/Users/kendlee/work/grafana-utils/rust/src/access/cli_defs.rs#L54)
+- Evidence: [cli_defs.rs](rust/src/commands/access/cli_defs.rs#L54)
 - Gap: no `--all-orgs`, no org fan-out logic.
-- Evidence: [team_list.rs](/Users/kendlee/work/grafana-utils/rust/src/access/team_list.rs#L92)
+- Evidence: [team_list.rs](rust/src/commands/access/team_list.rs#L92)
 
 #### `grafana-util access team browse`
 - Priority: `P2`
 - Current state: browse is also single-scope only.
-- Evidence: [cli_defs.rs](/Users/kendlee/work/grafana-utils/rust/src/access/cli_defs.rs#L92)
+- Evidence: [cli_defs.rs](rust/src/commands/access/cli_defs.rs#L92)
 - Gap: no cross-org inventory mode even though user browse already has a cross-org path.
 
 #### `grafana-util access team export`
 - Priority: `P1`
 - Current state: export walks only one scoped team surface.
-- Evidence: [cli_defs.rs](/Users/kendlee/work/grafana-utils/rust/src/access/cli_defs.rs#L144)
-- Evidence: [team_import_export.rs](/Users/kendlee/work/grafana-utils/rust/src/access/team_import_export.rs#L33)
+- Evidence: [cli_defs.rs](rust/src/commands/access/cli_defs.rs#L144)
+- Evidence: [team_import_export.rs](rust/src/commands/access/team_import_export.rs#L33)
 - Why it should support it: export is the right place to build a combined per-org team bundle for later import/diff/review.
 
 #### `grafana-util access team diff`
 - Priority: `P1`
 - Current state: diff compares one scoped live team set.
-- Evidence: [cli_defs.rs](/Users/kendlee/work/grafana-utils/rust/src/access/cli_defs.rs#L227)
-- Evidence: [team_list.rs](/Users/kendlee/work/grafana-utils/rust/src/access/team_list.rs#L151)
+- Evidence: [cli_defs.rs](rust/src/commands/access/cli_defs.rs#L227)
+- Evidence: [team_list.rs](rust/src/commands/access/team_list.rs#L151)
 - Why it should support it: same reason as export; inventory diff should be able to operate on combined multi-org exports.
 
 ### Access Service Accounts
@@ -78,20 +78,20 @@ These commands are inventory-style live reads or artifact generation paths. They
 #### `grafana-util access service-account list`
 - Priority: `P1`
 - Current state: list only supports one scoped org context through `CommonCliArgs`.
-- Evidence: [access_service_account_cli.rs](/Users/kendlee/work/grafana-utils/rust/src/access/access_service_account_cli.rs#L21)
+- Evidence: [access_service_account_cli.rs](rust/src/commands/access/access_service_account_cli.rs#L21)
 - Gap: no `--all-orgs` and no fan-out path.
-- Evidence: [service_account.rs](/Users/kendlee/work/grafana-utils/rust/src/access/service_account.rs#L25)
+- Evidence: [service_account.rs](rust/src/commands/access/service_account.rs#L25)
 
 #### `grafana-util access service-account export`
 - Priority: `P1`
 - Current state: export is single-scope only.
-- Evidence: [access_service_account_cli.rs](/Users/kendlee/work/grafana-utils/rust/src/access/access_service_account_cli.rs#L75)
+- Evidence: [access_service_account_cli.rs](rust/src/commands/access/access_service_account_cli.rs#L75)
 - Why it should support it: export is the natural reviewable multi-org capture path for service accounts.
 
 #### `grafana-util access service-account diff`
 - Priority: `P1`
 - Current state: diff is single-scope only.
-- Evidence: [access_service_account_cli.rs](/Users/kendlee/work/grafana-utils/rust/src/access/access_service_account_cli.rs#L100)
+- Evidence: [access_service_account_cli.rs](rust/src/commands/access/access_service_account_cli.rs#L100)
 - Why it should support it: same inventory parity reason as export.
 
 ## 3. Already Covered Or Covered By Another Model
@@ -119,8 +119,8 @@ These are not current gaps.
 
 Reason:
 - user workflows already expose cross-org/global admin coverage through `--scope global`, with `--all-orgs` only used as a human-friendly alias for the list/browse read surfaces.
-- Evidence: [access_user_cli.rs](/Users/kendlee/work/grafana-utils/rust/src/access/access_user_cli.rs#L12)
-- Evidence: [access_user_cli.rs](/Users/kendlee/work/grafana-utils/rust/src/access/access_user_cli.rs#L245)
+- Evidence: [access_user_cli.rs](rust/src/commands/access/access_user_cli.rs#L12)
+- Evidence: [access_user_cli.rs](rust/src/commands/access/access_user_cli.rs#L245)
 
 ### Not really a multi-org fan-out problem
 - `access org *`
@@ -134,12 +134,12 @@ These are worth discussing, but they are not as clear-cut as the inventory/expor
 
 ### `grafana-util dashboard inspect-vars`
 - Current state: has `--org-id` but no `--all-orgs`.
-- Evidence: [cli_defs_inspect.rs](/Users/kendlee/work/grafana-utils/rust/src/dashboard/cli_defs_inspect.rs#L238)
+- Evidence: [cli_defs_inspect.rs](rust/src/commands/dashboard/cli_defs_inspect.rs#L238)
 - Why lower confidence: this is a single-dashboard targeted action, not a broad inventory/export surface.
 
 ### `grafana-util dashboard screenshot`
 - Current state: has `--org-id` but no `--all-orgs`.
-- Evidence: [cli_defs_inspect.rs](/Users/kendlee/work/grafana-utils/rust/src/dashboard/cli_defs_inspect.rs#L65)
+- Evidence: [cli_defs_inspect.rs](rust/src/commands/dashboard/cli_defs_inspect.rs#L65)
 - Why lower confidence: screenshot is an explicit single-target capture flow, so cross-org behavior may be better handled by `--org-id` plus target URL/UID resolution.
 
 ## 5. Suggested Implementation Order

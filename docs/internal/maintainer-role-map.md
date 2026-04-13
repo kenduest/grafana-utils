@@ -19,7 +19,7 @@ Typical triggers:
     execution
 - First files to open:
   - [`docs/DEVELOPER.md`](../DEVELOPER.md)
-  - [`rust/src/cli.rs`](../../rust/src/cli.rs)
+  - [`rust/src/cli/mod.rs`](../../rust/src/cli/mod.rs)
   - relevant command module under [`rust/src/`](../../rust/src/)
   - [`python/grafana_utils/unified_cli.py`](../../python/grafana_utils/unified_cli.py)
     when the Python dispatcher is involved
@@ -51,7 +51,7 @@ Typical triggers:
   - [`docs/internal/generated-docs-playbook.md`](generated-docs-playbook.md)
   - [`docs/internal/contract-doc-map.md`](contract-doc-map.md) when the change
     touches a current contract doc
-  - [`scripts/contracts/command-surface.json`](/Users/kendlee/work/grafana-utils/scripts/contracts/command-surface.json) when public
+  - [`scripts/contracts/command-surface.json`](scripts/contracts/command-surface.json) when public
     command paths, legacy replacements, or docs routing change
 - Do not change casually:
   - generator output inventory, locale routing, or command/handbook linking

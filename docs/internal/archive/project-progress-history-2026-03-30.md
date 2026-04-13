@@ -485,5 +485,5 @@ This report was derived from:
 - `docs/internal/current-capability-inventory-2026-03-30.md`
 - `docs/internal/overview-architecture.md`
 - `docs/internal/project-status-architecture.md`
-- `rust/src/cli.rs`
+- `rust/src/cli/mod.rs`
 - `python/grafana_utils/unified_cli.py`

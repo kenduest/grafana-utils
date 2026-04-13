@@ -31,9 +31,9 @@ Current `dashboard import` is a batch import workflow rooted at `--import-dir`.
 
 Relevant code:
 
-- [grafana_utils/dashboard_cli.py](/Users/kendlee/work/grafana-utils/grafana_utils/dashboard_cli.py#L382)
-- [grafana_utils/dashboards/import_workflow.py](/Users/kendlee/work/grafana-utils/grafana_utils/dashboards/import_workflow.py#L21)
-- [grafana_utils/dashboards/export_inventory.py](/Users/kendlee/work/grafana-utils/grafana_utils/dashboards/export_inventory.py#L10)
+- [grafana_utils/dashboard_cli.py](grafana_utils/dashboard_cli.py#L382)
+- [grafana_utils/dashboards/import_workflow.py](grafana_utils/dashboards/import_workflow.py#L21)
+- [grafana_utils/dashboards/export_inventory.py](grafana_utils/dashboards/export_inventory.py#L10)
 
 ### Selection Behavior
 
@@ -61,9 +61,9 @@ Dashboard import decisions are keyed by `dashboard.uid`, not by title.
 
 Relevant code:
 
-- [grafana_utils/dashboards/import_support.py](/Users/kendlee/work/grafana-utils/grafana_utils/dashboards/import_support.py#L177)
-- [grafana_utils/dashboards/import_support.py](/Users/kendlee/work/grafana-utils/grafana_utils/dashboards/import_support.py#L191)
-- [grafana_utils/dashboards/import_support.py](/Users/kendlee/work/grafana-utils/grafana_utils/dashboards/import_support.py#L230)
+- [grafana_utils/dashboards/import_support.py](grafana_utils/dashboards/import_support.py#L177)
+- [grafana_utils/dashboards/import_support.py](grafana_utils/dashboards/import_support.py#L191)
+- [grafana_utils/dashboards/import_support.py](grafana_utils/dashboards/import_support.py#L230)
 
 ### Folder Placement
 
@@ -91,9 +91,9 @@ Current `alert export` writes the tool-owned round-trip format under `alerts/raw
 
 Relevant docs:
 
-- [README.md](/Users/kendlee/work/grafana-utils/README.md#L827)
-- [DEVELOPER.md](/Users/kendlee/work/grafana-utils/DEVELOPER.md#L262)
-- [DEVELOPER.md](/Users/kendlee/work/grafana-utils/DEVELOPER.md#L294)
+- [README.md](README.md#L827)
+- [DEVELOPER.md](DEVELOPER.md#L262)
+- [DEVELOPER.md](DEVELOPER.md#L294)
 
 ### Important Constraint
 
@@ -119,7 +119,7 @@ Current alert import supports:
 
 Relevant API summary:
 
-- [DEVELOPER.md](/Users/kendlee/work/grafana-utils/DEVELOPER.md#L398)
+- [DEVELOPER.md](DEVELOPER.md#L398)
 
 ### Selection Behavior
 
@@ -136,8 +136,8 @@ Operators can still do partial import by narrowing the directory passed to `--im
 
 Relevant code:
 
-- [grafana_utils/alert_cli.py](/Users/kendlee/work/grafana-utils/grafana_utils/alert_cli.py#L564)
-- [grafana_utils/alert_cli.py](/Users/kendlee/work/grafana-utils/grafana_utils/alert_cli.py#L1036)
+- [grafana_utils/alert_cli.py](grafana_utils/alert_cli.py#L564)
+- [grafana_utils/alert_cli.py](grafana_utils/alert_cli.py#L1036)
 
 ## Alert Mapping Support
 
@@ -148,7 +148,7 @@ Unlike dashboard import, alert import already supports explicit linkage mapping:
 
 Relevant CLI definition:
 
-- [grafana_utils/alert_cli.py](/Users/kendlee/work/grafana-utils/grafana_utils/alert_cli.py#L209)
+- [grafana_utils/alert_cli.py](grafana_utils/alert_cli.py#L209)
 
 ### Meaning of `--dashboard-uid-map`
 
@@ -189,7 +189,7 @@ The export also stores extra dashboard metadata for import-time repair.
 
 Relevant docs:
 
-- [DEVELOPER.md](/Users/kendlee/work/grafana-utils/DEVELOPER.md#L303)
+- [DEVELOPER.md](DEVELOPER.md#L303)
 
 Implication:
 
@@ -210,7 +210,7 @@ Current documented repair behavior:
 
 Relevant docs:
 
-- [DEVELOPER.md](/Users/kendlee/work/grafana-utils/DEVELOPER.md#L319)
+- [DEVELOPER.md](DEVELOPER.md#L319)
 
 Current limitation:
 

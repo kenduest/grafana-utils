@@ -15,15 +15,15 @@ Use three layers:
 ## Current Contract Specs
 
 - Repo-level export-root policy:
-  [`export-root-output-layering-policy.md`](/Users/kendlee/work/grafana-utils/docs/internal/export-root-output-layering-policy.md)
+  [`export-root-output-layering-policy.md`](docs/internal/export-root-output-layering-policy.md)
 - Dashboard export-root contract:
-  [`dashboard-export-root-contract.md`](/Users/kendlee/work/grafana-utils/docs/internal/dashboard-export-root-contract.md)
+  [`dashboard-export-root-contract.md`](docs/internal/dashboard-export-root-contract.md)
 - Datasource masked-recovery contract:
-  [`datasource-masked-recovery-contract.md`](/Users/kendlee/work/grafana-utils/docs/internal/datasource-masked-recovery-contract.md)
+  [`datasource-masked-recovery-contract.md`](docs/internal/datasource-masked-recovery-contract.md)
 - Alert/access boundary policy:
-  [`alert-access-contract-policy.md`](/Users/kendlee/work/grafana-utils/docs/internal/alert-access-contract-policy.md)
+  [`alert-access-contract-policy.md`](docs/internal/alert-access-contract-policy.md)
 - CLI/docs surface contract:
-  [`scripts/contracts/command-surface.json`](/Users/kendlee/work/grafana-utils/scripts/contracts/command-surface.json)
+  [`scripts/contracts/command-surface.json`](scripts/contracts/command-surface.json)
 
 ## Maintainer Rules
 

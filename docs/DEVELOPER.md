@@ -14,7 +14,7 @@ If you just entered the repo:
    - public product shape and operator-facing entrypoints
 2. `docs/internal/maintainer-quickstart.md`
    - first-entry maintainer routing
-3. `rust/src/cli.rs`
+3. `rust/src/cli/mod.rs`
    - public CLI topology and namespace wiring
 4. `docs/internal/maintainer-role-map.md`
    - routing by maintainer persona
@@ -55,25 +55,25 @@ Treat these namespaces as the maintained public surface:
 - `grafana-util export`
 - `grafana-util config`
 
-For command topology and help routing, start with `rust/src/cli.rs`. For help
-rendering specifically, also check `rust/src/cli_help.rs`.
+For command topology and help routing, start with `rust/src/cli/mod.rs`. For help
+rendering specifically, also check `rust/src/cli/help/mod.rs`.
 
 ## Choose Your Lane
 
 If the task is mostly:
 
 - runtime behavior, flags, parser rules, help, or dispatch:
-  - start with `rust/src/cli.rs` and the owning Rust module under `rust/src/`
+  - start with `rust/src/cli/mod.rs` and the owning Rust module under `rust/src/`
 - dashboard behavior:
-  - start with `rust/src/dashboard/`
+  - start with `rust/src/commands/dashboard/`
 - datasource behavior:
-  - start with `rust/src/datasource.rs`
+  - start with `rust/src/commands/datasource/mod.rs`
 - alert behavior:
-  - start with `rust/src/alert.rs`
+  - start with `rust/src/commands/alert/mod.rs`
 - access behavior:
-  - start with `rust/src/access/`
+  - start with `rust/src/commands/access/`
 - status, snapshot, resource, or workspace/change runtime behavior:
-  - start with `rust/src/sync/`
+  - start with `rust/src/commands/sync/`
 - handbook or command docs:
   - start with `README.md`, `README.zh-TW.md`, `docs/user-guide/`, and `docs/commands/`
 - generated HTML or manpages:
@@ -162,4 +162,4 @@ When you make a meaningful architecture, contract, or workflow change:
   when the change is meaningful enough to trace
 
 For the current summary/spec/trace split, start with
-[`docs/internal/contract-doc-map.md`](/Users/kendlee/work/grafana-utils/docs/internal/contract-doc-map.md).
+[`docs/internal/contract-doc-map.md`](docs/internal/contract-doc-map.md).

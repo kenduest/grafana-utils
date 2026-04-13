@@ -236,16 +236,16 @@ Do not collapse them into one abstraction that hides these tradeoffs from operat
 
 Primary implementation:
 
-- [profile_secret_store.rs](/Users/kendlee/work/grafana-utils/rust/src/profile_secret_store.rs)
-- [profile_config.rs](/Users/kendlee/work/grafana-utils/rust/src/profile_config.rs)
-- [profile_cli_runtime.rs](/Users/kendlee/work/grafana-utils/rust/src/profile_cli_runtime.rs)
-- [profile_cli_render.rs](/Users/kendlee/work/grafana-utils/rust/src/profile_cli_render.rs)
+- [profile_secret_store.rs](rust/src/commands/config/profile/secret_store.rs)
+- [profile_config.rs](rust/src/commands/config/profile/config.rs)
+- [profile_cli_runtime.rs](rust/src/commands/config/profile/runtime.rs)
+- [profile_cli_render.rs](rust/src/commands/config/profile/render.rs)
 
 Current documented user surfaces:
 
-- [profile.md](/Users/kendlee/work/grafana-utils/docs/commands/en/profile.md)
-- [getting-started.md](/Users/kendlee/work/grafana-utils/docs/user-guide/en/getting-started.md)
-- [reference.md](/Users/kendlee/work/grafana-utils/docs/user-guide/en/reference.md)
+- [profile.md](docs/commands/en/profile.md)
+- [getting-started.md](docs/user-guide/en/getting-started.md)
+- [reference.md](docs/user-guide/en/reference.md)
 
 ## Maintainer Rules
 
@@ -280,7 +280,7 @@ When editing user-facing docs, keep these constraints explicit:
 
 If this architecture changes, update:
 
-- [docs/DEVELOPER.md](/Users/kendlee/work/grafana-utils/docs/DEVELOPER.md)
-- [docs/internal/README.md](/Users/kendlee/work/grafana-utils/docs/internal/README.md)
-- [generated-docs-architecture.md](/Users/kendlee/work/grafana-utils/docs/internal/generated-docs-architecture.md) if generator behavior changes
+- [docs/DEVELOPER.md](docs/DEVELOPER.md)
+- [docs/internal/README.md](docs/internal/README.md)
+- [generated-docs-architecture.md](docs/internal/generated-docs-architecture.md) if generator behavior changes
 - user-facing profile and reference docs if operator guidance changes
