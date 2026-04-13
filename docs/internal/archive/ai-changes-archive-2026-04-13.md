@@ -59,3 +59,11 @@
 - Impact: `rust/src/cli_help.rs`, `rust/src/cli_help/routing.rs`, `rust/src/cli_help/contextual.rs`, `rust/src/cli_help/flat.rs`, and AI trace docs.
 - Rollback/Risk: low to moderate. The refactor is behavior-preserving and covered by focused help tests, but future help work should extend the focused helper modules instead of re-growing `routing.rs` into another mixed-responsibility file.
 - Follow-up: none.
+
+## 2026-04-12 - Split snapshot review shaping and browser behavior
+- Summary: split snapshot review into shared validation, text rendering, tabular/output shaping, and browser-specific helper modules, keeping the public snapshot review entrypoints unchanged while making `snapshot_review.rs` a thin module hub.
+- Tests: relied on the existing snapshot review Rust coverage for behavior; reran the focused snapshot review Rust target after the split.
+- Test Run: `cargo fmt --manifest-path rust/Cargo.toml --all`; `cargo test --manifest-path rust/Cargo.toml --quiet snapshot_rust_tests -- --test-threads=1`.
+- Impact: `rust/src/snapshot_review.rs`, `rust/src/snapshot_review_common.rs`, `rust/src/snapshot_review_render.rs`, `rust/src/snapshot_review_browser.rs`, `rust/src/snapshot_review_output.rs`.
+- Rollback/Risk: low. The refactor is behavior-preserving and only changes module boundaries, but the full crate still has unrelated `access` / `alert` compile failures in the current worktree, so broader verification remains blocked until those existing edits are resolved.
+- Follow-up: none.

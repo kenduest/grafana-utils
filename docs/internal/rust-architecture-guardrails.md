@@ -76,6 +76,10 @@ Current high-value refactor candidates usually follow that order in this repo:
 Already handled and no longer current candidates:
 
 - `sync/mod.rs`
+- `sync/bundle_preflight.rs`
+- `sync/promotion_preflight.rs`
+- `sync/workspace_discovery.rs`
+- `sync/bundle_inputs.rs`
 
 Later candidates from the current architecture report may also include:
 
@@ -91,8 +95,10 @@ Later candidates from the current architecture report may also include:
 Use the architecture lint as an early review gate, not as a cleanup step.
 
 - run it in report mode first when you are still shaping a change
+- use directory summaries when a domain like `sync/` needs a totals view, for example `python3 scripts/rust_maintainability_report.py --root rust/src --summary-root rust/src/sync --summary-hotspots 3`
 - treat new root artifacts, layer breaks, and facade bloat as high-signal findings
 - keep size-only warnings as triage input unless the module also violates a layer rule
+- read directory summaries as well as single-file hotspots; a domain like `sync/` can be risky even when `mod.rs` is no longer the largest file
 - keep handled modules out of the current candidate list; once a hotspot is split, remove it from the report and guardrails instead of keeping a permanent allowlist
 - rerun it after a refactor that changes ownership boundaries or module layout
 
