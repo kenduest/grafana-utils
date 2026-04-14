@@ -1,5 +1,5 @@
 # grafana-util
-### 套用 Grafana 變更前，先完成審查
+### 針對 Grafana 提供強大的 SRE 支援需求，與維運審查、盤點 與 CICD 支援的一體式整合工具程式。 
 
 [![CI](https://img.shields.io/github/actions/workflow/status/kenduest-brobridge/grafana-util/ci.yml?branch=main)](https://github.com/kenduest-brobridge/grafana-util/actions)
 [![License](https://img.shields.io/github/license/kenduest-brobridge/grafana-util)](LICENSE)
@@ -9,7 +9,7 @@
 
 **線上盤點、匯出匯入、差異比對、變更預覽與安全套用，整合在同一套流程裡。**
 
-`grafana-util` 是給 Grafana 維運使用的 Rust CLI。它不是把 API 包一層就結束，而是把唯讀檢查、匯出匯入、差異比對、工作區預覽、安全套用、連線設定檔與密鑰處理整理成一套可重複執行的流程。要查狀態、備份、比對或套用變更時，不用在不同腳本和手動操作之間切來切去。
+`grafana-util` 是給 Grafana 維運使用的 Rust CLI，包含 SRE 人員用來快速備份復原 Grafana 面板，與面板開發人員能夠匯出面板提供再行使用本機匯入開發等多重情境用途，包含快速盤點 Grafan 整個常見的 Dashboard、Data Source、User、Teams 項目的綜合支援管理支援。工具的設計不是把 API 包一層單純封裝，實際常用的內容查看、匯出匯入、差異比對、工作區預覽、安全套用異動、不同環境連線設定檔 (包含連線驗證密鑰) 整理成一套可重複執行的流程。要查狀態、備份、比對或套用變更時，不用在不同腳本和手動操作之間切來切去。
 
 常見用途：
 
@@ -28,12 +28,12 @@ CLI 主要圍繞這幾個指令家族：`status`、`workspace`、`dashboard`、`
 
 | 面向 | 目前涵蓋 | 建議先跑 |
 | :--- | :--- | :--- |
-| Dashboards | 瀏覽、列表、匯出/匯入、比對、審查、修補、發布、歷史版本、相依性分析、政策檢查、截圖、raw-to-prompt 轉換。 | `grafana-util dashboard browse` |
+| Dashboards | 瀏覽、列表、匯出/匯入、比對、審查、修補、發布、歷史版本、相依性分析、政策檢查、截圖、面板轉換成不同環境再次匯入支援。 | `grafana-util dashboard browse` |
 | Datasources | 盤點、匯出/匯入、比對、建立/修改/刪除、密鑰感知復原、類型探索。 | `grafana-util datasource list` |
 | Alerting | 規則、contact points、mute timings、templates、notification routes、審查計畫、套用流程、route 預覽。 | `grafana-util alert plan` |
 | Access | org、user、team、service accounts、service-account tokens、匯出/匯入、比對、刪除前審查。 | `grafana-util access user list` |
 | Status 與 workspace | live readiness、資源盤點、本地 workspace scan/test/preview/package/apply、適合 CI 的檢查。 | `grafana-util status live` |
-| Profiles 與 secrets | repo-local 連線 profiles、直接旗標、環境變數驗證、互動輸入、支援的密鑰儲存。 | `grafana-util config profile add` |
+| Profiles 與 secrets | repo-local 連線 profiles、直接旗標、環境變數驗證、互動輸入、支援的認證密鑰不同方式儲存。 | `grafana-util config profile add` |
 
 ---
 
@@ -75,7 +75,7 @@ curl -sSL https://raw.githubusercontent.com/kenduest-brobridge/grafana-util/main
 sh ./scripts/install.sh --help
 ```
 
-用同一套 installer 流程安裝並驗證目前 checkout 的本地 build：
+用同一套 installer 流程安裝並驗證目前 local 環境 checkout 進行 build：
 
 ```bash
 make install-local-interactive
@@ -210,7 +210,7 @@ grafana-util config profile --help
 
 ## 專案狀態
 
-此專案仍在積極開發中。CLI 路徑、help 輸出、範例與文件結構都可能在版本之間調整。指令介面請以 command reference 和 `--help` 輸出為準，不要依賴舊版範例。
+此專案仍在積極開發中。CLI 路徑、help 輸出、範例與文件結構可能會有異動改變整。指令介面請以 command reference 和 `--help` 輸出為準。
 
 ---
 
