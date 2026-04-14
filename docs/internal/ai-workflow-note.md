@@ -193,7 +193,7 @@ The invariant is the same in both modes:
 - define the task clearly first
 - inspect the actual diff and validation results before accepting the change
 
-Use [`task-brief-template.md`](/Users/kendlee/work/grafana-utils/docs/internal/task-brief-template.md)
+Use [`task-brief-template.md`](docs/internal/task-brief-template.md)
 when you want a repo-shaped starting point for that brief.
 If the work is tracked on GitHub, reuse the same fields through
 `.github/ISSUE_TEMPLATE/ai-task-brief.md` or `.github/PULL_REQUEST_TEMPLATE.md`.
@@ -223,7 +223,7 @@ Example:
 Goal: add a new dashboard export flag for flat output naming
 Touched surface: dashboard CLI + command docs
 Constraints: preserve existing JSON contract; do not change import semantics
-Source-of-truth files: rust/src/dashboard/, docs/commands/en/, docs/commands/zh-TW/
+Source-of-truth files: rust/src/commands/dashboard/, docs/commands/en/, docs/commands/zh-TW/
 Expected companion updates: parser/help tests, command docs, regenerated man/html if docs text changes
 Validation: cd rust && cargo test --quiet; make man-check; make html-check
 ```

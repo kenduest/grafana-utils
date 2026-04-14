@@ -1,6 +1,6 @@
-# Start Here
+# Review Grafana changes before you apply them
 
-Choose the job you need to do now. This page only keeps the most common entry points; use the jump menu for the full handbook and command index.
+Live inventory, export/import, diff, change preview, and safe apply in one workflow. This page keeps the most common entry points; use the jump menu for the full handbook and command index.
 
 - [Start with the handbook](../user-guide/en/index.md)
 - [Open command reference](../commands/en/index.md)

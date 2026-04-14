@@ -14,4 +14,4 @@
 - Fix: enable `keyring` with `features = ["apple-native"]` on the macOS target and keep a manual ignored smoke that checks `security` CLI interoperability.
 - Prevention: when adopting `keyring`, always verify the target-specific backend feature set instead of assuming the real platform store is enabled by default.
 - Keywords: keyring apple-native macos keychain mock backend security-framework profile_secret_store
-- Refs: `rust/Cargo.toml`, `rust/src/profile_secret_store.rs`, `/Users/kendlee/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/keyring-3.6.3/src/lib.rs`
+- Refs: `rust/Cargo.toml`, `rust/src/commands/config/profile/secret_store.rs`, `<cargo-home>/registry/src/index.crates.io-1949cf8c6b5b557f/keyring-3.6.3/src/lib.rs`

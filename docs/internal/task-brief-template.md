@@ -92,7 +92,7 @@ Owned Layer:
 - parser/help + command-reference docs
 
 Source-Of-Truth Files:
-- rust/src/dashboard/
+- rust/src/commands/dashboard/
 - docs/commands/en/dashboard-export.md
 - docs/commands/zh-TW/dashboard-export.md
 

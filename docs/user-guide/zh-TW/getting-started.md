@@ -54,36 +54,58 @@ profile 的重點是讓日常操作少重打重複參數，不是代表一開始
 
 若要對照本章提到的旗標，請一併參考 [config profile](../../commands/zh-TW/profile.md) 與 [指令參考](../../commands/zh-TW/index.md)。
 
+## 先選第一條路
+
+| 你現在要做的是... | 從這裡開始 | 原因 |
+| :--- | :--- | :--- |
+| 確認一組連線可用 | `status live --output-format yaml` | 唯讀，而且能先暴露 auth、URL 與 scope 問題 |
+| 快速理解 live Grafana 現況 | `status overview live --output-format interactive` | 先看可瀏覽總覽，再決定要鑽 dashboard、datasource、alert 或 access |
+| 搬移 dashboard 或 datasource | `export`，再 `diff`，最後 dry-run `import` | 保持先 review、再 replay |
+| 自動化一包本地變更 | `workspace scan`，再 `workspace preview`，再 `workspace test` | 先把 staged files 變成可審查 plan，再進 apply |
+
 ---
 
 ## 步驟 1：安裝
 
 ### 下載並安裝
 ```bash
-# 下載並安裝。
+# 安裝最新 release。
 curl -sSL https://raw.githubusercontent.com/kenduest-brobridge/grafana-util/main/scripts/install.sh | sh
+```
+
+若要從 GitHub 安裝 binary 時順手更新 shell completion，請明確 opt in：
+
+```bash
+# 安裝最新 release，並替目前 shell 寫入 completion。
+curl -sSL https://raw.githubusercontent.com/kenduest-brobridge/grafana-util/main/scripts/install.sh | INSTALL_COMPLETION=auto sh
+```
+
+若想由 installer 逐步詢問，請使用互動安裝。它會問安裝目錄、是否安裝 shell completion，以及 completion file 要寫到哪裡：
+
+```bash
+# 先詢問，再決定 binary 與 completion 的安裝位置。
+curl -sSL https://raw.githubusercontent.com/kenduest-brobridge/grafana-util/main/scripts/install.sh | sh -s -- --interactive
 ```
 
 若您想固定版本，或想指定安裝到哪個 binary 目錄，也可以直接這樣裝：
 
 ```bash
 # 把固定版本安裝到指定的 binary 目錄。
-VERSION=0.10.0 BIN_DIR="$HOME/.local/bin" \
-  curl -sSL https://raw.githubusercontent.com/kenduest-brobridge/grafana-util/main/scripts/install.sh | sh
+curl -sSL https://raw.githubusercontent.com/kenduest-brobridge/grafana-util/main/scripts/install.sh | VERSION=0.10.0 BIN_DIR="$HOME/.local/bin" sh
 ```
 
 安裝腳本會優先使用您指定的 `BIN_DIR`。若沒有設定，會先嘗試可寫入的 `/usr/local/bin`，再退回 `$HOME/.local/bin`。
 
-如果最後選到的安裝目錄尚未加入 `PATH`，安裝腳本會直接印出對應 `zsh` 或 `bash` 可貼上的設定方式。若想先看完整安裝說明，也可以先執行：
+如果最後選到的安裝目錄尚未加入 `PATH`，安裝腳本會直接印出對應 `zsh` 或 `bash` 可貼上的設定方式。`INSTALL_COMPLETION=auto` 會從 `SHELL` 偵測 `bash` 或 `zsh`；若想明確指定，請用 `INSTALL_COMPLETION=bash` 或 `INSTALL_COMPLETION=zsh`。互動模式下，若您已經透過 `BIN_DIR`、`INSTALL_COMPLETION` 或 `COMPLETION_DIR` 傳入值，installer 會視為已選好，不再重複詢問。若想先看完整安裝說明，也可以先執行：
 
 ```bash
-# 查看安裝腳本支援的參數、BIN_DIR 行為與 PATH 設定提醒。
+# 查看安裝腳本支援的參數、BIN_DIR 行為、completion 與 PATH 設定提醒。
 sh ./scripts/install.sh --help
 ```
 
 ### 檢查版本
 ```bash
-# 檢查版本。
+# 確認目前 shell 找得到 binary，且版本正確。
 grafana-util --version
 ```
 **預期輸出：**

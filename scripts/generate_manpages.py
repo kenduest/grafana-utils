@@ -516,7 +516,7 @@ def generate_top_level_manpage(*, command_docs_dir: Path, version: str = VERSION
     emit_header(
         lines,
         "grafana-util",
-        "unified CLI for Grafana dashboards, alerts, datasources, access, status, workspace, and snapshot workflows",
+        "review Grafana changes before applying them",
         version=version,
     )
     lines.extend(
@@ -532,7 +532,7 @@ def generate_top_level_manpage(*, command_docs_dir: Path, version: str = VERSION
     lines.extend(
         [
             ".SH DESCRIPTION",
-            "grafana-util is a unified command-line interface for operating Grafana estates with one executable and one namespaced command shape.",
+            "grafana-util is a command-line interface for reviewing Grafana changes with live inventory, diff, preview, and safe apply workflows in one executable and one namespaced command shape.",
             ".PP",
             router_intro[0],
             ".SH TOP-LEVEL COMMANDS",

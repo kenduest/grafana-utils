@@ -11,13 +11,21 @@ Rust crate 提供四個 CLI domain 的核心執行能力：
 - `access`
 - `datasource`
 
-共同資源由 `common`、`http` 兩層承接，並以 `cli` 做統一入口分流。
+共同資源由 `common` 與 `grafana` 兩層承接，並以 `cli` 做統一入口分流。
 
-這個 crate 的對外定位是：  
-- CLI 參數解析與路由是入口層；  
-- Domain 模組是命令執行器；  
-- `common/http` 是輸出、驗證、傳輸基礎層；  
+這個 crate 的對外定位是：
+- CLI 參數解析與路由是入口層；
+- Domain 模組是命令執行器；
+- `common` 是輸出、驗證、檔案/JSON/TUI 等 command-agnostic 基礎層；
+- `grafana` 是 Grafana HTTP transport、API client、connection wiring 層；
 - 不在這裡直接實作跨 domain 的業務策略。
+
+Rust source layout mirrors that boundary:
+
+- `rust/src/commands/` contains operator command families and their subcommand helpers.
+- `rust/src/cli/` contains the unified command topology, dispatch, completion, and help renderer.
+- `rust/src/common/` contains command-agnostic shared helpers.
+- `rust/src/grafana/` contains Grafana-specific transport and API integration.
 
 如果要維護 `grafana-util overview` 的 staged overview / workbench 路徑，請先讀
 `docs/internal/overview-architecture.md`。那份文件是 `overview` 子系統的專用維護地圖，
@@ -43,83 +51,84 @@ execution plans、gap lists、或 progress snapshots，改到 `docs/internal/arc
 
 ### 2.2 Unified Dispatcher 層
 
-- `rust/src/cli.rs`
+- `rust/src/cli/mod.rs`
   - 擁有 `UnifiedCommand`、`DashboardGroupCommand` 等 command enum。
   - 透過 `parse_cli_from` 完成 CLI 解析（純解析，無 side effect）。
   - 透過 `run_cli` 與 `dispatch_with_handlers` 實作 alias、legacy 及 namespaced 轉換，最後呼叫 domain runner。
   - 任何「domain 邏輯」都不應放在這裡；這一層只做「命令路徑決定」。
   - 如果要補註解，先寫 boundary / ownership / non-obvious behavior，不要重述命令分流本身。
 
-- `rust/src/cli_help.rs`
+- `rust/src/cli/help/mod.rs`
   - 承接 unified help rendering、extended examples 與 `--help-full` 快路徑，避免 `cli.rs` 重新膨脹回同時持有 command topology 與長篇 help 文案的混合層。
 
 ### 2.3 Domain orchestrator 層
 
-- `rust/src/dashboard/mod.rs`
-  - 導出 dashboard 的 parser 型別、client helper、runner、以及 `rust/src/dashboard/` 子模組共用型別。
+- `rust/src/commands/dashboard/mod.rs`
+  - 導出 dashboard 的 parser 型別、client helper、runner、以及 `rust/src/commands/dashboard/` 子模組共用型別。
   - `run_dashboard_cli` 是核心 runtime 執行入口：normalize、建 client、分派到 export/import/diff/inspect/list/topology/impact/governance/screenshot/validate/vars 的子流程。
   - inspect 的 query extraction 與 query analysis helper 主要落在 `inspect_query.rs`，live inspect 的 command 路由與 TUI 分工則分別落在 `inspect_live.rs` 與 `inspect_live_tui.rs`。
   - `run_dashboard_cli_with_client` 提供已有 client 的測試/整合替代路徑。
   - `dashboard export` 的 raw metadata contract 會備份 `permissions.json`，但 `dashboard import` 目前仍忽略權限 bundle，只還原 dashboard/folder 與既有 raw inventory。
 
-- `rust/src/alert.rs`
+- `rust/src/commands/alert/mod.rs`
   - 處理 alert 命令入口、legacy/namespaced normalization、`GrafanaAlertClient` 組裝與 routing。
   - `run_alert_cli` 依 `list` / `import` / `diff` / default-export 決定執行路徑。
 
-- `rust/src/access/mod.rs`
+- `rust/src/commands/access/mod.rs`
   - 處理 access 命令入口與巢狀 dispatch（user/org/team/service-account）。
   - `run_access_cli_with_request` 可注入 request 函式，這是測試時 decouple transport 的主要入口。
   - `run_access_cli` 主要負責 normalize 與 client 注入。
 
-- `rust/src/sync/mod.rs`
+- `rust/src/commands/sync/mod.rs`
   - 處理 sync 命令入口、staged document builder、review/audit/bundle workflow，並把 JSON、bundle inputs、staged document、以及 live fetch/apply helpers 分別收在 `sync/json.rs`、`sync/bundle_inputs.rs`、`sync/staged_documents.rs`、`sync/cli.rs`、`sync/live.rs`。
   - `run_sync_cli` 主要負責 normalize、document routing 與可選 live wiring 的分派。
-  - `sync/apply_contract.rs` 現在承接 apply-intent 這種 repo-owned envelope；`apply_builder.rs` 負責建構它，`live.rs` / `live_apply.rs` 只消費它。
+  - `sync/apply_contract.rs` 現在承接 apply-intent 這種 repo-owned envelope；`apply_builder.rs` 負責建構它，`live.rs` 與 `grafana/api/sync_live*.rs` 消費它。
   - Sync data contract is intentionally narrow:
     1. Input contract: the CLI accepts raw JSON arrays or objects from `--desired-file`, `--live-file`, `--lock-file`, `--availability-file`, `--source-bundle`, and `--target-inventory`; live-backed commands only consult Grafana when `--fetch-live` is set and they reuse `CommonCliArgs` plus optional `--org-id` / `--page-size`.
     2. Normalized internal model: `normalize_resource_spec` collapses staged resources into `SyncResourceSpec { kind, identity, title, body, managed_fields, source_path }`; `kind` is lower-cased, `identity` is derived from `uid/name/title/path`, and alert-like resources must keep `managedFields` so ownership stays explicit.
     3. Output contract: the staged builders emit stable JSON envelopes such as `grafana-utils-sync-summary`, `grafana-utils-sync-plan`, `grafana-utils-sync-apply-intent`, `grafana-utils-sync-source-bundle`, `grafana-utils-sync-preflight`, `grafana-utils-sync-lock`, and `grafana-utils-sync-audit`, each with fixed summary and lineage metadata that later stages validate.
   - Shortest modification path:
-    - Change local resource shape or compare/apply semantics: start in `rust/src/sync/workbench.rs`.
-    - Change Grafana request mapping or live endpoint handling: start in `rust/src/sync/live_fetch.rs` or `rust/src/sync/live_apply.rs`.
-    - Change command routing or live-vs-local selection: start in `rust/src/sync/cli.rs`.
-    - Change staged lineage/review metadata: start in `rust/src/sync/staged_documents.rs`.
-    - Keep offline contract tests in `rust/src/sync/rust_tests.rs` and request-backed live tests in `rust/src/sync/live_rust_tests.rs`.
+    - Change local resource shape or compare/apply semantics: start in `rust/src/commands/sync/workbench.rs`.
+    - Change Grafana request mapping or live endpoint handling: start in `rust/src/commands/sync/live.rs` and `rust/src/grafana/api/sync_live*.rs`.
+    - Change command routing or live-vs-local selection: start in `rust/src/commands/sync/cli.rs`.
+    - Change staged lineage/review metadata: start in `rust/src/commands/sync/staged_documents.rs`.
+    - Keep offline contract tests in `rust/src/commands/sync/rust_tests.rs` and request-backed live tests in `rust/src/commands/sync/live_rust_tests.rs`.
 
-- `rust/src/datasource.rs`
+- `rust/src/commands/datasource/mod.rs`
   - 管理 list/export/import/diff 四類流程與輸出模式（table/csv/json）。
   - `run_datasource_cli` 先 normalize 再 build client，接著進入對應 handler。
 
 ### 2.3.1 Ownership map: facade vs contract vs renderer/state-machine
 
 - Facade / orchestrator：
-  - `rust/src/cli.rs`
-  - `rust/src/dashboard/mod.rs`
-  - `rust/src/access/mod.rs`
-  - `rust/src/datasource.rs`
-  - `rust/src/sync/mod.rs`
+  - `rust/src/cli/mod.rs`
+  - `rust/src/commands/dashboard/mod.rs`
+  - `rust/src/commands/access/mod.rs`
+  - `rust/src/commands/datasource/mod.rs`
+  - `rust/src/commands/sync/mod.rs`
   - 這些檔案應維持在「command topology、normalize、client/request wiring、top-level dispatch」層級，不承接細部資料契約或 renderer 細節。
   - 如果 facade 開始持有穩定 envelope、跨模組 shape 或 workflow 規則，就把那段邏輯下放到專屬 contract / submodule。
+  - 如果單一 facade 或 runner 開始同時處理 local/live 分流、auth materialization、輸出格式、TUI fallback，優先拆成 `dispatch`、`auth_materialize`、`run_*` 或 `*_render` 類子模組，不要繼續往 root 塞分支。
 
 - Typed contract / shared model：
-  - `rust/src/dashboard/inspect_summary.rs`, `rust/src/dashboard/inspect_report.rs`
-  - `rust/src/dashboard_reference_models.rs`
-  - `rust/src/dashboard_inspection_dependency_contract.rs`
-  - `rust/src/sync/workbench.rs`, `rust/src/sync/staged_documents.rs`, `rust/src/sync/bundle_alert_contracts.rs`
+  - `rust/src/commands/dashboard/inspect_summary.rs`, `rust/src/commands/dashboard/inspect_report.rs`
+  - `rust/src/commands/dashboard/reference_models.rs`
+  - `rust/src/commands/dashboard/inspection/dependency_contract.rs`
+  - `rust/src/commands/sync/workbench.rs`, `rust/src/commands/sync/staged_documents.rs`, `rust/src/commands/sync/bundle_alert_contracts.rs`
   - 這些模組定義跨流程要穩定的中介文件、summary/report 形狀、或 staged contract，改動時要先想 downstream render/tests 是否跟著變。
   - 優先使用 repo-owned typed envelope 或明確 struct，避免在流程之間傳遞 ad hoc map / loosely typed blob。
 
 - Renderer / presentation：
-  - `rust/src/dashboard/inspect_render.rs`, `rust/src/dashboard/inspect_dependency_render.rs`, `rust/src/dashboard/inspect_governance_render.rs`
-  - `rust/src/dashboard/browse_render.rs`
-  - `rust/src/sync/review_tui.rs`, `rust/src/sync/audit_tui.rs`
+  - `rust/src/commands/dashboard/inspect_render.rs`, `rust/src/commands/dashboard/inspect_dependency_render.rs`, `rust/src/commands/dashboard/inspect_governance_render.rs`
+  - `rust/src/commands/dashboard/browse_render.rs`
+  - `rust/src/commands/sync/review_tui.rs`, `rust/src/commands/sync/audit_tui.rs`
   - 這些模組主要擁有 text/table/TUI 的可見輸出，不應反向擴張成新的 workflow owner。
 
 - State machine / interactive workbench：
-  - `rust/src/dashboard/import_interactive_state.rs`
-  - `rust/src/dashboard/inspect_workbench_state.rs`
-  - `rust/src/dashboard/import_interactive*.rs`
-  - `rust/src/dashboard/inspect_workbench*.rs`
+  - `rust/src/commands/dashboard/import_interactive_state.rs`
+  - `rust/src/commands/dashboard/inspect_workbench_state.rs`
+  - `rust/src/commands/dashboard/import_interactive*.rs`
+  - `rust/src/commands/dashboard/inspect_workbench*.rs`
   - 這些模組承接互動式模式的 state、事件處理、view-model 與畫面分工；如果變更只影響 TUI 互動，不應先從 facade 改起。
 
 ### 2.3.2 Cross-module relationships maintainers usually need first
@@ -131,26 +140,27 @@ execution plans、gap lists、或 progress snapshots，改到 `docs/internal/arc
 
 ### 2.4 Domain 子模組（實作重點）
 
-- `rust/src/dashboard/`：`cli_defs`, `export`, `files`, `governance_gate`, `governance_gate_tui`, `help`, `impact_tui`, `import`, `inspect`, `inspect_analyzer_*`, `inspect_governance`, `inspect_live`, `inspect_live_tui`, `inspect_query`, `inspect_render`, `inspect_report`, `inspect_summary`, `list`, `live`, `models`, `prompt`, `screenshot`, `topology`, `topology_tui`, `validate`, `vars`；typed inspect summary/report contract surfaces are split across `inspect_summary.rs` and `inspect_report.rs`.
-- `rust/src/alert_*`：`alert_cli_defs`, `alert_client`, `alert_list`。
-- `rust/src/access/`：`cli_defs`, `org`, `pending_delete`, `render`, `service_account`, `team`, `user`。
-- `rust/src/sync/`：`audit`, `audit_tui`, `bundle_alert_contracts`, `bundle_inputs`, `bundle_preflight`, `cli`, `json`, `live`, `preflight`, `review_tui`, `staged_documents`, `workbench`；typed apply/live contract boundaries are split across `live.rs`, `staged_documents.rs`, and `workbench.rs`.
-- `rust/src/datasource_diff.rs`：diff 合併/欄位對齊與結果摘要模型。
-- `rust/src/http.rs`：HTTP transport 實作、query/url 建構、錯誤對映。
-- `rust/src/common.rs`：錯誤型別、訊息、解析工具與共用 helper。
+- `rust/src/commands/dashboard/`：`cli_defs`, `export`, `files`, `governance_gate`, `governance_gate_tui`, `help`, `impact_tui`, `import`, `inspect`, `inspect_analyzer_*`, `inspect_governance`, `inspect_live`, `inspect_live_tui`, `inspect_query`, `inspect_render`, `inspect_report`, `inspect_summary`, `list`, `live`, `models`, `prompt`, `screenshot`, `topology`, `topology_tui`, `validate`, `vars`；typed inspect summary/report contract surfaces are split across `inspect_summary.rs` and `inspect_report.rs`.
+- `rust/src/commands/alert/`：`cli`, `client`, `list`, `export`, `diff`, `import_diff`, `project_status`, `support`, `sync`。
+- `rust/src/commands/access/`：`cli_defs`, `org`, `pending_delete`, `render`, `service_account`, `team`, `user`。
+- `rust/src/commands/sync/`：`audit`, `audit_tui`, `bundle_alert_contracts`, `bundle_inputs`, `bundle_preflight`, `cli`, `json`, `live`, `preflight`, `review_tui`, `staged_documents`, `workbench`；typed apply/live contract boundaries are split across `live.rs`, `staged_documents.rs`, and `workbench.rs`.
+- `rust/src/commands/datasource/diff/mod.rs`：diff 合併/欄位對齊與結果摘要模型。
+- `rust/src/grafana/http.rs`：HTTP transport 實作、query/url 建構、錯誤對映。
+- `rust/src/common/mod.rs`：錯誤型別、訊息、解析工具與共用 helper。
 
 補充維護心法：
 
 - 如果模組名稱帶 `render`、`report`、`summary`，先假設它是 presentation 或 typed-output boundary，不是 command owner。
 - 如果模組名稱帶 `state`、`workbench`、`interactive`、`tui`，先假設它承接互動流程或畫面狀態，不是核心 API contract。
+- 如果模組名稱帶 `dispatch`、`auth_materialize`、`run_*`，先假設它是 facade 瘦身後的 command handoff，不應再往裡塞資料 contract 或 renderer。
 - 如果要找「真正的入口」，先回到各 domain 的 `mod.rs` 或單檔 facade（如 `alert.rs`, `datasource.rs`）。
 
 ### 2.5 Contract 與 test split
 
-- `dashboard inspect` 的主要 contract 落在 `rust/src/dashboard/inspect.rs`, `rust/src/dashboard/inspect_query.rs`, `rust/src/dashboard/inspect_live.rs`, `rust/src/dashboard/inspect_live_tui.rs`，typed summary/report boundary 則分別在 `rust/src/dashboard/inspect_summary.rs` 與 `rust/src/dashboard/inspect_report.rs`。
-- `dashboard inspect` 的回歸測試主要落在 `rust/src/dashboard/rust_tests.rs`，parser/help 類變更則仍跟著對應的 `*_cli_defs.rs`。
-- `sync` 的主要 contract 落在 `rust/src/sync/mod.rs`, `rust/src/sync/cli.rs`, `rust/src/sync/live.rs`, `rust/src/sync/json.rs`, `rust/src/sync/bundle_inputs.rs`, `rust/src/sync/staged_documents.rs`, `rust/src/sync/workbench.rs`。
-- `sync` 的回歸測試主要落在 `rust/src/sync/cli_rust_tests.rs` 與 `rust/src/sync/rust_tests.rs`。
+- `dashboard inspect` 的主要 contract 落在 `rust/src/commands/dashboard/inspect.rs`, `rust/src/commands/dashboard/inspect_query.rs`, `rust/src/commands/dashboard/inspect_live.rs`, `rust/src/commands/dashboard/inspect_live_tui.rs`，typed summary/report boundary 則分別在 `rust/src/commands/dashboard/inspect_summary.rs` 與 `rust/src/commands/dashboard/inspect_report.rs`。
+- `dashboard inspect` 的回歸測試主要落在 `rust/src/commands/dashboard/rust_tests.rs`，parser/help 類變更則仍跟著對應的 `*_cli_defs.rs`。
+- `sync` 的主要 contract 落在 `rust/src/commands/sync/mod.rs`, `rust/src/commands/sync/cli.rs`, `rust/src/commands/sync/live.rs`, `rust/src/commands/sync/json.rs`, `rust/src/commands/sync/bundle_inputs.rs`, `rust/src/commands/sync/staged_documents.rs`, `rust/src/commands/sync/workbench.rs`。
+- `sync` 的回歸測試主要落在 `rust/src/commands/sync/cli_rust_tests.rs` 與 `rust/src/commands/sync/rust_tests.rs`。
 
 ## 3) 執行資料流（可複製做 debug）
 
@@ -226,7 +236,7 @@ execution plans、gap lists、或 progress snapshots，改到 `docs/internal/arc
   - 先看 `http.rs` 是否有可複用封裝；
   - 有限域特例改在 domain 子模組 handler。
 - 改輸出格式：
-  - dashboard/list/import/diff 常在 `rust/src/dashboard/list.rs`, `rust/src/dashboard/export.rs`, `rust/src/dashboard/import.rs`, `rust/src/dashboard/prompt.rs`, 以及 `datasource` 對應輸出路徑修改。
+  - dashboard/list/import/diff 常在 `rust/src/commands/dashboard/list.rs`, `rust/src/commands/dashboard/export.rs`, `rust/src/commands/dashboard/import.rs`, `rust/src/commands/dashboard/prompt.rs`, 以及 `datasource` 對應輸出路徑修改。
 - 加新 domain：
   - 先定義 CLI 入口（`*_cli_defs.rs`）  
   - 再加 runner 分派（`cli.rs`）  
@@ -252,6 +262,7 @@ execution plans、gap lists、或 progress snapshots，改到 `docs/internal/arc
 
 - `cargo doc --no-deps --document-private-items`
 - `rg -n "run_.*_cli|dispatch_with_handlers|normalize_.*command" rust/src`
+- `python3 scripts/rust_maintainability_report.py --root rust/src`
 
 ### 行為變更時
 

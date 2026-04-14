@@ -32,13 +32,13 @@ with five major domain surfaces:
 
 At a high level, the current structure is:
 
-- `rust/src/cli.rs`: unified entrypoint, namespaced command topology, and top-level help flow
-- `rust/src/access/`: user, org, team, and service-account lifecycle workflows
-- `rust/src/dashboard/`: export, import, diff, inspect, governance, screenshot, topology, and interactive browse/workbench flows
-- `rust/src/datasource.rs` plus helper modules: datasource inventory, import/export/diff, live mutation, and staged secret placeholder support
-- `rust/src/alert.rs` plus helper modules: alert export/import/diff/list and related support paths
-- `rust/src/sync/`: staged summary, plan, review, audit, preflight, promotion-preflight, bundle-preflight, and apply workflows
-- `rust/src/common.rs` and `rust/src/http.rs`: shared error, auth, JSON, and transport foundations
+- `rust/src/cli/mod.rs`: unified entrypoint, namespaced command topology, and top-level help flow
+- `rust/src/commands/access/`: user, org, team, and service-account lifecycle workflows
+- `rust/src/commands/dashboard/`: export, import, diff, inspect, governance, screenshot, topology, and interactive browse/workbench flows
+- `rust/src/commands/datasource/mod.rs` plus helper modules: datasource inventory, import/export/diff, live mutation, and staged secret placeholder support
+- `rust/src/commands/alert/mod.rs` plus helper modules: alert export/import/diff/list and related support paths
+- `rust/src/commands/sync/`: staged summary, plan, review, audit, preflight, promotion-preflight, bundle-preflight, and apply workflows
+- `rust/src/common/mod.rs` and `rust/src/grafana/http.rs`: shared error, auth, JSON, and transport foundations
 
 Since the original review pass, several recommendations have already landed or
 partially landed:

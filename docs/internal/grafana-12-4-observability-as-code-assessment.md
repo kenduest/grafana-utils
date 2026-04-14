@@ -157,7 +157,7 @@ This repo already exposes multiple dashboard lanes:
 Relevant code and docs:
 
 - [README.md](../../README.md)
-- [rust/src/dashboard/cli_defs_command.rs](../../rust/src/dashboard/cli_defs_command.rs)
+- [rust/src/commands/dashboard/cli_defs_command.rs](../../rust/src/commands/dashboard/cli_defs_command.rs)
 - [docs/commands/en/dashboard-import.md](../commands/en/dashboard-import.md)
 
 Most relevant overlap:
@@ -177,8 +177,8 @@ This repo has stronger operator UX than the official Git-backed model currently 
 
 Relevant code:
 
-- [rust/src/dashboard/cli_defs_command.rs](../../rust/src/dashboard/cli_defs_command.rs)
-- [rust/src/dashboard/history.rs](../../rust/src/dashboard/history.rs)
+- [rust/src/commands/dashboard/cli_defs_command.rs](../../rust/src/commands/dashboard/cli_defs_command.rs)
+- [rust/src/commands/dashboard/history.rs](../../rust/src/commands/dashboard/history.rs)
 
 ### Staged workspace and change review
 
@@ -186,7 +186,9 @@ This repo already has a staged-input discovery and review model that spans multi
 
 Relevant code:
 
-- [rust/src/sync/guided.rs](../../rust/src/sync/guided.rs)
+- [rust/src/commands/sync/task_first.rs](../../rust/src/commands/sync/task_first.rs)
+- [rust/src/commands/sync/workspace_discovery.rs](../../rust/src/commands/sync/workspace_discovery.rs)
+- [rust/src/commands/sync/workbench.rs](../../rust/src/commands/sync/workbench.rs)
 
 This is a major differentiator. Grafana's new OaC story does not obviously provide one unified cross-resource preflight and review layer.
 
@@ -203,7 +205,7 @@ This repo already has its own alert desired-state and replay pipeline:
 
 Relevant code:
 
-- [rust/src/alert.rs](../../rust/src/alert.rs)
+- [rust/src/commands/alert/mod.rs](../../rust/src/commands/alert/mod.rs)
 
 Important caveat:
 
@@ -211,7 +213,7 @@ Important caveat:
 
 Relevant code:
 
-- [rust/src/alert_support.rs](../../rust/src/alert_support.rs)
+- [rust/src/commands/alert/support/mod.rs](../../rust/src/commands/alert/support/mod.rs)
 
 Implication:
 
@@ -970,13 +972,14 @@ This is required before adding Git Sync-aware validation or schema-v2-aware vali
 
 ### Modules to touch first
 
-- [rust/src/dashboard/files.rs](../../rust/src/dashboard/files.rs)
-- [rust/src/dashboard/import.rs](../../rust/src/dashboard/import.rs)
-- [rust/src/dashboard/import_compare.rs](../../rust/src/dashboard/import_compare.rs)
-- [rust/src/dashboard/import_validation.rs](../../rust/src/dashboard/import_validation.rs)
-- [rust/src/dashboard/browse_support.rs](../../rust/src/dashboard/browse_support.rs)
-- [rust/src/dashboard/vars.rs](../../rust/src/dashboard/vars.rs)
-- [rust/src/sync/guided.rs](../../rust/src/sync/guided.rs)
+- [rust/src/commands/dashboard/files.rs](../../rust/src/commands/dashboard/files.rs)
+- [rust/src/commands/dashboard/import.rs](../../rust/src/commands/dashboard/import.rs)
+- [rust/src/commands/dashboard/import_compare.rs](../../rust/src/commands/dashboard/import_compare.rs)
+- [rust/src/commands/dashboard/import_validation.rs](../../rust/src/commands/dashboard/import_validation.rs)
+- [rust/src/commands/dashboard/browse_support.rs](../../rust/src/commands/dashboard/browse_support.rs)
+- [rust/src/commands/dashboard/vars.rs](../../rust/src/commands/dashboard/vars.rs)
+- [rust/src/commands/sync/task_first.rs](../../rust/src/commands/sync/task_first.rs)
+- [rust/src/commands/sync/workspace_discovery.rs](../../rust/src/commands/sync/workspace_discovery.rs)
 
 ### Explicit non-goals for the first slice
 
@@ -1075,18 +1078,19 @@ This is low-value unless users explicitly ask for it.
 
 ### Dashboard
 
-- [rust/src/dashboard/cli_defs_command.rs](../../rust/src/dashboard/cli_defs_command.rs)
+- [rust/src/commands/dashboard/cli_defs_command.rs](../../rust/src/commands/dashboard/cli_defs_command.rs)
 - dashboard input-format enums and local loaders
 - dashboard validation and analyze surfaces
 
 ### Change / staged discovery
 
-- [rust/src/sync/guided.rs](../../rust/src/sync/guided.rs)
+- [rust/src/commands/sync/task_first.rs](../../rust/src/commands/sync/task_first.rs)
+- [rust/src/commands/sync/workspace_discovery.rs](../../rust/src/commands/sync/workspace_discovery.rs)
 
 ### Alert bridges
 
-- [rust/src/alert.rs](../../rust/src/alert.rs)
-- [rust/src/alert_support.rs](../../rust/src/alert_support.rs)
+- [rust/src/commands/alert/mod.rs](../../rust/src/commands/alert/mod.rs)
+- [rust/src/commands/alert/support/mod.rs](../../rust/src/commands/alert/support/mod.rs)
 
 ### Docs and positioning
 

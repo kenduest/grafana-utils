@@ -43,11 +43,11 @@ Current usable sources:
 
 Strongest current files:
 
-- `rust/src/dashboard/inspect_summary.rs`
-- `rust/src/dashboard/inspect_report.rs`
-- `rust/src/dashboard/inspect_governance*.rs`
-- `rust/src/dashboard_inspection_dependency_contract.rs`
-- `rust/src/dashboard/governance_gate*.rs`
+- `rust/src/commands/dashboard/inspect_summary.rs`
+- `rust/src/commands/dashboard/inspect_report.rs`
+- `rust/src/commands/dashboard/inspect_governance*.rs`
+- `rust/src/commands/dashboard/inspection/dependency_contract.rs`
+- `rust/src/commands/dashboard/governance_gate*.rs`
 
 ### What Already Works
 
@@ -85,11 +85,11 @@ Current usable sources:
 
 Strongest current files:
 
-- `rust/src/datasource_export_support.rs`
-- `rust/src/datasource_diff.rs`
-- `rust/src/datasource_import_export.rs`
-- `rust/src/datasource_secret.rs`
-- `rust/src/datasource_provider.rs`
+- `rust/src/commands/datasource/export/support.rs`
+- `rust/src/commands/datasource/diff/mod.rs`
+- `rust/src/commands/datasource/import_export.rs`
+- `rust/src/commands/datasource/secret/mod.rs`
+- `rust/src/commands/datasource/provider/mod.rs`
 
 ### What Already Works
 
@@ -126,8 +126,8 @@ Current usable sources:
 
 Strongest current files:
 
-- `rust/src/alert.rs`
-- `rust/src/sync/bundle_alert_contracts.rs`
+- `rust/src/commands/alert/mod.rs`
+- `rust/src/commands/sync/bundle_alert_contracts.rs`
 
 ### What Already Works
 
@@ -162,9 +162,9 @@ Current usable sources:
 
 Strongest current files:
 
-- `rust/src/access/user_workflows.rs`
-- `rust/src/access/team_import_export_diff.rs`
-- `rust/src/access/mod.rs`
+- `rust/src/commands/access/user_workflows.rs`
+- `rust/src/commands/access/team_import_export_diff.rs`
+- `rust/src/commands/access/mod.rs`
 
 ### What Already Works
 
@@ -200,11 +200,11 @@ Current usable sources:
 
 Strongest current files:
 
-- `rust/src/sync/workbench.rs`
-- `rust/src/sync/staged_documents.rs`
-- `rust/src/sync/audit.rs`
-- `rust/src/sync/preflight.rs`
-- `rust/src/sync/cli.rs`
+- `rust/src/commands/sync/workbench.rs`
+- `rust/src/commands/sync/staged_documents.rs`
+- `rust/src/commands/sync/audit.rs`
+- `rust/src/commands/sync/preflight.rs`
+- `rust/src/commands/sync/cli.rs`
 
 ### What Already Works
 
@@ -240,7 +240,7 @@ Current usable sources:
 
 Strongest current files:
 
-- `rust/src/sync/promotion_preflight.rs`
+- `rust/src/commands/sync/promotion_preflight.rs`
 
 ### What Already Works
 

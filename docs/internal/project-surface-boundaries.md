@@ -23,7 +23,7 @@ The maintained operator model is:
 
 ## Naming Boundary
 
-- Public names are the `grafana-util` command names shown by `rust/src/cli.rs`,
+- Public names are the `grafana-util` command names shown by `rust/src/cli/mod.rs`,
   `README.md`, and the user guides.
 - Internal module or contract names may remain narrower or older than the
   public names when they describe implementation slices rather than the

@@ -45,4 +45,4 @@ datasource imports and live mutation payloads.
 
 - `grafana_utils/datasource/parser.py`
 - `grafana_utils/datasource/workflows.py`
-- `rust/src/datasource.rs`
+- `rust/src/commands/datasource/mod.rs`
